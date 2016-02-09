@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+
+{% block header %}
+    <h2>Wähle Schachspiel</h2>
+{% endblock %}
+
+{% block nav %}
+    <h2 style="text-align: left; vertical-align: middle">
+        <a href="{% url 'kate:index' %}">ABBRECHEN</a>
+    </h2>
+{% endblock %}
+
+
+{% block content %}
+    <ul>
+    {% for match in matches %}
+        <li><a href="{% url 'kate:index' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}
+

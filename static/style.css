@@ -1,0 +1,163 @@
+/* CSS for all width's */
+
+* {
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+    font-family: "'Segoe UI', 'Calibri', 'Courier New'";
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 16px;
+    text-align: left;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+
+body {
+    background-color: LightBlue;
+}
+
+
+#wrapper {
+    width: 640px;
+    margin: 20px auto;
+    background-color: Beige;  
+}
+
+header {
+  padding: 10px;
+  margin: 10px 0px;
+}
+
+nav {
+  padding: 10px;
+  margin: 10px 0px;
+}
+
+#comment {
+  padding: 10px;
+  margin: 10px 0px;
+}
+
+
+#content {
+  padding: 10px;
+  margin: 10px 0px;
+}
+
+.div-table {
+    display: table;
+    border-collapse: collapse;
+}
+
+.div-row {
+    display: table-row;
+}
+
+.div-cell {	
+    display: table-cell;
+    vertical-align: top;
+    padding: 0px;
+    border-width: 0px;
+}
+
+a, a:link, a:visited, a:active, a:focus {
+    text-decoration: underline;
+    color: green;
+}
+
+a:hover {
+    color: #2F4F4F;
+}
+
+.fbold {
+    font-weight: bold !important;
+}
+
+.fitalic {
+    font-style: italic;
+    letter-spacing: 1px;
+}
+
+.bottom_line {
+    border-bottom-width: 1px;
+    border-style: solid;
+}
+
+.top_dots {
+    border-top-width: 1px;
+    border-style: dotted;
+}
+
+.right_dots {
+    border-right-width: 1px;
+    border-style: dotted;
+}
+
+.right_line {
+    border-right-width: 1px;
+    border-style: solid;
+}
+
+.bottom_dots {
+    border-bottom-width: 1px;
+    border-style: dotted;
+}
+
+.left_dots {
+    border-left-width: 1px;
+    border-style: dotted;
+}
+
+.small-gap {
+    padding-bottom: 10px;
+}
+
+.gap {
+    padding-bottom: 20px;
+}
+
+.huge-gap {
+    padding-bottom: 30px;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+table#board {
+    border-collapse: collapse;
+    background: gray;
+}
+
+table#board td {
+    width: 40px; 
+    height: 40px;
+}
+
+.marked {
+    opacity: 0.4;
+}
+
+.invisible {
+    display: none;
+}
+
+table#board img {
+    width: 40px; 
+    height: 40px;
+}
+
+tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
+    background: white;
+}
+
+
