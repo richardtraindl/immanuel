@@ -18,12 +18,13 @@
 
 
 {% block comment %}
+    <div id="comments">
     {% for comment in comments %}
         <p>{{ comment }}</p>
     {% endfor %}
+    </div>
 
     <form>
-        <label></label>
         <p><input id="new-comment" name="new_comment" value="" size="100" /></p>
         <button id ="btn-comment" type="button">send comment</button>
     </form>
@@ -104,53 +105,54 @@
 {% endif %}
 
     <script>
-        $('#board td').click(function(){
-            if( $(this).hasClass("marked") ){
-                $(this).removeClass("marked");
-                $('#prom-piece').addClass("invisible");
-                if( $('#move-dst').val().trim() == $(this).attr("id") ){
-                    $('#move-dst').val("");
-                }
-                else if( $('#move-src').val().trim() == $(this).attr("id") ){
-                    $('#move-src').val("");
-                    $('#move-dst').val("");
-                }
-            }
-            else{
-                $(this).addClass("marked");
-                var src = $('#move-src').val();
-                if(! src.trim() ){
-                    $('#move-src').val($(this).attr("id"));
+        $(document).ready(function() {
+            $('#board td').click(function(){
+                if( $(this).hasClass("marked") ){
+                    $(this).removeClass("marked");
+                    $('#prom-piece').addClass("invisible");
+                    if( $('#move-dst').val().trim() == $(this).attr("id") ){
+                        $('#move-dst').val("");
+                    }
+                    else if( $('#move-src').val().trim() == $(this).attr("id") ){
+                        $('#move-src').val("");
+                        $('#move-dst').val("");
+                    }
                 }
                 else{
-                    $('#move-dst').val($(this).attr("id"));
-                    var fieldid = $('#move-src').val();
-                    var piece = $('#' + fieldid).attr("value");
-                    if( piece == '2' ){
-                        var row = $('#move-dst').val();
-                        if( row.charAt(1) == '8' ){
-                            $('#prom-piece').removeClass("invisible");
-                            $('#prom-piece').val('wQu');
-                        }
+                    $(this).addClass("marked");
+                    var src = $('#move-src').val();
+                    if(! src.trim() ){
+                        $('#move-src').val($(this).attr("id"));
                     }
-                    else if( piece == '10' ){
-                        var row = $('#move-dst').val();
-                        if( row.charAt(1) == '1' ){
-                            $('#prom-piece').removeClass("invisible");
-                            $('#prom-piece').val('bQu');
+                    else{
+                        $('#move-dst').val($(this).attr("id"));
+                        var fieldid = $('#move-src').val();
+                        var piece = $('#' + fieldid).attr("value");
+                        if( piece == '2' ){
+                            var row = $('#move-dst').val();
+                            if( row.charAt(1) == '8' ){
+                                $('#prom-piece').removeClass("invisible");
+                                $('#prom-piece').val('wQu');
+                            }
+                        }
+                        else if( piece == '10' ){
+                            var row = $('#move-dst').val();
+                            if( row.charAt(1) == '1' ){
+                                $('#prom-piece').removeClass("invisible");
+                                $('#prom-piece').val('bQu');
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
         
-        $('#btn-comment').click(function(){
-            var newcomment;
-            newcomment = $('#new-comment').val();
-            $.get('/kate/new_comment/', {newcomment: newcomment}, function(data){
-               $('#new-comment').html(data);
-               $('#likes').hide();
-           });
-});
+            $('#btn-comment').click(function(){
+                var newcomment;
+                newcomment = $('#new-comment').val();
+                $.get('/kate/new_comment/', { newcomment: newcomment }, function(data){
+                   $('#comments').html(data);
+               });
+            });
+        });
     </script>
 {% endblock %}
