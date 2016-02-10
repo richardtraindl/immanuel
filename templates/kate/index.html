@@ -18,7 +18,15 @@
 
 
 {% block comment %}
-    <p>Das ist erst der Anfang...</p>
+    {% for comment in comments %}
+        <p>{{ comment }}</p>
+    {% endfor %}
+
+    <form>
+        <label></label>
+        <p><input id="new-comment" name="new_comment" value="" size="100" /></p>
+        <button id ="btn-comment" type="button">send comment</button>
+    </form>
 {% endblock %}
 
 
@@ -135,5 +143,14 @@
                 }
             }
         });
+        
+        $('#btn-comment').click(function(){
+            var newcomment;
+            newcomment = $('#new-comment').val();
+            $.get('/kate/new_comment/', {newcomment: newcomment}, function(data){
+               $('#new-comment').html(data);
+               $('#likes').hide();
+           });
+});
     </script>
 {% endblock %}
