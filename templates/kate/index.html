@@ -149,7 +149,7 @@
             $('#btn-comment').click(function(){
                 var newcomment;
                 newcomment = $('#new-comment').val();
-                $.get('/kate/new_comment/', { newcomment: newcomment }, function(data){
+                $.get('/kate/add_comment/', { newcomment: newcomment }, function(data){
                    $('#comments').html(data);
                });
             });
