@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^load/$', views.load, name='load'),
     url(r'^move/(?P<matchid>[0-9]+)/$', views.move, name='move'),
     url(r'^undomove/(?P<matchid>\w+)/$', views.undo_move, name='undomove'),
+    url(r'^addcomment/(?P<newcomment>\w+)/$', views.add_comment, name='addcomment'),
 ]
