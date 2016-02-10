@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from kate.models import Match, Move
+from kate.models import Match, Move, Comment
 from kate.modules import values, rules
 
 def index(request, matchid=None):
@@ -40,7 +40,7 @@ def index(request, matchid=None):
         if(len(moves) % 2 == 1):
             fmtmoves.append("<td>&nbsp;</td></tr>")
 
-        comments = Comment.objects.filter().order_by("created_at")[:5]
+    comments = Comment.objects.filter().order_by("created_at").reverse()[:5]
 
     return render(request, 'kate/index.html', {'match': match, 'board': board, 'fmtmoves': fmtmoves, 'comments': comments, } )
 
@@ -99,19 +99,32 @@ def undo_move(request, matchid):
     return HttpResponseRedirect(reverse('kate:index', args=(match.id,)))
 
 
-def add_comment(request, newcomment):
+def add_comment(request):
     context = RequestContext(request)
 
-    comments = Comment.objects.filter().order_by("created_at")
+    newcomment = request.GET['newcomment']
+    print(": " + newcomment)
     if(len(newcomment) > 0):
-        comments.append(newcomment)
-        comments.save()
+        comment = Comment()
+        comment.text = newcomment
+        comment.save()
 
-    return HttpResponse(comments[:5])
+    comments = Comment.objects.filter().order_by("created_at").reverse()[:5]
+    data = ""
+    for comment in reversed(comments):
+        data += "<p>" + comment.text + "</p>"
+
+    return HttpResponse(data)
 
 
 def retrieve_comments(request):
     context = RequestContext(request)
 
-    comments = Comment.objects.filter().order_by("created_at")[:5]
-    return HttpResponse(comments)
+    comments = Comment.objects.filter().order_by("created_at").reverse()[:5]
+    data = ""
+    for comment in reversed(comments):
+        data += "<p>" + comment.text + "</p>"
+
+    return HttpResponse(data)
+
+

@@ -5,7 +5,7 @@
 
             <meta charset="utf-8">
 
-            <link rel="stylesheet" type="text/css" href="{% static ''responding.css' %}">
+            <link rel="stylesheet" type="text/css" href="{% static 'responding.css' %}">
 
             <script src="{% static 'jquery-1.11.1.min.js' %}"></script>
 
@@ -15,22 +15,22 @@
         </head>
         <body id="{{body_id}}">
             <div id="wrapper">
-                <header>
+                <header class="grid">
                     {% block header %}
                     {% endblock %}
                 </header>
 
-                <nav>
+                <nav class="grid">
                     {% block nav %}
                     {% endblock %}
                 </nav>
 
-                <div id="comments">
-                    {% block comment %}
+                <div id="chat" class="grid">
+                    {% block chat %}
                     {% endblock %}
                 </div>
 
-                <div id="content">
+                <div id="content" class="grid">
                     {% block content %}
                     {% endblock %}
                 </div>

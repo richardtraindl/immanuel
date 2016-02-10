@@ -5,103 +5,116 @@
 
 
 {% block header %}
-    <h2>Schachspiel &nbsp; {{ match.begin }}</h2>
+    <div class="row_12_of_12">
+        <h2>Schachspiel &nbsp; {{ match.begin }}</h2>
+    </div>
 {% endblock %}
 
 {% block nav %}
-    <h2 style="text-align: left; vertical-align: middle">
-        <a href="{% url 'kate:new' %}">NEUES SPIEL</a> |
-        <a href="{% url 'kate:load' %}">SPIEL LADEN</a> |
-        <a href="{% url 'kate:undomove' match.id %}">ZUG RÜCKNEHMEN</a>
-    </h2>
+    <div class="row_12_of_12">
+        <h2 style="text-align: left; vertical-align: middle">
+            <a href="{% url 'kate:new' %}">NEUES SPIEL</a> |
+            <a href="{% url 'kate:load' %}">SPIEL LADEN</a> |
+            <a href="{% url 'kate:undomove' match.id %}">ZUG RÜCKNEHMEN</a>
+        </h2>
+    </div>
 {% endblock %}
 
 
-{% block comment %}
-    <div id="comments">
-    {% for comment in comments %}
-        <p>{{ comment }}</p>
-    {% endfor %}
-    </div>
+{% block chat %}
+    <div class="row_12_of_12">
+        <div id="comments">
+        {% for comment in comments reversed %}
+            <p>{{ comment.text }} ccc</p>
+        {% endfor %}
+        </div>
 
-    <form>
-        <p><input id="new-comment" name="new_comment" value="" size="100" /></p>
-        <button id ="btn-comment" type="button">send comment</button>
-    </form>
+        <form>
+            <input id="new-comment" name="new_comment" value="" size="100" />
+            <button id ="btn-comment" type="button">send comment</button>
+        </form>
+    </div>
 {% endblock %}
 
 
 {% block content %}
     {% if match.id != None %}
-        <table>
-            <tr>
-                <td>
-                    {% if match.white_player == None %}
-                        &nbsp;
-                    {% else %}
-                        {{ match.white_player }}
-                    {% endif %}
-                </td>
-                <td style="width: 10px; text-align: center;">
-                    :
-                </td>
-                <td>
-                    {% if match.black_player == None %}
-                        &nbsp;
-                    {% else %}
-                        {{ match.black_player }}
-                    {% endif %}
-                </td>
-            </tr>
-        </table>
+        <div class="row_12_of_12">
+            <table>
+                <tr>
+                    <td>
+                        {% if match.white_player == None %}
+                            &nbsp;
+                        {% else %}
+                            {{ match.white_player }}
+                        {% endif %}
+                    </td>
+                    <td style="width: 10px; text-align: center;">
+                        :
+                    </td>
+                    <td>
+                        {% if match.black_player == None %}
+                            &nbsp;
+                        {% else %}
+                            {{ match.black_player }}
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
     {% endif %}
 
     <div class="gap"></div>
 
-    <table id="board">
-    {% for row in board reversed %}
-        <tr>
-        {% for col in row %}
-            <td id="{{ col.1 }}" value="{{ col.0 }}">
-            {% if col.0 == 0 %}
-                &nbsp;
-            {% else %}
-                <img src="{% static col.0|imgsrc %}">
-            {% endif %}
-            </td>
+    <div class="row_7_of_12">
+        <table id="board">
+        {% for row in board reversed %}
+            <tr>
+            {% for col in row %}
+                <td id="{{ col.1 }}" value="{{ col.0 }}">
+                {% if col.0 == 0 %}
+                    &nbsp;
+                {% else %}
+                    <img src="{% static col.0|imgsrc %}">
+                {% endif %}
+                </td>
+            {% endfor %}
+            </tr>
         {% endfor %}
-        </tr>
-    {% endfor %}
-    </table>
+        </table>
+    </div>
 
-    <table id="moves">
-    {% for col in fmtmoves %}
-        {{ col|safe }}
-    {% endfor %}
-    </table>
-
+    <div class="row_5_of_12">
+        <table id="moves">
+        {% for col in fmtmoves %}
+            {{ col|safe }}
+        {% endfor %}
+        </table>
+    </div>
 
 {% if match.id != None %}
-    <form id="move" method="post" action="{% url 'kate:move' match.id %}">
-        {% csrf_token %}
-        <table>
-            <tr>
-                <td>
-                    <input type="hidden" name="match" value="{{match.id}}" style="height: 0px" />
-                    <input id="move-src" type="text" name="move_src" value="" size="5" />
-                </td>
-                <td>
-                    <input id="move-dst" type="text" name="move_dst" value="" size="5" />
-                </td>
-                <td>
-                    <input id="prom-piece" type="text" name="prom_piece" value="blk" size="5" class="invisible" />
-                </td>
-                <td>
-                    <input type="submit" value="ziehen" />
-                </td>
-            </tr>
-        </table>
-    </form>
+    <div class="row_12_of_12">
+        <form id="move" method="post" action="{% url 'kate:move' match.id %}">
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>
+                        <input type="hidden" name="match" value="{{match.id}}" style="height: 0px" />
+                        <input id="move-src" type="text" name="move_src" value="" size="5" />
+                    </td>
+                    <td>
+                        <input id="move-dst" type="text" name="move_dst" value="" size="5" />
+                    </td>
+                    <td>
+                        <input id="prom-piece" type="text" name="prom_piece" value="blk" size="5" class="invisible" />
+                    </td>
+                    <td>
+                        <input type="submit" value="ziehen" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
 {% endif %}
 
     <script>
@@ -149,7 +162,7 @@
             $('#btn-comment').click(function(){
                 var newcomment;
                 newcomment = $('#new-comment').val();
-                $.get('/kate/add_comment/', { newcomment: newcomment }, function(data){
+                $.get('/kate/addcomment', { newcomment: newcomment }, function(data){
                    $('#comments').html(data);
                });
             });
