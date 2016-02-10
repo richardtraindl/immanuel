@@ -40,7 +40,9 @@ def index(request, matchid=None):
         if(len(moves) % 2 == 1):
             fmtmoves.append("<td>&nbsp;</td></tr>")
 
-    return render(request, 'kate/index.html', {'match': match, 'board': board, 'fmtmoves': fmtmoves, } )
+        comments = Comment.objects.filter().order_by("created_at")[:5]
+
+    return render(request, 'kate/index.html', {'match': match, 'board': board, 'fmtmoves': fmtmoves, 'comments': comments, } )
 
 
 def new(request):
@@ -97,4 +99,19 @@ def undo_move(request, matchid):
     return HttpResponseRedirect(reverse('kate:index', args=(match.id,)))
 
 
+def add_comment(request, newcomment):
+    context = RequestContext(request)
 
+    comments = Comment.objects.filter().order_by("created_at")
+    if(len(newcomment) > 0):
+        comments.append(newcomment)
+        comments.save()
+
+    return HttpResponse(comments[:5])
+
+
+def retrieve_comments(request):
+    context = RequestContext(request)
+
+    comments = Comment.objects.filter().order_by("created_at")[:5]
+    return HttpResponse(comments)
