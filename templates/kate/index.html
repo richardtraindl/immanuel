@@ -1,171 +1,24 @@
 {% extends "base.html" %}
 
 {% load staticfiles %}
-{% load kate_extras %}
 
 
 {% block header %}
-    <div class="row_12_of_12">
-        <h2>Schachspiel &nbsp; {{ match.begin }}</h2>
-    </div>
+    <h2>Wähle Schachspiel</h2>
 {% endblock %}
 
 {% block nav %}
-    <div class="row_12_of_12">
-        <h2 style="text-align: left; vertical-align: middle">
-            <a href="{% url 'kate:new' %}">NEUES SPIEL</a> |
-            <a href="{% url 'kate:load' %}">SPIEL LADEN</a> |
-            <a href="{% url 'kate:undomove' match.id %}">ZUG RÜCKNEHMEN</a>
-        </h2>
-    </div>
-{% endblock %}
-
-
-{% block chat %}
-    <div class="row_12_of_12">
-        <div id="comments">
-        {% for comment in comments reversed %}
-            <p>{{ comment.text }} ccc</p>
-        {% endfor %}
-        </div>
-
-        <form>
-            <input id="new-comment" name="new_comment" value="" size="100" />
-            <button id ="btn-comment" type="button">send comment</button>
-        </form>
-    </div>
+    <h2 style="text-align: left; vertical-align: middle">
+        <a href="{% url 'kate:new' %}">NEUES SPIEL</a>
+    </h2>
 {% endblock %}
 
 
 {% block content %}
-    {% if match.id != None %}
-        <div class="row_12_of_12">
-            <table>
-                <tr>
-                    <td>
-                        {% if match.white_player == None %}
-                            &nbsp;
-                        {% else %}
-                            {{ match.white_player }}
-                        {% endif %}
-                    </td>
-                    <td style="width: 10px; text-align: center;">
-                        :
-                    </td>
-                    <td>
-                        {% if match.black_player == None %}
-                            &nbsp;
-                        {% else %}
-                            {{ match.black_player }}
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>
-        </div>
-    {% endif %}
-
-    <div class="gap"></div>
-
-    <div class="row_7_of_12">
-        <table id="board">
-        {% for row in board reversed %}
-            <tr>
-            {% for col in row %}
-                <td id="{{ col.1 }}" value="{{ col.0 }}">
-                {% if col.0 == 0 %}
-                    &nbsp;
-                {% else %}
-                    <img src="{% static col.0|imgsrc %}">
-                {% endif %}
-                </td>
-            {% endfor %}
-            </tr>
-        {% endfor %}
-        </table>
-    </div>
-
-    <div class="row_5_of_12">
-        <table id="moves">
-        {% for col in fmtmoves %}
-            {{ col|safe }}
-        {% endfor %}
-        </table>
-    </div>
-
-{% if match.id != None %}
-    <div class="row_12_of_12">
-        <form id="move" method="post" action="{% url 'kate:move' match.id %}">
-            {% csrf_token %}
-            <table>
-                <tr>
-                    <td>
-                        <input type="hidden" name="match" value="{{match.id}}" style="height: 0px" />
-                        <input id="move-src" type="text" name="move_src" value="" size="5" />
-                    </td>
-                    <td>
-                        <input id="move-dst" type="text" name="move_dst" value="" size="5" />
-                    </td>
-                    <td>
-                        <input id="prom-piece" type="text" name="prom_piece" value="blk" size="5" class="invisible" />
-                    </td>
-                    <td>
-                        <input type="submit" value="ziehen" />
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
-{% endif %}
-
-    <script>
-        $(document).ready(function() {
-            $('#board td').click(function(){
-                if( $(this).hasClass("marked") ){
-                    $(this).removeClass("marked");
-                    $('#prom-piece').addClass("invisible");
-                    if( $('#move-dst').val().trim() == $(this).attr("id") ){
-                        $('#move-dst').val("");
-                    }
-                    else if( $('#move-src').val().trim() == $(this).attr("id") ){
-                        $('#move-src').val("");
-                        $('#move-dst').val("");
-                    }
-                }
-                else{
-                    $(this).addClass("marked");
-                    var src = $('#move-src').val();
-                    if(! src.trim() ){
-                        $('#move-src').val($(this).attr("id"));
-                    }
-                    else{
-                        $('#move-dst').val($(this).attr("id"));
-                        var fieldid = $('#move-src').val();
-                        var piece = $('#' + fieldid).attr("value");
-                        if( piece == '2' ){
-                            var row = $('#move-dst').val();
-                            if( row.charAt(1) == '8' ){
-                                $('#prom-piece').removeClass("invisible");
-                                $('#prom-piece').val('wQu');
-                            }
-                        }
-                        else if( piece == '10' ){
-                            var row = $('#move-dst').val();
-                            if( row.charAt(1) == '1' ){
-                                $('#prom-piece').removeClass("invisible");
-                                $('#prom-piece').val('bQu');
-                            }
-                        }
-                    }
-                }
-            });
-        
-            $('#btn-comment').click(function(){
-                var newcomment;
-                newcomment = $('#new-comment').val();
-                $.get('/kate/addcomment', { newcomment: newcomment }, function(data){
-                   $('#comments').html(data);
-               });
-            });
-        });
-    </script>
+    <ul>
+    {% for match in matches %}
+        <li><a href="{% url 'kate:match' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a></li>
+    {% endfor %}
+    </ul>
 {% endblock %}
+
