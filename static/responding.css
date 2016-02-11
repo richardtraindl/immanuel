@@ -7,6 +7,22 @@
     font-size: 16px;
 }
 
+.clearfix {
+    clear: both;
+}
+
+.fbold {
+    font-weight: bold;
+}
+
+.marked {
+    opacity: 0.4;
+}
+
+.invisible {
+    display: none;
+}
+
 html {
     overflow: -moz-scrollbars-vertical;
     overflow: scroll;
@@ -25,9 +41,9 @@ h2 {
     font-size: 20px;
 }
 
-p, figure {
+p {
     margin: 0px 0px 0px 0px;
-    padding: 0px 0px 30px 0px;
+    padding: 0px 20px 0px 20px;
 }
 
 a, a:link, a:visited, a:active {
@@ -51,8 +67,7 @@ img {
     box-sizing: border-box;
     display: inline-block;
     float: left;
-    width: 40%;
-    padding: 0px 5px 5px 5px;
+    padding: 0px;
 }
 
 #wrapper {
@@ -76,7 +91,7 @@ header h1 {
 }
 
 header .grid {
-    padding: 0px 0px 00px 0px;
+    padding: 0px 0px 0px 0px;
 }
 
 nav {
@@ -107,44 +122,43 @@ nav li a:hover{
     color: darkgrey;
 }
 
-.clearfix {
+#chat {
     clear: both;
+    padding: 10px;
+    margin: 10px 0px;
+    min-height: 80px;
+    max-height: 80px;
 }
 
-#comment {
+#chat p {
+    margin: 0px;
+    padding: 4px;
+}
+
+#content {
     clear: both;
     padding: 10px;
     margin: 10px 0px;
 }
 
-#contents {
-    clear: both;
-    padding: 10px;
-    margin: 10px 0px;
+table#board {
+    border-collapse: collapse;
+    background: gray;
 }
 
-article {
-    margin: 10px 0px 10px 0px;
-    text-align: justify;
+table#board td {
+    width: 40px; 
+    height: 40px;
 }
 
-article h1,
-article h2,
-article h3 {
-    text-align: center;
-    padding: 10px 10px 20px 10px;    
-    margin: 10px 10px 10px 10px;
+table#board img {
+    width: 40px; 
+    height: 40px;
 }
 
-.fbold {
-    font-weight: bold;
+tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
+    background: white;
 }
-
-.div-3cols {
-    -webkit-column-count: 3; /* Chrome, Safari, Opera */
-    -moz-column-count: 3; /* Firefox */
-    column-count: 3;
-} 
 
 .grid {
     width: 100%;
@@ -246,31 +260,4 @@ div[class*='row_'] {
         max-width: 99%;
         padding: 10px;
     }
-}
-
-table#board {
-    border-collapse: collapse;
-    background: gray;
-}
-
-table#board td {
-    width: 40px; 
-    height: 40px;
-}
-
-.marked {
-    opacity: 0.4;
-}
-
-.invisible {
-    display: none;
-}
-
-table#board img {
-    width: 40px; 
-    height: 40px;
-}
-
-tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
-    background: white;
 }
