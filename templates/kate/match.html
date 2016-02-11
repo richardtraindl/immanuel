@@ -167,6 +167,12 @@
                });
                $('#input-comment').val("");
             });
+        
+            setInterval(function() {
+                $.get('/kate/fetchcomments', { }, function(data){
+                   $('#comments').html(data);
+                });
+            }, 5000); //5 seconds
         });
     </script>
 {% endblock %}
