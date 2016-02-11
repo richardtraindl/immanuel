@@ -28,9 +28,13 @@ html {
     overflow: scroll;
 }
 
+body {
+    background-color: white;
+}
+
 h1, h2, h3 {
-    margin: 0px 0px 0px 0px;
-    padding: 10px 0px 10px 0px;
+    margin: 0px;
+    padding: 10px;
 }
 
 h1 {
@@ -42,8 +46,8 @@ h2 {
 }
 
 p {
-    margin: 0px 0px 0px 0px;
-    padding: 0px 20px 0px 20px;
+    margin: 0px;
+    padding: 10px;
 }
 
 a, a:link, a:visited, a:active {
@@ -71,21 +75,22 @@ img {
 }
 
 #wrapper {
-    margin: 20px auto;
-    padding: 10px;
-    width: 840px;
+    margin: 0px auto;
+    padding: 0px;
+    width: 680px;
     max-width: 90%;
     min-width: 320px;
-    background-color: Beige; 
+    background-color: #FF8C69;
 }
 
 header {
     padding: 10px;
-    margin: 10px 0px;
+    margin: 0px;
+    background-color: lightgrey;
 }
 
 header h1 {
-    padding: 60px 10px 10px 10px;
+    padding: 10px 10px 10px 10px;
     font-size: 28px;
     text-align: left;
 }
@@ -95,8 +100,9 @@ header .grid {
 }
 
 nav {
-    padding: 10px;
+    padding: 0px;
     margin: 10px 0px;
+    background-color: lightblue;
 }
 
 nav ul {
@@ -126,9 +132,15 @@ nav li a:hover{
     clear: both;
     padding: 10px;
     margin: 10px 0px;
-    min-height: 80px;
-    max-height: 80px;
+    background: beige;
 }
+
+#comments{
+    min-height: 140px;
+    max-height: 140px;
+    overflow-y: auto;
+}
+
 
 #chat p {
     margin: 0px;
@@ -138,7 +150,8 @@ nav li a:hover{
 #content {
     clear: both;
     padding: 10px;
-    margin: 10px 0px;
+    margin: 0px;
+    background-color: #FFFFBB;
 }
 
 table#board {
@@ -147,16 +160,16 @@ table#board {
 }
 
 table#board td {
-    width: 40px; 
-    height: 40px;
+    width: 48px; 
+    height: 48px;
 }
 
 table#board img {
-    width: 40px; 
-    height: 40px;
+    width: 48px; 
+    height: 48px;
 }
 
-tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
+#board tr:nth-child(odd) td:nth-child(even), #board tr:nth-child(even) td:nth-child(odd) {
     background: white;
 }
 
@@ -168,7 +181,7 @@ tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
     flex-wrap: wrap;
     flex-direction: row;
     box-sizing: border-box;
-    padding: 0px 0px 20px 0px;
+    padding: 0px 0px 0px 0px;
 }
 
 .grid * {
@@ -229,19 +242,7 @@ div[class*='row_'] {
     width: 7.33%;
 }
 
-@media only screen and (max-width: 639px) {
-    header, header * {
-        display: inline-block;
-        text-align: center;
-    }
-    nav li {
-        clear: both;
-        margin-bottom: 1px;
-        display: inline-block;
-    }
-}
-
-@media only screen and (max-width: 419px) {
+@media only screen and (max-width: 679px) {
     header, header * {
         display: inline-block;
         text-align: center;
@@ -253,11 +254,5 @@ div[class*='row_'] {
     }
     div[class*='row_'] {
         width: 99%; 
-    }
-    img {
-        display: block;
-        width: 99%;
-        max-width: 99%;
-        padding: 10px;
     }
 }

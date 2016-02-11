@@ -6,7 +6,8 @@
 
 {% block header %}
     <div class="row_12_of_12">
-        <h2>Schachspiel &nbsp; {{ match.begin }}</h2>
+        <h1>Schachspiel</h1>
+        <p> {{ match.white_player }} &nbsp; versus &nbsp; {{ match.black_player }}, &nbsp; {{ match.begin }}</p>
     </div>
 {% endblock %}
 
@@ -25,48 +26,24 @@
     <div class="row_12_of_12">
         <div id="comments">
         {% for comment in comments reversed %}
-            <p>{{ comment.text }} ccc</p>
+            <p>{{ comment.text }}</p>
         {% endfor %}
         </div>
 
         <form>
-            <input id="input-comment" name="input_comment" value="" size="100" />
-            <button id ="btn-comment" type="button">send comment</button>
+            <p style="padding: 5px; 0px">
+                <input id="input-comment" name="input_comment" value="" size="60" />
+            </p>
+            <p>
+                <button id ="btn-comment" type="button">send comment</button>
+            </p>
         </form>
     </div>
 {% endblock %}
 
 
 {% block content %}
-    {% if match.id != None %}
-        <div class="row_12_of_12">
-            <table>
-                <tr>
-                    <td>
-                        {% if match.white_player == None %}
-                            &nbsp;
-                        {% else %}
-                            {{ match.white_player }}
-                        {% endif %}
-                    </td>
-                    <td style="width: 10px; text-align: center;">
-                        :
-                    </td>
-                    <td>
-                        {% if match.black_player == None %}
-                            &nbsp;
-                        {% else %}
-                            {{ match.black_player }}
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>
-        </div>
-    {% endif %}
-
-    <div class="gap"></div>
-
-    <div class="row_7_of_12">
+    <div class="row_8_of_12">
         <table id="board">
         {% for row in board reversed %}
             <tr>
@@ -84,8 +61,13 @@
         </table>
     </div>
 
-    <div class="row_5_of_12">
+    <div class="row_4_of_12">
         <table id="moves">
+            <tr>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td>{{ match.white_player }}&nbsp;&nbsp;:</td>
+                <td>&nbsp;&nbsp;{{ match.black_player }}</td>
+            </tr>
         {% for col in fmtmoves %}
             {{ col|safe }}
         {% endfor %}
