@@ -24,9 +24,9 @@ body {
     background-color: white;
 }
 
-h1, h2, h3 {
+h1, h2 {
     margin: 0px;
-    padding: 10px;
+    padding: 0px;
 }
 
 h1 {
@@ -39,16 +39,12 @@ h2 {
 
 p {
     margin: 0px;
-    padding: 10px;
+    padding: 0px;
 }
 
 a, a:link, a:visited, a:active {
-    color: black;
+    color: #0000CD;
     text-decoration: underline;
-}
-
-a:hover{
-    color: darkgrey;
 }
 
 ul {
@@ -76,13 +72,13 @@ img {
 }
 
 header {
-    padding: 10px;
+    padding: 0px;
     margin: 0px;
     background-color: lightgrey;
 }
 
 header h1 {
-    padding: 10px 10px 10px 10px;
+    padding: 0px;
     font-size: 28px;
     text-align: left;
 }
@@ -93,7 +89,7 @@ header .grid {
 
 nav {
     padding: 0px;
-    margin: 10px 0px;
+    margin: 0px;
     background-color: lightblue;
 }
 
@@ -102,8 +98,8 @@ nav ul {
 }
 
 nav li {
-    margin: 0px 0px 0px 0px;
-    padding: 10px 10px 10px 10px;
+    margin: 0px;
+    padding: 0px;
     float: left;
     display: inline-block;
 }
@@ -112,18 +108,14 @@ nav li a,
 nav li a:link, 
 nav li a:visited,
 nav li a:active {
-    color: black;
+    color: #0000CD;
     text-decoration: none;
-}
-
-nav li a:hover{
-    color: darkgrey;
 }
 
 #chat {
     clear: both;
-    padding: 10px;
-    margin: 10px 0px;
+    padding: 0px;
+    margin: 0px;
     background: beige;
 }
 
@@ -136,12 +128,12 @@ nav li a:hover{
 
 #chat p {
     margin: 0px;
-    padding: 4px;
+    padding: 10px;
 }
 
 #content {
     clear: both;
-    padding: 10px;
+    padding: 0px;
     margin: 0px;
     background-color: #FFFFBB;
 }
