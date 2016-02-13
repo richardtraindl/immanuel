@@ -6,3 +6,7 @@
 
 *.pyc
 *.geany
+db.sqlite3
+venv
+__pycache__
+local_settings.py
