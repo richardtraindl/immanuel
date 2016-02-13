@@ -5,99 +5,110 @@
 
 
 {% block header %}
-    <div class="row_12_of_12">
-        <h1>Schachspiel</h1>
-        <p> {{ match.white_player }} &nbsp; versus &nbsp; {{ match.black_player }}, &nbsp; {{ match.begin }}</p>
+    <div class="grid">
+        <div class="row_12_of_12">
+            <h1>Schachspiel</h1>
+            <p> {{ match.white_player }} &nbsp; versus &nbsp; {{ match.black_player }}, &nbsp; {{ match.begin }}</p>
+        </div>
     </div>
 {% endblock %}
 
+
 {% block nav %}
-    <div class="row_12_of_12">
-        <h2 style="text-align: left; vertical-align: middle">
-            <a href="{% url 'kate:new' %}">NEUES SPIEL</a> |
-            <a href="{% url 'kate:index' %}">SPIEL LADEN</a> |
-            <a href="{% url 'kate:undomove' match.id %}">ZUG RÜCKNEHMEN</a>
-        </h2>
+    <div class="grid">
+        <div class="row_12_of_12">
+            <h2>
+                <a href="{% url 'kate:new' %}">NEUES SPIEL</a> |
+                <a href="{% url 'kate:index' %}">SPIEL LADEN</a> |
+                <a href="{% url 'kate:undomove' match.id %}">ZUG RÜCKNEHMEN</a>
+            </h2>
+        </div>
     </div>
 {% endblock %}
 
 
 {% block chat %}
-    <div class="row_12_of_12">
-        <div id="comments">
-        {% for comment in comments reversed %}
-            <p>{{ comment.text }}</p>
-        {% endfor %}
-        </div>
+    <div class="grid">
+        <div class="row_12_of_12">
+            <div id="comments">
+            {% for comment in comments reversed %}
+                <p>{{ comment.text }}</p>
+            {% endfor %}
+            </div>
 
-        <form>
-            <p style="padding: 5px; 0px">
-                <input id="input-comment" name="input_comment" value="" size="60" />
-            </p>
-            <p>
-                <button id ="btn-comment" type="button">send comment</button>
-            </p>
-        </form>
+            <form>
+                <p>
+                    <input id="input-comment" name="input_comment" value="" size="60" />
+                </p>
+                <p>
+                    <button id ="btn-comment" type="button">send comment</button>
+                </p>
+            </form>
+        </div>
     </div>
 {% endblock %}
 
 
 {% block content %}
-    <div class="row_8_of_12">
-        <table id="board">
-        {% for row in board reversed %}
-            <tr>
-            {% for col in row %}
-                <td id="{{ col.1 }}" value="{{ col.0 }}">
-                {% if col.0 == 0 %}
-                    &nbsp;
-                {% else %}
-                    <img src="{% static col.0|imgsrc %}">
-                {% endif %}
-                </td>
-            {% endfor %}
-            </tr>
-        {% endfor %}
-        </table>
-    </div>
-
-    <div class="row_4_of_12">
-        <table id="moves">
-            <tr>
-                <td>&nbsp;&nbsp;&nbsp;</td>
-                <td>{{ match.white_player }}&nbsp;&nbsp;:</td>
-                <td>&nbsp;&nbsp;{{ match.black_player }}</td>
-            </tr>
-        {% for col in fmtmoves %}
-            {{ col|safe }}
-        {% endfor %}
-        </table>
-    </div>
-
-{% if match.id != None %}
-    <div class="row_12_of_12">
-        <form id="move" method="post" action="{% url 'kate:domove' match.id %}">
-            {% csrf_token %}
-            <table>
+    <div class="grid">
+        <div class="row_8_of_12">
+            <table id="board">
+            {% for row in board reversed %}
                 <tr>
-                    <td>
-                        <input type="hidden" name="match" value="{{match.id}}" style="height: 0px" />
-                        <input id="move-src" type="text" name="move_src" value="" size="5" />
+                {% for col in row %}
+                    <td id="{{ col.1 }}" value="{{ col.0 }}">
+                    {% if col.0 == 0 %}
+                        &nbsp;
+                    {% else %}
+                        <img src="{% static col.0|imgsrc %}">
+                    {% endif %}
                     </td>
-                    <td>
-                        <input id="move-dst" type="text" name="move_dst" value="" size="5" />
-                    </td>
-                    <td>
-                        <input id="prom-piece" type="text" name="prom_piece" value="blk" size="5" class="invisible" />
-                    </td>
-                    <td>
-                        <input type="submit" value="ziehen" />
-                    </td>
+                {% endfor %}
                 </tr>
+            {% endfor %}
             </table>
-        </form>
+
+
+
+        </div>
+
+        <div class="row_4_of_12">
+            <table id="moves">
+                <tr>
+                    <td>&nbsp;&nbsp;&nbsp;</td>
+                    <td>{{ match.white_player }}&nbsp;&nbsp;:</td>
+                    <td>&nbsp;&nbsp;{{ match.black_player }}</td>
+                </tr>
+            {% for col in fmtmoves %}
+                {{ col|safe }}
+            {% endfor %}
+            </table>
+        </div>
     </div>
-{% endif %}
+
+    <div class="grid">
+        <div class="row_12_of_12">
+            <form id="move" method="post" action="{% url 'kate:domove' match.id %}">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <td>
+                            <input id="move-src" type="text" name="move_src" value="" size="5" />
+                        </td>
+                        <td>
+                            <input id="move-dst" type="text" name="move_dst" value="" size="5" />
+                        </td>
+                        <td>
+                            <input id="prom-piece" type="text" name="prom_piece" value="blk" size="5" class="invisible" />
+                        </td>
+                        <td>
+                            <input type="submit" value="ziehen" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
 
     <script>
         $(document).ready(function() {

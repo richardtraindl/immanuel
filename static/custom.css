@@ -68,11 +68,10 @@ img {
     width: 680px;
     max-width: 90%;
     min-width: 320px;
-    background-color: #FF8C69;
 }
 
 header {
-    padding: 0px;
+    padding: 10px;
     margin: 0px;
     background-color: lightgrey;
 }
@@ -83,12 +82,8 @@ header h1 {
     text-align: left;
 }
 
-header .grid {
-    padding: 0px 0px 0px 0px;
-}
-
 nav {
-    padding: 0px;
+    padding: 10px;
     margin: 0px;
     background-color: lightblue;
 }
@@ -114,9 +109,15 @@ nav li a:active {
 
 #chat {
     clear: both;
-    padding: 0px;
+    padding: 10px;
     margin: 0px;
-    background: beige;
+    background-color: #FFDEAD;
+    // background-color: beige;
+}
+
+#chat p {
+    margin: 0px;
+    padding: 0px;
 }
 
 #comments{
@@ -125,17 +126,11 @@ nav li a:active {
     overflow-y: auto;
 }
 
-
-#chat p {
-    margin: 0px;
-    padding: 10px;
-}
-
 #content {
     clear: both;
-    padding: 0px;
+    padding: 10px;
     margin: 0px;
-    background-color: #FFFFBB;
+    background-color: #FF8C69;
 }
 
 table#board {

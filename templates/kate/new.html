@@ -4,44 +4,57 @@
 
 
 {% block header %}
-    <h2>Neues Schachspiel</h2>
+    <div class="grid">
+        <div class="row_12_of_12">
+            <h2>Neues Schachspiel</h2>
+        </div>
+    </div>
 {% endblock %}
 
+
 {% block nav %}
-    <h2 style="text-align: left; vertical-align: middle">
-        <a href="{% url 'kate:index' %}">ABBRECHEN</a>
-    </h2>
+    <div class="grid">
+        <div class="row_12_of_12">
+            <h2>
+                <a href="{% url 'kate:index' %}">ABBRECHEN</a>
+            </h2>
+        </div>
+    </div>
 {% endblock %}
 
 
 {% block content %}
-    <form id="new" method="post" action="{% url 'kate:create' %}">
-        {% csrf_token %}
-        <table>
-            <tr>
-                <td>
-                    Weisser Spieler: &nbsp;
-                </td>
-                <td>
-                    <input type="text" name="white_player" value="" size="20" />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Schwarzer Spieler: &nbsp;
-                </td>
-                <td>
-                    <input type="text" name="black_player" value="" size="20" />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    &nbsp;
-                </td>
-                <td>
-                    <input type="submit" value="submit" />
-                </td>
-            </tr>
-        </table>
-    </form>
+    <div class="grid">
+        <div class="row_12_of_12">
+            <form id="new" method="post" action="{% url 'kate:create' %}">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <td>
+                            Weisser Spieler: &nbsp;
+                        </td>
+                        <td>
+                            <input type="text" name="white_player" value="" size="20" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Schwarzer Spieler: &nbsp;
+                        </td>
+                        <td>
+                            <input type="text" name="black_player" value="" size="20" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td>
+                            <input type="submit" value="submit" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
 {% endblock %}

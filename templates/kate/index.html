@@ -4,21 +4,33 @@
 
 
 {% block header %}
-    <h2>Wähle Schachspiel</h2>
+    <div class="grid">
+        <div class="row_12_of_12">
+            <h2>Wähle Schachspiel</h2>
+        </div>
+    </div>
 {% endblock %}
 
 {% block nav %}
-    <h2 style="text-align: left; vertical-align: middle">
-        <a href="{% url 'kate:new' %}">NEUES SPIEL</a>
-    </h2>
+    <div class="grid">
+        <div class="row_12_of_12">
+            <h2>
+                <a href="{% url 'kate:new' %}">NEUES SPIEL</a>
+            </h2>
+        </div>
+    </div>
 {% endblock %}
 
 
 {% block content %}
-    <ul>
-    {% for match in matches %}
-        <li><a href="{% url 'kate:match' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a></li>
-    {% endfor %}
-    </ul>
+    <div class="grid">
+        <div class="row_12_of_12">
+            <ul>
+            {% for match in matches %}
+                <li><a href="{% url 'kate:match' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
 {% endblock %}
 
