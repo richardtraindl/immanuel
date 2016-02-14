@@ -62,6 +62,10 @@ img {
     padding: 0px;
 }
 
+table {
+    border-collapse: collapse;
+}
+
 #wrapper {
     margin: 0px auto;
     padding: 0px;
@@ -134,7 +138,6 @@ nav li a:active {
 }
 
 table#board {
-    border-collapse: collapse;
     background: gray;
 }
 

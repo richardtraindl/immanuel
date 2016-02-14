@@ -68,8 +68,30 @@
             {% endfor %}
             </table>
 
-
-
+            <div style="padding-top: 10px">
+                <form id="move" method="post" action="{% url 'kate:domove' match.id %}">
+                    {% csrf_token %}
+                    <table>
+                        <tr>
+                            <td>
+                                <input id="move-src" type="text" name="move_src" value="" size="3" />
+                                &nbsp;
+                            </td>
+                            <td>
+                                <input id="move-dst" type="text" name="move_dst" value="" size="3" />
+                                &nbsp;
+                            </td>
+                            <td>
+                                <input id="prom-piece" type="text" name="prom_piece" value="blk" size="3" readonly="readonly" />
+                                &nbsp;
+                            </td>
+                            <td>
+                                <input type="submit" value="ziehen" />
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
         </div>
 
         <div class="row_4_of_12">
@@ -86,36 +108,12 @@
         </div>
     </div>
 
-    <div class="grid">
-        <div class="row_12_of_12">
-            <form id="move" method="post" action="{% url 'kate:domove' match.id %}">
-                {% csrf_token %}
-                <table>
-                    <tr>
-                        <td>
-                            <input id="move-src" type="text" name="move_src" value="" size="5" />
-                        </td>
-                        <td>
-                            <input id="move-dst" type="text" name="move_dst" value="" size="5" />
-                        </td>
-                        <td>
-                            <input id="prom-piece" type="text" name="prom_piece" value="blk" size="5" class="invisible" />
-                        </td>
-                        <td>
-                            <input type="submit" value="ziehen" />
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-    </div>
-
     <script>
         $(document).ready(function() {
             $('#board td').click(function(){
                 if( $(this).hasClass("marked") ){
                     $(this).removeClass("marked");
-                    $('#prom-piece').addClass("invisible");
+                    $('#prom-piece').attr("readonly", "readonly");
                     if( $('#move-dst').val().trim() == $(this).attr("id") ){
                         $('#move-dst').val("");
                     }
@@ -137,14 +135,14 @@
                         if( piece == '2' ){
                             var row = $('#move-dst').val();
                             if( row.charAt(1) == '8' ){
-                                $('#prom-piece').removeClass("invisible");
+                                $('#prom-piece').removeAttr("readonly");
                                 $('#prom-piece').val('wQu');
                             }
                         }
                         else if( piece == '10' ){
                             var row = $('#move-dst').val();
                             if( row.charAt(1) == '1' ){
-                                $('#prom-piece').removeClass("invisible");
+                                $('#prom-piece').removeAttr("readonly");
                                 $('#prom-piece').val('bQu');
                             }
                         }
