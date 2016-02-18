@@ -19,5 +19,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', kate.views.index,  name='index'),
     url(r'^kate/', include('kate.urls', namespace="kate")),
 ]
