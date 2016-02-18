@@ -1,3 +1,4 @@
+import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "immanuel.settings")
 
 from django.core.wsgi import get_wsgi_application
