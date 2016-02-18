@@ -1,4 +1,4 @@
-web: gunicorn immanuel.wsgi --log-file -
+web: gunicorn chesswithkate.wsgi --log-file -
 
 
 
