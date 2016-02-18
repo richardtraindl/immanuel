@@ -8,6 +8,6 @@
 *.pyc
 __pycache__
 db.sqlite3
-venv
+.venv
 local_settings.py
 

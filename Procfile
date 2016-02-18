@@ -1,1 +1,4 @@
-web: gunicorn immanuel.wsgi
+web: gunicorn wsgi --log-file -
+
+
+
