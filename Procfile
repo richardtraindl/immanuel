@@ -1,4 +1,4 @@
-web: gunicorn chesswithkate.wsgi --log-file -
+web: gunicorn wsgi --log-file -
 
 
 
