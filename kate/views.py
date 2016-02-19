@@ -47,7 +47,7 @@ def match(request, match_id=None):
         if(len(moves) % 2 == 1):
             fmtmoves.append("<td>&nbsp;</td></tr>")
 
-    comments = Comment.objects.filter().order_by("created_at").reverse()[:5]
+    comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
 
     return render(request, 'kate/match.html', {'match': match, 'board': board, 'fmtmoves': fmtmoves, 'comments': comments, } )
 
@@ -103,14 +103,17 @@ def undo_move(request, match_id):
 def add_comment(request):
     context = RequestContext(request)
 
+    matchid = request.GET['match_id']
+    print("match_id:" + matchid)
     newcomment = request.GET['newcomment']
-    print(": " + newcomment)
+    print("newcomment: " + newcomment)
     if(len(newcomment) > 0):
         comment = Comment()
+        comment.match_id = matchid
         comment.text = newcomment
         comment.save()
 
-    comments = Comment.objects.filter().order_by("created_at").reverse()[:5]
+    comments = Comment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:5]
     data = ""
     for comment in reversed(comments):
         data += "<p>" + comment.text + "</p>"
@@ -120,8 +123,9 @@ def add_comment(request):
 
 def fetch_comments(request):
     context = RequestContext(request)
+    match_id = request.GET['match_id']
 
-    comments = Comment.objects.filter().order_by("created_at").reverse()[:5]
+    comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
     data = ""
     for comment in reversed(comments):
         data += "<p>" + comment.text + "</p>"

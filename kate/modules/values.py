@@ -22,6 +22,14 @@ MOVE_TYPES = {
     'en_passant': 5 }
 
 
+MATCH_STATUS = dict()
+MATCH_STATUS = {
+    'open': 1, 
+    'draw': 2, 
+    'winner_white': 3, 
+    'winner_black': 4, 
+    'cancelled': 5 }
+
 def koord_to_index(koord):
     col = koord[0]
     row = koord[1]

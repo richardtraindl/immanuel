@@ -6,7 +6,7 @@ from kate.modules import values
 
 
 class Match(models.Model):
-    active = models.PositiveSmallIntegerField(null=False, default=1)
+    status = models.PositiveSmallIntegerField(null=False, default=1)
     begin = models.DateTimeField(default=timezone.now)
     white_player = models.CharField(max_length=100, blank=False)
     black_player = models.CharField(max_length=100, blank=False)
@@ -179,6 +179,8 @@ class Move(models.Model):
 
 
 class Comment(models.Model):
+    match= models.ForeignKey(Match)
     created_at = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=500)
+
 

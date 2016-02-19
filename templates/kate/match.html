@@ -38,7 +38,7 @@
 
             <form>
                 <p>
-                    <input id="input-comment" name="input_comment" value="" size="60" />
+                    <input id="input-comment" name="input_comment" matchid="{{ match.id }}" value="" size="60" />
                 </p>
                 <p>
                     <button id ="btn-comment" type="button">send comment</button>
@@ -153,14 +153,18 @@
             $('#btn-comment').click(function(){
                 var newcomment;
                 newcomment = $('#input-comment').val();
-                $.get('/kate/addcomment', { newcomment: newcomment }, function(data){
+                var matchid;                
+                matchid = $('#input-comment').attr("matchid");
+                $.get('/kate/addcomment', { match_id: matchid, newcomment: newcomment }, function(data){
                    $('#comments').html(data);
                });
                $('#input-comment').val("");
             });
         
             setInterval(function() {
-                $.get('/kate/fetchcomments', { }, function(data){
+                var matchid;
+                matchid = $('#input-comment').attr("matchid");
+                $.get('/kate/fetchcomments', { match_id: matchid }, function(data){
                    $('#comments').html(data);
                 });
             }, 3000);
