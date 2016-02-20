@@ -40,6 +40,7 @@ h2 {
 p {
     margin: 0px;
     padding: 0px;
+    font-size: 16px;
 }
 
 a, a:link, a:visited, a:active {
@@ -71,23 +72,17 @@ table {
     padding: 0px;
     width: 680px;
     max-width: 90%;
-    min-width: 320px;
+    min-width: 420px;
 }
 
 header {
-    padding: 10px;
+    padding: 5px;
     margin: 0px;
     background-color: lightgrey;
 }
 
-header h1 {
-    padding: 0px;
-    font-size: 28px;
-    text-align: left;
-}
-
 nav {
-    padding: 10px;
+    padding: 5px;
     margin: 0px;
     background-color: lightblue;
 }
@@ -113,7 +108,7 @@ nav li a:active {
 
 #chat {
     clear: both;
-    padding: 10px;
+    padding: 5px;
     margin: 0px;
     background-color: #FFDEAD;
     // background-color: beige;
@@ -121,7 +116,8 @@ nav li a:active {
 
 #chat p {
     margin: 0px;
-    padding: 0px;
+    padding: 0px 0px 4px 0px;
+    font-size: 14px;
 }
 
 #comments{
@@ -132,7 +128,7 @@ nav li a:active {
 
 #content {
     clear: both;
-    padding: 10px;
+    padding: 5px;
     margin: 0px;
     background-color: #FF8C69;
 }
@@ -158,6 +154,11 @@ table#board img {
 tr#board-letters td, .board-label {
     background-color: #FF8C69 !important;
     text-align: center;
+    font-size: 12px;
+}
+
+tr#board-letters td {
+    height: 24px !important;
 }
 
 #moves td:first-child {
@@ -166,4 +167,9 @@ tr#board-letters td, .board-label {
 
 #moves td {
     width: 80px;
+}
+
+button, input[type="submit"]{
+    min-width: 100px;
+    height: 30px;
 }

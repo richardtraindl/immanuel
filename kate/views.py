@@ -33,9 +33,9 @@ def match(request, match_id=None):
         fmtmoves = []
     else:
         if(curr_move.count % 2 == 0):
-            limit = 30
+            limit = 60
         else:
-            limit = 31
+            limit = 61
         moves = Move.objects.filter(match_id=match_id).order_by("count").reverse()[:limit]
         fmtmoves = []
         for move in reversed(moves):
