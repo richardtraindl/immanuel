@@ -124,4 +124,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Override production variables if DJANGO_DEVELOPMENT env variable is set
 if os.environ.get('DJANGO_DEVELOPMENT') is not None:
-    from settings_dev import *
+    from immanuel.settings_dev import *

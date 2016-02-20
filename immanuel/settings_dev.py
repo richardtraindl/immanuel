@@ -3,6 +3,8 @@ Local Django settings for immanuel project.
 Overrides production setings
 """
 
+import os
+
 # Database
 DATABASES = {
     'default': {
@@ -14,3 +16,5 @@ DATABASES = {
 ALLOWED_HOSTS = ['']
 
 DEBUG = True
+
+STATIC_ROOT = '/static'
