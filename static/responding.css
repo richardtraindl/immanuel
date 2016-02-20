@@ -31,7 +31,7 @@ footer, header, hgroup, menu, nav, section {
 div[class*='row_'] {
     margin-right: 0.5%;
     margin-left: 0.5%;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
 }
 
 .row_12_of_12 {
@@ -94,5 +94,6 @@ div[class*='row_'] {
     }
     div[class*='row_'] {
         width: 99%; 
+        text-align: center;
     }
 }

@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^create/$', views.create, name='create'),
     url(r'^addcomment/$', views.add_comment, name='addcomment'),
     url(r'^fetchcomments/$', views.fetch_comments, name='fetchcomments'),
+    url(r'^fetchboard/$', views.fetch_board, name='fetchboard'),
 ]
