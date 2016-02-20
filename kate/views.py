@@ -33,12 +33,12 @@ def match(request, match_id=None):
         fmtmoves = []
     else:
         if(curr_move.count % 2 == 0):
-            limit = 10
+            limit = 30
         else:
-            limit = 11
-        moves = Move.objects.filter(match_id=match_id).order_by("count")[:limit]
+            limit = 31
+        moves = Move.objects.filter(match_id=match_id).order_by("count").reverse()[:limit]
         fmtmoves = []
-        for move in moves:
+        for move in reversed(moves):
             if(move.count % 2 == 1 ):
                 fmtmoves.append("<tr><td>" + str( (move.count + 1) // 2) + ".</td>")
                 fmtmoves.append("<td>" + values.format_move(move) + "</td>")

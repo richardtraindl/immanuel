@@ -23,6 +23,13 @@ def iseven(value):
 def isodd(value):
     return value % 2 != 0
 
+@register.filter(name='cut')
+def cut(value):
+    if(len(value) == 2):
+        return str(value)[1]
+    else:
+        return str("")
+
 @register.filter(name='lower')
 def lower(value):
     return value.lower()

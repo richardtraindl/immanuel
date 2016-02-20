@@ -127,7 +127,7 @@ nav li a:active {
 #comments{
     min-height: 140px;
     max-height: 140px;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 #content {
@@ -152,5 +152,18 @@ table#board img {
 }
 
 #board tr:nth-child(odd) td:nth-child(even), #board tr:nth-child(even) td:nth-child(odd) {
-    background: white;
+    background-color: white;
+}
+
+tr#board-letters td, .board-label {
+    background-color: #FF8C69 !important;
+    text-align: center;
+}
+
+#moves td:first-child {
+    width: 30px;
+}
+
+#moves td {
+    width: 80px;
 }

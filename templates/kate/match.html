@@ -38,7 +38,7 @@
 
             <form>
                 <p>
-                    <textarea id="input-comment" name="input_comment" matchid="{{ match.id }}" cols="35" rows="2" maxlength="200"></textarea>
+                    <textarea id="input-comment" name="input_comment" matchid="{{ match.id }}" cols="40" rows="3" maxlength="200"></textarea>
                 </p>
                 <p>
                     <button id ="btn-comment" type="button">send comment</button>
@@ -51,10 +51,14 @@
 
 {% block content %}
     <div class="grid">
-        <div class="row_8_of_12">
+        <div class="row_9_of_12">
             <table id="board">
+                <tr id="board-letters">
+                    <td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td>
+                <tr>
             {% for row in board reversed %}
                 <tr>
+                    <td class="board-label">{{ row.0.1|cut }}</td>
                 {% for col in row %}
                     <td id="{{ col.1 }}" value="{{ col.0 }}">
                     {% if col.0 == 0 %}
@@ -64,8 +68,12 @@
                     {% endif %}
                     </td>
                 {% endfor %}
+                    <td class="board-label">{{ row.0.1|cut }}</td>
                 </tr>
             {% endfor %}
+                <tr id="board-letters">
+                    <td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td>
+                <tr>
             </table>
 
             <div style="padding-top: 10px">
@@ -94,12 +102,12 @@
             </div>
         </div>
 
-        <div class="row_4_of_12">
+        <div class="row_3_of_12">
             <table id="moves">
                 <tr>
-                    <td>&nbsp;&nbsp;&nbsp;</td>
-                    <td>{{ match.white_player }}&nbsp;&nbsp;:</td>
-                    <td>&nbsp;&nbsp;{{ match.black_player }}</td>
+                    <td>&nbsp;</td>
+                    <td>{{ match.white_player }}:</td>
+                    <td>{{ match.black_player }}</td>
                 </tr>
             {% for col in fmtmoves %}
                 {{ col|safe }}
