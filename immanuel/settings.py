@@ -66,12 +66,11 @@ TEMPLATES = [
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.path.join('kate_db'),
-    }
-}
+
+DATABASES = {}
+
+import dj_database_url
+DATABASES['default'] = dj_database_url.config()
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -90,8 +89,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+ALLOWED_HOSTS = ['*']
 
 WSGI_APPLICATION = 'immanuel.wsgi.application'
+
+DEBUG = False
 
 
 # Internationalization
@@ -116,14 +120,4 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
-
-import dj_database_url
-DATABASES['default'] = dj_database_url.config()
-
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-ALLOWED_HOSTS = ['*']
-
-DEBUG = True
-
 
