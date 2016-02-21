@@ -30,19 +30,21 @@
 {% block chat %}
     <div class="grid">
         <div class="row_12_of_12">
-            <div id="comments">
+            <div id="comments" commentcnt="{{ commentcnt }}">
             {% for comment in comments reversed %}
                 <p>{{ comment.text }}</p>
             {% endfor %}
             </div>
 
-            <form style="padding-top: 5px;">
+            <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}" matchid="{{ match.id }}" style="padding-top: 5px;">
+                {% csrf_token %}
                 <div class="grid">
                     <div class="row_8_of_12">
-                        <textarea id="input-comment" name="input_comment" matchid="{{ match.id }}" cols="40" rows="2" maxlength="200"></textarea>
+                        <textarea id="newcomment" name="newcomment" cols="40" rows="2" maxlength="200"></textarea>
                     </div>
                     <div class="row_4_of_12">
-                        <button id ="btn-comment" type="button">kommentieren</button>
+                        <input type="submit" value="kommentieren" />
+                        <!-- button id ="btn-comment" type="button">kommentieren</button -->
                     </div>
                 </div>
             </form>
@@ -160,32 +162,21 @@
                 }
             });
         
-            $('#btn-comment').click(function(){
-                var newcomment;
-                newcomment = $('#input-comment').val();
-                var matchid;                
-                matchid = $('#input-comment').attr("matchid");
-                $.get('/kate/addcomment', { match_id: matchid, newcomment: newcomment }, function(data){
-                   $('#comments').html(data);
-               });
-               $('#input-comment').val("");
-            });
-        
             setInterval(function() {
                 var matchid;
-                matchid = $('#input-comment').attr("matchid");
-                $.get('/kate/fetchcomments', { match_id: matchid }, function(data){
-                   $('#comments').html(data);
+                matchid = $('#addcomment').attr("matchid");
+                $.get('/kate/fetchcomments', { matchid: matchid }, function(data){
+                    $('#comments').html(data);
                 });
-            }, 3000);
+            }, 5000);
 
-            setInterval(function() {
-                var matchid;
-                matchid = $('#input-comment').attr("matchid");
-                $.get('/kate/fetchboard', { match_id: matchid }, function(data){
-                   $('table#board').html(data);
-                });
-            }, 6000);
+            // setInterval(function() {
+            //     var matchid;
+            //     matchid = $('#addcomment').attr("matchid");
+            //     $.get('/kate/fetchboard', { match_id: matchid }, function(data){
+            //        $('table#board').html(data);
+            //     });
+            // }, 10000);
 
         });
     </script>

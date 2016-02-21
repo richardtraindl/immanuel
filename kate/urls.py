@@ -9,7 +9,7 @@ urlpatterns = [
     url(r'^(?P<match_id>[0-9]+)/undomove/$', views.undo_move, name='undomove'),
     url(r'^new/$', views.new, name='new'),
     url(r'^create/$', views.create, name='create'),
-    url(r'^addcomment/$', views.add_comment, name='addcomment'),
+    url(r'^(?P<match_id>[0-9]+)/addcomment/$', views.add_comment, name='addcomment'),
     url(r'^fetchcomments/$', views.fetch_comments, name='fetchcomments'),
     url(r'^fetchboard/$', views.fetch_board, name='fetchboard'),
 ]

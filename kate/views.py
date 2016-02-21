@@ -48,8 +48,8 @@ def match(request, match_id=None):
             fmtmoves.append("<td>&nbsp;</td></tr>")
 
     comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
-
-    return render(request, 'kate/match.html', {'match': match, 'board': board, 'fmtmoves': fmtmoves, 'comments': comments, } )
+    comment_cnt = Comment.objects.filter(match_id=match_id).count()
+    return render(request, 'kate/match.html', {'match': match, 'board': board, 'fmtmoves': fmtmoves, 'comments': comments, 'commentcnt': comment_cnt } )
 
 
 def new(request):
@@ -100,37 +100,29 @@ def undo_move(request, match_id):
     return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
 
 
-def add_comment(request):
+def add_comment(request, match_id):
     context = RequestContext(request)
-
-    matchid = request.GET['match_id']
-    print("match_id:" + matchid)
-    newcomment = request.GET['newcomment']
-    print("newcomment: " + newcomment)
-    if(len(newcomment) > 0):
-        comment = Comment()
-        comment.match_id = matchid
-        comment.text = newcomment
-        comment.save()
-
-    comments = Comment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:5]
-    data = ""
-    for comment in reversed(comments):
-        data += "<p>" + comment.text + "</p>"
-
-    return HttpResponse(data)
+    match = get_object_or_404(Match, pk=match_id)
+    if request.method == 'POST':
+        newcomment = request.POST['newcomment']
+        print("newcomment: " + newcomment)
+        if(len(newcomment) > 0):
+            comment = Comment()
+            comment.match_id = match.id
+            comment.text = newcomment
+            comment.save()
+        return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
 
 
 def fetch_comments(request):
     context = RequestContext(request)
-    match_id = request.GET['match_id']
-
-    comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
-    data = ""
-    for comment in reversed(comments):
-        data += "<p>" + comment.text + "</p>"
-
-    return HttpResponse(data)
+    if request.method == 'GET':
+        match_id = request.GET['matchid']
+        comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
+        data = ""
+        for comment in reversed(comments):
+            data += "<p>" + comment.text + "</p>"
+        return HttpResponse(data)
 
 
 def fetch_board(request):
@@ -157,6 +149,6 @@ def fetch_board(request):
                 data += "<td id='" + str(col[1]) + "' value='" + str(col[0]) + "'><img src='/static/img/" + str(values.reverse_lookup(values.PIECES, col[0])) + ".png'></td>"
         data += "<td class='board-label'>" + str((row[0][1])[1]) + "</td></tr>"
     data += "<tr id='board-letters'><td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td></tr>"
-    print("html: " + data)
+    # print("html: " + data)
     return HttpResponse(data)
     
