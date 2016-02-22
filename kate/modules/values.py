@@ -1,5 +1,6 @@
 from named_constants import Constants
 
+
 class Colors(Constants):
   undefined = 0
   white = 1
@@ -21,11 +22,28 @@ class Pieces(Constants):
   bBp = Colors.black + 4 # 13
   bQu = Colors.black + 5 # 14
 
-dictPieces = dict()
-dictPieces = { 0:'blk': , 
-                  'wKg': 1, 'wPw': 2, 'wRk': 3, 'wKn': 4, 'wBp': 5, 'wQu': 6, 
-                  'bKg': 9, 'bPw': 10, 'bRk': 11, 'bKn': 12, 'bBp': 13, 'bQu': 14 }
 
+dictPieces = dict()
+dictPieces = { Pieces.blk:'blk',
+               Pieces.wKg:'wKg',
+               Pieces.wPw:'wPw',
+               Pieces.wRk:'wRk',
+               Pieces.wKn:'wKn',
+               Pieces.wBp:'wBp',
+               Pieces.wQu:'wQu',
+               Pieces.bKg:'bKg',
+               Pieces.bPw:'bPw',
+               Pieces.bRk:'bRk',
+               Pieces.bKn:'bKn',
+               Pieces.bBp:'bBp',
+               Pieces.bQu:'bQu' }
+
+
+def reverse_lookup(dic, value):
+    for key in dic:
+        if dic[key] == value:
+            return key
+    raiseValueError
 
 
 def color_of piece(piece):
@@ -35,12 +53,6 @@ def color_of piece(piece):
     return Colors.black
   else:
     return Colors.undefined
-
-def reverse_lookup(dic, value):
-    for key in dic:
-        if dic[key] == value:
-            return key
-    raiseValueError
 
 
 class MoveTypes(Constants):
@@ -73,11 +85,14 @@ def index_to_koord(idx):
     koord = str(col + row)
     return koord
 
+
 def is_incol(idx1, idx2):
     return (idx1 % 8) == (idx2 % 8)
 
+
 def is_inrow(idx1, idx2):
     return (idx1 // 8) == (idx2 // 8)
+
 
 def format_move(move):
     if(move.move_type == MoveTypes.standard):
@@ -96,12 +111,9 @@ def format_move(move):
             hyphen = "-"
         else:
             hyphen = "x"
-        fmtmove= index_to_koord(move.src) + hyphen + index_to_koord(move.dest) + " " + reverse_lookup(PIECES, move.prom_piece)
+        fmtmove= index_to_koord(move.src) + hyphen + index_to_koord(move.dest) + " " + reverse_lookup(dictPieces, move.prom_piece)
         return fmtmove
     else:
         fmtmove= index_to_koord(move.src) + "x" + index_to_koord(move.dest) + " e.p."
         return fmtmove
 
-
-
-    
