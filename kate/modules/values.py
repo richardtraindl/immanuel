@@ -1,21 +1,40 @@
+from named_constants import Constants
+
+class Colors(Constants):
+  undefined = 0
+  white = 1
+  black = 9
 
 
-PIECES = dict()
-PIECES = {'blk': 0, 
+class Pieces(Constants):
+  blk = Colors.undefined + 0 # 0
+  wKg = Colors.white + 0 # 1
+  wPw = Colors.white + 1 # 2
+  wRk = Colors.white + 2 # 3
+  wKn = Colors.white + 3 # 4
+  wBp = Colors.white + 4 # 5
+  wQu = Colors.white + 5 # 6
+  bKg = Colors.black + 0 # 9 
+  bPw = Colors.black + 1 # 10
+  bRk = Colors.black + 2 # 11
+  bKn = Colors.black + 3 # 12
+  bBp = Colors.black + 4 # 13
+  bQu = Colors.black + 5 # 14
+
+dictPieces = dict()
+dictPieces = { 0:'blk': , 
                   'wKg': 1, 'wPw': 2, 'wRk': 3, 'wKn': 4, 'wBp': 5, 'wQu': 6, 
                   'bKg': 9, 'bPw': 10, 'bRk': 11, 'bKn': 12, 'bBp': 13, 'bQu': 14 }
 
-COLORS = dict()
-COLORS = {'undefined': 0, 'white': 1, 'black': 2 }
+
 
 def color_of piece(piece):
-  value = PIECES[piece]
-  if(value >= PIECES['wKg'] and value <= PIECES['wQu']):
-    return COLORS['white']
-  elif(value >= PIECES['bKg'] and value <= PIECES['bQu']):
-    return COLORS['black']
+  if(piece >= Pieces.wKg and piece <= Pieces.wQu):
+    return Colors.white
+  elif(piece >= Pieces.bKg and piece <= Pieces.bQu):
+    return Colors.black
   else:
-    return COLORS['undefined']
+    return Colors.undefined
 
 def reverse_lookup(dic, value):
     for key in dic:
@@ -24,22 +43,21 @@ def reverse_lookup(dic, value):
     raiseValueError
 
 
-MOVE_TYPES = dict()
-MOVE_TYPES = {
-    'standard': 1, 
-    'short_castling': 2, 
-    'long_castling': 3, 
-    'promotion': 4, 
-    'en_passant': 5 }
+class MoveTypes(Constants):
+  standard = 1
+  short_castling = 2
+  long_castling = 3
+  promotion = 4 
+  en_passant = 5
+  
 
+class MatchStatus(Constants):
+  open = 1
+  draw = 2
+  winner_white = 3
+  winner_black = 4
+  cancelled = 5
 
-MATCH_STATUS = dict()
-MATCH_STATUS = {
-    'open': 1, 
-    'draw': 2, 
-    'winner_white': 3, 
-    'winner_black': 4, 
-    'cancelled': 5 }
 
 def koord_to_index(koord):
     col = koord[0]
@@ -62,18 +80,18 @@ def is_inrow(idx1, idx2):
     return (idx1 // 8) == (idx2 // 8)
 
 def format_move(move):
-    if(move.move_type == MOVE_TYPES['standard']):
+    if(move.move_type == MoveTypes.standard):
         if(move.captured_piece == 0):
             hyphen = "-"
         else:
             hyphen = "x"
         fmtmove= index_to_koord(move.src) + hyphen + index_to_koord(move.dest)
         return fmtmove
-    elif(move.move_type == MOVE_TYPES['short_castling']):
+    elif(move.move_type == MoveTypes.short_castling):
         return "0-0"
-    elif(move.move_type == MOVE_TYPES['long_castling']):
+    elif(move.move_type == MoveTypes.long_castling):
         return "0-0-0"
-    elif(move.move_type == MOVE_TYPES['promotion']):
+    elif(move.move_type == MoveTypes.promotion):
         if(move.captured_piece == 0):
             hyphen = "-"
         else:
