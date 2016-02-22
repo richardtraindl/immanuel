@@ -17,9 +17,10 @@ class Match(models.Model):
         fields = ''
         for rows in arrboard:
             for col in rows:
-                fields += reverse_lookup(PIECES, value)
+                fields += dictPieces[col]
                 fields += ','
         self.board = fields
+
 
     def readboard(self):
         arrboard = [[0 for x in range(8)] for x in range(8)]
@@ -27,20 +28,22 @@ class Match(models.Model):
         col = 0
         fieldsarr = self.board.split(',')
         for field in fieldsarr:
-            arrboard[row][col] = values.PIECES[field]
+            arrboard[row][col] = reverse_lookup(dictPieces, field)
             col += 1
             if col == 8:
                 row += 1
                 col = 0
         return arrboard
 
+
     def readfield(self, idx):
         fields = self.board.split(',')
-        return fields[idx]
+        return reverse_lookup(dictPieces, fields[idx])
 
-    def writefield(self, idx, key):
+
+    def writefield(self, idx, value):
         fields = self.board.split(',')
-        fields[idx] = key
+        fields[idx] = dictPieces[value]
         newfields = ''
         for i in range(len(fields)):
             newfields += fields[i]
@@ -58,6 +61,7 @@ class Match(models.Model):
                         'bPw,bPw,bPw,bPw,bPw,bPw,bPw,bPw,'
                         'bRk,bKn,bBp,bQu,bKg,bBp,bKn,bRk')
 
+
     def do_move(self, srcidx, destidx, prom_piece):
         prev_move = Move.objects.filter(match_id=self.id).order_by("count").last()
         if(prev_move == None):
@@ -71,9 +75,9 @@ class Match(models.Model):
         
         srcpiece = self.readfield(srcidx)
         destpiece = self.readfield(destidx)
-        if(srcpiece == 'wPw' or srcpiece == 'bPw'):
+        if(srcpiece == Pieces.wPw or srcpiece == Pieces.bPw):
             if(prom_piece != 'blk'):
-                self.writefield(srcidx, 'blk')
+                self.writefield(srcidx, Pieces.blk)
                 self.writefield(destidx, prom_piece)
                 move.move_type = values.MOVE_TYPES['promotion']
                 move.src = srcidx
