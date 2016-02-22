@@ -7,6 +7,7 @@ from kate.modules import values
 
 class Match(models.Model):
     status = models.PositiveSmallIntegerField(null=False, default=1)
+    score = models.SmallIntegerField(null=False, default=0)
     begin = models.DateTimeField(default=timezone.now)
     white_player = models.CharField(max_length=100, blank=False)
     black_player = models.CharField(max_length=100, blank=False)
@@ -167,7 +168,7 @@ class Match(models.Model):
 
 
 class Move(models.Model):
-    match= models.ForeignKey(Match)
+    match= models.ForeignKey(Match, on_delete=models.CASCADE)
     count = models.PositiveSmallIntegerField(null=False)
     move_type = models.PositiveSmallIntegerField(null=False, default=1)
     src = models.PositiveSmallIntegerField(null=False)
@@ -179,7 +180,7 @@ class Move(models.Model):
 
 
 class Comment(models.Model):
-    match= models.ForeignKey(Match)
+    match= models.ForeignKey(Match, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=500)
 
