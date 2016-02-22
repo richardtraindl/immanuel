@@ -5,6 +5,17 @@ PIECES = {'blk': 0,
                   'wKg': 1, 'wPw': 2, 'wRk': 3, 'wKn': 4, 'wBp': 5, 'wQu': 6, 
                   'bKg': 9, 'bPw': 10, 'bRk': 11, 'bKn': 12, 'bBp': 13, 'bQu': 14 }
 
+COLORS = dict()
+COLORS = {'undefined': 0, 'white': 1, 'black': 2 }
+
+def color_of piece(piece):
+  value = PIECES[piece]
+  if(value >= wKg and value <= wQu):
+    return COLORS[white]
+  elif(value >= bKg and value <= bQu):
+    return COLORS[black]
+  else:
+    return COLORS[undefined]
 
 def reverse_lookup(dic, value):
     for key in dic:
