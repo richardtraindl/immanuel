@@ -11,58 +11,43 @@ class Match(models.Model):
     begin = models.DateTimeField(default=timezone.now)
     white_player = models.CharField(max_length=100, blank=False)
     black_player = models.CharField(max_length=100, blank=False)
-    board = models.CharField(max_length=256)
+    board = ArrayField(ArrayField(models.PositiveSmallIntegerField(null=False, blank=False, default=0), size=8), size=8)
 
-    def writeboard(self, arrboard):
-        fields = ''
-        for rows in arrboard:
-            for col in rows:
-                fields += dictPieces[col]
-                fields += ','
-        self.board = fields
-
-
-    def readboard(self):
-        arrboard = [[0 for x in range(8)] for x in range(8)]
-        row = 0
-        col = 0
-        fieldsarr = self.board.split(',')
-        for field in fieldsarr:
-            arrboard[row][col] = reverse_lookup(dictPieces, field)
-            col += 1
-            if col == 8:
-                row += 1
-                col = 0
-        return arrboard
-
-
-    def readfield(self, idx):
-        fields = self.board.split(',')
-        return reverse_lookup(dictPieces, fields[idx])
-
-
-    def writefield(self, idx, value):
-        fields = self.board.split(',')
-        fields[idx] = dictPieces[value]
-        newfields = ''
-        for i in range(len(fields)):
-            newfields += fields[i]
-            newfields += ','
-        self.board = newfields[:255]
+    def writefield(self, x, y, value):
+        self.board[y][x] = value
+    
+    
+    def readfield(self, x, y):
+        return self.board[y][x]
 
 
     def setboardbase(self):
-        self.board = ('wRk,wKn,wBp,wQu,wKg,wBp,wKn,wRk,' 
-                        'wPw,wPw,wPw,wPw,wPw,wPw,wPw,wPw,'
-                        'blk,blk,blk,blk,blk,blk,blk,blk,'
-                        'blk,blk,blk,blk,blk,blk,blk,blk,'
-                        'blk,blk,blk,blk,blk,blk,blk,blk,'
-                        'blk,blk,blk,blk,blk,blk,blk,blk,'
-                        'bPw,bPw,bPw,bPw,bPw,bPw,bPw,bPw,'
-                        'bRk,bKn,bBp,bQu,bKg,bBp,bKn,bRk')
+        self.board[0][i] = Pieces.wRk
+        self.board[0][i] = Pieces.wKn
+        self.board[0][i] = Pieces.wBp
+        self.board[0][i] = Pieces.wQu
+        self.board[0][i] = Pieces.wKg
+        self.board[0][i] = Pieces.wBp
+        self.board[0][i] = Pieces.wKn
+        self.board[0][i] = Pieces.wRk
+        for i in range(0, 8, 1):
+            self.board[1][i] = Pieces.wPw
+        for j in range(2, 6, 1):
+            for i in range(0, 8, 1):
+                self.board[j][i] = Pieces.blk
+        for i in range(0, 8, 1):
+            self.board[6][i] = Pieces.bPw
+        self.board[0][i] = Pieces.bRk
+        self.board[0][i] = Pieces.bKn
+        self.board[0][i] = Pieces.bBp
+        self.board[0][i] = Pieces.bQu
+        self.board[0][i] = Pieces.bKg
+        self.board[0][i] = Pieces.bBp
+        self.board[0][i] = Pieces.bKn
+        self.board[0][i] = Pieces.bRk
 
 
-    def do_move(self, srcidx, destidx, prom_piece):
+    def do_move(self, srcx, srcy, destx, desty, prom_piece):
         prev_move = Move.objects.filter(match_id=self.id).order_by("count").last()
         if(prev_move == None):
             count = 1
@@ -73,101 +58,110 @@ class Match(models.Model):
         move.match_id = self.id
         move.count = count
         
-        srcpiece = self.readfield(srcidx)
-        destpiece = self.readfield(destidx)
+        srcpiece = self.readfield(srcx, srcy)
+        destpiece = self.readfield(destx, desty)
         if(srcpiece == Pieces.wPw or srcpiece == Pieces.bPw):
-            if(prom_piece != 'blk'):
-                self.writefield(srcidx, Pieces.blk)
-                self.writefield(destidx, prom_piece)
-                move.move_type = values.MOVE_TYPES['promotion']
-                move.src = srcidx
-                move.dest = destidx
-                move.captured_piece = values.PIECES[destpiece]
-                move.prom_piece = values.PIECES[prom_piece]
+            if(prom_piece != Pieces.blk):
+                self.writefield(srcx, srcy, Pieces.blk) 
+                self.writefield(destx, desty, prom_piece)
+                move.move_type = MoveTypes.promotion
+                move.srcx = srcidx
+                move.srcy = srcidy
+                move.destx = destidx
+                move.desty = destidy
+                move.captured_piece = destpiece
+                move.prom_piece = prom_piece
                 return move
-            elif(destpiece == 'blk' and not values.is_incol(srcidx, destidx)):
-                self.writefield(srcidx, 'blk')
-                self.writefield(destidx, srcpiece)
-                move.move_type = values.MOVE_TYPES['en_passant']
-                move.src = srcidx
-                move.dest = destidx
-                row = srcidx // 8
-                col = destidx % 8
-                move.e_p_field = row * 8 + col
-                pawn = self.readfield(move.e_p_field)
-                self.writefield(move.e_p_field, 'blk')
-                move.captured_piece = values.PIECES[pawn]                
+            elif(destpiece == Pieces.blk and srcx != destx):
+                self.writefield(srcx, srcy, Pieces.blk)
+                self.writefield(destx, desty, srcpiece)
+                move.move_type = MoveTypes.en_passant
+                move.srcx = srcx
+                move.srcy = srcy
+                move.destx = destx
+                move.desty = desty
+                move.e_p_fieldx = destx
+                move.e_p_fieldy = srcy
+                pawn = self.readfield(move.e_p_fieldx, move.e_p_fieldy)
+                self.writefield(move.e_p_fieldx, move.e_p_fieldy, Pieces.blk)
+                move.captured_piece = pawn
                 return move 
-        elif(srcpiece == 'wKg' or srcpiece == 'bKg'):
+        elif(srcpiece == Pieces.wKg or srcpiece == Pieces.bKg):
             if(srcidx - destidx == -2):
-                self.writefield(srcidx, 'blk')
-                self.writefield(destidx, srcpiece)
-                rook = self.readfield(srcidx + 3)
-                self.writefield(srcidx + 3, 'blk')
-                self.writefield(destidx - 1, rook)
-                move.move_type = values.MOVE_TYPES['short_castling']
-                move.src = srcidx
-                move.dest = destidx
-                move.captured_piece = values.PIECES[destpiece]
+                self.writefield(srcx, srcy, Pieces.blk)
+                self.writefield(destx, desty, srcpiece)
+                rook = self.readfield(srcidx + 3, srcy)
+                self.writefield(srcx + 3, srcy, Pieces.blk)
+                self.writefield(destx - 1, desty, rook)
+                move.move_type = MoveTypes.short_castling
+                move.srcx = srcx
+                move.srcy = srcy
+                move.destx = destx
+                move.desty = desty
+                move.captured_piece = destpiece
                 return move
-            elif(srcidx - destidx == 2):
-                self.writefield(srcidx, 'blk')
-                self.writefield(destidx, srcpiece)
-                rook = self.readfield(srcidx - 4)
-                self.writefield(srcidx - 4, 'blk')
-                self.writefield(destidx + 1, rook)
-                move.move_type = values.MOVE_TYPES['long_castling']
-                move.src = srcidx
-                move.dest = destidx
-                move.captured_piece = values.PIECES[destpiece]
+            elif(srcx - destx == 2):
+                self.writefield(srcx, srcy, Pieces.blk)
+                self.writefield(destx, desty, srcpiece)
+                rook = self.readfield(srcx - 4, srcy)
+                self.writefield(srcx - 4, srcy, Pieces.blk)
+                self.writefield(destx + 1, desty, rook)
+                move.move_type = MoveTypes.long_castling
+                move.srcx = srcx
+                move.srcy = srcy
+                move.desxt = destx
+                move.desty = desty
+                move.captured_piece = destpiece
                 return move
-
-        self.writefield(srcidx, 'blk')
-        self.writefield(destidx, srcpiece)
-        move.move_type = values.MOVE_TYPES['standard']
-        move.src = srcidx
-        move.dest = destidx
-        move.captured_piece = values.PIECES[destpiece]
+        self.writefield(srcx, srcy, Pieces.blk)
+        self.writefield(destx, desty, srcpiece)
+        move.move_type = MoveTypes.standard
+        move.srcx = srcy
+        move.srcy = srcy
+        move.destx = destx
+        move.desty = desty
+        move.captured_piece = destpiece
         return move
+
 
     def undo_move(self):
         move = Move.objects.filter(match_id=self.id).order_by("count").last()
         if(move == None):
             return None
-        if(move.move_type == values.MOVE_TYPES['standard']):
-            piece = self.readfield(move.dest)
-            self.writefield(move.src, piece)
-            self.writefield(move.dest, values.reverse_lookup(values.PIECES, move.captured_piece))
+        if(move.move_type == MoveTypes.standard):
+            piece = self.readfield(move.destx, move.desty)
+            self.writefield(move.srcx, move.srcy, piece)
+            self.writefield(move.destx, move.desty, move.captured_piece)
             return move
-        elif(move.move_type == values.MOVE_TYPES['short_castling']):
-            piece = self.readfield(move.dest)
-            rook = self.readfield(move.dest - 1)
-            self.writefield(move.src, piece)
-            self.writefield(move.dest, 'blk')
-            self.writefield(move.dest - 1, 'blk')
-            self.writefield(move.dest + 1, rook)
+        elif(move.move_type == MoveTypes.short_castling):
+            piece = self.readfield(move.destx, move.desty)
+            rook = self.readfield(move.destx - 1, move.desty)
+            self.writefield(move.srcx, move.srcy, piece)
+            self.writefield(move.destx, move.desty, Pieces.blk)
+            self.writefield(move.destx - 1, move.desty, Pieces.blk)
+            self.writefield(move.destx + 1, move.desty, rook)
             return move
-        elif(move.move_type == values.MOVE_TYPES['long_castling']):
-            piece = self.readfield(move.dest)
-            rook = self.readfield(move.dest + 1)
-            self.writefield(move.src, piece)
-            self.writefield(move.dest, 'blk')
-            self.writefield(move.dest + 1, 'blk')
-            self.writefield(move.dest - 2, rook)
+        elif(move.move_type == MoveTypes.long_castling):
+            piece = self.readfield(move.destx, move.desty)
+            rook = self.readfield(move.destx + 1, move.desty)
+            self.writefield(move.srcx, move.srcy, piece)
+            self.writefield(move.destx, move.desty, Pieces.blk)
+            self.writefield(move.destx + 1, move.desty, Pieces.blk)
+            self.writefield(move.destx - 2, move.desty, rook)
             return move
-        elif(move.move_type == values.MOVE_TYPES['promotion']):
-            if((move.dest // 8) == 7):
-                piece = 'wPw'
+        elif(move.move_type == MoveTypes.promotion):
+            if(move.desty == 7):
+                piece = Pieces.wPw
             else:
-                piece = 'bPw'
-            self.writefield(move.src, piece)
-            self.writefield(move.dest, values.reverse_lookup(values.PIECES, move.captured_piece))
+                piece = Pieces.bPw
+            self.writefield(move.srcx, move.srcy, piece)
+            self.writefield(move.destx, move.desty, move.captured_piece)
             return move
         else:
-            piece = self.readfield(move.dest)
-            self.writefield(move.src, piece)
-            self.writefield(move.dest, 'blk')
-            self.writefield(move.e_p_field, values.reverse_lookup(values.PIECES, move.captured_piece))
+            piece = self.readfield(move.destx, move.desty)
+            self.writefield(move.srcx, move.srcy, piece)
+            self.writefield(move.destx, move.desty, Pieces.blk)
+            self.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
             return move
 
 
@@ -175,12 +169,14 @@ class Move(models.Model):
     match= models.ForeignKey(Match, on_delete=models.CASCADE)
     count = models.PositiveSmallIntegerField(null=False)
     move_type = models.PositiveSmallIntegerField(null=False, default=1)
-    src = models.PositiveSmallIntegerField(null=False)
-    dest = models.PositiveSmallIntegerField(null=False)
-    e_p_field = models.PositiveSmallIntegerField(null=True)
+    srcx = models.PositiveSmallIntegerField(null=False)
+    srcy = models.PositiveSmallIntegerField(null=False)
+    destx = models.PositiveSmallIntegerField(null=False)
+    desty = models.PositiveSmallIntegerField(null=False)
+    e_p_fieldx = models.PositiveSmallIntegerField(null=True)
+    e_p_fieldy = models.PositiveSmallIntegerField(null=True)
     captured_piece = models.PositiveSmallIntegerField(null=False, default=0)
     prom_piece = models.PositiveSmallIntegerField(null=False, default=0)
-
 
 
 class Comment(models.Model):
