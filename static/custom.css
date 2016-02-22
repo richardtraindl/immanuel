@@ -64,13 +64,14 @@ img {
 }
 
 table {
+    table-layout: fixed;
     border-collapse: collapse;
 }
 
 #wrapper {
     margin: 0px auto;
     padding: 0px;
-    width: 680px;
+    width: 720px;
     // max-width: 90%;
     min-width: 420px;
 }

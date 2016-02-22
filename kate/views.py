@@ -87,7 +87,8 @@ def do_move(request, match_id):
                 match.save()
                 return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
 
-    return HttpResponseRedirect(reverse('kate:match' ))
+    match = match = Match.objects.get(id=match_id)
+    return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
 
 
 def undo_move(request, match_id):
