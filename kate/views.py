@@ -20,11 +20,10 @@ def match(request, match_id=None):
     else:
         match = Match.objects.get(id=match_id)
 
-    chessbd = match.readboard()
     board = [ [ [0  for k in range(2)] for x in range(8)] for x in range(8) ]
     for i in range(8):
         for j in range(8):
-            board[i][j][0] = chessbd[i][j]
+            board[i][j][0] = match.board[i][j]
             field = chr(ord('a') + j) + chr(ord('1') + i)
             board[i][j][1] = field
 
@@ -76,13 +75,17 @@ def do_move(request, match_id):
         match = get_object_or_404(Match, pk=match_id)
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
-        prom_piece = request.POST['prom_piece']
-        if(len(movesrc) > 0 and len(movedst) > 0 and len(prom_piece) > 0):
-            src = values.koord_to_index(movesrc)
-            dest = values.koord_to_index(movedst)
-            if(rules.is_move_valid(match, src, dest, prom_piece) == True):
+        prompiece = request.POST['prom_piece']
+        if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
+            srcx,srcy = values.koord_to_index(movesrc)
+            print("koord: " + str(srcx) + " " + str(srcy))
+            dstx,dsty = values.koord_to_index(movedst)
+            print("koord: " + str(dstx) + " " + str(dsty))
+            prom_piece = values.PIECES[prompiece]
+            if(rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece) == True):
+                print("****")
                 match = Match.objects.get(id=match_id)
-                move = match.do_move(src, dest, prom_piece)
+                move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
                 move.save()
                 match.save()
                 return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
