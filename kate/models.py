@@ -223,27 +223,27 @@ class Move(models.Model):
     captured_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
     prom_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
 
-    def format_move(move):
-        if(move.move_type == TYPES['standard']):
-            if(move.captured_piece == 0):
+    def format_move():
+        if(self.move_type == TYPES['standard']):
+            if(self.captured_piece == 0):
                 hyphen = "-"
             else:
                 hyphen = "x"
-            fmtmove= index_to_koord(move.srcx, move.srcy) + hyphen + index_to_koord(move.dstx, move.dsty)
+            fmtmove= values.index_to_koord(self.srcx, self.srcy) + hyphen + values.index_to_koord(self.dstx, self.dsty)
             return fmtmove
-        elif(move.move_type == TYPES['short_castling']):
+        elif(self.move_type == TYPES['short_castling']):
             return "0-0"
-        elif(move.move_type == TYPES['long_castling']):
+        elif(self.move_type == TYPES['long_castling']):
             return "0-0-0"
-        elif(move.move_type == TYPES['promotion']):
-            if(move.captured_piece == 0):
+        elif(self.move_type == TYPES['promotion']):
+            if(self.captured_piece == 0):
                 hyphen = "-"
             else:
                 hyphen = "x"
-            fmtmove= index_to_koord(move.srcx, move.srcy) + hyphen + index_to_koord(move.dstx, move.dsty) + " " + reverse_lookup(PIECES, move.prom_piece)
+            fmtmove= values.index_to_koord(self.srcx, self.srcy) + hyphen + values.index_to_koord(self.dstx, self.dsty) + " " + reverse_lookup(PIECES, self.prom_piece)
             return fmtmove
         else:
-            fmtmove= index_to_koord(move.srcx, move.srcy) + "x" + index_to_koord(move.dstx, move.dsty) + " e.p."
+            fmtmove= values.index_to_koord(self.srcx, self.srcy) + "x" + values.index_to_koord(self.dstx, self.dsty) + " e.p."
             return fmtmove
 
 
