@@ -3,10 +3,10 @@ from kate.modules import values, pawn, rook, knight, bishop, queen, king
 
 
 def is_move_color_ok(piece, count):
-    color = values.color_of_piece(piece)
-    if(count % 2 == 0 and color == values.COLORS['white']):
+    color = Match.color_of_piece(piece)
+    if(count % 2 == 0 and color == Match.COLORS['white']):
         return True
-    elif(count % 2 == 1 and color == values.COLORS['black']):
+    elif(count % 2 == 1 and color == Match.COLORS['black']):
         return True
     else:
         return False
@@ -20,31 +20,31 @@ def is_move_inbounds(srcx, srcy, dstx, dsty):
         return True
 
 
-def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
+def is_move_valid(match, count, srcx, srcy, dstx, dsty, prom_piece):
     piece = match.readfield(srcx, srcy)
 
     if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
         return False
 
-    if(not is_move_color_ok(piece, match.count)):
+    if(not is_move_color_ok(piece, count)):
         return False
 
-    if(piece == values.PIECES['wPw'] or piece == values.PIECES['bPw']):
+    if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
         if(not pawn.is_move_ok(match, srcx, srcy, dstx, dsty, prom_piece)):
             return False
         else:
             return True
-    elif(piece == values.PIECES['wRk'] or piece == values.PIECES['bRk']):
+    elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
         if(not rook.is_move_ok(match, srcx, srcy, dstx, dsty)):
             return False
         else:
             return True
-    elif(piece == values.PIECES['wKn'] or piece == values.PIECES['bKn']):
+    elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
         if(not knight.is_move_ok(match, srcx, srcy, dstx, dsty)):
             return False
         else:
             return True
-    elif(piece == values.PIECES['wBp'] or piece == values.PIECES['bBp']):
+    elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
         if(not bishop.is_move_ok(match, srcx, srcy, dstx, dsty)):
             return False
         else:
@@ -54,7 +54,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
             return False
         else:
             return True
-    elif(piece == values.PIECES['wKg'] or piece == values.PIECES['bKg']):
+    elif(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
         if(not king.is_move_ok(match, srcx, srcy, dstx, dsty)):
             return False
         else:

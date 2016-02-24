@@ -50,37 +50,37 @@ class Match(models.Model):
 
     def setboardbase(self):
         self.board = [ [0  for x in range(8)] for x in range(8) ]
-        self.board[0][0] = PIECES['wRk']
-        self.board[0][1] = PIECES['wKn']
-        self.board[0][2] = PIECES['wBp']
-        self.board[0][3] = PIECES['wQu']
-        self.board[0][4] = PIECES['wKg']
-        self.board[0][5] = PIECES['wBp']
-        self.board[0][6] = PIECES['wKn']
-        self.board[0][7] = PIECES['wRk']
+        self.board[0][0] = self.PIECES['wRk']
+        self.board[0][1] = self.PIECES['wKn']
+        self.board[0][2] = self.PIECES['wBp']
+        self.board[0][3] = self.PIECES['wQu']
+        self.board[0][4] = self.PIECES['wKg']
+        self.board[0][5] = self.PIECES['wBp']
+        self.board[0][6] = self.PIECES['wKn']
+        self.board[0][7] = self.PIECES['wRk']
         for i in range(0, 8, 1):
-            self.board[1][i] = PIECES['wPw']
+            self.board[1][i] = self.PIECES['wPw']
         for j in range(2, 6, 1):
             for i in range(0, 8, 1):
-                self.board[j][i] = PIECES['blk']
+                self.board[j][i] = self.PIECES['blk']
         for i in range(0, 8, 1):
-            self.board[6][i] = PIECES['bPw']
-        self.board[7][0] = PIECES['bRk']
-        self.board[7][1] = PIECES['bKn']
-        self.board[7][2] = PIECES['bBp']
-        self.board[7][3] = PIECES['bQu']
-        self.board[7][4] = PIECES['bKg']
-        self.board[7][5] = PIECES['bBp']
-        self.board[7][6] = PIECES['bKn']
-        self.board[7][7] = PIECES['bRk']
+            self.board[6][i] = self.PIECES['bPw']
+        self.board[7][0] = self.PIECES['bRk']
+        self.board[7][1] = self.PIECES['bKn']
+        self.board[7][2] = self.PIECES['bBp']
+        self.board[7][3] = self.PIECES['bQu']
+        self.board[7][4] = self.PIECES['bKg']
+        self.board[7][5] = self.PIECES['bBp']
+        self.board[7][6] = self.PIECES['bKn']
+        self.board[7][7] = self.PIECES['bRk']
 
 
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
-        prev_move = Move.objects.filter(match_id=self.id).order_by("count").last()
-        if(prev_move == None):
+        prevmove = Move.objects.filter(match_id=self.id).order_by("count").last()
+        if(prevmove == None):
             count = 1
         else:
-            count = prev_move.count + 1
+            count = prevmove.count + 1
 
         self.count = count
         move = Move()
@@ -89,9 +89,9 @@ class Match(models.Model):
 
         srcpiece = self.readfield(srcx, srcy)
         dstpiece = self.readfield(dstx, dsty)
-        if(srcpiece == PIECES['wPw'] or srcpiece == PIECES['bPw']):
-            if(prom_piece != PIECES['blk']):
-                self.writefield(srcx, srcy, PIECES['blk']) 
+        if(srcpiece == Match.PIECES['wPw'] or srcpiece == Match.PIECES['bPw']):
+            if(prom_piece != Match.PIECES['blk']):
+                self.writefield(srcx, srcy, Match.PIECES['blk']) 
                 self.writefield(dstx, dsty, prom_piece)
                 move.move_type = move.TYPES['promotion']
                 move.srcx = srcx
@@ -101,8 +101,8 @@ class Match(models.Model):
                 move.captured_piece = dstpiece
                 move.prom_piece = prom_piece
                 return move
-            elif(dstpiece == PIECES['blk'] and srcx != dstx):
-                self.writefield(srcx, srcy, PIECES['blk'])
+            elif(dstpiece == Match.PIECES['blk'] and srcx != dstx):
+                self.writefield(srcx, srcy, Match.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
                 move.move_type = move.TYPES['en_passant']
                 move.srcx = srcx
@@ -112,15 +112,15 @@ class Match(models.Model):
                 move.e_p_fieldx = dstx
                 move.e_p_fieldy = srcy
                 pawn = self.readfield(move.e_p_fieldx, move.e_p_fieldy)
-                self.writefield(move.e_p_fieldx, move.e_p_fieldy, PIECES['blk'])
+                self.writefield(move.e_p_fieldx, move.e_p_fieldy, Match.PIECES['blk'])
                 move.captured_piece = pawn
                 return move 
-        elif(srcpiece == PIECES['wKg'] or srcpiece == PIECES['bKg']):
+        elif(srcpiece == Match.PIECES['wKg'] or srcpiece == Match.PIECES['bKg']):
             if(srcidx - dstidx == -2):
-                self.writefield(srcx, srcy, PIECES['blk'])
+                self.writefield(srcx, srcy, Match.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
                 rook = self.readfield(srcidx + 3, srcy)
-                self.writefield(srcx + 3, srcy, PIECES['blk'])
+                self.writefield(srcx + 3, srcy, Match.PIECES['blk'])
                 self.writefield(dstx - 1, dsty, rook)
                 move.move_type = move.TYPES['short_castling']
                 move.srcx = srcx
@@ -130,10 +130,10 @@ class Match(models.Model):
                 move.captured_piece = destpiece
                 return move
             elif(srcx - dstx == 2):
-                self.writefield(srcx, srcy, PIECES['blk'])
+                self.writefield(srcx, srcy, Match.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
                 rook = self.readfield(srcx - 4, srcy)
-                self.writefield(srcx - 4, srcy, PIECES['blk'])
+                self.writefield(srcx - 4, srcy, Match.PIECES['blk'])
                 self.writefield(dstx + 1, dsty, rook)
                 move.move_type = move.TYPES['long_castling']
                 move.srcx = srcx
@@ -142,7 +142,7 @@ class Match(models.Model):
                 move.dsty = dsty
                 move.captured_piece = destpiece
                 return move
-        self.writefield(srcx, srcy, PIECES['blk'])
+        self.writefield(srcx, srcy, Match.PIECES['blk'])
         self.writefield(dstx, dsty, srcpiece)
         move.move_type = move.TYPES['standard']
         move.srcx = srcx
@@ -195,12 +195,12 @@ class Match(models.Model):
 
     @staticmethod
     def color_of_piece(piece):
-      if(piece >= PIECES['wKg'] and piece <= PIECES['wQu']):
-        return COLORS['white']
-      elif(piece >= PIECES['bKg'] and piece <= PIECES['bQu']):
-        return COLORS['black']
+      if(piece >= Match.PIECES['wKg'] and piece <= Match.PIECES['wQu']):
+        return Match.COLORS['white']
+      elif(piece >= Match.PIECES['bKg'] and piece <= Match.PIECES['bQu']):
+        return Match.COLORS['black']
       else:
-        return COLORS['undefined']
+        return Match.COLORS['undefined']
 
 
 class Move(models.Model):
@@ -213,29 +213,29 @@ class Move(models.Model):
 
     match= models.ForeignKey(Match, on_delete=models.CASCADE)
     count = models.PositiveSmallIntegerField(null=False)
-    move_type = models.PositiveSmallIntegerField(null=False, TYPES['standard'])
+    move_type = models.PositiveSmallIntegerField(null=False, default=TYPES['standard'])
     srcx = models.PositiveSmallIntegerField(null=False)
     srcy = models.PositiveSmallIntegerField(null=False)
     dstx = models.PositiveSmallIntegerField(null=False)
     dsty = models.PositiveSmallIntegerField(null=False)
     e_p_fieldx = models.PositiveSmallIntegerField(null=True)
     e_p_fieldy = models.PositiveSmallIntegerField(null=True)
-    captured_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
-    prom_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
+    captured_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
+    prom_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
 
-    def format_move():
-        if(self.move_type == TYPES['standard']):
+    def format_move(self):
+        if(self.move_type == self.TYPES['standard']):
             if(self.captured_piece == 0):
                 hyphen = "-"
             else:
                 hyphen = "x"
             fmtmove= values.index_to_koord(self.srcx, self.srcy) + hyphen + values.index_to_koord(self.dstx, self.dsty)
             return fmtmove
-        elif(self.move_type == TYPES['short_castling']):
+        elif(self.move_type == self.TYPES['short_castling']):
             return "0-0"
-        elif(self.move_type == TYPES['long_castling']):
+        elif(self.move_type == self.TYPES['long_castling']):
             return "0-0-0"
-        elif(self.move_type == TYPES['promotion']):
+        elif(self.move_type == self.TYPES['promotion']):
             if(self.captured_piece == 0):
                 hyphen = "-"
             else:
