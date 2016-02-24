@@ -64,7 +64,8 @@ def create(request):
         match.black_player = request.POST['black_player']
         match.setboardbase()
         match.save()
-        return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
+        return match(request, match_id=match.id)
+        # return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
     else:
         return HttpResponseRedirect(reverse('kate:index'))
 
