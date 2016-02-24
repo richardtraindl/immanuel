@@ -116,10 +116,10 @@ class Match(models.Model):
                 move.captured_piece = pawn
                 return move 
         elif(srcpiece == Match.PIECES['wKg'] or srcpiece == Match.PIECES['bKg']):
-            if(srcidx - dstidx == -2):
+            if(srcx - dstx == -2):
                 self.writefield(srcx, srcy, Match.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
-                rook = self.readfield(srcidx + 3, srcy)
+                rook = self.readfield(srcx + 3, srcy)
                 self.writefield(srcx + 3, srcy, Match.PIECES['blk'])
                 self.writefield(dstx - 1, dsty, rook)
                 move.move_type = move.TYPES['short_castling']
@@ -127,7 +127,7 @@ class Match(models.Model):
                 move.srcy = srcy
                 move.dstx = dstx
                 move.dsty = dsty
-                move.captured_piece = destpiece
+                move.captured_piece = dstpiece
                 return move
             elif(srcx - dstx == 2):
                 self.writefield(srcx, srcy, Match.PIECES['blk'])
