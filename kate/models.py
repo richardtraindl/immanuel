@@ -42,14 +42,13 @@ class Match(models.Model):
 
     def writefield(self, x, y, value):
         self.board[y][x] = value
-    
-    
+
+
     def readfield(self, x, y):
         return self.board[y][x]
 
 
     def setboardbase(self):
-        
         self.board = [ [0  for x in range(8)] for x in range(8) ]
         self.board[0][0] = PIECES['wRk']
         self.board[0][1] = PIECES['wKn']
@@ -194,6 +193,15 @@ class Match(models.Model):
             self.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
             return move
 
+    @staticmethod
+    def color_of_piece(piece):
+      if(piece >= PIECES['wKg'] and piece <= PIECES['wQu']):
+        return COLORS['white']
+      elif(piece >= PIECES['bKg'] and piece <= PIECES['bQu']):
+        return COLORS['black']
+      else:
+        return COLORS['undefined']
+
 
 class Move(models.Model):
     TYPES = {
@@ -214,6 +222,30 @@ class Move(models.Model):
     e_p_fieldy = models.PositiveSmallIntegerField(null=True)
     captured_piece = models.PositiveSmallIntegerField(null=False, default=0)
     prom_piece = models.PositiveSmallIntegerField(null=False, default=0)
+
+    def format_move(move):
+        if(move.move_type == TYPES['standard']):
+            if(move.captured_piece == 0):
+                hyphen = "-"
+            else:
+                hyphen = "x"
+            fmtmove= index_to_koord(move.srcx, move.srcy) + hyphen + index_to_koord(move.dstx, move.dsty)
+            return fmtmove
+        elif(move.move_type == TYPES['short_castling']):
+            return "0-0"
+        elif(move.move_type == TYPES['long_castling']):
+            return "0-0-0"
+        elif(move.move_type == TYPES['promotion']):
+            if(move.captured_piece == 0):
+                hyphen = "-"
+            else:
+                hyphen = "x"
+            fmtmove= index_to_koord(move.srcx, move.srcy) + hyphen + index_to_koord(move.dstx, move.dsty) + " " + reverse_lookup(PIECES, move.prom_piece)
+            return fmtmove
+        else:
+            fmtmove= index_to_koord(move.srcx, move.srcy) + "x" + index_to_koord(move.dstx, move.dsty) + " e.p."
+            return fmtmove
+
 
 
 class Comment(models.Model):
