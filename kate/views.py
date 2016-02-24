@@ -40,9 +40,9 @@ def match(request, match_id=None):
         for move in reversed(moves):
             if(move.count % 2 == 1 ):
                 fmtmoves.append("<tr><td>" + str( (move.count + 1) // 2) + ".</td>")
-                fmtmoves.append("<td>" + values.format_move(move) + "</td>")
+                fmtmoves.append("<td>" + move.format_move() + "</td>")
             else:
-                fmtmoves.append("<td>" + values.format_move(move) + "</td></tr>")
+                fmtmoves.append("<td>" + move.format_move() + "</td></tr>")
         if(len(moves) % 2 == 1):
             fmtmoves.append("<td>&nbsp;</td></tr>")
 
@@ -78,12 +78,9 @@ def do_move(request, match_id):
         prompiece = request.POST['prom_piece']
         if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
             srcx,srcy = values.koord_to_index(movesrc)
-            print("koord: " + str(srcx) + " " + str(srcy))
             dstx,dsty = values.koord_to_index(movedst)
-            print("koord: " + str(dstx) + " " + str(dsty))
             prom_piece = values.PIECES[prompiece]
             if(rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece) == True):
-                print("****")
                 match = Match.objects.get(id=match_id)
                 move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
                 move.save()
