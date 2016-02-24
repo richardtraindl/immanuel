@@ -140,7 +140,7 @@ class Match(models.Model):
                 move.srcy = srcy
                 move.dstx = dstx
                 move.dsty = dsty
-                move.captured_piece = destpiece
+                move.captured_piece = dstpiece
                 return move
         self.writefield(srcx, srcy, Match.PIECES['blk'])
         self.writefield(dstx, dsty, srcpiece)
@@ -179,7 +179,7 @@ class Match(models.Model):
             self.writefield(move.dstx - 2, move.dsty, rook)
             return move
         elif(move.move_type == move.TYPES['promotion']):
-            if(move.desty == 7):
+            if(move.dsty == 7):
                 piece = PIECES['wPw']
             else:
                 piece = PIECES['bPw']
