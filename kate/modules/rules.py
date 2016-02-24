@@ -49,7 +49,7 @@ def is_move_valid(match, count, srcx, srcy, dstx, dsty, prom_piece):
             return False
         else:
             return True
-    elif(piece == values.PIECES['wQu'] or piece == values.PIECES['bQu']):
+    elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
         if(not queen.is_move_ok(match, srcx, srcy, dstx, dsty)):
             return False
         else:
