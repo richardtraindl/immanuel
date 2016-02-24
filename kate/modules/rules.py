@@ -1,5 +1,5 @@
 from kate.models import Match, Move
-from kate.modules import values, pawn
+from kate.modules import values, pawn, rook, knight, bishop, queen, king
 
 
 def is_move_color_ok(piece, count):
