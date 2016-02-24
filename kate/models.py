@@ -220,8 +220,8 @@ class Move(models.Model):
     dsty = models.PositiveSmallIntegerField(null=False)
     e_p_fieldx = models.PositiveSmallIntegerField(null=True)
     e_p_fieldy = models.PositiveSmallIntegerField(null=True)
-    captured_piece = models.PositiveSmallIntegerField(null=False, default=0)
-    prom_piece = models.PositiveSmallIntegerField(null=False, default=0)
+    captured_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
+    prom_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
 
     def format_move(move):
         if(move.move_type == TYPES['standard']):
