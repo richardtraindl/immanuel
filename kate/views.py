@@ -6,6 +6,39 @@ from kate.models import Match, Move, Comment
 from kate.modules import values, rules
 
 
+def fill_fmtboard(match):
+    board = [ [ [0  for k in range(2)] for x in range(8)] for x in range(8) ]
+    for i in range(8):
+        for j in range(8):
+            board[i][j][0] = match.board[i][j]
+            field = chr(ord('a') + j) + chr(ord('1') + i)
+            board[i][j][1] = field
+    return board
+
+
+def fill_fmtmoves(match):
+    fmtmoves = []
+    
+    currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+    if(currmove == None):
+        return fmtmoves
+    else:
+        if(currmove.count % 2 == 0):
+            limit = 60
+        else:
+            limit = 61
+        moves = Move.objects.filter(match_id=match.id).order_by("count").reverse()[:limit]
+        for move in reversed(moves):
+            if(move.count % 2 == 1 ):
+                fmtmoves.append("<tr><td>" + str( (move.count + 1) // 2) + ".</td>")
+                fmtmoves.append("<td>" + move.format_move() + "</td>")
+            else:
+                fmtmoves.append("<td>" + move.format_move() + "</td></tr>")
+        if(len(moves) % 2 == 1):
+            fmtmoves.append("<td>&nbsp;</td></tr>")
+        return fmtmoves
+
+
 def index(request):
     context = RequestContext(request)
     matches = Match.objects.order_by("begin").reverse()[:10]
@@ -20,40 +53,15 @@ def match(request, match_id=None):
     else:
         match = Match.objects.get(id=match_id)
 
-    board = [ [ [0  for k in range(2)] for x in range(8)] for x in range(8) ]
-    for i in range(8):
-        for j in range(8):
-            board[i][j][0] = match.board[i][j]
-            field = chr(ord('a') + j) + chr(ord('1') + i)
-            board[i][j][1] = field
-
-    curr_move = Move.objects.filter(match_id=match_id).order_by("count").last()
-    if(curr_move == None):
-        fmtmoves = []
-    else:
-        if(curr_move.count % 2 == 0):
-            limit = 60
-        else:
-            limit = 61
-        moves = Move.objects.filter(match_id=match_id).order_by("count").reverse()[:limit]
-        fmtmoves = []
-        for move in reversed(moves):
-            if(move.count % 2 == 1 ):
-                fmtmoves.append("<tr><td>" + str( (move.count + 1) // 2) + ".</td>")
-                fmtmoves.append("<td>" + move.format_move() + "</td>")
-            else:
-                fmtmoves.append("<td>" + move.format_move() + "</td></tr>")
-        if(len(moves) % 2 == 1):
-            fmtmoves.append("<td>&nbsp;</td></tr>")
-
+    board = fill_fmtboard(match)
+    fmtmoves = fill_fmtmoves(match)
     comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
-    comment_cnt = Comment.objects.filter(match_id=match_id).count()
-    return render(request, 'kate/match.html', {'match': match, 'board': board, 'fmtmoves': fmtmoves, 'comments': comments, 'commentcnt': comment_cnt } )
+    return render(request, 'kate/match.html', {'match': match, 'board': board, 'fmtmoves': fmtmoves, 'comments': comments } )
 
 
 def new(request):
     context = RequestContext(request)
-    return render(request, 'kate/new.html', {} )
+    return render(request, 'kate/new.html', {'white_player': "", 'black_player': "" } )
 
 
 def create(request):
@@ -62,11 +70,11 @@ def create(request):
         match = Match()
         match.white_player = request.POST['white_player']
         match.black_player = request.POST['black_player']
-        match.setboardbase()
-        match.save()
-        return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
-    else:
-        return HttpResponseRedirect(reverse('kate:index'))
+        if(len(match.white_player) > 0 and len(match.black_player)):
+            match.setboardbase()
+            match.save()
+            return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
+    return render(request, 'kate/new.html', {'white_player': match.white_player, 'black_player': match.black_player } )
 
 
 def do_move(request, match_id):
@@ -85,10 +93,7 @@ def do_move(request, match_id):
                 move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
                 move.save()
                 match.save()
-                # return match(request, { 'match_id' : match.id })
                 return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
-    match = match = Match.objects.get(id=match_id)
-    # return match(request, { 'match_id' : match.id })
     return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
 
 
@@ -99,7 +104,6 @@ def undo_move(request, match_id):
     if(move != None):
         move.delete()
         match.save()
-    # return match(request, { 'match_id' : match.id })
     return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
 
 
@@ -108,14 +112,12 @@ def add_comment(request, match_id):
     match = get_object_or_404(Match, pk=match_id)
     if request.method == 'POST':
         newcomment = request.POST['newcomment']
-        print("newcomment: " + newcomment)
         if(len(newcomment) > 0):
             comment = Comment()
             comment.match_id = match.id
             comment.text = newcomment
             comment.save()
-        # return match(request, { 'match_id' : match.id })
-        return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
+    return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
 
 
 def fetch_comments(request):
@@ -153,6 +155,5 @@ def fetch_board(request):
                 data += "<td id='" + str(col[1]) + "' value='" + str(col[0]) + "'><img src='/static/img/" + str(values.reverse_lookup(values.PIECES, col[0])) + ".png'></td>"
         data += "<td class='board-label'>" + str((row[0][1])[1]) + "</td></tr>"
     data += "<tr id='board-letters'><td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td></tr>"
-    # print("html: " + data)
     return HttpResponse(data)
     

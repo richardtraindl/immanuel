@@ -20,7 +20,6 @@
             <h2>
                 <a href="{% url 'kate:new' %}">NEUES SPIEL</a> |
                 <a href="{% url 'kate:index' %}">SPIEL LADEN</a> |
-                <a href="{% url 'kate:undomove' match.id %}">ZUG RÜCKNEHMEN</a>
             </h2>
         </div>
     </div>
@@ -30,7 +29,7 @@
 {% block chat %}
     <div class="grid">
         <div class="row_12_of_12">
-            <div id="comments" commentcnt="{{ commentcnt }}">
+            <div id="comments">
             {% for comment in comments reversed %}
                 <p>{{ comment.text }}</p>
             {% endfor %}
@@ -99,6 +98,10 @@
                             </td>
                             <td>
                                 <input type="submit" value="ziehen" />
+                                &nbsp;
+                            </td>
+                            <td>
+                                <a href="{% url 'kate:undomove' match.id %}" class="btn">rücknehmen</a>
                             </td>
                         </tr>
                     </table>
@@ -109,8 +112,14 @@
         <div class="row_4_of_12">
             <table id="minutes">
                 <tr>
-                    <td colspan=3 style="text-align: center">
-                        {{ match.white_player }} &nbsp; - &nbsp; {{ match.black_player }}
+                    <td>
+                        &nbsp;
+                    </td>
+                    <td>
+                        {{ match.white_player }}
+                    </td>
+                    <td>
+                        {{ match.black_player }}
                     </td>
                 </tr>
             {% for col in fmtmoves %}
