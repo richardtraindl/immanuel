@@ -20,13 +20,13 @@ def is_move_inbounds(srcx, srcy, dstx, dsty):
         return True
 
 
-def is_move_valid(match, count, srcx, srcy, dstx, dsty, prom_piece):
+def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
     piece = match.readfield(srcx, srcy)
 
     if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
         return False
 
-    if(not is_move_color_ok(piece, count)):
+    if(not is_move_color_ok(piece, match.count)):
         return False
 
     if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):

@@ -77,16 +77,11 @@ def do_move(request, match_id):
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
         prompiece = request.POST['prom_piece']
-        prevmove = Move.objects.filter(match_id=match.id).order_by("count").last()
         if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
             srcx,srcy = values.koord_to_index(movesrc)
             dstx,dsty = values.koord_to_index(movedst)
             prom_piece = match.PIECES[prompiece]
-            if(prevmove == None):
-                count = 0
-            else:
-                count = prevmove.count
-            if(rules.is_move_valid(match, count, srcx, srcy, dstx, dsty, prom_piece) == True):
+            if(rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece) == True):
                 match = Match.objects.get(id=match_id)
                 move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
                 move.save()

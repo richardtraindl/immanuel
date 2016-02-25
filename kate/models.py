@@ -34,7 +34,8 @@ class Match(models.Model):
         'cancelled' : 5 }
 
     status = models.PositiveSmallIntegerField(null=False, default=STATUS['open'])
-    score = models.SmallIntegerField(null=False, default=0)
+    count = models.SmallIntegerField(null=False, default=0)
+    score = models.SmallIntegerField(null=False, default=0)    
     begin = models.DateTimeField(default=timezone.now)
     white_player = models.CharField(max_length=100, blank=False)
     black_player = models.CharField(max_length=100, blank=False)
@@ -76,22 +77,16 @@ class Match(models.Model):
 
 
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
-        prevmove = Move.objects.filter(match_id=self.id).order_by("count").last()
-        if(prevmove == None):
-            count = 1
-        else:
-            count = prevmove.count + 1
-
-        self.count = count
+        self.count += 1
         move = Move()
         move.match_id = self.id
-        move.count = count
+        move.count = self.count
 
         srcpiece = self.readfield(srcx, srcy)
         dstpiece = self.readfield(dstx, dsty)
-        if(srcpiece == Match.PIECES['wPw'] or srcpiece == Match.PIECES['bPw']):
+        if(srcpiece == Match.PIECES['wPw'] or srcpiece == self.PIECES['bPw']):
             if(prom_piece != Match.PIECES['blk']):
-                self.writefield(srcx, srcy, Match.PIECES['blk']) 
+                self.writefield(srcx, srcy, self.PIECES['blk']) 
                 self.writefield(dstx, dsty, prom_piece)
                 move.move_type = move.TYPES['promotion']
                 move.srcx = srcx
@@ -102,7 +97,7 @@ class Match(models.Model):
                 move.prom_piece = prom_piece
                 return move
             elif(dstpiece == Match.PIECES['blk'] and srcx != dstx):
-                self.writefield(srcx, srcy, Match.PIECES['blk'])
+                self.writefield(srcx, srcy, self.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
                 move.move_type = move.TYPES['en_passant']
                 move.srcx = srcx
@@ -112,15 +107,15 @@ class Match(models.Model):
                 move.e_p_fieldx = dstx
                 move.e_p_fieldy = srcy
                 pawn = self.readfield(move.e_p_fieldx, move.e_p_fieldy)
-                self.writefield(move.e_p_fieldx, move.e_p_fieldy, Match.PIECES['blk'])
+                self.writefield(move.e_p_fieldx, move.e_p_fieldy, self.PIECES['blk'])
                 move.captured_piece = pawn
                 return move 
-        elif(srcpiece == Match.PIECES['wKg'] or srcpiece == Match.PIECES['bKg']):
+        elif(srcpiece == Match.PIECES['wKg'] or srcpiece == self.PIECES['bKg']):
             if(srcx - dstx == -2):
-                self.writefield(srcx, srcy, Match.PIECES['blk'])
+                self.writefield(srcx, srcy, self.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
                 rook = self.readfield(srcx + 3, srcy)
-                self.writefield(srcx + 3, srcy, Match.PIECES['blk'])
+                self.writefield(srcx + 3, srcy, self.PIECES['blk'])
                 self.writefield(dstx - 1, dsty, rook)
                 move.move_type = move.TYPES['short_castling']
                 move.srcx = srcx
@@ -130,10 +125,10 @@ class Match(models.Model):
                 move.captured_piece = dstpiece
                 return move
             elif(srcx - dstx == 2):
-                self.writefield(srcx, srcy, Match.PIECES['blk'])
+                self.writefield(srcx, srcy, self.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
                 rook = self.readfield(srcx - 4, srcy)
-                self.writefield(srcx - 4, srcy, Match.PIECES['blk'])
+                self.writefield(srcx - 4, srcy, self.PIECES['blk'])
                 self.writefield(dstx + 1, dsty, rook)
                 move.move_type = move.TYPES['long_castling']
                 move.srcx = srcx
@@ -142,7 +137,7 @@ class Match(models.Model):
                 move.dsty = dsty
                 move.captured_piece = dstpiece
                 return move
-        self.writefield(srcx, srcy, Match.PIECES['blk'])
+        self.writefield(srcx, srcy, self.PIECES['blk'])
         self.writefield(dstx, dsty, srcpiece)
         move.move_type = move.TYPES['standard']
         move.srcx = srcx
@@ -157,6 +152,7 @@ class Match(models.Model):
         move = Move.objects.filter(match_id=self.id).order_by("count").last()
         if(move == None):
             return None
+        self.count -= 1
         if(move.move_type == move.TYPES['standard']):
             piece = self.readfield(move.dstx, move.dsty)
             self.writefield(move.srcx, move.srcy, piece)
@@ -166,30 +162,30 @@ class Match(models.Model):
             piece = self.readfield(move.dstx, move.dsty)
             rook = self.readfield(move.dstx - 1, move.dsty)
             self.writefield(move.srcx, move.srcy, piece)
-            self.writefield(move.dstx, move.dsty, values.PIECES['blk'])
-            self.writefield(move.dstx - 1, move.dsty, values.PIECES['blk'])
+            self.writefield(move.dstx, move.dsty, self.PIECES['blk'])
+            self.writefield(move.dstx - 1, move.dsty, self.PIECES['blk'])
             self.writefield(move.dstx + 1, move.dsty, rook)
             return move
         elif(move.move_type == move.TYPES['long_castling']):
             piece = self.readfield(move.dstx, move.dsty)
             rook = self.readfield(move.dstx + 1, move.dsty)
             self.writefield(move.srcx, move.srcy, piece)
-            self.writefield(move.dstx, move.dsty, PIECES['blk'])
-            self.writefield(move.dstx + 1, move.dsty, PIECES['blk'])
+            self.writefield(move.dstx, move.dsty, self.PIECES['blk'])
+            self.writefield(move.dstx + 1, move.dsty, self.PIECES['blk'])
             self.writefield(move.dstx - 2, move.dsty, rook)
             return move
         elif(move.move_type == move.TYPES['promotion']):
             if(move.dsty == 7):
-                piece = PIECES['wPw']
+                piece = self.PIECES['wPw']
             else:
-                piece = PIECES['bPw']
+                piece = self.PIECES['bPw']
             self.writefield(move.srcx, move.srcy, piece)
             self.writefield(move.dstx, move.dsty, move.captured_piece)
             return move
         else:
             piece = self.readfield(move.dstx, move.dsty)
             self.writefield(move.srcx, move.srcy, piece)
-            self.writefield(move.dstx, move.dsty, PIECES['blk'])
+            self.writefield(move.dstx, move.dsty, self.PIECES['blk'])
             self.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
             return move
 
@@ -240,7 +236,7 @@ class Move(models.Model):
                 hyphen = "-"
             else:
                 hyphen = "x"
-            fmtmove= values.index_to_koord(self.srcx, self.srcy) + hyphen + values.index_to_koord(self.dstx, self.dsty) + " " + reverse_lookup(PIECES, self.prom_piece)
+            fmtmove= values.index_to_koord(self.srcx, self.srcy) + hyphen + values.index_to_koord(self.dstx, self.dsty) + " " + values.reverse_lookup(Match.PIECES, self.prom_piece)
             return fmtmove
         else:
             fmtmove= values.index_to_koord(self.srcx, self.srcy) + "x" + values.index_to_koord(self.dstx, self.dsty) + " e.p."
