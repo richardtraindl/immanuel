@@ -189,26 +189,15 @@ button, input[type="submit"]{
   text-align: center;
   color: #333;
   background-color: #E6E6E6;
-  background-image: -webkit-linear-gradient(top, white 0%, #E6E6E6 100%);
-  background-image: -moz-linear-gradient(top, white 0%, #E6E6E6 100%);
-  background-image: -ms-linear-gradient(top, white 0%, #E6E6E6 100%);
-  background-image: -o-linear-gradient(top, white 0%, #E6E6E6 100%);
   background-image: linear-gradient(top, white 0%, #E6E6E6 100%);
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -ms-border-radius: 4px;
-  -o-border-radius: 4px;
   border-radius: 4px;
   cursor: pointer;
   border: 1px solid darkgray;
   white-space: nowrap; 
+
 }
 
 a.btn, a.btn:visited, a.btn:hover {
   color: #333;
-  text-decoration: none;
-}
-
-a.btn:hover {
-  background-color: #E6E6E6;
+  text-decoration: none; 
 }
