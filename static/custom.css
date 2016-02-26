@@ -133,7 +133,6 @@ nav li a:active {
 }
 
 table#board {
-    margin: 0px auto;
     background: gray;
 }
 
@@ -157,17 +156,19 @@ tr#board-letters td, .board-label {
     font-size: 12px;
 }
 
+tr#board-letters td:first-child, tr#board-letters td:nth-child(10) {
+    width: 24px !important;
+}
+
 tr#board-letters td {
     height: 24px !important;
 }
 
 
 table#process-move {
-    margin: 0px auto;
 }
 
 table#minutes {
-    margin: 0px auto;
 }
 
 #minutes td:first-child {
