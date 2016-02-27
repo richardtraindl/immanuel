@@ -20,6 +20,7 @@
             <h2>
                 <a href="{% url 'kate:new' %}">NEUES SPIEL</a> |
                 <a href="{% url 'kate:index' %}">SPIEL LADEN</a> |
+                <a href="{% url 'kate:undomove' match.id %}" onclick="return confirm('Wollen sie den letzten Zug zurücknehmen?')">ZUG RÜCKNEHMEN</a>
             </h2>
         </div>
     </div>
@@ -55,7 +56,7 @@
 {% block content %}
     <div class="grid">
         <div class="row_8_of_12">
-            <table id="board">
+            <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
                 <tr id="board-letters">
                     <td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td>
                 </tr>
@@ -99,9 +100,6 @@
                             <td>
                                 <input type="submit" value="ziehen" />
                                 &nbsp;
-                            </td>
-                            <td>
-                                <a href="{% url 'kate:undomove' match.id %}" class="btn">rücknehmen</a>
                             </td>
                         </tr>
                     </table>
@@ -179,13 +177,16 @@
                 });
             }, 5000);
 
-            // setInterval(function() {
-            //     var matchid;
-            //     matchid = $('#addcomment').attr("matchid");
-            //     $.get('/kate/fetchboard', { match_id: matchid }, function(data){
-            //        $('table#board').html(data);
-            //     });
-            // }, 10000);
+            setInterval(function(){
+                var matchid;
+                matchid = $('#board').attr("matchid");
+                movecnt = $('#board').attr("movecnt");
+                $.get('/kate/fetchboard', { matchid: matchid, movecnt: movecnt }, function(data){
+                    if(data == 1){
+                        window.location.reload();
+                    }
+                });
+            }, 10000);
 
         });
     </script>
