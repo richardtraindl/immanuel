@@ -35,18 +35,11 @@
                 <p>{{ comment.text }}</p>
             {% endfor %}
             </div>
-
+            
             <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}" matchid="{{ match.id }}" style="padding-top: 5px;">
                 {% csrf_token %}
-                <div class="grid">
-                    <div class="row_8_of_12">
-                        <textarea id="newcomment" name="newcomment" cols="40" rows="2" maxlength="200"></textarea>
-                    </div>
-                    <div class="row_4_of_12">
-                        <input type="submit" value="kommentieren" />
-                        <!-- button id ="btn-comment" type="button">kommentieren</button -->
-                    </div>
-                </div>
+                <textarea id="newcomment" name="newcomment" cols="40" rows="2" maxlength="200"></textarea>
+                <input type="submit" value="kommentieren" />
             </form>
         </div>
     </div>
@@ -88,7 +81,7 @@
                 </tr>
             </table>
 
-            <div style="padding-top: 5px">
+            <div style="padding-top: 5px; display: none;">
                 <form id="move" method="post" action="{% url 'kate:domove' match.id %}">
                     {% csrf_token %}
                     <table id="process-move">
@@ -173,6 +166,7 @@
                                 $('#prom-piece').val('bQu');
                             }
                         }
+                        $("#move").submit()
                     }
                 }
             });

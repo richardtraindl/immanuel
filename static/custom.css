@@ -181,11 +181,12 @@ table#minutes {
 }
 
 #minutes td:first-child {
+    min-width: 30px;
     width: 30px;
 }
 
 #minutes td {
-    width: 80px;
+    min-width: 80px;
 }
 
 button, input[type="submit"]{

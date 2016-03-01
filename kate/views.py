@@ -25,9 +25,9 @@ def fill_fmtmoves(match):
         return fmtmoves
     else:
         if(currmove.count % 2 == 0):
-            limit = 60
+            limit = 42
         else:
-            limit = 61
+            limit = 41
         moves = Move.objects.filter(match_id=match.id).order_by("count").reverse()[:limit]
         for move in reversed(moves):
             if(move.count % 2 == 1 ):
