@@ -32,7 +32,7 @@ def fill_fmtmoves(match):
         for move in reversed(moves):
             if(move.count % 2 == 1 ):
                 fmtmoves.append("<tr><td>" + str( (move.count + 1) // 2) + ".</td>")
-                fmtmoves.append("<td>" + move.format_move() + "</td>")
+                fmtmoves.append("<td>" + move.format_move() + "&nbsp;</td>")
             else:
                 fmtmoves.append("<td>" + move.format_move() + "</td></tr>")
         if(len(moves) % 2 == 1):

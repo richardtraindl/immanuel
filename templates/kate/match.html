@@ -109,22 +109,24 @@
         </div>
 
         <div class="row_4_of_12">
-            <table id="minutes">
-                <tr>
-                    <td>
-                        &nbsp;
-                    </td>
-                    <td>
-                        {{ match.white_player }}
-                    </td>
-                    <td>
-                        {{ match.black_player }}
-                    </td>
-                </tr>
-            {% for col in fmtmoves %}
-                {{ col|safe }}
-            {% endfor %}
-            </table>
+            <div style="padding-top: 5px;">
+                <table id="minutes">
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                        <td>
+                            {{ match.white_player }}
+                        </td>
+                        <td>
+                            {{ match.black_player }}
+                        </td>
+                    </tr>
+                    {% for col in fmtmoves %}
+                        {{ col|safe }}
+                    {% endfor %}
+                </table>
+            </div>
         </div>
     </div>
 
