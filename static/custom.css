@@ -132,6 +132,15 @@ nav li a:active {
     background-color: #FF8C69;
 }
 
+#msg {
+    padding: 5px;
+    margin: 0px;
+    background-color: Beige;
+    min-height: 30px;
+    max-height: 30px;
+    overflow: auto;
+}
+
 table#board {
     background: gray;
 }
@@ -201,4 +210,12 @@ button, input[type="submit"]{
 a.btn, a.btn:visited, a.btn:hover {
   color: #333;
   text-decoration: none; 
+}
+
+.error, .ok {
+    font-weight: bold;
+}
+
+.error {
+    color: red;
 }

@@ -54,10 +54,11 @@ def match(request, match_id=None):
     else:
         match = Match.objects.get(id=match_id)
 
-    board = fill_fmtboard(match)
+    fmtboard = fill_fmtboard(match)
     fmtmoves = fill_fmtmoves(match)
     comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
-    return render(request, 'kate/match.html', {'match': match, 'board': board, 'fmtmoves': fmtmoves, 'comments': comments } )
+    msg = "<p class='ok'></p>"
+    return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
 
 
 def new(request):
@@ -94,8 +95,17 @@ def do_move(request, match_id):
                 move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
                 move.save()
                 match.save()
-                return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
-    return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
+                msg = "<p class='ok'>Zug ist OK.</p>"
+            else:
+                msg = "<p class='error'>Zug ist ungültig.</p>"
+        else:
+            msg = "<p class='error'>Zug-Format ist ungültig.</p>"
+        fmtboard = fill_fmtboard(match)
+        fmtmoves = fill_fmtmoves(match)
+        comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
+        return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
+    else:
+        return HttpResponseRedirect(reverse('kate:match', args=(match_id,)))
 
 
 def undo_move(request, match_id):
