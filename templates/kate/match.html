@@ -48,15 +48,11 @@
 
 {% block content %}
     <div class="grid">
-        <div class="row_12_of_12">
+        <div class="row_8_of_12">
             <div id="msg">
                 {{ msg|safe }}
             </div>
-        </div>
-    </div>
 
-    <div class="grid">
-        <div class="row_8_of_12">
             <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
                 <tr id="board-letters">
                     <td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td>
@@ -81,31 +77,46 @@
                 </tr>
             </table>
 
-            <div style="padding-top: 5px; display: none;">
-                <form id="move" method="post" action="{% url 'kate:domove' match.id %}">
-                    {% csrf_token %}
-                    <table id="process-move">
-                        <tr>
-                            <td>
-                                <input id="move-src" type="text" name="move_src" value="" size="3" />
-                                &nbsp;
-                            </td>
-                            <td>
-                                <input id="move-dst" type="text" name="move_dst" value="" size="3" />
-                                &nbsp;
-                            </td>
-                            <td>
-                                <input id="prom-piece" type="text" name="prom_piece" value="blk" size="3" readonly="readonly" />
-                                &nbsp;
-                            </td>
-                            <td>
-                                <input type="submit" value="ziehen" />
-                                &nbsp;
-                            </td>
-                        </tr>
-                    </table>
-                </form>
+            <div>
+                <table id="promotion">
+                    <tr id="white-pieces" class="invisible">
+                        <td value="wQu"><img src="{% static 6|imgsrc %}"></td>
+                        <td value="wBp"><img src="{% static 5|imgsrc %}"></td>
+                        <td value="wKn"><img src="{% static 4|imgsrc %}"></td>
+                        <td value="wRk"><img src="{% static 3|imgsrc %}"></td>
+                     </tr>
+                     <tr id="black-pieces" class="invisible">
+                        <td value="bQu"><img src="{% static 14|imgsrc %}"></td>
+                        <td value="bBp"><img src="{% static 13|imgsrc %}"></td>
+                        <td value="bKn"><img src="{% static 12|imgsrc %}"></td>
+                        <td value="bRk"><img src="{% static 11|imgsrc %}"></td>
+                    </tr>
+                </table>
             </div>
+
+            <form id="move" method="post" action="{% url 'kate:domove' match.id %}" style="display: none;">
+                {% csrf_token %}
+                <table id="process-move">
+                    <tr>
+                        <td>
+                            <input id="move-src" type="text" name="move_src" value="" size="3" />
+                            &nbsp;
+                        </td>
+                        <td>
+                            <input id="move-dst" type="text" name="move_dst" value="" size="3" />
+                            &nbsp;
+                        </td>
+                        <td>
+                            <input id="prom-piece" type="text" name="prom_piece" value="blk" size="3" readonly="readonly" />
+                            &nbsp;
+                        </td>
+                        <td>
+                            <input type="submit" value="ziehen" />
+                            &nbsp;
+                        </td>
+                    </tr>
+                </table>
+            </form>
         </div>
 
         <div class="row_4_of_12">
@@ -135,6 +146,8 @@
             $('#board td').click(function(){
                 if( $(this).hasClass("marked") ){
                     $(this).removeClass("marked");
+                    $('#white-pieces').addClass("invisible");
+                    $('#black-pieces').addClass("invisible");
                     $('#prom-piece').attr("readonly", "readonly");
                     if( $('#move-dst').val().trim() == $(this).attr("id") ){
                         $('#move-dst').val("");
@@ -157,22 +170,31 @@
                         if( piece == '2' ){
                             var row = $('#move-dst').val();
                             if( row.charAt(1) == '8' ){
+                                $('#white-pieces').removeClass("invisible");
                                 $('#prom-piece').removeAttr("readonly");
-                                $('#prom-piece').val('wQu');
+                                return;
                             }
                         }
                         else if( piece == '10' ){
                             var row = $('#move-dst').val();
                             if( row.charAt(1) == '1' ){
+                                $('#black-pieces').removeClass("invisible");
                                 $('#prom-piece').removeAttr("readonly");
-                                $('#prom-piece').val('bQu');
+                                return;
                             }
                         }
                         $("#move").submit()
                     }
                 }
             });
-        
+
+            $('#promotion td').click(function(){
+                var piece;
+                piece = $(this).attr("value");
+                $('#prom-piece').val(piece);
+                $("#move").submit()
+            });
+
             setInterval(function() {
                 var matchid;
                 matchid = $('#addcomment').attr("matchid");
