@@ -6,14 +6,33 @@ from kate.models import Match, Move, Comment
 from kate.modules import values, rules
 
 
-def fill_fmtboard(match):
+def fill_fmtboard(match, switch):
     fmtboard = [ [ [0  for k in range(2)] for x in range(8)] for x in range(8) ]
 
-    for i in range(8):
-        for j in range(8):
-            fmtboard[i][j][0] = match.board[i][j]
+    if(switch == 0):
+        rowstart = 7
+        rowend = -1
+        rowstep = -1
+        colstart = 0
+        colend = 8
+        colstep = 1
+    else:
+        rowstart = 0
+        rowend = 8
+        rowstep = 1
+        colstart = 7
+        colend = -1
+        colstep = -1
+
+    idx1 = 0
+    for i in range(rowstart, rowend, rowstep):
+        idx2 = 0
+        for j in range(colstart, colend, colstep):
+            fmtboard[idx1][idx2][0] = match.board[i][j]
             field = chr(ord('a') + j) + chr(ord('1') + i)
-            fmtboard[i][j][1] = field
+            fmtboard[idx1][idx2][1] = field
+            idx2 += 1
+        idx1 += 1
     return fmtboard
 
 
@@ -46,19 +65,20 @@ def index(request):
     return render(request, 'kate/index.html', {'matches': matches} )
 
 
-def match(request, match_id=None):
+def match(request, match_id=None, switch=None):
     context = RequestContext(request)
+    print("xx:" + switch)
     if match_id == None:
         match = Match(white_player=None, black_player=None)
         match.setboardbase()
     else:
         match = Match.objects.get(id=match_id)
 
-    fmtboard = fill_fmtboard(match)
+    fmtboard = fill_fmtboard(match, int(switch))
     fmtmoves = fill_fmtmoves(match)
     comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
     msg = "<p class='ok'></p>"
-    return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
+    return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'switch': switch, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
 
 
 def new(request):
@@ -75,7 +95,7 @@ def create(request):
         if(len(match.white_player) > 0 and len(match.black_player)):
             match.setboardbase()
             match.save()
-            return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
+            return HttpResponseRedirect(reverse('kate:match', args=(match.id, 0)))
     return render(request, 'kate/new.html', {'white_player': match.white_player, 'black_player': match.black_player } )
 
 
@@ -86,6 +106,7 @@ def do_move(request, match_id):
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
         prompiece = request.POST['prom_piece']
+        switch = request.POST['switch']
         if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
             srcx,srcy = values.koord_to_index(movesrc)
             dstx,dsty = values.koord_to_index(movedst)
@@ -100,22 +121,22 @@ def do_move(request, match_id):
                 msg = "<p class='error'>Zug ist ungültig.</p>"
         else:
             msg = "<p class='error'>Zug-Format ist ungültig.</p>"
-        fmtboard = fill_fmtboard(match)
+        fmtboard = fill_fmtboard(match, int(switch))
         fmtmoves = fill_fmtmoves(match)
         comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
-        return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
+        return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'movesrc': movesrc, 'movedst': movedst, 'switch': switch, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
     else:
-        return HttpResponseRedirect(reverse('kate:match', args=(match_id,)))
+        return HttpResponseRedirect(reverse('kate:match', args=(match_id, switch)))
 
 
-def undo_move(request, match_id):
+def undo_move(request, match_id, switch=None):
     context = RequestContext(request)
     match = Match.objects.get(id=match_id)
     move = match.undo_move()
     if(move != None):
         move.delete()
         match.save()
-    return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
+    return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
 
 
 def add_comment(request, match_id):
@@ -128,7 +149,7 @@ def add_comment(request, match_id):
             comment.match_id = match.id
             comment.text = newcomment
             comment.save()
-    return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
+    return HttpResponseRedirect(reverse('kate:match', args=(match.id, 0)))
 
 
 def fetch_comments(request):
@@ -152,38 +173,5 @@ def fetch_board(request):
         data = 0
     else:
         data = 1
-    return HttpResponse(data)
-
-
-def fetch_board2(request):
-    context = RequestContext(request)
-    match_id = request.GET['match_id']
-
-    match = Match.objects.get(id=match_id)
-    chessbd = fill_fmtboard(match)
-    # chessbd = match.readboard()
-    # board = [ [ [0  for k in range(2)] for x in range(8)] for x in range(8) ]
-    # for i in range(8):
-    #     for j in range(8):
-    #         board[i][j][0] = chessbd[i][j]
-    #         field = chr(ord('a') + j) + chr(ord('1') + i)
-    #         board[i][j][1] = field
-
-    data = []
-    data += "<tr id='board-letters'><td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td></tr>"
-    for row in reversed(chessbd):
-        data += "<tr><td class='board-label'>" + str((row[0][1])[1]) + "</td>"
-        for col in row:
-            if col[0] == 0:
-                data += "<td id='" + str(col[1]) + "' value='" + str(col[0]) + "'>&nbsp;</td>"
-            else:
-                data += "<td id='" + str(col[1]) + "' value='" + str(col[0]) + "'><img src='/static/img/" + str(values.reverse_lookup(match.PIECES, col[0])) + ".png'></td>"
-        data += "<td class='board-label'>" + str((row[0][1])[1]) + "</td></tr>"
-    data += "<tr id='board-letters'><td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td></tr>"
-
-    data += "|||"
-    lstmoves = fill_fmtmoves(match)
-    for col in lstmoves:
-        data += col
     return HttpResponse(data)
     

@@ -20,7 +20,8 @@
             <h2>
                 <a href="{% url 'kate:new' %}">NEUES SPIEL</a> |
                 <a href="{% url 'kate:index' %}">SPIEL LADEN</a> |
-                <a href="{% url 'kate:undomove' match.id %}" onclick="return confirm('Wollen sie den letzten Zug zurücknehmen?')">ZUG RÜCKNEHMEN</a>
+                <a href="{% url 'kate:match' match.id switch|invert %}">BRETT DREHEN</a> |
+                <a href="{% url 'kate:undomove' match.id switch %}" onclick="return confirm('Wollen sie den letzten Zug zurücknehmen?')">ZUG RÜCKNEHMEN</a>
             </h2>
         </div>
     </div>
@@ -57,11 +58,15 @@
                 <tr id="board-letters">
                     <td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td>
                 </tr>
-            {% for row in board reversed %}
+            {% for row in board %}
                 <tr>
                     <td class="board-label">{{ row.0.1|cut }}</td>
                 {% for col in row %}
-                    <td id="{{ col.1 }}" value="{{ col.0 }}">
+                    {% if col.1 == movesrc or col.1 == movedst %}
+                        <td id="{{ col.1 }}" class="hint" value="{{ col.0 }}">
+                    {% else %}
+                        <td id="{{ col.1 }}" value="{{ col.0 }}">
+                    {% endif %}
                     {% if col.0 == 0 %}
                         &nbsp;
                     {% else %}
@@ -110,6 +115,11 @@
                             <input id="prom-piece" type="text" name="prom_piece" value="blk" size="3" readonly="readonly" />
                             &nbsp;
                         </td>
+                        <td>
+                            <input id="switch" type="text" name="switch" value="{{ switch }}" size="3" readonly="readonly" />
+                            &nbsp;
+                        </td>
+
                         <td>
                             <input type="submit" value="ziehen" />
                             &nbsp;

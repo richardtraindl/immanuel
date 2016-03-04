@@ -16,13 +16,9 @@ def alternate(value):
     else:
         return 'white'
 
-@register.filter(name='iseven')
-def iseven(value):
-    return value % 2 == 0
-
-@register.filter(name='isodd')
-def isodd(value):
-    return value % 2 != 0
+@register.filter(name='invert')
+def invert(value):
+    return int(value) ^ 1
 
 @register.filter(name='cut')
 def cut(value):

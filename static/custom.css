@@ -217,6 +217,10 @@ a.btn, a.btn:visited, a.btn:hover {
     font-weight: bold;
 }
 
-.error {
+.error{
     color: red;
+}
+
+.hint {
+    background-color: lightblue !important;
 }
