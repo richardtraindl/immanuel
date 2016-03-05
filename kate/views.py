@@ -65,20 +65,27 @@ def index(request):
     return render(request, 'kate/index.html', {'matches': matches} )
 
 
-def match(request, match_id=None, switch=None):
+def match(request, match_id=None, switch=0, newmove=0):
     context = RequestContext(request)
-    print("xx:" + switch)
     if match_id == None:
         match = Match(white_player=None, black_player=None)
         match.setboardbase()
     else:
         match = Match.objects.get(id=match_id)
 
+    movesrc = ''
+    movedst = ''
+    if(int(newmove) == 1):
+        lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+        if(lastmove != None):
+            movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
+            movedst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
+
     fmtboard = fill_fmtboard(match, int(switch))
     fmtmoves = fill_fmtmoves(match)
     comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
     msg = "<p class='ok'></p>"
-    return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'switch': switch, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
+    return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
 
 
 def new(request):
@@ -95,7 +102,7 @@ def create(request):
         if(len(match.white_player) > 0 and len(match.black_player)):
             match.setboardbase()
             match.save()
-            return HttpResponseRedirect(reverse('kate:match', args=(match.id, 0)))
+            return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
     return render(request, 'kate/new.html', {'white_player': match.white_player, 'black_player': match.black_player } )
 
 
@@ -124,7 +131,7 @@ def do_move(request, match_id):
         fmtboard = fill_fmtboard(match, int(switch))
         fmtmoves = fill_fmtmoves(match)
         comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
-        return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'movesrc': movesrc, 'movedst': movedst, 'switch': switch, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
+        return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(match_id, switch)))
 

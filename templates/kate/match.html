@@ -217,9 +217,13 @@
                 var matchid;
                 matchid = $('#board').attr("matchid");
                 movecnt = $('#board').attr("movecnt");
+                switchflag = $('#switch').attr("value");
                 $.get('/kate/fetchboard', { matchid: matchid, movecnt: movecnt }, function(data){
                     if(data == 1){
-                        window.location.reload();
+                        var url;
+                        url = '/kate/' + matchid + '/' + switchflag + '/1' + '/match/';
+                        window.location.href = url;
+                        // window.location.reload();
                     }
                 });
             }, 10000);
