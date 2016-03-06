@@ -38,8 +38,21 @@ class Match(models.Model):
     score = models.SmallIntegerField(null=False, default=0)    
     begin = models.DateTimeField(default=timezone.now)
     white_player = models.CharField(max_length=100, blank=False)
+    white_player_human = models.BooleanField(null=False, default=False)
     black_player = models.CharField(max_length=100, blank=False)
+    black_player_human = models.BooleanField(null=False, default=False)
     board = ArrayField(ArrayField(models.PositiveSmallIntegerField(null=False, blank=False, default=PIECES['blk']), size=8), size=8)
+    fifty_moves_count = models.SmallIntegerField(null=False, default=0)
+    wKg_x = models.SmallIntegerField(null=False, default=0)
+    wKg_y = models.SmallIntegerField(null=False, default=0)
+    bKg_x = models.SmallIntegerField(null=False, default=0)
+    bKg_y = models.SmallIntegerField(null=False, default=0)
+    wKg_first_movecnt = models.SmallIntegerField(null=False, default=0)
+    bKg_first_movecnt = models.SmallIntegerField(null=False, default=0)
+    wRk_a1_first_movecnt = models.SmallIntegerField(null=False, default=0)
+    wRk_h1_first_movecnt = models.SmallIntegerField(null=False, default=0)
+    bRk_a8_first_movecnt = models.SmallIntegerField(null=False, default=0)
+    bRk_h8_first_movecnt = models.SmallIntegerField(null=False, default=0)
 
     def writefield(self, x, y, value):
         self.board[y][x] = value
@@ -75,12 +88,25 @@ class Match(models.Model):
         self.board[7][6] = self.PIECES['bKn']
         self.board[7][7] = self.PIECES['bRk']
 
+        self.fifty_moves_count = 0
+        self.wKg_x = 3
+        self.wKg_y = 0
+        self.bKg_x = 3
+        self.bKg_y = 7
+        self.wKg_first_movecnt = 0
+        self.bKg_first_movecnt = 0
+        self.wRk_a1_first_movecnt = 0
+        self.wRk_h1_first_movecnt = 0
+        self.bRk_a8_first_movecnt = 0
+        self.bRk_h8_first_movecnt = 0
+
 
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
         self.count += 1
         move = Move()
         move.match_id = self.id
         move.count = self.count
+        move.fifty_moves_count = self.fifty_moves_count
 
         srcpiece = self.readfield(srcx, srcy)
         dstpiece = self.readfield(dstx, dsty)
@@ -88,6 +114,7 @@ class Match(models.Model):
             if(prom_piece != Match.PIECES['blk']):
                 self.writefield(srcx, srcy, self.PIECES['blk']) 
                 self.writefield(dstx, dsty, prom_piece)
+                self.fifty_moves_count = 0
                 move.move_type = move.TYPES['promotion']
                 move.srcx = srcx
                 move.srcy = srcy
@@ -99,6 +126,7 @@ class Match(models.Model):
             elif(dstpiece == Match.PIECES['blk'] and srcx != dstx):
                 self.writefield(srcx, srcy, self.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
+                self.fifty_moves_count = 0
                 move.move_type = move.TYPES['en_passant']
                 move.srcx = srcx
                 move.srcy = srcy
@@ -117,6 +145,16 @@ class Match(models.Model):
                 rook = self.readfield(srcx + 3, srcy)
                 self.writefield(srcx + 3, srcy, self.PIECES['blk'])
                 self.writefield(dstx - 1, dsty, rook)
+                self.fifty_moves_count += 1
+                if(srcpiece == Match.PIECES['wKg']):
+                    self.wKg_x = dstx
+                    self.wKg_y = dsty
+                    self.wKg_first_movecnt = self.count
+                else:
+                    self.bKg_x = dstx
+                    self.bKg_y = dsty              
+                    self.bKg_first_movecnt = self.count
+                
                 move.move_type = move.TYPES['short_castling']
                 move.srcx = srcx
                 move.srcy = srcy
@@ -130,6 +168,16 @@ class Match(models.Model):
                 rook = self.readfield(srcx - 4, srcy)
                 self.writefield(srcx - 4, srcy, self.PIECES['blk'])
                 self.writefield(dstx + 1, dsty, rook)
+                self.fifty_moves_count += 1
+                if(srcpiece == Match.PIECES['wKg']):
+                    self.wKg_x = dstx
+                    self.wKg_y = dsty
+                    self.wKg_first_movecnt = self.count
+                else:
+                    self.bKg_x = dstx
+                    self.bKg_y = dsty              
+                    self.bKg_first_movecnt = self.count
+                
                 move.move_type = move.TYPES['long_castling']
                 move.srcx = srcx
                 move.srcy = srcy
@@ -139,6 +187,32 @@ class Match(models.Model):
                 return move
         self.writefield(srcx, srcy, self.PIECES['blk'])
         self.writefield(dstx, dsty, srcpiece)
+        if(dstpiece != self.PIECES['blk']):
+            self.fifty_moves_count = 0
+        else:
+            self.fifty_moves_count += 1
+
+        if(srcpiece == Match.PIECES['wKg']):
+            self.wKg_x = dstx
+            self.wKg_y = dsty
+            self.wKg_first_movecnt = self.count
+        else:
+            self.bKg_x = dstx
+            self.bKg_y = dsty
+            self.bKg_first_movecnt = self.count
+
+        if(srcpiece == Match.PIECES['wRk']):
+            if(srcx == 0 and srcy == 0 and self.wRk_a1_first_movecnt == 0):
+                self.wRk_a1_first_movecnt = self.count
+            elif(srcx == 7 and srcy == 0 and self.wRk_h1_first_movecnt == 0):
+                self.wRk_h1_first_movecnt = self.count
+        elif(srcpiece == Match.PIECES['bRk']):
+            if(srcx == 0 and srcy == 7 and self.wRk_a8_first_movecnt == 0):
+                self.wRk_a8_first_movecnt = self.count
+            elif(srcx == 7 and srcy == 7 and self.wRk_h8_first_movecnt == 0):
+                self.wRk_h8_first_movecnt = self.count
+
+        move.fifty_moves_count = self.fifty_moves_count
         move.move_type = move.TYPES['standard']
         move.srcx = srcx
         move.srcy = srcy
@@ -218,6 +292,7 @@ class Move(models.Model):
     e_p_fieldy = models.PositiveSmallIntegerField(null=True)
     captured_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
     prom_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
+    fifty_moves_count = models.SmallIntegerField(null=False)
 
     def format_move(self):
         if(self.move_type == self.TYPES['standard']):

@@ -65,17 +65,17 @@ def index(request):
     return render(request, 'kate/index.html', {'matches': matches} )
 
 
-def match(request, match_id=None, switch=0, newmove=0):
+def match(request, matchid=None, switch=0, markmove=0):
     context = RequestContext(request)
-    if match_id == None:
+    if matchid == None:
         match = Match(white_player=None, black_player=None)
         match.setboardbase()
     else:
-        match = Match.objects.get(id=match_id)
+        match = Match.objects.get(id=matchid)
 
     movesrc = ''
     movedst = ''
-    if(int(newmove) == 1):
+    if(int(markmove) == 1):
         lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
         if(lastmove != None):
             movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
@@ -83,7 +83,7 @@ def match(request, match_id=None, switch=0, newmove=0):
 
     fmtboard = fill_fmtboard(match, int(switch))
     fmtmoves = fill_fmtmoves(match)
-    comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
+    comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
     msg = "<p class='ok'></p>"
     return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
 
@@ -106,10 +106,10 @@ def create(request):
     return render(request, 'kate/new.html', {'white_player': match.white_player, 'black_player': match.black_player } )
 
 
-def do_move(request, match_id):
+def do_move(request, matchid):
     context = RequestContext(request)
     if request.method == 'POST':
-        match = get_object_or_404(Match, pk=match_id)
+        match = get_object_or_404(Match, pk=matchid)
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
         prompiece = request.POST['prom_piece']
@@ -119,7 +119,7 @@ def do_move(request, match_id):
             dstx,dsty = values.koord_to_index(movedst)
             prom_piece = match.PIECES[prompiece]
             if(rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece) == True):
-                match = Match.objects.get(id=match_id)
+                match = Match.objects.get(id=matchid)
                 move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
                 move.save()
                 match.save()
@@ -130,25 +130,25 @@ def do_move(request, match_id):
             msg = "<p class='error'>Zug-Format ist ungültig.</p>"
         fmtboard = fill_fmtboard(match, int(switch))
         fmtmoves = fill_fmtmoves(match)
-        comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
+        comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
         return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
     else:
-        return HttpResponseRedirect(reverse('kate:match', args=(match_id, switch)))
+        return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
 
 
-def undo_move(request, match_id, switch=None):
+def undo_move(request, matchid, switch=None):
     context = RequestContext(request)
-    match = Match.objects.get(id=match_id)
+    match = Match.objects.get(id=matchid)
     move = match.undo_move()
     if(move != None):
         move.delete()
         match.save()
-    return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
+    return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch, 1)))
 
 
-def add_comment(request, match_id):
+def add_comment(request, matchid):
     context = RequestContext(request)
-    match = get_object_or_404(Match, pk=match_id)
+    match = get_object_or_404(Match, pk=matchid)
     if request.method == 'POST':
         newcomment = request.POST['newcomment']
         if(len(newcomment) > 0):
@@ -162,8 +162,8 @@ def add_comment(request, match_id):
 def fetch_comments(request):
     context = RequestContext(request)
     if request.method == 'GET':
-        match_id = request.GET['matchid']
-        comments = Comment.objects.filter(match_id=match_id).order_by("created_at").reverse()[:5]
+        matchid = request.GET['matchid']
+        comments = Comment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:5]
         data = ""
         for comment in reversed(comments):
             data += "<p>" + comment.text + "</p>"
@@ -175,10 +175,9 @@ def fetch_board(request):
     matchid = request.GET['matchid']
     movecnt = request.GET['movecnt']
     match = Match.objects.get(id=matchid)
-    print(" " + str(movecnt) + " " + str(match.count))
     if(int(movecnt) == match.count):
         data = 0
     else:
         data = 1
     return HttpResponse(data)
-    
+

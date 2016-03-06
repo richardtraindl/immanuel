@@ -30,32 +30,32 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
         return False
 
     if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
-        if(not pawn.is_move_ok(match, srcx, srcy, dstx, dsty, prom_piece)):
+        if(not pawn.is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece)):
             return False
         else:
             return True
     elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
-        if(not rook.is_move_ok(match, srcx, srcy, dstx, dsty)):
+        if(not rook.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
             return False
         else:
             return True
     elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
-        if(not knight.is_move_ok(match, srcx, srcy, dstx, dsty)):
+        if(not knight.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
             return False
         else:
             return True
     elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
-        if(not bishop.is_move_ok(match, srcx, srcy, dstx, dsty)):
+        if(not bishop.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
             return False
         else:
             return True
     elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
-        if(not queen.is_move_ok(match, srcx, srcy, dstx, dsty)):
+        if(not queen.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
             return False
         else:
             return True
     elif(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
-        if(not king.is_move_ok(match, srcx, srcy, dstx, dsty)):
+        if(not king.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
             return False
         else:
             return True
