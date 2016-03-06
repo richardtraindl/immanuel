@@ -7,11 +7,11 @@ DIRS = {
     'west' : 4,
     'undefined' : 5 }
 
-PIN_DIRS = {
-    'vertical' : 1,
-    'hotizontal' : 2,
-    'south-west-to-north-east' : 3,
-    'south-east-to-north-west' : 4,
+REVERSE_DIRS = {
+    'north' : DIRS['south'],
+    'south' : DIRS['north'],
+    'east' : DIRS['west'],
+    'west' : DIRS['east'],
     'undefined' : 5 }
 
 NORTH_X = 0
@@ -47,12 +47,10 @@ def move_step(srcx, srcy, dstx, dsty):
     elif(direction == DIRS['west']):
         return WEST_X, WEST_Y
     else:
-        return NORTH_X, NORTH_Y
+        return 8, 8
 
 
-# define IST_TURMZUG_OK(FARBE, GEGN_FARBE, KOENIG_X, KOENIG_Y) \
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
-  # return True
     direction = rook_direction(srcx, srcy, dstx, dsty)
     if(direction == DIRS['undefined']):
         return False
@@ -60,17 +58,17 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
     stepx, stepy = move_step(srcx, srcy, dstx, dsty)
 
     if(match.color_of_piece(piece) == match.COLORS['white']):
-        pinned = PIN_DIRS['undefined']
+        pinned = DIRS['undefined']
         # fesselung = gib_weisse_figur_fesselung(_session->brett, _gzug->start_x, _gzug->start_y, _session->kw_feldnr_x, _session->kw_feldnr_y); \
     else:
-        pinned = PIN_DIRS['undefined']
+        pinned = DIRS['undefined']
         # fesselung = gib_schwarze_figur_fesselung(_session->brett, _gzug->start_x, _gzug->start_y, _session->ks_feldnr_x, _session->ks_feldnr_y); \
 
     if(direction == DIRS['north'] or direction == DIRS['south']):
-        if(pinned != PIN_DIRS['vertical'] and pinned != PIN_DIRS['undefined']):
+        if(pinned != DIRS['north'] and pinned != DIRS['south'] and pinned != DIRS['undefined']):
             return False
     elif(direction == DIRS['east'] or direction == DIRS['west']):
-        if(pinned != PIN_DIRS['hotizontal'] and pinned != PIN_DIRS['undefined']):
+        if(pinned != DIRS['east'] and pinned != DIRS['west'] and pinned != DIRS['undefined']):
             return False
 
     x = srcx
