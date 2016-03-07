@@ -1,19 +1,18 @@
-  
+from kate.models import Match
 
 DIRS = {
-    'north-east' : 1,
-    'south-west' : 2,
-    'north-west' : 3,
-    'south-east' : 4,
-    'undefined' : 5 }
-
+    'north-east' : 5,
+    'south-west' : 6,
+    'north-west' : 7,
+    'south-east' : 8,
+    'undefined' : 10 }
 
 REVERSE_DIRS = {
     'north-east' : DIRS['south-west'],
     'south-west' : DIRS['north-east'],
     'north-west' : DIRS['south-east'],
     'south-east' : DIRS['north-west'],
-    'undefined' : 5 }
+    'undefined' : 10 }
 
 NEAST_X = 1
 NEAST_Y = 1
@@ -24,7 +23,8 @@ NWEST_Y = 1
 SEAST_X = 1
 SEAST_Y = -1
 
-def bishop_direction(srcx, srcy, dstx, dsty):
+
+def direction(srcx, srcy, dstx, dsty):
     if( (srcx - dstx) == (srcy - dsty) and (srcy < dsty) ):
         return DIRS['north-east']
     elif( (srcx - dstx) == (srcy - dsty) and (srcy > dsty) ):
@@ -36,27 +36,28 @@ def bishop_direction(srcx, srcy, dstx, dsty):
     else:
         return DIRS['undefined']
 
+def step(bishop_direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
+    if(bishop_direction == None):
+        bishop_direction = direction(srcx, srcy, dstx, dsty)
 
-def move_step(srcx, srcy, dstx, dsty):
-    direction = bishop_direction(srcx, srcy, dstx, dsty)
-    if(direction == DIRS['north-east']):
+    if(bishop_direction == DIRS['north-east']):
         return NEAST_X, NEAST_Y
-    elif(direction == DIRS['south-west']):
+    elif(bishop_direction == DIRS['south-west']):
         return SWEST_X, SWEST_Y
-    elif(direction == DIRS['north-west']):
+    elif(bishop_direction == DIRS['north-west']):
         return NWEST_X, NWEST_Y
-    elif(direction == DIRS['south-east']):
+    elif(bishop_direction == DIRS['south-east']):
         return SEAST_X, SEAST_Y
     else:
         return 8, 8
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
-    direction = bishop_direction(srcx, srcy, dstx, dsty)
-    if(direction == DIRS['undefined']):
+    bishop_direction = direction(srcx, srcy, dstx, dsty)
+    if(bishop_direction == DIRS['undefined']):
         return False
 
-    stepx, stepy = move_step(srcx, srcy, dstx, dsty)
+    stepx, stepy = step(None, srcx, srcy, dstx, dsty)
 
     if(match.color_of_piece(piece) == match.COLORS['white']):
         pinned = DIRS['undefined']
@@ -65,18 +66,16 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
         pinned = DIRS['undefined']
         # fesselung = gib_schwarze_figur_fesselung(_session->brett, _gzug->start_x, _gzug->start_y, _session->ks_feldnr_x, _session->ks_feldnr_y); \
 
-    if(direction == DIRS['north-east'] or direction == DIRS['south-west']):
+    if(bishop_direction == DIRS['north-east'] or bishop_direction == DIRS['south-west']):
         if(pinned != DIRS['north-east'] and pinned != DIRS['south-west'] and pinned != DIRS['undefined']):
             return False
-    elif(direction == DIRS['north-west'] or direction == DIRS['south-east']):
+    elif(bishop_direction == DIRS['north-west'] or bishop_direction == DIRS['south-east']):
         if(pinned != DIRS['north-west'] and pinned != DIRS['south-east'] and pinned != DIRS['undefined']):
             return False
 
-    x = srcx
-    y = srcy
+    x = srcx + stepx
+    y = srcy + stepy
     while(x >= 0 and x <= 7 and y >= 0 and y <= 7):
-        x += stepx
-        y += stepy
         field = match.readfield(x, y)
         if(x == dstx and y == dsty):
             if(match.color_of_piece(field)== match.color_of_piece(piece)):
@@ -85,6 +84,9 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
                 return True
         elif(field != match.PIECES['blk']):
             return False
+
+        x += stepx
+        y += stepy
 
     return False
 

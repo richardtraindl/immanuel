@@ -1,18 +1,19 @@
-
+from kate.models import Match
+from kate.modules import values, rules
 
 DIRS = {
     'north' : 1,
     'south' : 2,
     'east' : 3,
     'west' : 4,
-    'undefined' : 5 }
+    'undefined' : 10 }
 
 REVERSE_DIRS = {
-    'north' : DIRS['south'],
-    'south' : DIRS['north'],
-    'east' : DIRS['west'],
-    'west' : DIRS['east'],
-    'undefined' : 5 }
+    DIRS['north'] : DIRS['south'],
+    DIRS['south'] : DIRS['north'],
+    DIRS['east'] : DIRS['west'],
+    DIRS['west'] : DIRS['east'],
+    DIRS['undefined'] : 10 }
 
 NORTH_X = 0
 NORTH_Y = 1
@@ -23,7 +24,8 @@ EAST_Y = 0
 WEST_X = -1
 WEST_Y = 0
 
-def rook_direction(srcx, srcy, dstx, dsty):
+
+def direction(srcx, srcy, dstx, dsty):
     if( (srcx == dstx) and (srcy < dsty) ):
         return DIRS['north']
     elif( (srcx == dstx) and (srcy > dsty) ):
@@ -36,54 +38,55 @@ def rook_direction(srcx, srcy, dstx, dsty):
         return DIRS['undefined']
 
 
-def move_step(srcx, srcy, dstx, dsty):
-    direction = rook_direction(srcx, srcy, dstx, dsty)
-    if(direction == DIRS['north']):
+def step(rook_direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
+    if(rook_direction == None):
+        rook_direction = direction(srcx, srcy, dstx, dsty)
+
+    if(rook_direction == DIRS['north']):
         return NORTH_X, NORTH_Y
-    elif(direction == DIRS['south']):
+    elif(rook_direction == DIRS['south']):
         return SOUTH_X, SOUTH_Y
-    elif(direction == DIRS['east']):
+    elif(rook_direction == DIRS['east']):
         return EAST_X, EAST_Y
-    elif(direction == DIRS['west']):
+    elif(rook_direction == DIRS['west']):
         return WEST_X, WEST_Y
     else:
         return 8, 8
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
-    direction = rook_direction(srcx, srcy, dstx, dsty)
-    if(direction == DIRS['undefined']):
+    rook_direction = direction(srcx, srcy, dstx, dsty)
+    if(rook_direction == DIRS['undefined']):
         return False
 
-    stepx, stepy = move_step(srcx, srcy, dstx, dsty)
-
-    if(match.color_of_piece(piece) == match.COLORS['white']):
-        pinned = DIRS['undefined']
-        # fesselung = gib_weisse_figur_fesselung(_session->brett, _gzug->start_x, _gzug->start_y, _session->kw_feldnr_x, _session->kw_feldnr_y); \
+    stepx, stepy = step(None, srcx, srcy, dstx, dsty)
+    color = match.color_of_piece(piece)
+    if(color == match.COLORS['white']):
+        pin_direction = rules.pinned(match, color, srcx, srcy, match.wKg_x, match.wKg_y)
     else:
-        pinned = DIRS['undefined']
-        # fesselung = gib_schwarze_figur_fesselung(_session->brett, _gzug->start_x, _gzug->start_y, _session->ks_feldnr_x, _session->ks_feldnr_y); \
+        pin_direction = rules.pinned(match, color, srcx, srcy, match.bKg_x, match.bKg_y)
 
-    if(direction == DIRS['north'] or direction == DIRS['south']):
-        if(pinned != DIRS['north'] and pinned != DIRS['south'] and pinned != DIRS['undefined']):
+    if(rook_direction == DIRS['north'] or rook_direction == DIRS['south']):
+        if(pin_direction != DIRS['north'] and pin_direction != DIRS['south'] and pin_direction != DIRS['undefined']):
             return False
-    elif(direction == DIRS['east'] or direction == DIRS['west']):
-        if(pinned != DIRS['east'] and pinned != DIRS['west'] and pinned != DIRS['undefined']):
+    elif(rook_direction == DIRS['east'] or rook_direction == DIRS['west']):
+        if(pin_direction != DIRS['east'] and pin_direction != DIRS['west'] and pin_direction != DIRS['undefined']):
             return False
 
-    x = srcx
-    y = srcy
+    x = srcx + stepx
+    y = srcy + stepy
     while(x >= 0 and x <= 7 and y >= 0 and y <= 7):
-        x += stepx
-        y += stepy
         field = match.readfield(x, y)
         if(x == dstx and y == dsty):
-            if(match.color_of_piece(field)== match.color_of_piece(piece)):
+            if(match.color_of_piece(field) == match.color_of_piece(piece)):
                 return False
             else:
                 return True
         elif(field != match.PIECES['blk']):
             return False
+
+        x += stepx
+        y += stepy
 
     return False
 
