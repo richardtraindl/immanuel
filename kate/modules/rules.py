@@ -42,6 +42,13 @@ def is_move_color_ok(piece, count):
         return False
 
 
+def is_inbounds(x, y):
+    if(x < 0 or x > 7 or y < 0 or y > 7):
+        return False
+    else:
+        return True
+
+
 def is_move_inbounds(srcx, srcy, dstx, dsty):
     if(srcx < 0 or srcx > 7 or srcy < 0 or srcy > 7 or
        dstx < 0 or dstx > 7 or dsty < 0 or dsty > 7):
