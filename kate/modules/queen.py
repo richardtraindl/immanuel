@@ -1,5 +1,4 @@
-from kate.models import Match
-from kate.modules import values, rook, bishop
+from kate.modules import rook, bishop
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
