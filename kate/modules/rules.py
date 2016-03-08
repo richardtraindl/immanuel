@@ -11,8 +11,11 @@ DIRS = {
     'south-west' : 6,
     'north-west' : 7,
     'south-east' : 8,
-    'valid' : 9,
-    'undefined' : 10 
+    '2north' : 9,
+    '2south' : 10,
+    'valid' : 11,
+    'undefined' : 12 
+}
 
 
 REVERSE_DIRS = {
@@ -24,8 +27,10 @@ REVERSE_DIRS = {
     DIRS['south-west'] : DIRS['north-east'],
     DIRS['north-west'] : DIRS['south-east'],
     DIRS['south-east'] : DIRS['north-west'],
+    DIRS['2north'] : DIRS['2south'],
+    DIRS['2south'] : DIRS['2north'],
     DIRS['valid'] : DIRS['valid'],
-    DIRS['undefined'] : DIRS['undefined']
+    DIRS['undefined'] : DIRS['undefined'] 
 }
 
 UNDEF_X = 8
@@ -56,6 +61,7 @@ def is_move_inbounds(srcx, srcy, dstx, dsty):
     else:
         return True
 
+
 def search(match, srcx, srcy, stepx, stepy):
     x = srcx + stepx
     y = srcy + stepy
@@ -82,47 +88,48 @@ def pin_dir(match, scrx, srcy):
     direction, stepx, stepy = rook.rk_step(None, scrx, srcy, kgx, kgy)
     if(direction != DIRS['undefined']):
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
-        piece = match.readfield(dstx, dsty)
-        if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
-            (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
-            reverse_dir = REVERSE_DIRS[direction]
-            reverse_dir, stepx, stepy = rook.rk_step(reverse_dir, None, None, None, None)
-            dstx, dsty = search(match, scrx, srcy, stepx, stepy)
-            if(dstx != UNDEF_X):
-                piece = match.readfield(dstx, dsty)
-                if(color == Match.COLORS['white']):
-                    if(piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk']):
-                        return direction
+        if(dstx != UNDEF_X):
+            piece = match.readfield(dstx, dsty)
+            if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
+                (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
+                reverse_dir = REVERSE_DIRS[direction]
+                reverse_dir, stepx, stepy = rook.rk_step(reverse_dir, None, None, None, None)
+                dstx, dsty = search(match, scrx, srcy, stepx, stepy)
+                if(dstx != UNDEF_X):
+                    piece = match.readfield(dstx, dsty)
+                    if(color == Match.COLORS['white']):
+                        if(piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk']):
+                            return direction
+                        else:
+                            return DIRS['undefined']
                     else:
-                        return DIRS['undefined']
-                else:
-                    if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk']):
-                        return direction
-                    else:
-                        return DIRS['undefined']
+                        if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk']):
+                            return direction
+                        else:
+                            return DIRS['undefined']
 
     direction, stepx, stepy = bishop.bp_step(None, scrx, srcy, kgx, kgy)
     if(direction != DIRS['undefined']):
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
-        piece = match.readfield(dstx, dsty)
-        if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
-            (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
-            reverse_dir = REVERSE_DIRS[direction]
-            reverse_dir, stepx, stepy = bishop.bp_step(reverse_dir, None, None, None, None)
-            dstx, dsty = search(match, scrx, srcy, stepx, stepy)
-            if(dstx != UNDEF_X):
-                piece = match.readfield(dstx, dsty)
-                if(color == Match.COLORS['white']):
-                    if(piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp']):
-                        return direction
+        if(dstx != UNDEF_X):
+            piece = match.readfield(dstx, dsty)
+            if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
+                (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
+                reverse_dir = REVERSE_DIRS[direction]
+                reverse_dir, stepx, stepy = bishop.bp_step(reverse_dir, None, None, None, None)
+                dstx, dsty = search(match, scrx, srcy, stepx, stepy)
+                if(dstx != UNDEF_X):
+                    piece = match.readfield(dstx, dsty)
+                    if(color == Match.COLORS['white']):
+                        if(piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp']):
+                            return direction
+                        else:
+                            return DIRS['undefined']
                     else:
-                        return DIRS['undefined']
-                else:
-                    if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp']):
-                        return direction
-                    else:
-                        return DIRS['undefined']
-        
+                        if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp']):
+                            return direction
+                        else:
+                            return DIRS['undefined']
     return DIRS['undefined']
 
 
@@ -143,7 +150,7 @@ def attacked(match, scrx, srcy):
 
     BP_DIRS = [ DIRS['north-east'], DIRS['south-west'], DIRS['north-west'], DIRS['south-east'] ]
     for i in range(0, 4, 1):
-        direction, stepx, stepy = rook.bp_step(BP_DIRS[i], None, None, None, None)
+        direction, stepx, stepy = bishop.bp_step(BP_DIRS[i], None, None, None, None)
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
             piece = match.readfield(dstx, dsty)

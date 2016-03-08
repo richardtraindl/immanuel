@@ -1,5 +1,5 @@
 from kate.models import Match
-from kate.modules.rules import DIRS, UNDEF_X, UNDEF_Y, pin_dir
+from kate.modules import rules
 
 
 STEP_2N1E_X = 1
@@ -21,6 +21,7 @@ STEP_2N1W_Y = 2
 
 
 def kn_dir(srcx, srcy, dstx, dsty):
+    DIRS = rules.DIRS
     step_x = dstx - srcx
     step_y = dsty - srcy
     if(step_x == STEP_2N1E_X and step_y == STEP_2N1E_Y):
@@ -45,15 +46,16 @@ def kn_dir(srcx, srcy, dstx, dsty):
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
+    DIRS = rules.DIRS
     direction = kn_dir(srcx, srcy, dstx, dsty)
     if(direction == DIRS['undefined']):
         return False
 
     color = Match.color_of_piece(piece)
 
-    pin_dir = pin_dir(match, srcx, srcy)
+    pin_dir = rules.pin_dir(match, srcx, srcy)
 
-    if(pin_dir != DIRS['undefined']:
+    if(pin_dir != DIRS['undefined']):
         return False
 
     field = match.readfield(dstx, dsty)

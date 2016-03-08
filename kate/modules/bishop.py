@@ -1,5 +1,5 @@
 from kate.models import Match
-from kate.modules.rules import DIRS, UNDEF_X, UNDEF_Y, pin_dir
+from kate.modules import rules
 
 
 NEAST_X = 1
@@ -13,6 +13,7 @@ SEAST_Y = -1
 
 
 def bp_dir(srcx, srcy, dstx, dsty):
+    DIRS = rules.DIRS
     if( (srcx - dstx) == (srcy - dsty) and (srcy < dsty) ):
         return DIRS['north-east']
     elif( (srcx - dstx) == (srcy - dsty) and (srcy > dsty) ):
@@ -26,6 +27,7 @@ def bp_dir(srcx, srcy, dstx, dsty):
 
 
 def bp_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
+    DIRS = rules.DIRS
     if(direction == None):
         direction = bp_dir(srcx, srcy, dstx, dsty)
 
@@ -38,17 +40,18 @@ def bp_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
     elif(direction == DIRS['south-east']):
         return direction, SEAST_X, SEAST_Y
     else:
-        return direction, UNDEF_X, UNDEF_Y
+        return direction, rules.UNDEF_X, rules.UNDEF_Y
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
-    direction, stepx, stepy = rk_step(None, srcx, srcy, dstx, dsty)
+    DIRS = rules.DIRS
+    direction, stepx, stepy = bp_step(None, srcx, srcy, dstx, dsty)
     if(direction == DIRS['undefined']):
         return False
 
     color = Match.color_of_piece(piece)
 
-    pin_dir = pin_dir(match, srcx, srcy)
+    pin_dir = rules.pin_dir(match, srcx, srcy)
 
     if(direction == DIRS['north-east'] or direction == DIRS['south-west']):
         if(pin_dir != DIRS['north-east'] and pin_dir != DIRS['south-west'] and pin_dir != DIRS['undefined']):

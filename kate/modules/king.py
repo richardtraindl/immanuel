@@ -21,29 +21,31 @@ STEP_1N1W_Y = 1
 
 
 def kg_dir(srcx, srcy, dstx, dsty):
+    DIRS = rules.DIRS
     step_x = dstx - srcx
     step_y = dsty - srcy
     if(step_x == STEP_1N_X and step_y == STEP_1N_Y):
-        return KING_DIRS['valid']
+        return DIRS['valid']
     elif(step_x == STEP_1N1E_X and step_y == STEP_1N1E_Y):
-        return KING_DIRS['valid']
+        return DIRS['valid']
     elif(step_x == STEP_1E_X and step_y == STEP_1E_Y):
-        return KING_DIRS['valid']
+        return DIRS['valid']
     elif(step_x == STEP_1S1E_X and step_y == STEP_1S1E_Y):
-        return KING_DIRS['valid']
+        return DIRS['valid']
     elif(step_x == STEP_1S_X and step_y == STEP_1S_Y):
-        return KING_DIRS['valid']
+        return DIRS['valid']
     elif(step_x == STEP_1S1W_X and step_y == STEP_1S1W_Y):
-        return KING_DIRS['valid']
+        return DIRS['valid']
     elif(step_x == STEP_1W_X and step_y == STEP_1W_Y):
-        return KING_DIRS['valid']
+        return DIRS['valid']
     elif(step_x == STEP_1N1W_X and step_y == STEP_1N1W_Y):
-        return KING_DIRS['valid']
+        return DIRS['valid']
     else:
-        return KING_DIRS['undefined']
+        return DIRS['undefined']
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
+    DIRS = rules.DIRS
     direction = kg_dir(srcx, srcy, dstx, dsty)
     if(direction == DIRS['undefined']):
         return False
@@ -52,9 +54,9 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
 
     king = match.readfield(srcx, srcy)
     captured = match.readfield(dstx, dsty)
-    match.writefield(srcx, srcy, PIECES['blk'])
+    match.writefield(srcx, srcy, Match.PIECES['blk'])
     match.writefield(dstx, dsty, king)
-    flag = attacked(match, dstx, dsty)
+    flag = rules.attacked(match, dstx, dsty)
     match.writefield(srcx, srcy, king)
     match.writefield(dstx, dsty, captured)
     if(flag == True):
