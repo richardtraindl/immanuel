@@ -1,5 +1,5 @@
 from kate.models import Match
-from kate.modules import values, rules
+from kate.modules.rules import DIRS, UNDEF_X, UNDEF_Y
 
 
 NORTH_X = 0
@@ -14,28 +14,28 @@ WEST_Y = 0
 
 def rk_dir(srcx, srcy, dstx, dsty):
     if( (srcx == dstx) and (srcy < dsty) ):
-        return rules.DIRS['north']
+        return DIRS['north']
     elif( (srcx == dstx) and (srcy > dsty) ):
-        return rules.DIRS['south']
+        return DIRS['south']
     elif( (srcx < dstx) and (srcy == dsty) ):
-        return rules.DIRS['east']
+        return DIRS['east']
     elif( (srcx > dstx) and (srcy == dsty) ):
-        return rules.DIRS['west']
+        return DIRS['west']
     else:
-        return rules.DIRS['undefined']
+        return DIRS['undefined']
 
 
 def rk_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
     if(direction == None):
         direction = rk_dir(srcx, srcy, dstx, dsty)
 
-    if(direction == rules.DIRS['north']):
+    if(direction == DIRS['north']):
         return direction, NORTH_X, NORTH_Y
-    elif(direction == rules.DIRS['south']):
+    elif(direction == DIRS['south']):
         return direction, SOUTH_X, SOUTH_Y
-    elif(direction == rules.DIRS['east']):
+    elif(direction == DIRS['east']):
         return direction, EAST_X, EAST_Y
-    elif(direction == rules.DIRS['west']):
+    elif(direction == DIRS['west']):
         return direction, WEST_X, WEST_Y
     else:
         return direction, UNDEF_X, UNDEF_Y
@@ -43,18 +43,18 @@ def rk_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
     direction, stepx, stepy = rk_step(None, srcx, srcy, dstx, dsty)
-    if(direction == rules.DIRS['undefined']):
+    if(direction == DIRS['undefined']):
         return False
 
     color = Match.color_of_piece(piece)
 
     pin_dir = rules.pin_dir(match, srcx, srcy)
 
-    if(direction == rules.DIRS['north'] or direction == rules.DIRS['south']):
-        if(pin_dir != rules.DIRS['north'] and pin_dir != rules.DIRS['south'] and pin_dir != rules.DIRS['undefined']):
+    if(direction == DIRS['north'] or direction == DIRS['south']):
+        if(pin_dir != DIRS['north'] and pin_dir != DIRS['south'] and pin_dir != DIRS['undefined']):
             return False
-    elif(direction == rules.DIRS['east'] or direction == rules.DIRS['west']):
-        if(pin_dir != rules.DIRS['east'] and pin_dir != rules.DIRS['west'] and pin_dir != rules.DIRS['undefined']):
+    elif(direction == DIRS['east'] or direction == DIRS['west']):
+        if(pin_dir != DIRS['east'] and pin_dir != DIRS['west'] and pin_dir != DIRS['undefined']):
             return False
 
     x = srcx + stepx
