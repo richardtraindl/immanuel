@@ -119,6 +119,37 @@ def pin_dir(match, scrx, srcy):
     return DIRS['undefined']
 
 
+def attacked(match, scrx, srcy):
+    piece = match.readfield(scrx, srcy)
+
+    color = Match.color_of_piece(piece)
+
+    RK_DIRS = [ DIRS['north'], DIRS['south'], DIRS['east'], DIRS['west'] ]
+    for i in range(0, 4, 1):
+        direction, stepx, stepy = rook.rk_step(RK_DIRS[i], None, None, None, None)
+        dstx, dsty = search(match, scrx, srcy, stepx, stepy)
+        if(dstx != UNDEF_X):
+            piece = match.readfield(dstx, dsty)
+            if( (color == Match.COLORS['white'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) or
+                (color == Match.COLORS['black'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) ):
+                return True, dstx, dsty
+
+    BP_DIRS = [ DIRS['north-east'], DIRS['south-west'], DIRS['north-west'], DIRS['south-east'] ]
+    for i in range(0, 4, 1):
+        direction, stepx, stepy = rook.bp_step(BP_DIRS[i], None, None, None, None)
+        dstx, dsty = search(match, scrx, srcy, stepx, stepy)
+        if(dstx != UNDEF_X):
+            piece = match.readfield(dstx, dsty)
+            if( (color == Match.COLORS['white'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) or
+                (color == Match.COLORS['black'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) ):
+                return True, dstx, dsty
+
+    # knight
+    # pawn
+    # king
+    return True
+
+
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
     piece = match.readfield(srcx, srcy)
 
