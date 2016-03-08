@@ -1,19 +1,5 @@
 from kate.models import Match
 
-DIRS = {
-    'north-east' : 5,
-    'south-west' : 6,
-    'north-west' : 7,
-    'south-east' : 8,
-    'undefined' : 10 }
-
-REVERSE_DIRS = {
-    'north-east' : DIRS['south-west'],
-    'south-west' : DIRS['north-east'],
-    'north-west' : DIRS['south-east'],
-    'south-east' : DIRS['north-west'],
-    'undefined' : 10 }
-
 NEAST_X = 1
 NEAST_Y = 1
 SWEST_X = -1
@@ -22,8 +8,6 @@ NWEST_X = -1
 NWEST_Y = 1
 SEAST_X = 1
 SEAST_Y = -1
-UNDEF_X = 8
-UNDEF_Y = 8
 
 
 def bp_dir(srcx, srcy, dstx, dsty):
