@@ -73,7 +73,7 @@ def pin_dir(match, scrx, srcy):
         kgy = match.bKg_y
 
     direction, stepx, stepy = rook.rk_step(None, scrx, srcy, kgx, kgy)
-    if(direction != rook.DIRS['undefined']):
+    if(direction != DIRS['undefined']):
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         piece = match.readfield(dstx, dsty)
         if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
@@ -87,15 +87,15 @@ def pin_dir(match, scrx, srcy):
                     if(piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk']):
                         return direction
                     else:
-                        return rook.DIRS['undefined']
+                        return DIRS['undefined']
                 else:
                     if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk']):
                         return direction
                     else:
-                        return rook.DIRS['undefined']
+                        return DIRS['undefined']
 
     direction, stepx, stepy = bishop.bp_step(None, scrx, srcy, kgx, kgy)
-    if(direction != bishop.DIRS['undefined']):
+    if(direction != DIRS['undefined']):
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         piece = match.readfield(dstx, dsty)
         if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
@@ -109,14 +109,14 @@ def pin_dir(match, scrx, srcy):
                     if(piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp']):
                         return direction
                     else:
-                        return bishop.DIRS['undefined']
+                        return DIRS['undefined']
                 else:
                     if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp']):
                         return direction
                     else:
-                        return bishop.DIRS['undefined']
+                        return DIRS['undefined']
         
-    return rook.DIRS['undefined']
+    return DIRS['undefined']
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
