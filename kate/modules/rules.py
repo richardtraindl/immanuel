@@ -1,17 +1,32 @@
-from kate.models import Match, Move
+from kate.models import Match
 from kate.modules import values, pawn, rook, knight, bishop, queen, king
 
 
+DIRS = {
+    'north' : 1,
+    'south' : 2,
+    'east' : 3,
+    'west' : 4,
+    'north-east' : 5,
+    'south-west' : 6,
+    'north-west' : 7,
+    'south-east' : 8,
+    'valid' : 9,
+    'undefined' : 10 
+
+
 REVERSE_DIRS = {
-    'north' : rook.DIRS['south'],
-    'south' : rook.DIRS['north'],
-    'east' : rook.DIRS['west'],
-    'west' : rook.DIRS['east'],
-    'north-east' : bishop.DIRS['south-west'],
-    'south-west' : bishop.DIRS['north-east'],
-    'north-west' : bishop.DIRS['south-east'],
-    'south-east' : bishop.DIRS['north-west'],
-    'undefined' : 10 }
+    DIRS['north'] : DIRS['south'],
+    DIRS['south'] : DIRS['north'],
+    DIRS['east'] : DIRS['west'],
+    DIRS['west'] : DIRS['east'],
+    DIRS['north-east'] : DIRS['south-west'],
+    DIRS['south-west'] : DIRS['north-east'],
+    DIRS['north-west'] : DIRS['south-east'],
+    DIRS['south-east'] : DIRS['north-west'],
+    DIRS['valid'] : DIRS['valid'],
+    DIRS['undefined'] : 1DIRS['undefined']
+}
 
 UNDEF_X = 8
 UNDEF_Y = 8
@@ -63,7 +78,7 @@ def pin_dir(match, scrx, srcy):
         piece = match.readfield(dstx, dsty)
         if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
             (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
-            reverse_dir = rook.REVERSE_DIRS[direction]
+            reverse_dir = REVERSE_DIRS[direction]
             reverse_dir, stepx, stepy = rook.rk_step(reverse_dir, None, None, None, None)
             dstx, dsty = search(match, scrx, srcy, stepx, stepy)
             if(dstx != UNDEF_X):
@@ -85,7 +100,7 @@ def pin_dir(match, scrx, srcy):
         piece = match.readfield(dstx, dsty)
         if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
             (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
-            reverse_dir = bishop.REVERSE_DIRS[direction]
+            reverse_dir = REVERSE_DIRS[direction]
             reverse_dir, stepx, stepy = bishop.bp_step(reverse_dir, None, None, None, None)
             dstx, dsty = search(match, scrx, srcy, stepx, stepy)
             if(dstx != UNDEF_X):
