@@ -1,19 +1,5 @@
 from kate.models import Match
 
-DIRS = {
-    'north' : 1,
-    'south' : 2,
-    'east' : 3,
-    'west' : 4,
-    'undefined' : 10 }
-
-REVERSE_DIRS = {
-    DIRS['north'] : DIRS['south'],
-    DIRS['south'] : DIRS['north'],
-    DIRS['east'] : DIRS['west'],
-    DIRS['west'] : DIRS['east'],
-    DIRS['undefined'] : 10 }
-
 NORTH_X = 0
 NORTH_Y = 1
 SOUTH_X = 0
@@ -22,8 +8,6 @@ EAST_X = 1
 EAST_Y = 0
 WEST_X = -1
 WEST_Y = 0
-UNDEF_X = 8
-UNDEF_Y = 8
 
 
 def rk_dir(srcx, srcy, dstx, dsty):
