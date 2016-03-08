@@ -20,7 +20,7 @@ STEP_1N1W_X = -1
 STEP_1N1W_Y = 1
 
 
-def direction(srcx, srcy, dstx, dsty):
+def kg_dir(srcx, srcy, dstx, dsty):
     step_x = dstx - srcx
     step_y = dsty - srcy
     if(step_x == STEP_1N_X and step_y == STEP_1N_Y):
@@ -44,29 +44,24 @@ def direction(srcx, srcy, dstx, dsty):
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
-    king_direction = direction(srcx, srcy, dstx, dsty)
-    if(king_direction == KING_DIRS['undefined']):
+    direction = kg_dir(srcx, srcy, dstx, dsty)
+    if(direction == DIRS['undefined']):
         return False
 
-    if(match.color_of_piece(piece) == match.COLORS['white']):
-        attached = False
-        # ge_figur = gib_feld(_session->brett, _gzug->ziel_x, _gzug->ziel_y); \
-        # if(gib_farbe(ge_figur) == FARBE){ return mNOK; } \
-        # figur = gib_feld(_session->brett, _gzug->start_x, _gzug->start_y); \
-        # setze_feld(_session->brett, _gzug->start_x, _gzug->start_y, mLEER); \
-        # setze_feld(_session->brett, _gzug->ziel_x, _gzug->ziel_y, figur); \
-        # if(ist_feld_bedroht(_session->brett, GEGN_FARBE, _gzug->ziel_x, _gzug->ziel_y)){ \
-        # setze_feld(_session->brett, _gzug->start_x, _gzug->start_y, figur); \
-        # setze_feld(_session->brett, _gzug->ziel_x, _gzug->ziel_y, ge_figur); \
-        # return mNOK; \
-    else:
-        attached = False
+    color = Match.color_of_piece(piece)
 
-    if(attached == True):
+    king = match.readfield(srcx, srcy)
+    captured = match.readfield(dstx, dsty)
+    match.writefield(srcx, srcy, PIECES['blk'])
+    match.writefield(dstx, dsty, king)
+    flag = attacked(match, dstx, dsty)
+    match.writefield(srcx, srcy, king)
+    match.writefield(dstx, dsty, captured)
+    if(flag == True):
         return False
 
     field = match.readfield(dstx, dsty)
-    if(match.color_of_piece(field)== match.color_of_piece(piece)):
+    if(match.color_of_piece(field) == color):
         return False
 
     return True
