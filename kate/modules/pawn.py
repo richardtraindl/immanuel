@@ -1,4 +1,5 @@
 from kate.models import Match
+from kate.modules import values, rules
 
 
 WHITE_1N_X = 0
@@ -25,44 +26,44 @@ def pw_dir(srcx, srcy, dstx, dsty, piece):
     step_y = dsty - srcy
     if(piece == Match.PIECES['wPw']):
         if(step_x == WHITE_1N_X and step_y == WHITE_1N_Y):
-            return DIRS['valid']
+            return rules.DIRS['valid']
         elif(step_x == WHITE_2N_X and step_y == WHITE_2N_Y):
-            return DIRS['valid']
+            return rules.DIRS['valid']
         elif(step_x == WHITE_1N1E_X and step_y == WHITE_1N1E_Y):
-            return DIRS['valid']
+            return rules.DIRS['valid']
         elif(step_x == WHITE_1N1W_X and step_y == WHITE_1N1W_Y):
-            return DIRS['valid']
+            return rules.DIRS['valid']
         else:
-            return DIRS['undefined']
+            return rules.DIRS['undefined']
     else:
         step_x = dstx - srcx
         step_y = dsty - srcy
         if(step_x == BLACK_1S_X and step_y == BLACK_1S_Y):
-            return DIRS['valid']
+            return rules.DIRS['valid']
         elif(step_x == BLACK_2S_X and step_y == BLACK_2S_Y):
-            return DIRS['valid']
+            return rules.DIRS['valid']
         elif(step_x == BLACK_1S1E_X and step_y == BLACK_1S1E_Y):
-            return DIRS['valid']
+            return rules.DIRS['valid']
         elif(step_x == BLACK_1S1W_X and step_y == BLACK_1S1W_Y):
-            return DIRS['valid']
+            return rules.DIRS['valid']
         else:
-            return DIRS['undefined']
+            return rules.DIRS['undefined']
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):
     direction = pw_dir(srcx, srcy, dstx, dsty, piece)
-    if(direction == DIRS['undefined']):
+    if(direction == rules.DIRS['undefined']):
         return False
 
     pin_dir = rules.pin_dir(match, srcx, srcy)
 
-    if(direction == DIRS['north'] or direction == DIRS['south']):
-        if(pin_dir != DIRS['north'] and pin_dir != DIRS['south'] and pin_dir != DIRS['undefined']):
+    if(direction == rules.DIRS['north'] or direction == rules.DIRS['south']):
+        if(pin_dir != rules.DIRS['north'] and pin_dir != rules.DIRS['south'] and pin_dir != rules.DIRS['undefined']):
             return False
-    elif(direction == DIRS['north-west'] or direction == DIRS['south-east']):
-        if(pin_dir != DIRS['north-west'] and pin_dir != DIRS['south-east'] and pin_dir != DIRS['undefined']):
+    elif(direction == rules.DIRS['north-west'] or direction == rules.DIRS['south-east']):
+        if(pin_dir != rules.DIRS['north-west'] and pin_dir != rules.DIRS['south-east'] and pin_dir != rules.DIRS['undefined']):
             return False
-    elif(direction == DIRS['north-east'] or direction == DIRS['south-west']):
-        if(pin_dir != DIRS['north-east'] and pin_dir != DIRS['south-west'] and pin_dir != DIRS['undefined']):
+    elif(direction == rules.DIRS['north-east'] or direction == rules.DIRS['south-west']):
+        if(pin_dir != rules.DIRS['north-east'] and pin_dir != rules.DIRS['south-west'] and pin_dir != rules.DIRS['undefined']):
             return False
 
     if(piece == Match.PIECES['wPw'] and dsty == 7 and not (prom_piece == Match.PIECES['wQu'] or
