@@ -1,5 +1,5 @@
 from kate.models import Match
-from kate.modules.rules import DIRS, UNDEF_X, UNDEF_Y
+from kate.modules.rules import DIRS, UNDEF_X, UNDEF_Y, pin_dir
 
 
 NEAST_X = 1
@@ -48,7 +48,7 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
 
     color = Match.color_of_piece(piece)
 
-    pin_dir = rules.pin_dir(match, srcx, srcy)
+    pin_dir = pin_dir(match, srcx, srcy)
 
     if(direction == DIRS['north-east'] or direction == DIRS['south-west']):
         if(pin_dir != DIRS['north-east'] and pin_dir != DIRS['south-west'] and pin_dir != DIRS['undefined']):
