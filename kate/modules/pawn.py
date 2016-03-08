@@ -1,10 +1,6 @@
 from kate.models import Match
 
 
-PAWN_DIRS = {
-    'valid' : 9,
-    'undefined' : 10 }
-
 WHITE_1N_X = 0
 WHITE_1N_Y = 1
 WHITE_2N_X = 0
@@ -24,59 +20,56 @@ BLACK_1S1W_X = -1
 BLACK_1S1W_Y = -1
 
 
-def direction(srcx, srcy, dstx, dsty, piece):
+def pw_dir(srcx, srcy, dstx, dsty, piece):
     step_x = dstx - srcx
     step_y = dsty - srcy
     if(piece == Match.PIECES['wPw']):
         if(step_x == WHITE_1N_X and step_y == WHITE_1N_Y):
-            return PAWN_DIRS['valid']
+            return DIRS['valid']
         elif(step_x == WHITE_2N_X and step_y == WHITE_2N_Y):
-            return PAWN_DIRS['valid']
+            return DIRS['valid']
         elif(step_x == WHITE_1N1E_X and step_y == WHITE_1N1E_Y):
-            return PAWN_DIRS['valid']
+            return DIRS['valid']
         elif(step_x == WHITE_1N1W_X and step_y == WHITE_1N1W_Y):
-            return PAWN_DIRS['valid']
+            return DIRS['valid']
         else:
-            return PAWN_DIRS['undefined']
+            return DIRS['undefined']
     else:
         step_x = dstx - srcx
         step_y = dsty - srcy
         if(step_x == BLACK_1S_X and step_y == BLACK_1S_Y):
-            return PAWN_DIRS['valid']
+            return DIRS['valid']
         elif(step_x == BLACK_2S_X and step_y == BLACK_2S_Y):
-            return PAWN_DIRS['valid']
+            return DIRS['valid']
         elif(step_x == BLACK_1S1E_X and step_y == BLACK_1S1E_Y):
-            return PAWN_DIRS['valid']
+            return DIRS['valid']
         elif(step_x == BLACK_1S1W_X and step_y == BLACK_1S1W_Y):
-            return PAWN_DIRS['valid']
+            return DIRS['valid']
         else:
-            return PAWN_DIRS['undefined']
+            return DIRS['undefined']
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):
-    pawn_direction = direction(srcx, srcy, dstx, dsty, piece)
-    if(direction == PAWN_DIRS['undefined']):
+    direction = pw_dir(srcx, srcy, dstx, dsty, piece)
+    if(direction == DIRS['undefined']):
         return False
 
-    # if(piece == match.PIECES['wPw']):
-    # pinned = DIRS['undefined']
-    # fesselung = gib_weisse_figur_fesselung(_session->brett, _gzug->start_x, _gzug->start_y, _session->kw_feldnr_x, _session->kw_feldnr_y); \
+    pin_dir = rules.pin_dir(match, srcx, srcy)
 
-    #if(direction == WHITE_DIRS['1north'] or direction == WHITE_DIRS['2north']):
-    #    if(pinned != WHITE_DIRS['north-east'] and pinned != DIRS['south-west'] and pinned != DIRS['undefined']):
-    #    return False
-    #(fesselung == mSTRECKE_UNDEF || fesselung == mSTRECKE_NORD_SUED) &&
-    #_gzug->start_y - _gzug->ziel_y == -1){
-    #    mABBRUCH_BEI_BAUER_NORD_ZUG_NOK
+    if(direction == DIRS['north'] or direction == DIRS['south']):
+        if(pin_dir != DIRS['north'] and pin_dir != DIRS['south'] and pin_dir != DIRS['undefined']):
+            return False
+    elif(direction == DIRS['north-west'] or direction == DIRS['south-east']):
+        if(pin_dir != DIRS['north-west'] and pin_dir != DIRS['south-east'] and pin_dir != DIRS['undefined']):
+            return False
+    elif(direction == DIRS['north-east'] or direction == DIRS['south-west']):
+        if(pin_dir != DIRS['north-east'] and pin_dir != DIRS['south-west'] and pin_dir != DIRS['undefined']):
+            return False
 
-    # else if(richtung == mRICHT_NORD && 
-    #(fesselung == mSTRECKE_UNDEF || fesselung == mSTRECKE_NORD_SUED) &&
-    # _gzug->start_y == 1 && _gzug->start_y - _gzug->ziel_y == -2){
-    #mABBRUCH_BEI_BAUER_2NORD_ZUG_NOK
-
-    if(piece == match.PIECES['wPw'] and dsty == 7 and not (prom_piece == match.PIECES['wQu'] or
-       prom_piece == match.PIECES['wRk'] or prom_piece == match.PIECES['wBp'] or prom_piece == match.PIECES['wKn'])):
+    if(piece == Match.PIECES['wPw'] and dsty == 7 and not (prom_piece == Match.PIECES['wQu'] or
+       prom_piece == Match.PIECES['wRk'] or prom_piece == Match.PIECES['wBp'] or prom_piece == Match.PIECES['wKn'])):
         return False
-    elif(piece == match.PIECES['bPw'] and dsty == 0 and not (prom_piece == match.PIECES['bQu'] or 
-         prom_piece == match.PIECES['bRk'] or prom_piece == match.PIECES['bBp'] or prom_piece == match.PIECES['bKn'])):
+    elif(piece == Match.PIECES['bPw'] and dsty == 0 and not (prom_piece == Match.PIECES['bQu'] or 
+         prom_piece == Match.PIECES['bRk'] or prom_piece == Match.PIECES['bBp'] or prom_piece == Match.PIECES['bKn'])):
         return False
+
     return True
