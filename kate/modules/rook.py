@@ -1,5 +1,4 @@
 from kate.models import Match
-from kate.modules import values, rules
 
 DIRS = {
     'north' : 1,
