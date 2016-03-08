@@ -61,10 +61,8 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
         return False
 
     color = Match.color_of_piece(piece)
-    if(color == Match.COLORS['white']):
-        pin_dir = rules.pinned(match, color, srcx, srcy, match.wKg_x, match.wKg_y)
-    else:
-        pin_dir = rules.pinned(match, color, srcx, srcy, match.bKg_x, match.bKg_y)
+
+    pin_dir = rules.pin_dir(match,srcx, srcy)
 
     if(direction == DIRS['north'] or direction == DIRS['south']):
         if(pin_dir != DIRS['north'] and pin_dir != DIRS['south'] and pin_dir != DIRS['undefined']):
@@ -89,9 +87,4 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
         y += stepy
 
     return False
-
-
-
-
-
 
