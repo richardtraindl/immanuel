@@ -25,7 +25,7 @@ REVERSE_DIRS = {
     DIRS['north-west'] : DIRS['south-east'],
     DIRS['south-east'] : DIRS['north-west'],
     DIRS['valid'] : DIRS['valid'],
-    DIRS['undefined'] : 1DIRS['undefined']
+    DIRS['undefined'] : DIRS['undefined']
 }
 
 UNDEF_X = 8
