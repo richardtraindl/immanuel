@@ -22,9 +22,11 @@ NWEST_X = -1
 NWEST_Y = 1
 SEAST_X = 1
 SEAST_Y = -1
+UNDEF_X = 8
+UNDEF_Y = 8
 
 
-def direction(srcx, srcy, dstx, dsty):
+def bp_dir(srcx, srcy, dstx, dsty):
     if( (srcx - dstx) == (srcy - dsty) and (srcy < dsty) ):
         return DIRS['north-east']
     elif( (srcx - dstx) == (srcy - dsty) and (srcy > dsty) ):
@@ -36,41 +38,39 @@ def direction(srcx, srcy, dstx, dsty):
     else:
         return DIRS['undefined']
 
-def step(bishop_direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
-    if(bishop_direction == None):
-        bishop_direction = direction(srcx, srcy, dstx, dsty)
 
-    if(bishop_direction == DIRS['north-east']):
-        return NEAST_X, NEAST_Y
-    elif(bishop_direction == DIRS['south-west']):
-        return SWEST_X, SWEST_Y
-    elif(bishop_direction == DIRS['north-west']):
-        return NWEST_X, NWEST_Y
-    elif(bishop_direction == DIRS['south-east']):
-        return SEAST_X, SEAST_Y
+def bp_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
+    if(direction == None):
+        direction = bp_dir(srcx, srcy, dstx, dsty)
+
+    if(direction == DIRS['north-east']):
+        return direction, NEAST_X, NEAST_Y
+    elif(direction == DIRS['south-west']):
+        return direction, SWEST_X, SWEST_Y
+    elif(direction == DIRS['north-west']):
+        return direction, NWEST_X, NWEST_Y
+    elif(direction == DIRS['south-east']):
+        return direction, SEAST_X, SEAST_Y
     else:
-        return 8, 8
+        return direction, UNDEF_X, UNDEF_Y
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
-    bishop_direction = direction(srcx, srcy, dstx, dsty)
-    if(bishop_direction == DIRS['undefined']):
+    direction, stepx, stepy = rk_step(None, srcx, srcy, dstx, dsty)
+    if(direction == DIRS['undefined']):
         return False
 
-    stepx, stepy = step(None, srcx, srcy, dstx, dsty)
-
-    if(match.color_of_piece(piece) == match.COLORS['white']):
-        pinned = DIRS['undefined']
-        # fesselung = gib_weisse_figur_fesselung(_session->brett, _gzug->start_x, _gzug->start_y, _session->kw_feldnr_x, _session->kw_feldnr_y); \
+    color = Match.color_of_piece(piece)
+    if(color == Match.COLORS['white']):
+        pin_dir = rules.pinned(match, color, srcx, srcy, match.wKg_x, match.wKg_y)
     else:
-        pinned = DIRS['undefined']
-        # fesselung = gib_schwarze_figur_fesselung(_session->brett, _gzug->start_x, _gzug->start_y, _session->ks_feldnr_x, _session->ks_feldnr_y); \
+        pin_dir = rules.pinned(match, color, srcx, srcy, match.bKg_x, match.bKg_y)
 
-    if(bishop_direction == DIRS['north-east'] or bishop_direction == DIRS['south-west']):
-        if(pinned != DIRS['north-east'] and pinned != DIRS['south-west'] and pinned != DIRS['undefined']):
+    if(direction == DIRS['north-east'] or direction == DIRS['south-west']):
+        if(pin_dir != DIRS['north-east'] and pin_dir != DIRS['south-west'] and pin_dir != DIRS['undefined']):
             return False
-    elif(bishop_direction == DIRS['north-west'] or bishop_direction == DIRS['south-east']):
-        if(pinned != DIRS['north-west'] and pinned != DIRS['south-east'] and pinned != DIRS['undefined']):
+    elif(direction == DIRS['north-west'] or direction == DIRS['south-east']):
+        if(pin_dir != DIRS['north-west'] and pin_dir != DIRS['south-east'] and pin_dir != DIRS['undefined']):
             return False
 
     x = srcx + stepx
@@ -78,11 +78,11 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
     while(x >= 0 and x <= 7 and y >= 0 and y <= 7):
         field = match.readfield(x, y)
         if(x == dstx and y == dsty):
-            if(match.color_of_piece(field)== match.color_of_piece(piece)):
+            if(Match.color_of_piece(field) == color):
                 return False
             else:
                 return True
-        elif(field != match.PIECES['blk']):
+        elif(field != Match.PIECES['blk']):
             return False
 
         x += stepx
