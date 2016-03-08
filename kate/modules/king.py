@@ -1,8 +1,5 @@
 from kate.models import Match
 
-KING_DIRS = {
-    'valid' : 9,
-    'undefined' : 10 }
 
 STEP_1N_X = 0
 STEP_1N_Y = 1
