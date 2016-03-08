@@ -23,9 +23,11 @@ EAST_X = 1
 EAST_Y = 0
 WEST_X = -1
 WEST_Y = 0
+UNDEF_X = 8
+UNDEF_Y = 8
 
 
-def direction(srcx, srcy, dstx, dsty):
+def rk_dir(srcx, srcy, dstx, dsty):
     if( (srcx == dstx) and (srcy < dsty) ):
         return DIRS['north']
     elif( (srcx == dstx) and (srcy > dsty) ):
@@ -38,39 +40,38 @@ def direction(srcx, srcy, dstx, dsty):
         return DIRS['undefined']
 
 
-def step(rook_direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
-    if(rook_direction == None):
-        rook_direction = direction(srcx, srcy, dstx, dsty)
+def rk_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
+    if(direction == None):
+        direction = rk_dir(srcx, srcy, dstx, dsty)
 
-    if(rook_direction == DIRS['north']):
-        return NORTH_X, NORTH_Y
-    elif(rook_direction == DIRS['south']):
-        return SOUTH_X, SOUTH_Y
-    elif(rook_direction == DIRS['east']):
-        return EAST_X, EAST_Y
-    elif(rook_direction == DIRS['west']):
-        return WEST_X, WEST_Y
+    if(direction == DIRS['north']):
+        return direction, NORTH_X, NORTH_Y
+    elif(direction == DIRS['south']):
+        return direction, SOUTH_X, SOUTH_Y
+    elif(direction == DIRS['east']):
+        return direction, EAST_X, EAST_Y
+    elif(direction == DIRS['west']):
+        return direction, WEST_X, WEST_Y
     else:
-        return 8, 8
+        return direction, UNDEF_X, UNDEF_Y
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
-    rook_direction = direction(srcx, srcy, dstx, dsty)
-    if(rook_direction == DIRS['undefined']):
+    direction, stepx, stepy = rk_step(None, srcx, srcy, dstx, dsty)
+    if(direction == DIRS['undefined']):
         return False
 
-    stepx, stepy = step(None, srcx, srcy, dstx, dsty)
-    color = match.color_of_piece(piece)
-    if(color == match.COLORS['white']):
-        pin_direction = rules.pinned(match, color, srcx, srcy, match.wKg_x, match.wKg_y)
+    color = Match.color_of_piece(piece)
+    if(color == Match.COLORS['white']):
+        pin_dir = rules.pinned(match, color, srcx, srcy, match.wKg_x, match.wKg_y)
     else:
-        pin_direction = rules.pinned(match, color, srcx, srcy, match.bKg_x, match.bKg_y)
+        pin_dir = rules.pinned(match, color, srcx, srcy, match.bKg_x, match.bKg_y)
 
-    if(rook_direction == DIRS['north'] or rook_direction == DIRS['south']):
-        if(pin_direction != DIRS['north'] and pin_direction != DIRS['south'] and pin_direction != DIRS['undefined']):
+    if(direction == DIRS['north'] or direction == DIRS['south']):
+        if(pin_dir != DIRS['north'] and pin_dir != DIRS['south'] and pin_dir != DIRS['undefined']):
             return False
-    elif(rook_direction == DIRS['east'] or rook_direction == DIRS['west']):
-        if(pin_direction != DIRS['east'] and pin_direction != DIRS['west'] and pin_direction != DIRS['undefined']):
+    elif(direction == DIRS['east'] or direction == DIRS['west']):
+        if(pin_dir != DIRS['east'] and pin_dir != DIRS['west'] and pin_dir != DIRS['undefined']):
             return False
 
     x = srcx + stepx
@@ -78,11 +79,11 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
     while(x >= 0 and x <= 7 and y >= 0 and y <= 7):
         field = match.readfield(x, y)
         if(x == dstx and y == dsty):
-            if(match.color_of_piece(field) == match.color_of_piece(piece)):
+            if(Match.color_of_piece(field) == color):
                 return False
             else:
                 return True
-        elif(field != match.PIECES['blk']):
+        elif(field != Match.PIECES['blk']):
             return False
 
         x += stepx
