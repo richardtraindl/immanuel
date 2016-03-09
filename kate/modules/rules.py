@@ -161,7 +161,7 @@ def attacked(match, scrx, srcy):
     # knight
     # pawn
     # king
-    return True
+    return False, UNDEF_X, UNDEF_Y
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
