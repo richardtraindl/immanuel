@@ -64,7 +64,7 @@ UNDEF_X = 8
 UNDEF_Y = 8
 
 
-def is_move_color_ok(piece, count):
+def is_move_color_ok_OLD(piece, count):
     color = Match.color_of_piece(piece)
     if(count % 2 == 0 and color == Match.COLORS['white']):
         return True
@@ -234,7 +234,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
 
     piece = match.readfield(srcx, srcy)
 
-    if(not is_move_color_ok(piece, match.count)):
+    if(match.next_color() != Match.color_of_piece(piece):
         return False, ERROR_CODES['wrong-color']
 
     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
