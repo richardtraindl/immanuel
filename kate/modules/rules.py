@@ -138,9 +138,10 @@ def attacked(match, scrx, srcy):
 
     color = Match.color_of_piece(piece)
 
-    RK_DIRS = [ DIRS['north'], DIRS['south'], DIRS['east'], DIRS['west'] ]
-    for i in range(0, 4, 1):
-        direction, stepx, stepy = rook.rk_step(RK_DIRS[i], None, None, None, None)
+    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
+    for i in range(4):
+        stepx = RK_STEPS[i][0]
+        stepy = RK_STEPS[i][1]
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
             piece = match.readfield(dstx, dsty)
@@ -148,9 +149,10 @@ def attacked(match, scrx, srcy):
                 (color == Match.COLORS['black'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) ):
                 return True, dstx, dsty
 
-    BP_DIRS = [ DIRS['north-east'], DIRS['south-west'], DIRS['north-west'], DIRS['south-east'] ]
-    for i in range(0, 4, 1):
-        direction, stepx, stepy = bishop.bp_step(BP_DIRS[i], None, None, None, None)
+    BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+    for i in range(4):
+        stepx = BP_STEPS[i][0]
+        stepy = BP_STEPS[i][1]
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
             piece = match.readfield(dstx, dsty)
@@ -158,9 +160,44 @@ def attacked(match, scrx, srcy):
                 (color == Match.COLORS['black'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) ):
                 return True, dstx, dsty
 
-    # knight
-    # pawn
-    # king
+    KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
+    for i in range(8):
+        dstx = scrx + KN_STEPS[i][0]
+        dsty = srcy + KN_STEPS[i][1]
+        if(is_inbounds(dstx, dsty)):
+            piece = match.readfield(dstx, dsty)
+            if( (color == Match.COLORS['white'] and piece == Match.PIECES['bKn']) or
+                (color == Match.COLORS['black'] and piece == Match.PIECES['wKn']) ):
+                return True, dstx, dsty
+
+    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
+    for i in range(8):
+        dstx = scrx + KG_STEPS[i][0]
+        dsty = srcy + KG_STEPS[i][1]
+        if(is_inbounds(dstx, dsty)):
+            piece = match.readfield(dstx, dsty)
+            if( (color == Match.COLORS['white'] and piece == Match.PIECES['bKg']) or
+                (color == Match.COLORS['black'] and piece == Match.PIECES['wKg']) ):
+                return True, dstx, dsty
+
+    wPW_STEPS = [ [1, 1], [-1, 1] ]
+    for i in range(2):
+        dstx = scrx + wPW_STEPS[i][0]
+        dsty = srcy + wPW_STEPS[i][1]
+        if(is_inbounds(dstx, dsty)):
+            piece = match.readfield(dstx, dsty)
+            if(color == Match.COLORS['white'] and piece == Match.PIECES['bPw']):
+                return True, dstx, dsty
+
+    bPW_STEPS = [ [1, -1], [-1, -1] ]
+    for i in range(2):
+        dstx = scrx + bPW_STEPS[i][0]
+        dsty = srcy + bPW_STEPS[i][1]
+        if(is_inbounds(dstx, dsty)):
+            piece = match.readfield(dstx, dsty)
+            if(color == Match.COLORS['black'] and piece == Match.PIECES['wPw']):
+                return True, dstx, dsty
+
     return False, UNDEF_X, UNDEF_Y
 
 
