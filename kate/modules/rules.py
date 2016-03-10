@@ -13,6 +13,18 @@ ERROR_CODES = {
     'king-error' : 7,
 }
 
+ERROR_MSGS = {
+    ERROR_CODES['none'] : "Zug ist OK.",
+    ERROR_CODES['general-error'] : "Allgemeiner Fehler",
+    ERROR_CODES['pawn-error'] : "Bauernzug Fehler",
+    ERROR_CODES['rook-error'] : "Turmzug Fehler",
+    ERROR_CODES['knight-error'] : "Springerzug Fehler",
+    ERROR_CODES['bishop-error'] : "Läuferzug Fehler",
+    ERROR_CODES['queen-error'] : "Damenzug Fehler",
+    ERROR_CODES['king-error'] : "Königzug Fehler",
+}
+
+
 DIRS = {
     'north' : 1,
     'south' : 2,
