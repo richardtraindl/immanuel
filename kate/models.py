@@ -54,6 +54,7 @@ class Match(models.Model):
     bRk_a8_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_h8_first_movecnt = models.SmallIntegerField(null=False, default=0)
 
+
     def writefield(self, x, y, value):
         self.board[y][x] = value
 
@@ -293,6 +294,14 @@ class Match(models.Model):
             self.writefield(move.dstx, move.dsty, self.PIECES['blk'])
             self.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
             return move
+
+
+    def next_color(self):
+        if(self.count % 2 == 0 ):
+            return Match.COLORS['white']
+        else:
+            return Match.COLORS['black']
+
 
     @staticmethod
     def color_of_piece(piece):
