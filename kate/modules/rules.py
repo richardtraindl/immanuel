@@ -2,6 +2,17 @@ from kate.models import Match
 from kate.modules import values, pawn, rook, knight, bishop, queen, king
 
 
+ERROR_CODES = {
+    'none' : 0,
+    'general-error' : 1,
+    'pawn-error' : 2,
+    'rook-error' : 3,
+    'knight-error' : 4,
+    'bishop-error' : 5,
+    'queen-error' : 6,
+    'king-error' : 7,
+}
+
 DIRS = {
     'north' : 1,
     'south' : 2,
@@ -206,43 +217,43 @@ def attacked(match, scrx, srcy):
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
+    if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
+        return False, ERROR_CODES['out-of-bounds']
+
     piece = match.readfield(srcx, srcy)
 
-    if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
-        return False
-
     if(not is_move_color_ok(piece, match.count)):
-        return False
+        return False, ERROR_CODES['wrong-color']
 
     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
         if(not pawn.is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece)):
-            return False
+            return False, ERROR_CODES['pawn-error']
         else:
-            return True
+            return True, ERROR_CODES['none']
     elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
         if(not rook.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
-            return False
+            return False, ERROR_CODES['rook-error']
         else:
-            return True
+            return True, ERROR_CODES['none']
     elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
         if(not knight.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
-            return False
+            return False, ERROR_CODES['knight-error']
         else:
-            return True
+            return True, ERROR_CODES['none']
     elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
         if(not bishop.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
-            return False
+            return False, ERROR_CODES['bishop-error']
         else:
-            return True
+            return True, ERROR_CODES['none']
     elif(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
         if(not queen.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
-            return False
+            return False, ERROR_CODES['queen-error']
         else:
-            return True
+            return True, ERROR_CODES['none']
     elif(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
         if(not king.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
-            return False
+            return False, ERROR_CODES['king-error']
         else:
-            return True
+            return True, ERROR_CODES['none']
     else:
-        return False
+        return False, ERROR_CODES['general-error']
