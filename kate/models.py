@@ -305,12 +305,12 @@ class Match(models.Model):
 
     @staticmethod
     def color_of_piece(piece):
-      if(piece >= Match.PIECES['wKg'] and piece <= Match.PIECES['wQu']):
-        return Match.COLORS['white']
-      elif(piece >= Match.PIECES['bKg'] and piece <= Match.PIECES['bQu']):
-        return Match.COLORS['black']
-      else:
-        return Match.COLORS['undefined']
+        if(piece >= Match.PIECES['wKg'] and piece <= Match.PIECES['wQu']):
+            return Match.COLORS['white']
+        elif(piece >= Match.PIECES['bKg'] and piece <= Match.PIECES['bQu']):
+            return Match.COLORS['black']
+        else:
+            return Match.COLORS['undefined']
 
 
 class Move(models.Model):

@@ -124,9 +124,9 @@ def do_move(request, matchid):
                 move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
                 move.save()
                 match.save()
-                fmtmsg = "<p class='ok'>" + msg + "</p>"
+                fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
             else:
-                fmtmsg = "<p class='error'>" + msg + "</p>"
+                fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
         else:
             fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
 

@@ -5,17 +5,21 @@ from kate.modules import values, pawn, rook, knight, bishop, queen, king
 ERROR_CODES = {
     'none' : 0,
     'general-error' : 1,
-    'pawn-error' : 2,
-    'rook-error' : 3,
-    'knight-error' : 4,
-    'bishop-error' : 5,
-    'queen-error' : 6,
-    'king-error' : 7,
+    'wrong-color' : 2,
+    'out-of-bounds' : 3,
+    'pawn-error' : 4,
+    'rook-error' : 5,
+    'knight-error' : 6,
+    'bishop-error' : 7,
+    'queen-error' : 8,
+    'king-error' : 9,
 }
 
 ERROR_MSGS = {
     ERROR_CODES['none'] : "Zug ist OK.",
     ERROR_CODES['general-error'] : "Allgemeiner Fehler",
+    ERROR_CODES['wrong-color'] : "Farbe nicht am Zug",
+    ERROR_CODES['out-of-bounds'] : "Falsches Feld",
     ERROR_CODES['pawn-error'] : "Bauernzug Fehler",
     ERROR_CODES['rook-error'] : "Turmzug Fehler",
     ERROR_CODES['knight-error'] : "Springerzug Fehler",
@@ -37,7 +41,7 @@ DIRS = {
     '2north' : 9,
     '2south' : 10,
     'sh-castling' : 11,
-    'lg-castling' : 12:
+    'lg-castling' : 12,
     'valid' : 13,
     'undefined' : 14 
 }
@@ -160,72 +164,72 @@ def pin_dir(match, scrx, srcy):
     return DIRS['undefined']
 
 
-def attacked(match, scrx, srcy):
-    piece = match.readfield(scrx, srcy)
+def attacked(match, srcx, srcy):
+    piece = match.readfield(srcx, srcy)
 
     color = Match.color_of_piece(piece)
-
+    print("ffff" + str(piece) +"  " + str(color))
     RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
     for i in range(4):
         stepx = RK_STEPS[i][0]
         stepy = RK_STEPS[i][1]
-        dstx, dsty = search(match, scrx, srcy, stepx, stepy)
+        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
             piece = match.readfield(dstx, dsty)
             if( (color == Match.COLORS['white'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) or
                 (color == Match.COLORS['black'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) ):
-                return True, dstx, dsty
+                return True
 
     BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
     for i in range(4):
         stepx = BP_STEPS[i][0]
         stepy = BP_STEPS[i][1]
-        dstx, dsty = search(match, scrx, srcy, stepx, stepy)
+        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
             piece = match.readfield(dstx, dsty)
             if( (color == Match.COLORS['white'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) or
                 (color == Match.COLORS['black'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) ):
-                return True, dstx, dsty
+                return True
 
     KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
     for i in range(8):
-        dstx = scrx + KN_STEPS[i][0]
+        dstx = srcx + KN_STEPS[i][0]
         dsty = srcy + KN_STEPS[i][1]
         if(is_inbounds(dstx, dsty)):
             piece = match.readfield(dstx, dsty)
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['bKn']) or
                 (color == Match.COLORS['black'] and piece == Match.PIECES['wKn']) ):
-                return True, dstx, dsty
+                return True
 
     KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
     for i in range(8):
-        dstx = scrx + KG_STEPS[i][0]
+        dstx = srcx + KG_STEPS[i][0]
         dsty = srcy + KG_STEPS[i][1]
         if(is_inbounds(dstx, dsty)):
             piece = match.readfield(dstx, dsty)
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['bKg']) or
                 (color == Match.COLORS['black'] and piece == Match.PIECES['wKg']) ):
-                return True, dstx, dsty
+                return True
 
     wPW_STEPS = [ [1, 1], [-1, 1] ]
     for i in range(2):
-        dstx = scrx + wPW_STEPS[i][0]
+        dstx = srcx + wPW_STEPS[i][0]
         dsty = srcy + wPW_STEPS[i][1]
         if(is_inbounds(dstx, dsty)):
             piece = match.readfield(dstx, dsty)
             if(color == Match.COLORS['white'] and piece == Match.PIECES['bPw']):
-                return True, dstx, dsty
+                return True
 
     bPW_STEPS = [ [1, -1], [-1, -1] ]
     for i in range(2):
-        dstx = scrx + bPW_STEPS[i][0]
+        dstx = srcx + bPW_STEPS[i][0]
         dsty = srcy + bPW_STEPS[i][1]
         if(is_inbounds(dstx, dsty)):
             piece = match.readfield(dstx, dsty)
             if(color == Match.COLORS['black'] and piece == Match.PIECES['wPw']):
-                return True, dstx, dsty
+                return True
 
-    return False, UNDEF_X, UNDEF_Y
+    return False
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
@@ -234,7 +238,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
 
     piece = match.readfield(srcx, srcy)
 
-    if(match.next_color() != Match.color_of_piece(piece):
+    if(match.next_color() != Match.color_of_piece(piece)):
         return False, ERROR_CODES['wrong-color']
 
     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
