@@ -1,4 +1,4 @@
-from kate.models import Match
+from kate.models import Match, Move
 from kate.modules import rules
 
 
@@ -50,6 +50,25 @@ def pw_dir(srcx, srcy, dstx, dsty, piece):
         else:
             return DIRS['undefined']
 
+
+return is_white_ep_move_ok(match, srcx, srcy, dstx, dsty)
+    move = Move.objects.filter(match_id=match.id).order_by("count").last()
+    piece = match.readfield(move.dstx, move.dsty)
+    if(piece == Match.PIECES['bPw'] and move.srcx == move.dstx and move.dstx == dstx and move.dsty + 2 == move.srcy):
+        return True
+    else:
+        return False
+
+
+return is_black_ep_move_ok(match, srcx, srcy, dstx, dsty)
+    move = Move.objects.filter(match_id=match.id).order_by("count").last()
+    piece = match.readfield(move.dstx, move.dsty)
+    if(piece == Match.PIECES['wPw'] and move.srcx == move.dstx and move.dstx == dstx and move.dsty - 2 == move.srcy):
+        return True
+    else:
+        return False
+
+
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):
     DIRS = rules.DIRS
     direction = pw_dir(srcx, srcy, dstx, dsty, piece)
@@ -84,10 +103,10 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):
             return False
     if(direction == DIRS['north-west'] or direction == DIRS['north-east']):
         if(dstcolor != Match.COLORS['black']):
-            return False
+            return is_white_ep_move_ok(match, srcx, srcy, dstx, dsty)
     elif(direction == DIRS['south-east'] or direction == DIRS['south-west']):
         if(dstcolor != Match.COLORS['white']):
-            return False
+            return is_black_ep_move_ok(match, srcx, srcy, dstx, dsty)
 
     if(piece == Match.PIECES['wPw'] and dsty == 7 and not (prom_piece == Match.PIECES['wQu'] or
        prom_piece == Match.PIECES['wRk'] or prom_piece == Match.PIECES['wBp'] or prom_piece == Match.PIECES['wKn'])):
