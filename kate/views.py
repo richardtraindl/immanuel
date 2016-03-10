@@ -118,20 +118,22 @@ def do_move(request, matchid):
             srcx,srcy = values.koord_to_index(movesrc)
             dstx,dsty = values.koord_to_index(movedst)
             prom_piece = match.PIECES[prompiece]
-            if(rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece) == True):
+            flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
+            if(flag == True):
                 match = Match.objects.get(id=matchid)
                 move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
                 move.save()
                 match.save()
-                msg = "<p class='ok'>Zug ist OK.</p>"
+                fmtmsg = "<p class='ok'>" + msg + "</p>"
             else:
-                msg = "<p class='error'>Zug ist ungültig.</p>"
+                fmtmsg = "<p class='error'>" + msg + "</p>"
         else:
-            msg = "<p class='error'>Zug-Format ist ungültig.</p>"
+            fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
+
         fmtboard = fill_fmtboard(match, int(switch))
         fmtmoves = fill_fmtmoves(match)
         comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
-        return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': msg } )
+        return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': fmtmsg } )
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
 
