@@ -18,6 +18,10 @@ STEP_1W_X = -1
 STEP_1W_Y = 0
 STEP_1N1W_X = -1
 STEP_1N1W_Y = 1
+STEP_SH_CASTLING_X = 2
+STEP_SH_CASTLING_Y = 0
+STEP_LG_CASTLING_X = -2
+STEP_LG_CASTLING_Y = 0
 
 
 def kg_dir(srcx, srcy, dstx, dsty):
@@ -40,13 +44,64 @@ def kg_dir(srcx, srcy, dstx, dsty):
         return DIRS['valid']
     elif(step_x == STEP_1N1W_X and step_y == STEP_1N1W_Y):
         return DIRS['valid']
+    elif(step_x == STEP_SH_CASTLING_X and step_y == STEP_SH_CASTLING_Y):
+        return DIRS['sh-castling']
+    elif(step_x == STEP_LG_CASTLING_X and step_y == STEP_LG_CASTLING_Y):
+        return DIRS['lg-castling']
     else:
         return DIRS['undefined']
+
+
+def is_castling_ok(match, srcx, srcy, dstx, dsty, piece):
+    color = Match.color_of_piece(piece)
+
+    if(dstx == 6):
+        if(color == Match.COLORS['white']):
+            if(match.wKg_first_movecnt != 0 or match.wRk_h1_first_movecnt != 0)
+                return False
+        else:
+            if(match.bKg_first_movecnt != 0 or match.bRk_h8_first_movecnt != 0)
+                return False            
+
+        king = match.readfield(srcx, srcy)
+        match.writefield(srcx, srcy, Match.PIECES['blk'])
+        for i in range(3):
+            castlingx = srcx + i
+            attacked = rules.attacked(match, castlingx, srcy)
+            if(attacked == True):
+                match.writefield(srcx, srcy, king)
+                return False
+
+        match.writefield(srcx, srcy, king)
+        return True
+    else:
+        if(color == Match.COLORS['white']):
+            if(match.wKg_first_movecnt != 0 or match.wRk_a1_first_movecnt != 0)
+                return False
+        else:
+            if(match.bKg_first_movecnt != 0 or match.bRk_a8_first_movecnt != 0)
+                return False
+
+        king = match.readfield(srcx, srcy)
+        match.writefield(srcx, srcy, Match.PIECES['blk'])
+        for i in range(0, -3, -1):
+            castlingx = srcx + i
+            attacked = rules.attacked(match, castlingx, srcy)
+            if(attacked == True):
+                match.writefield(srcx, srcy, king)
+                return False
+
+        match.writefield(srcx, srcy, king)
+        return True
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
     DIRS = rules.DIRS
     direction = kg_dir(srcx, srcy, dstx, dsty)
+    if(direction == DIRS['sh-castling']):
+        return is_castling_ok(match, srcx, srcy, dstx, dsty, piece)
+    if(direction == DIRS['lg-castling']):
+        return is_castling_ok(match, srcx, srcy, dstx, dsty, piece)
     if(direction == DIRS['undefined']):
         return False
 
