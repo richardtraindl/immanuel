@@ -13,8 +13,10 @@ DIRS = {
     'south-east' : 8,
     '2north' : 9,
     '2south' : 10,
-    'valid' : 11,
-    'undefined' : 12 
+    'sh-castling' : 11,
+    'lg-castling' : 12:
+    'valid' : 13,
+    'undefined' : 14 
 }
 
 
@@ -29,6 +31,8 @@ REVERSE_DIRS = {
     DIRS['south-east'] : DIRS['north-west'],
     DIRS['2north'] : DIRS['2south'],
     DIRS['2south'] : DIRS['2north'],
+    DIRS['sh-castling'] : DIRS['undefined'],
+    DIRS['lg-castling'] : DIRS['undefined'],
     DIRS['valid'] : DIRS['valid'],
     DIRS['undefined'] : DIRS['undefined'] 
 }
