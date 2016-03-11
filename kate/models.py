@@ -98,9 +98,9 @@ class Match(models.Model):
         self.board[7][7] = self.PIECES['bRk']
 
         self.fifty_moves_count = 0
-        self.wKg_x = 3
+        self.wKg_x = 4
         self.wKg_y = 0
-        self.bKg_x = 3
+        self.bKg_x = 4
         self.bKg_y = 7
         self.wKg_first_movecnt = 0
         self.bKg_first_movecnt = 0

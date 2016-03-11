@@ -236,15 +236,15 @@ def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
 
     color = Match.color_of_piece(piece)
 
-    if(color = Match.COLORS['white']):
-        attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+    if(color == Match.COLORS['white']):
+        flag = attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
     else:
-        attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+        flag = attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
         
     match.writefield(dstx, dsty, dstpiece)
     match.writefield(srcx, srcy, piece)
 
-    return attacked
+    return flag
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
@@ -258,7 +258,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
 
     if(piece != Match.PIECES['wKg'] and piece != Match.PIECES['bKg']):
         if(is_king_after_move_attacked(match, srcx, srcy, dstx, dsty)):
-            return False
+            return False, ERROR_CODES['king-error']
 
     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
         if(not pawn.is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece)):
