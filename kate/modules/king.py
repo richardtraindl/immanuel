@@ -55,6 +55,8 @@ def kg_dir(srcx, srcy, dstx, dsty):
 def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     color = Match.color_of_piece(piece)
 
+    opp_color = Match.REVERSED_COLORS[color]
+
     for i in range(1, 3, 1):
         fieldx = srcx + i
         field = match.readfield(fieldx, srcy)
@@ -72,7 +74,7 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     match.writefield(srcx, srcy, Match.PIECES['blk'])
     for i in range(3):
         castlingx = srcx + i
-        attacked = rules.attacked(match, castlingx, srcy)
+        attacked = rules.attacked(match, castlingx, srcy, opp_color)
         if(attacked == True):            
             match.writefield(srcx, srcy, king)
             return False
@@ -83,6 +85,8 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
 
 def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     color = Match.color_of_piece(piece)
+
+    opp_color = Match.REVERSED_COLORS[color]
 
     for i in range(1, 3, 1):
         fieldx = srcx - i
@@ -101,7 +105,7 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     match.writefield(srcx, srcy, Match.PIECES['blk'])
     for i in range(0, -3, -1):
         castlingx = srcx + i
-        attacked = rules.attacked(match, castlingx, srcy)
+        attacked = rules.attacked(match, castlingx, srcy, opp_color)
         if(attacked == True):
             match.writefield(srcx, srcy, king)
             return False
@@ -112,6 +116,11 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
     DIRS = rules.DIRS
+
+    color = Match.color_of_piece(piece)
+
+    opp_color = Match.REVERSED_COLORS[color]
+
     direction = kg_dir(srcx, srcy, dstx, dsty)
     if(direction == DIRS['sh-castling']):
         return is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece)
@@ -120,12 +129,11 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
     if(direction == DIRS['undefined']):
         return False
 
-    color = Match.color_of_piece(piece)
     king = match.readfield(srcx, srcy)
     captured = match.readfield(dstx, dsty)
     match.writefield(srcx, srcy, Match.PIECES['blk'])
     match.writefield(dstx, dsty, king)
-    attacked = rules.attacked(match, dstx, dsty)
+    attacked = rules.attacked(match, dstx, dsty, opp_color)
     match.writefield(srcx, srcy, king)
     match.writefield(dstx, dsty, captured)
     if(attacked == True):

@@ -9,7 +9,14 @@ class Match(models.Model):
     COLORS = {
         'undefined' : 0,
         'white' : 1,
-        'black' : 9 }
+        'black' : 9 
+    }
+
+    REVERSED_COLORS = {
+        COLORS['undefined'] : COLORS['undefined'],
+        COLORS['white'] : COLORS['black'],
+        COLORS['black'] : COLORS['white'] 
+    }
 
     PIECES = {
         'blk' : 0,
@@ -24,7 +31,8 @@ class Match(models.Model):
         'bRk' : 11,
         'bKn' : 12,
         'bBp' : 13,
-        'bQu' : 14 }
+        'bQu' : 14 
+    }
 
     STATUS = {
         'open' : 1,
