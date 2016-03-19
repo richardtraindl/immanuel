@@ -54,6 +54,11 @@
                 {{ msg|safe }}
             </div>
 
+            <div>
+                {{ match.white_player }} &nbsp; {{ match.black_player }}<br>
+                Score: &nbsp;{{ match.score }}
+            </div>
+
             <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
                 <tr id="board-letters">
                     <td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td>

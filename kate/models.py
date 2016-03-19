@@ -34,6 +34,22 @@ class Match(models.Model):
         'bQu' : 14 
     }
 
+    SCORES = {
+        PIECES['blk'] : 0,
+        PIECES['wKg'] : -2000,
+        PIECES['wPw'] : -10,
+        PIECES['wRk'] : -50,
+        PIECES['wKn'] : -33,
+        PIECES['wBp'] : -35,
+        PIECES['wQu'] : -95,
+        PIECES['bKg'] : 2000,
+        PIECES['bPw'] : 10,
+        PIECES['bRk'] : 50,
+        PIECES['bKn'] : 33,
+        PIECES['bBp'] : 35,
+        PIECES['bQu'] : 95
+    }
+
     STATUS = {
         'open' : 1,
         'draw' : 2,
@@ -133,6 +149,8 @@ class Match(models.Model):
                 move.move_type = move.TYPES['promotion']
                 move.captured_piece = dstpiece
                 move.prom_piece = prom_piece
+                self.score += (self.SCORES[prom_piece] - self.SCORES[srcpiece])
+                self.score += self.SCORES[dstpiece]
                 return move
             elif(dstpiece == Match.PIECES['blk'] and srcx != dstx):
                 self.writefield(srcx, srcy, self.PIECES['blk'])
@@ -144,6 +162,7 @@ class Match(models.Model):
                 pawn = self.readfield(move.e_p_fieldx, move.e_p_fieldy)
                 self.writefield(move.e_p_fieldx, move.e_p_fieldy, self.PIECES['blk'])
                 move.captured_piece = pawn
+                self.score += self.SCORES[pawn]
                 return move 
         elif(srcpiece == Match.PIECES['wKg'] or srcpiece == self.PIECES['bKg']):
             if(srcx - dstx == -2):
@@ -215,6 +234,7 @@ class Match(models.Model):
         move.fifty_moves_count = self.fifty_moves_count
         move.move_type = move.TYPES['standard']
         move.captured_piece = dstpiece
+        self.score += self.SCORES[dstpiece]
         return move
 
 
@@ -230,6 +250,7 @@ class Match(models.Model):
             piece = self.readfield(move.dstx, move.dsty)
             self.writefield(move.srcx, move.srcy, piece)
             self.writefield(move.dstx, move.dsty, move.captured_piece)
+            self.score -= self.SCORES[move.captured_piece]
 
             if(piece == Match.PIECES['wKg']):
                 self.wKg_x = move.srcx
@@ -295,12 +316,15 @@ class Match(models.Model):
                 piece = self.PIECES['bPw']
             self.writefield(move.srcx, move.srcy, piece)
             self.writefield(move.dstx, move.dsty, move.captured_piece)
+            self.score -= (self.SCORES[move.prom_piece] - self.SCORES[piece])
+            self.score -= self.SCORES[move.captured_piece]
             return move
         else:
             piece = self.readfield(move.dstx, move.dsty)
             self.writefield(move.srcx, move.srcy, piece)
             self.writefield(move.dstx, move.dsty, self.PIECES['blk'])
             self.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
+            self.score -= self.SCORES[move.captured_piece]
             return move
 
 

@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from kate.models import Match, Move, Comment
-from kate.modules import values, rules
+from kate.modules import values, rules, calc
 
 
 def fill_fmtboard(match, switch):
@@ -129,6 +129,16 @@ def do_move(request, matchid):
                 fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
         else:
             fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
+
+        if(match.next_color() == Match.COLORS['white']):
+            if(match.white_player_human == True):
+                print("white random_move")
+                # calc.random_move()
+        else:
+            if(match.black_player_human == True):
+                print("black random_move")
+                # calc.random_move()
+        calc.random_move(match)
 
         fmtboard = fill_fmtboard(match, int(switch))
         fmtmoves = fill_fmtmoves(match)
