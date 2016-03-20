@@ -1,6 +1,6 @@
 from kate.models import Match, Move
 from kate.modules import values, rules
-import random
+import random, threading, copy, time
 
 
 RK_STEPS = [ [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]],
@@ -67,7 +67,7 @@ BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']], [0,
                 [[-1, -1, Match.PIECES['bQu']], [-1, -1, Match.PIECES['bRk']], [-1, -1, Match.PIECES['bBp']], [-1, -1, Match.PIECES['bKn']]] ]
 
 
-class genmove(object):
+class GenMove(object):
     def __init__(self, srcx=None, srcy=None, dstx=None, dsty=None, prom_piece=None):
         self.srcx = srcx
         self.srcy = srcy
@@ -140,7 +140,7 @@ class Generator(object):
 
 
     def generate_move(self):
-        gmove = genmove()
+        gmove = GenMove()
         color = self.match.next_color()
         
         while(True):
@@ -215,7 +215,7 @@ class Generator(object):
             flag, errmsg = rules.is_move_valid(self.match, self.board_x, self.board_y, dstx, dsty, prom_piece)
             if(flag == True):
                 # print("OK: " + str(self.board_x) + " " + str(self.board_y) + " " + str(dstx) + " " + str(dsty))
-                gmove = genmove(self.board_x, self.board_y, dstx, dsty, prom_piece)
+                gmove = GenMove(self.board_x, self.board_y, dstx, dsty, prom_piece)
                 self.rotate()
                 return True, gmove
             else:
@@ -229,16 +229,72 @@ class Generator(object):
 
 def random_move(match):
     generator = Generator()
-    generator.match = match
-    # gmove = genmove()
-    flag, gmove = generator.generate_move()
-    rand_flag = False
-    count = random.randint(0, 9)
-    for i in range(count):
-        rand_flag, rand_gmove = generator.generate_move()
-    if(rand_flag):
-        return rand_flag, rand_gmove
-    elif(flag):
-        return flag, gmove
-    else:
+    generator.match = match # copy.copy(match)
+    gmove_list = []
+
+    while(True):
+        flag, gmove = generator.generate_move()
+        if(flag == True):
+            gmove_list.append(gmove)
+        else:
+            break
+
+    count = len(gmove_list)
+    if(count == 0):
         return False, gmove
+
+    count = random.randint(0, count - 1)
+    print(values.index_to_koord(gmove_list[count].srcx, gmove_list[count].srcy) + " " + \
+          values.index_to_koord(gmove_list[count].dstx, gmove_list[count].dsty) + " " + \
+          str(gmove_list[count].prom_piece))
+    return True, gmove_list[count]
+
+
+
+class immanuelsThread(threading.Thread):
+    def __init__(self, threadID, match):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.match = match
+    def run(self):
+        # Get lock to synchronize threads
+        # threadLock.acquire()
+
+        print("Starting " + str(self.threadID))
+
+        flag, gmove = random_move(self.match)
+        if(flag):
+            time.sleep(1)
+            move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+            move.save()
+            self.match.save()
+
+        # Free lock to release next thread
+        # threadLock.release()
+
+
+def do_random_move(match):
+    # threadLock = threading.Lock()
+    thread = immanuelsThread(2, match)
+    thread.start()
+    
+    
+#threadLock = threading.Lock()
+#threads = []
+
+# Create new threads
+#thread1 = myThread(1, "Thread-1", 1)
+#thread2 = myThread(2, "Thread-2", 2)
+
+# Start new Threads
+#thread1.start()
+#thread2.start()
+
+# Add threads to thread list
+#threads.append(thread1)
+#threads.append(thread2)
+
+# Wait for all threads to complete
+#for t in threads:
+#    t.join()
+#print "Exiting Main Thread"

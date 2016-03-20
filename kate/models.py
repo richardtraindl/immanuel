@@ -3,6 +3,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 from django.db.models.signals import post_save
 from kate.modules import values
+import threading
 
 
 class Match(models.Model):
@@ -62,9 +63,9 @@ class Match(models.Model):
     score = models.SmallIntegerField(null=False, default=0)    
     begin = models.DateTimeField(default=timezone.now)
     white_player = models.CharField(max_length=100, blank=False)
-    white_player_human = models.BooleanField(null=False, default=False)
+    white_player_human = models.BooleanField(null=False, default=True)
     black_player = models.CharField(max_length=100, blank=False)
-    black_player_human = models.BooleanField(null=False, default=False)
+    black_player_human = models.BooleanField(null=False, default=True)
     board = ArrayField(ArrayField(models.PositiveSmallIntegerField(null=False, blank=False, default=PIECES['blk']), size=8), size=8)
     fifty_moves_count = models.SmallIntegerField(null=False, default=0)
     wKg_x = models.SmallIntegerField(null=False, default=0)
@@ -333,6 +334,13 @@ class Match(models.Model):
             return Match.COLORS['white']
         else:
             return Match.COLORS['black']
+
+
+    def next_color_human(self):
+        if(self.count % 2 == 0 ):
+            return self.white_player_human
+        else:
+            return self.black_player_human
 
 
     @staticmethod

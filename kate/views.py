@@ -98,7 +98,20 @@ def create(request):
     if request.method == 'POST':
         match = Match()
         match.white_player = request.POST['white_player']
+
+        human = request.POST.getlist('white_player_human')
+        if(len(human) == 1):
+            match.white_player_human = True
+        else:
+            match.white_player_human = False
         match.black_player = request.POST['black_player']
+
+        human = request.POST.getlist('black_player_human')
+        if(len(human) == 1):
+            match.black_player_human = True
+        else:
+            match.black_player_human = False
+            
         if(len(match.white_player) > 0 and len(match.black_player)):
             match.setboardbase()
             match.save()
@@ -114,31 +127,30 @@ def do_move(request, matchid):
         movedst = request.POST['move_dst']
         prompiece = request.POST['prom_piece']
         switch = request.POST['switch']
-        if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
-            srcx,srcy = values.koord_to_index(movesrc)
-            dstx,dsty = values.koord_to_index(movedst)
-            prom_piece = match.PIECES[prompiece]
-            flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
-            if(flag == True):
-                match = Match.objects.get(id=matchid)
-                move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
-                move.save()
-                match.save()
-                fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
+        if(match.next_color_human()):
+            if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
+                srcx,srcy = values.koord_to_index(movesrc)
+                dstx,dsty = values.koord_to_index(movedst)
+                prom_piece = match.PIECES[prompiece]
+                flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
+                if(flag == True):
+                    match = Match.objects.get(id=matchid)
+                    move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
+                    move.save()
+                    match.save()
+                    fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
+                    if(match.next_color_human() == False):
+                        calc.do_random_move(match)
+                        #if(match.next_color() == Match.COLORS['white']):
+                            #calc.do_random_move(match)
+                        #else:
+                            #calc.do_random_move(match)
+                else:
+                    fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
             else:
-                fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
+                fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
         else:
-            fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
-
-        if(match.next_color() == Match.COLORS['white']):
-            if(match.white_player_human == True):
-                print("white random_move")
-                # calc.random_move()
-        else:
-            if(match.black_player_human == True):
-                print("black random_move")
-                # calc.random_move()
-        calc.random_move(match)
+            fmtmsg = "<p class='error'>Mensch ist nicht am Zug.</p>"
 
         fmtboard = fill_fmtboard(match, int(switch))
         fmtmoves = fill_fmtmoves(match)
