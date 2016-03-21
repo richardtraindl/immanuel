@@ -250,51 +250,25 @@ def random_move(match):
     return True, gmove_list[count]
 
 
-
 class immanuelsThread(threading.Thread):
-    def __init__(self, threadID, match):
+    def __init__(self, threadID, match, delay):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.match = match
+        self.delay = delay
+
+
     def run(self):
-        # Get lock to synchronize threads
-        # threadLock.acquire()
-
         print("Starting " + str(self.threadID))
-
+        time.sleep(self.delay)
         flag, gmove = random_move(self.match)
         if(flag):
-            time.sleep(1)
             move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
             move.save()
             self.match.save()
 
-        # Free lock to release next thread
-        # threadLock.release()
 
-
-def do_random_move(match):
-    # threadLock = threading.Lock()
-    thread = immanuelsThread(2, match)
+def do_random_move(match, delay):
+    thread = immanuelsThread(2, match, delay)
     thread.start()
-    
-    
-#threadLock = threading.Lock()
-#threads = []
 
-# Create new threads
-#thread1 = myThread(1, "Thread-1", 1)
-#thread2 = myThread(2, "Thread-2", 2)
-
-# Start new Threads
-#thread1.start()
-#thread2.start()
-
-# Add threads to thread list
-#threads.append(thread1)
-#threads.append(thread2)
-
-# Wait for all threads to complete
-#for t in threads:
-#    t.join()
-#print "Exiting Main Thread"

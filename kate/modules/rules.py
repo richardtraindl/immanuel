@@ -247,6 +247,42 @@ def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
     return flag
 
 
+def is_move_available(match):
+    color = match.next_color()
+    for y1 in range(8):
+        for x1 in range(8):
+            piece = match.readfield(x1, y1);
+            if(color == Match.color_of_piece(piece)):
+                if(color == Match.COLORS['white']):
+                    prom_piece = Match.PIECES['wQu']
+                else:
+                    prom_piece = Match.PIECES['bQu']
+
+                for y2 in range(8):
+                    for x2 in range(8):
+                        flag, msg = is_move_valid(match, x1, y1, x2, y2, prom_piece)
+                        if(flag):
+                            return True
+    return False
+
+
+def game_status(match):
+    if(match.next_color() == Match.COLORS['white']):
+        flag = attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+    else:
+        flag = attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+
+    if(is_move_available(match)):
+        return Match.STATUS['open']
+    elif(flag):
+        if(match.next_color() == Match.COLORS['white']):
+            return Match.STATUS['winner_black']
+        else:
+            return Match.STATUS['winner_white']
+    else:
+        return Match.STATUS['draw']
+
+
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
     if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
         return False, ERROR_CODES['out-of-bounds']

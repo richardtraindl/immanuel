@@ -140,11 +140,7 @@ def do_move(request, matchid):
                     match.save()
                     fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
                     if(match.next_color_human() == False):
-                        calc.do_random_move(match)
-                        #if(match.next_color() == Match.COLORS['white']):
-                            #calc.do_random_move(match)
-                        #else:
-                            #calc.do_random_move(match)
+                        calc.do_random_move(match, 0)
                 else:
                     fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
             else:
@@ -155,6 +151,9 @@ def do_move(request, matchid):
         fmtboard = fill_fmtboard(match, int(switch))
         fmtmoves = fill_fmtmoves(match)
         comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
+        status = rules.game_status(match)
+        if(status != Match.STATUS['open']):
+            fmtmsg = "<p class='error'>" + values.reverse_lookup(Match.STATUS, status) + "</p>"
         return render(request, 'kate/match.html', {'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': fmtmsg } )
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
@@ -167,6 +166,8 @@ def undo_move(request, matchid, switch=None):
     if(move != None):
         move.delete()
         match.save()
+        if(match.next_color_human() == False):
+            calc.do_random_move(match, 6)
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch, 1)))
 
 
