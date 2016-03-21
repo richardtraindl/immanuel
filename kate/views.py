@@ -162,12 +162,11 @@ def do_move(request, matchid):
 def undo_move(request, matchid, switch=None):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
-    move = match.undo_move()
-    if(move != None):
-        move.delete()
-        match.save()
-        if(match.next_color_human() == False):
-            calc.do_random_move(match, 6)
+    if(match.white_player_human and match.black_player_human):
+        move = match.undo_move()
+        if(move != None):
+            move.delete()
+            match.save()
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch, 1)))
 
 

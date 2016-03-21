@@ -21,7 +21,11 @@
                 <a href="{% url 'kate:new' %}">NEUES SPIEL</a> |
                 <a href="{% url 'kate:index' %}">SPIEL LADEN</a> |
                 <a href="{% url 'kate:match' match.id switch|invert %}">BRETT DREHEN</a> |
-                <a href="{% url 'kate:undomove' match.id switch %}" onclick="return confirm('Wollen sie den letzten Zug zurücknehmen?')">ZUG RÜCKNEHMEN</a>
+                {% if match.white_player_human and match.black_player_human %}
+                    <a href="{% url 'kate:undomove' match.id switch %}" onclick="return confirm('Wollen sie den letzten Zug zurücknehmen?')">ZUG RÜCKNEHMEN</a>
+                {% else %}
+                    <span>ZUG RÜCKNEHMEN</span>
+                {% endif %}
             </h2>
         </div>
     </div>
