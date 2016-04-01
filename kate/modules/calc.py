@@ -91,7 +91,6 @@ class Generator(object):
         stepx = self.steps[self.dir_idx][self.step_idx][0]
         stepy = self.steps[self.dir_idx][self.step_idx][1]
         if( len(self.steps[self.dir_idx][self.step_idx]) == 3):
-            print("llllllllll")
             prom_piece = self.steps[self.dir_idx][self.step_idx][2]
         else:
             prom_piece = Match.PIECES['blk']
@@ -229,7 +228,7 @@ class Generator(object):
 
 def random_move(match):
     generator = Generator()
-    generator.match = match # copy.copy(match)
+    generator.match = match
     gmove_list = []
 
     while(True):
@@ -250,13 +249,21 @@ def random_move(match):
     return True, gmove_list[count]
 
 
-class immanuelsThread(threading.Thread):
+class immanuelsThread1(threading.Thread):
     def __init__(self, threadID, match, delay):
         threading.Thread.__init__(self)
         self.threadID = threadID
-        self.match = match
-        self.delay = delay
+        self.match = copy.copy(match)
+        print(str(self.match.wKg_x) + " "  + 
+              str(self.match.wKg_y) + " "  + 
+              str(self.match.wKg_first_movecnt) + " "  + 
+              str(self.match.wRk_a1_first_movecnt) + " "  + 
+              str(self.match.wRk_h1_first_movecnt))
 
+        move = Move.objects.filter(match_id=match.id).order_by("count").last()
+        if(move != None):
+            self.match.move_list.append(move)
+        self.delay = delay
 
     def run(self):
         print("Starting " + str(self.threadID))
@@ -269,6 +276,115 @@ class immanuelsThread(threading.Thread):
 
 
 def do_random_move(match, delay):
-    thread = immanuelsThread(2, match, delay)
+    thread = immanuelsThread1(2, match, delay)
+    thread.start()
+
+
+class immanuelsThread(threading.Thread):
+    def __init__(self, threadID, match, depth, delay):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.match = copy.copy(match)
+        move = Move.objects.filter(match_id=match.id).order_by("count").last()
+        if(move != None):
+            self.match.move_list.append(move)
+        self.depth = depth
+        self.delay = delay
+
+    def run(self):
+        print("Starting " + str(self.threadID))
+        print(str(self.match.wKg_x) + " "  + 
+              str(self.match.wKg_y) + " "  + 
+              str(self.match.wKg_first_movecnt) + " "  + 
+              str(self.match.wRk_a1_first_movecnt) + " "  + 
+              str(self.match.wRk_h1_first_movecnt))
+        time.sleep(self.delay)
+        gmove = calc_move(self.match, self.depth)
+        if(gmove != None):
+            move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+            move.save()
+            self.match.save()
+            print("move saved")
+
+
+def rate(color, gmove, new_gmove, score, new_score):
+    if((color == Match.COLORS['white'] and score < new_score) or 
+       (color == Match.COLORS['black'] and score > new_score)):
+        return new_score, new_gmove
+    else:
+        return score, gmove
+
+
+def calc_node(match, depth):
+    generator = Generator()
+    generator.match = match 
+    color = match.next_color()
+    gmove = None
+    count = 0
+
+    print(str(color) + " -------- ")
+
+    if(color == Match.COLORS['white']):
+        score = -20000
+    else:
+        score = 20000
+
+    while(True):
+        flag, new_gmove = generator.generate_move()
+        if(flag == True):
+            count += 1
+            move = match.do_move(new_gmove.srcx, new_gmove.srcy, new_gmove.dstx, new_gmove.dsty, new_gmove.prom_piece)
+            match.move_list.append(move)
+
+            if(depth > 1):
+                new_score, calc_move = calc_node(match, depth - 1)
+            else:
+                new_score = match.score
+
+            score, gmove = rate(color, gmove, new_gmove, score, new_score)
+
+            match.undo_move(True)
+        else:
+            break
+
+    if(count == 0):
+        status = rules.game_status(match)
+        gmove = None
+        if(status == Match.STATUS['winner_black']):
+            score = Match.SCORES['wKg']
+        elif(status == Match.STATUS['winner_white']):
+            score = Match.SCORES['bKg']
+        elif(status == Match.STATUS['draw']):
+            score = Match.SCORES['blk']
+        else:
+            score = match.score
+
+    return score, gmove
+
+
+def calc_move(match, depth):
+    #if(match.next_color() == Match.COLORS['white']):
+    #    alpha = -20000
+    #    beta = 20000
+    #else:
+    #    alpha = 20000
+    #    beta = -20000
+
+    score, gmove = calc_node(match, depth)
+
+    if(gmove != None):
+        print("result: " + str(score))
+        print(str(gmove.srcx) + " " + str(gmove.srcy)  + " " + str(gmove.dstx)  + " " +  str(gmove.dsty)  + " " + str(gmove.prom_piece))
+              #values.index_to_koord(gmove.srcx, gmove.srcy) + " " + 
+              # values.index_to_koord(gmove.dstx, gmove.dsty) + " " + "blk")
+              # values.reverse_lookup(Match.PIECES, gmove.prom_piece))
+    else:
+        print("no results found!!!" + str(score))
+    
+    return gmove
+
+
+def do_move(match, depth, delay):
+    thread = immanuelsThread(1, match, depth, delay)
     thread.start()
 

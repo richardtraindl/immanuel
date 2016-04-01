@@ -27,6 +27,10 @@ def cut(value):
     else:
         return str("")
 
+@register.filter(name='letter')
+def letter(value):
+    return chr(value + ord('A'))
+
 @register.filter(name='lower')
 def lower(value):
     return value.lower()

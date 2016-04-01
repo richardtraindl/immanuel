@@ -72,7 +72,7 @@ table {
     margin: 0px auto;
     padding: 0px;
     width: 768px;
-    // max-width: 90%;
+    /* max-width: 90%; */
     min-width: 420px;
 }
 
@@ -141,11 +141,11 @@ nav li a:active {
     overflow: auto;
 }
 
-table#board {
+#board  {
     background: gray;
 }
 
-table#board td {
+#board td {
     width: 48px; 
     height: 48px;
 }
@@ -154,22 +154,23 @@ table#board td {
     background-color: white;
 }
 
-table#board img {
+#board img {
     width: 48px; 
     height: 48px;
 }
 
-tr#board-letters td, .board-label {
+#board-letters1 td, #board-letters2 td, .board-label {
     background-color: #FF8C69 !important;
-    text-align: center;
-    font-size: 12px;
+    text-align: center !important;
+    font-size: 12px !important;
 }
 
-tr#board-letters td:first-child, tr#board-letters td:nth-child(10) {
+#board-letters1 td:first-child, #board-letters1 td:nth-child(10),
+#board-letters2 td:first-child, #board-letters2 td:nth-child(10) {
     width: 24px !important;
 }
 
-tr#board-letters td {
+#board-letters1 td, #board-letters2 td {
     height: 24px !important;
 }
 

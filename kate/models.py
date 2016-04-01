@@ -78,6 +78,7 @@ class Match(models.Model):
     wRk_h1_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_a8_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_h8_first_movecnt = models.SmallIntegerField(null=False, default=0)
+    move_list = []
 
 
     def writefield(self, x, y, value):
@@ -239,10 +240,16 @@ class Match(models.Model):
         return move
 
 
-    def undo_move(self):
-        move = Move.objects.filter(match_id=self.id).order_by("count").last()
-        if(move == None):
-            return None
+    def undo_move(self, calc):
+        if(calc == False):
+            move = Move.objects.filter(match_id=self.id).order_by("count").last()
+            if(move == None):
+                return None
+        else:
+            if(len(self.move_list) > 0):
+                move = self.move_list.pop()
+            else:
+                return None
 
         self.count -= 1
         self.fifty_moves_count = move.fifty_moves_count
@@ -256,23 +263,23 @@ class Match(models.Model):
             if(piece == Match.PIECES['wKg']):
                 self.wKg_x = move.srcx
                 self.wKg_y = move.srcy
-                if(self.wKg_first_movecnt == self.count):
+                if(self.wKg_first_movecnt == self.count + 1):
                     self.wKg_first_movecnt = 0
             elif(piece == Match.PIECES['bKg']):
                 self.bKg_x = move.srcx
                 self.bKg_y = move.srcy
-                if(self.bKg_first_movecnt == self.count):
+                if(self.bKg_first_movecnt == self.count + 1):
                     self.bKg_first_movecnt = 0
             elif(piece == Match.PIECES['wRk']):
-                if(self.wRk_a1_first_movecnt == self.count):
-                    self.wRk_a1_first_movecnt = self.count
-                elif(self.wRk_h1_first_movecnt == self.count):
-                    self.wRk_h1_first_movecnt = self.count
+                if(self.wRk_a1_first_movecnt == self.count + 1):
+                    self.wRk_a1_first_movecnt = 0
+                elif(self.wRk_h1_first_movecnt == self.count + 1):
+                    self.wRk_h1_first_movecnt = 0
             elif(piece == Match.PIECES['bRk']):
-                if(self.bRk_a8_first_movecnt == self.count):
-                    self.bRk_a8_first_movecnt = self.count
-                elif(self.bRk_h8_first_movecnt == self.count):
-                    self.bRk_h8_first_movecnt = self.count
+                if(self.bRk_a8_first_movecnt == self.count + 1):
+                    self.bRk_a8_first_movecnt = 0
+                elif(self.bRk_h8_first_movecnt == self.count + 1):
+                    self.bRk_h8_first_movecnt = 0
             return move
         elif(move.move_type == move.TYPES['short_castling']):
             piece = self.readfield(move.dstx, move.dsty)
@@ -286,10 +293,12 @@ class Match(models.Model):
                 self.wKg_x = move.srcx
                 self.wKg_y = move.srcy
                 self.wKg_first_movecnt = 0
+                self.wRk_h1_first_movecnt = 0
             else:
                 self.bKg_x = move.srcx
                 self.bKg_y = move.srcy
                 self.bKg_first_movecnt = 0
+                self.bRk_h8_first_movecnt = 0
 
             return move
         elif(move.move_type == move.TYPES['long_castling']):
@@ -304,10 +313,12 @@ class Match(models.Model):
                 self.wKg_x = move.srcx
                 self.wKg_y = move.srcy
                 self.wKg_first_movecnt = 0
+                self.wRk_a1_first_movecnt = 0
             else:
                 self.bKg_x = move.srcx
                 self.bKg_y = move.srcy
                 self.bKg_first_movecnt = 0
+                self.bRk_a8_first_movecnt = 0
 
             return move
         elif(move.move_type == move.TYPES['promotion']):

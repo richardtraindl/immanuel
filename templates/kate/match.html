@@ -22,10 +22,11 @@
                 <a href="{% url 'kate:index' %}">SPIEL LADEN</a> |
                 <a href="{% url 'kate:match' match.id switch|invert %}">BRETT DREHEN</a> |
                 {% if match.white_player_human and match.black_player_human %}
-                    <a href="{% url 'kate:undomove' match.id switch %}" onclick="return confirm('Wollen sie den letzten Zug zurücknehmen?')">ZUG RÜCKNEHMEN</a>
+                    <a href="{% url 'kate:undomove' match.id switch %}" onclick="return confirm('Wollen sie den letzten Zug zurücknehmen?')">ZUG RÜCKNEHMEN</a> |
                 {% else %}
-                    <span>ZUG RÜCKNEHMEN</span>
+                    <span>ZUG RÜCKNEHMEN</span> |
                 {% endif %}
+                <a href="{% url 'kate:edit' match.id %}">SPIEL ÄNDERN</a>
             </h2>
         </div>
     </div>
@@ -62,34 +63,44 @@
                 {{ match.white_player }} &nbsp; {{ match.black_player }}<br>
                 Score: &nbsp;{{ match.score }}
             </div>
-
-            <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
-                <tr id="board-letters">
-                    <td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td>
-                </tr>
-            {% for row in board %}
-                <tr>
-                    <td class="board-label">{{ row.0.1|cut }}</td>
-                {% for col in row %}
-                    {% if col.1 == movesrc or col.1 == movedst %}
-                        <td id="{{ col.1 }}" class="hint" value="{{ col.0 }}">
-                    {% else %}
-                        <td id="{{ col.1 }}" value="{{ col.0 }}">
-                    {% endif %}
-                    {% if col.0 == 0 %}
-                        &nbsp;
-                    {% else %}
-                        <img src="{% static col.0|imgsrc %}">
-                    {% endif %}
-                    </td>
+            
+            <div id="board-wrapper">
+                <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
+                    <tr id="board-letters1">
+                        <td>&nbsp;</td>
+                        {% for i in range %}
+                            <td>{{ i|letter }}</td>
+                        {% endfor %}
+                        <td>&nbsp;</td>
+                    </tr>
+                {% for row in board %}
+                    <tr>
+                        <td class="board-label">{{ row.0.1|cut }}</td>
+                    {% for col in row %}
+                        {% if col.1 == movesrc or col.1 == movedst %}
+                            <td id="{{ col.1 }}" class="hint" value="{{ col.0 }}">
+                        {% else %}
+                            <td id="{{ col.1 }}" value="{{ col.0 }}">
+                        {% endif %}
+                        {% if col.0 == 0 %}
+                            &nbsp;
+                        {% else %}
+                            <img src="{% static col.0|imgsrc %}">
+                        {% endif %}
+                        </td>
+                    {% endfor %}
+                        <td class="board-label">{{ row.0.1|cut }}</td>
+                    </tr>
                 {% endfor %}
-                    <td class="board-label">{{ row.0.1|cut }}</td>
-                </tr>
-            {% endfor %}
-                <tr id="board-letters">
-                    <td>&nbsp;</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td><td>H</td><td>&nbsp;</td>
-                </tr>
-            </table>
+                    <tr id="board-letters2">
+                        <td>&nbsp;</td>
+                        {% for i in range %}
+                            <td>{{ i|letter }}</td>
+                        {% endfor %}
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+            </div>
 
             <div>
                 <table id="promotion">
@@ -170,50 +181,7 @@
 
     <script>
         $(document).ready(function() {
-            $('#board td').click(function(){
-                if( $(this).hasClass("marked") ){
-                    $(this).removeClass("marked");
-                    $('#white-pieces').addClass("invisible");
-                    $('#black-pieces').addClass("invisible");
-                    $('#prom-piece').attr("readonly", "readonly");
-                    if( $('#move-dst').val().trim() == $(this).attr("id") ){
-                        $('#move-dst').val("");
-                    }
-                    else if( $('#move-src').val().trim() == $(this).attr("id") ){
-                        $('#move-src').val("");
-                        $('#move-dst').val("");
-                    }
-                }
-                else{
-                    $(this).addClass("marked");
-                    var src = $('#move-src').val();
-                    if(! src.trim() ){
-                        $('#move-src').val($(this).attr("id"));
-                    }
-                    else{
-                        $('#move-dst').val($(this).attr("id"));
-                        var fieldid = $('#move-src').val();
-                        var piece = $('#' + fieldid).attr("value");
-                        if( piece == '2' ){
-                            var row = $('#move-dst').val();
-                            if( row.charAt(1) == '8' ){
-                                $('#white-pieces').removeClass("invisible");
-                                $('#prom-piece').removeAttr("readonly");
-                                return;
-                            }
-                        }
-                        else if( piece == '10' ){
-                            var row = $('#move-dst').val();
-                            if( row.charAt(1) == '1' ){
-                                $('#black-pieces').removeClass("invisible");
-                                $('#prom-piece').removeAttr("readonly");
-                                return;
-                            }
-                        }
-                        $("#move").submit()
-                    }
-                }
-            });
+            performMove();
 
             $('#promotion td').click(function(){
                 var piece;
@@ -235,11 +203,15 @@
                 matchid = $('#board').attr("matchid");
                 movecnt = $('#board').attr("movecnt");
                 switchflag = $('#switch').attr("value");
-                $.get('/kate/fetchboard', { matchid: matchid, movecnt: movecnt }, function(data){
-                    if(data == 1){
-                        var url;
+                $.get('/kate/fetchboard', { matchid: matchid, movecnt: movecnt, switchflag: switchflag }, function(data){
+                    if(data.length > 0){
+                        var arr = data.split(':');
+                        $('#board-wrapper').html(arr[0]);
+                        $('#minutes').html(arr[1]);
+                        performMove();
+                        /* var url;
                         url = '/kate/' + matchid + '/' + switchflag + '/1' + '/match/';
-                        window.location.href = url;
+                        window.location.href = url; */
                         // window.location.reload();
                     }
                 });
