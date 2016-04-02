@@ -39,8 +39,13 @@ def html_board(match, switch, movesrc, movedst):
     fmtboard = fill_fmtboard(match, switch)
     htmldata = "<table id='board' matchid='" + str(match.id) + "' movecnt='" + str(match.count) + "'>"
     htmldata += "<tr id='board-letters1'><td>&nbsp;</td>"
-    for i in range(8):
-        htmldata += "<td>" + chr(i + ord('A')) + "</td>"
+    
+    if(switch == 0):
+        for i in range(8):
+            htmldata += "<td>" + chr(i + ord('A')) + "</td>"
+    else:
+        for i in range(8):
+            htmldata += "<td>" + chr(ord('H') - i) + "</td>"
 
     htmldata += "<td>&nbsp;</td></tr>"
                 
@@ -63,8 +68,12 @@ def html_board(match, switch, movesrc, movedst):
 
     htmldata += "<tr id='board-letters2'><td>&nbsp;</td>"
 
-    for i in range(8):
-        htmldata += "<td>" + chr(i + ord('A')) + "</td>"
+    if(switch == 0):
+        for i in range(8):
+            htmldata += "<td>" + chr(i + ord('A')) + "</td>"
+    else:
+        for i in range(8):
+            htmldata += "<td>" + chr(ord('H') - i) + "</td>"
 
     htmldata += "<td>&nbsp;</td></tr></table>"
     return htmldata
@@ -294,9 +303,6 @@ def fetch_board(request):
     if(int(movecnt) == match.count):
         data = ""
     else:
-        data = html_board(match, 0, movesrc, movedst) + ":" + html_moves(match)
-        # fmtboard = fill_fmtboard(match, switchflag)
-        # fmtmoves = fill_fmtmoves(match)
-        # data = fmtboard + "[[[" + fmtmoves
+        data = html_board(match, int(switchflag), movesrc, movedst) + ":" + html_moves(match)
     return HttpResponse(data)
 
