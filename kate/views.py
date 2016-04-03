@@ -231,6 +231,10 @@ def do_move(request, matchid):
                     fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
                     if(match.next_color_human() == False):
                         gmove = calc.do_move(match, 3, 1)
+                        if(gmove == None):
+                            print("NO MOVE")
+                        else:
+                            print("MOVE FOUND")
                 else:
                     fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
             else:

@@ -36,15 +36,15 @@ KN_STEPS = [ [[1, 2]],
 
 
 KG_STEPS = [ [[0, 1]],
+             [[1, 1]],
+             [[1, 0]], 
+             [[1, -1]],
+             [[0, -1]], 
+             [[-1, -1]],
+             [[-1, 0]],
+             [[-1, 1]],
              [[0, 2]],
-             [[0, 3]], 
-             [[0, 4]],
-             [[0, 5]], 
-             [[0, 6]],
-             [[0, 6]],
-             [[0, 6]],
-             [[0, 6]],
-             [[0, 7]] ]
+             [[0, -2]] ]
 
 
 WPW_STEPS = [ [[0, 1]],
@@ -211,6 +211,7 @@ class Generator(object):
             stepx, stepy, prom_piece = self.read_steps()
             dstx = self.board_x + stepx
             dsty = self.board_y + stepy
+            # print(str(self.board_x) + " " + str(self.board_y) + " " + str(dstx) + " " + str(dsty))
             flag, errmsg = rules.is_move_valid(self.match, self.board_x, self.board_y, dstx, dsty, prom_piece)
             if(flag == True):
                 # print("OK: " + str(self.board_x) + " " + str(self.board_y) + " " + str(dstx) + " " + str(dsty))
@@ -305,6 +306,7 @@ class immanuelsThread(threading.Thread):
             move.save()
             self.match.save()
             print("move saved")
+        return gmove
 
 
 def rate(color, gmove, new_gmove, score, new_score):
@@ -351,11 +353,11 @@ def calc_node(match, depth):
         status = rules.game_status(match)
         gmove = None
         if(status == Match.STATUS['winner_black']):
-            score = Match.SCORES['wKg']
+            score = Match.SCORES[Match.PIECES['wKg']]
         elif(status == Match.STATUS['winner_white']):
-            score = Match.SCORES['bKg']
+            score = Match.SCORES[Match.PIECES['bKg']]
         elif(status == Match.STATUS['draw']):
-            score = Match.SCORES['blk']
+            score = Match.SCORES[Match.PIECES['blk']]
         else:
             score = match.score
 
