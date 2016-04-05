@@ -101,7 +101,6 @@ def fill_fmtmoves(match):
             fmtmoves.append("<td>&nbsp;</td></tr>")
         return fmtmoves
 
-
 def html_moves(match):
     fmtmoves = []
     fmtmoves = fill_fmtmoves(match)

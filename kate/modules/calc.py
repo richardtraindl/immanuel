@@ -282,14 +282,14 @@ def do_random_move(match, delay):
 
 
 class immanuelsThread(threading.Thread):
-    def __init__(self, threadID, match, depth, delay):
+    def __init__(self, threadID, match, maxdepth, delay):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.match = copy.copy(match)
         move = Move.objects.filter(match_id=match.id).order_by("count").last()
         if(move != None):
             self.match.move_list.append(move)
-        self.depth = depth
+        self.maxdepth = maxdepth
         self.delay = delay
 
     def run(self):
@@ -300,7 +300,7 @@ class immanuelsThread(threading.Thread):
               str(self.match.wRk_a1_first_movecnt) + " "  + 
               str(self.match.wRk_h1_first_movecnt))
         time.sleep(self.delay)
-        gmove = calc_move(self.match, self.depth)
+        gmove = calc_move(self.match, self.maxdepth)
         if(gmove != None):
             move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
             move.save()
@@ -317,14 +317,14 @@ def rate(color, gmove, new_gmove, score, new_score):
         return score, gmove
 
 
-def calc_node(match, depth):
+def calc_node(match, maxdepth, depth):
     generator = Generator()
     generator.match = match 
     color = match.next_color()
     gmove = None
     count = 0
 
-    print(str(color) + " -------- ")
+    print(" -------- " + values.reverse_lookup(Match.COLORS, color) + " -------- ")
 
     if(color == Match.COLORS['white']):
         score = -20000
@@ -335,13 +335,24 @@ def calc_node(match, depth):
         flag, new_gmove = generator.generate_move()
         if(flag == True):
             count += 1
+            old_score = match.score
             move = match.do_move(new_gmove.srcx, new_gmove.srcy, new_gmove.dstx, new_gmove.dsty, new_gmove.prom_piece)
             match.move_list.append(move)
 
-            if(depth > 1):
-                new_score, calc_move = calc_node(match, depth - 1)
+            if(depth < maxdepth):
+                new_score, calc_move = calc_node(match, maxdepth, depth + 1)
             else:
-                new_score = match.score
+                if(match.next_color() == Match.COLORS['white']):
+                    attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+                    promotion = match.readfield(new_gmove.dstx, new_gmove.dsty) == Match.PIECES['bPw'] and new_gmove.dsty == 1
+                else:
+                    attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+                    promotion = match.readfield(new_gmove.dstx, new_gmove.dsty) == Match.PIECES['wPw'] and new_gmove.dsty == 6
+
+                if((old_score != match.score or attacked or promotion) and depth < 6):
+                    new_score, calc_move = calc_node(match, maxdepth, depth + 1)
+                else:
+                    new_score = match.score
 
             score, gmove = rate(color, gmove, new_gmove, score, new_score)
 
@@ -364,7 +375,7 @@ def calc_node(match, depth):
     return score, gmove
 
 
-def calc_move(match, depth):
+def calc_move(match, maxdepth):
     #if(match.next_color() == Match.COLORS['white']):
     #    alpha = -20000
     #    beta = 20000
@@ -372,7 +383,7 @@ def calc_move(match, depth):
     #    alpha = 20000
     #    beta = -20000
 
-    score, gmove = calc_node(match, depth)
+    score, gmove = calc_node(match, maxdepth, 1)
 
     if(gmove != None):
         print("result: " + str(score))
@@ -386,7 +397,7 @@ def calc_move(match, depth):
     return gmove
 
 
-def do_move(match, depth, delay):
-    thread = immanuelsThread(1, match, depth, delay)
+def do_move(match, maxdepth, delay):
+    thread = immanuelsThread(1, match, maxdepth, delay)
     thread.start()
 
