@@ -142,7 +142,7 @@ nav li a:active {
 }
 
 #board  {
-    background: gray;
+    background-color: white;
 }
 
 #board td {
@@ -151,7 +151,7 @@ nav li a:active {
 }
 
 #board tr:nth-child(odd) td:nth-child(even), #board tr:nth-child(even) td:nth-child(odd) {
-    background-color: white;
+    background: gray;
 }
 
 #board img {

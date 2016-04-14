@@ -1,6 +1,7 @@
 from kate.models import Match, Move
-from kate.modules import values, rules
-import random, threading, copy, time
+from kate.modules import values, rules, debug
+import random, threading, copy, time 
+
 
 
 RK_STEPS = [ [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]],
@@ -77,8 +78,9 @@ class GenMove(object):
 
 
 class Generator(object):
-    def __init__(self, match=None, steps=None, board_x=0, board_y=0, dir_idx=0, max_dir=0, step_idx=0, max_step=0):
+    def __init__(self, match=None, active=True, steps=None, board_x=0, board_y=0, dir_idx=0, max_dir=0, step_idx=0, max_step=0):
         self.match = match
+        self.active = active
         self.steps = steps
         self.board_x = board_x
         self.board_y = board_y
@@ -95,22 +97,6 @@ class Generator(object):
         else:
             prom_piece = Match.PIECES['blk']
         return stepx, stepy, prom_piece
-
-
-    def rotate_field(self):
-        self.steps = None
-
-        if(self.board_x < 7):
-            self.board_x += 1
-        else:
-            self.board_x = 0
-
-            if(self.board_y < 7):
-                self.board_y += 1
-            else:
-                self.board_y = 0
-                return False
-        return True
 
 
     def rotate(self):
@@ -138,18 +124,35 @@ class Generator(object):
                 return self.rotate_field()
 
 
+    def rotate_field(self):
+        self.steps = None
+
+        if(self.board_x < 7):
+            self.board_x += 1
+        else:
+            self.board_x = 0
+
+            if(self.board_y < 7):
+                self.board_y += 1
+            else:
+                self.board_y = 0
+                self.active = False
+                return False
+        return True
+
+
     def generate_move(self):
         gmove = GenMove()
         color = self.match.next_color()
-        
-        while(True):
+
+        while(self.active):
             if(self.steps == None):
                 piece = self.match.readfield(self.board_x, self.board_y)
                 if(piece == Match.PIECES['blk'] or color != Match.color_of_piece(piece)):
                     if(self.rotate_field()):
                         continue
                     else:
-                        break
+                        return False, gmove
                 else:
                     if(piece == Match.PIECES['wPw']):
                         if(self.board_y < 6):
@@ -207,13 +210,12 @@ class Generator(object):
                         self.max_dir = 10
                         self.step_idx = 0
                         self.max_step = 1
-
             stepx, stepy, prom_piece = self.read_steps()
             dstx = self.board_x + stepx
             dsty = self.board_y + stepy
             # print(str(self.board_x) + " " + str(self.board_y) + " " + str(dstx) + " " + str(dsty))
             flag, errmsg = rules.is_move_valid(self.match, self.board_x, self.board_y, dstx, dsty, prom_piece)
-            if(flag == True):
+            if(flag):
                 # print("OK: " + str(self.board_x) + " " + str(self.board_y) + " " + str(dstx) + " " + str(dsty))
                 gmove = GenMove(self.board_x, self.board_y, dstx, dsty, prom_piece)
                 self.rotate()
@@ -222,8 +224,7 @@ class Generator(object):
                 # print("NOK: " + str(self.board_x) + " " + str(self.board_y) + " " + str(dstx) + " " + str(dsty))
                 # print(rules.ERROR_MSGS[errmsg])
                 if(self.rotate_dir() == False):
-                    break
-
+                    return False, gmove
         return False, gmove
 
 
@@ -306,6 +307,7 @@ class immanuelsThread(threading.Thread):
             move.save()
             self.match.save()
             print("move saved")
+        print("Finish " + str(self.threadID))
         return gmove
 
 
@@ -323,38 +325,69 @@ def calc_node(match, maxdepth, depth):
     color = match.next_color()
     gmove = None
     count = 0
+    global starttime
 
-    print(" -------- " + values.reverse_lookup(Match.COLORS, color) + " -------- ")
+    #if((time.time() - starttime) > 300):
+    #    starttime = time.time()
+    #    print(str(starttime))
 
     if(color == Match.COLORS['white']):
         score = -20000
     else:
         score = 20000
 
-    while(True):
+    while(generator.active):
         flag, new_gmove = generator.generate_move()
-        if(flag == True):
+        if(flag):
             count += 1
             old_score = match.score
             move = match.do_move(new_gmove.srcx, new_gmove.srcy, new_gmove.dstx, new_gmove.dsty, new_gmove.prom_piece)
             match.move_list.append(move)
 
+
+            if(depth == 1):
+                lastmove = match.move_list[1]
+                print(" 1: " 
+                        + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
+                        + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
+                        + str(lastmove.prom_piece))
+            elif(depth == 2):
+                lastmove = match.move_list[1]
+                sndlastmove = match.move_list[2]
+                print(" 1: " 
+                        + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
+                        + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
+                        + str(lastmove.prom_piece)
+                        + " 2: " 
+                        + values.index_to_koord(sndlastmove.srcx, sndlastmove.srcy) + " " 
+                        + values.index_to_koord(sndlastmove.dstx, sndlastmove.dsty) + " " 
+                        + str(sndlastmove.prom_piece))
+            else:
+                print('.', end="")
+
+
             if(depth < maxdepth):
                 new_score, calc_move = calc_node(match, maxdepth, depth + 1)
             else:
-                if(match.next_color() == Match.COLORS['white']):
-                    attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
-                    promotion = match.readfield(new_gmove.dstx, new_gmove.dsty) == Match.PIECES['bPw'] and new_gmove.dsty == 1
-                else:
-                    attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
-                    promotion = match.readfield(new_gmove.dstx, new_gmove.dsty) == Match.PIECES['wPw'] and new_gmove.dsty == 6
+                new_score = match.score
+                #if(match.next_color() == Match.COLORS['white']):
+                #    attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+                #    promotion = match.readfield(new_gmove.dstx, new_gmove.dsty) == Match.PIECES['bPw'] and new_gmove.dsty == 1
+                #else:
+                #    attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+                #    promotion = match.readfield(new_gmove.dstx, new_gmove.dsty) == Match.PIECES['wPw'] and new_gmove.dsty == 6
 
-                if((old_score != match.score or attacked or promotion) and depth < 6):
-                    new_score, calc_move = calc_node(match, maxdepth, depth + 1)
-                else:
-                    new_score = match.score
+                #if((old_score != match.score or attacked or promotion) and depth < 5):
+                #    new_score, calc_move = calc_node(match, maxdepth, depth + 1)
+                #else:
+                #    new_score = match.score
 
             score, gmove = rate(color, gmove, new_gmove, score, new_score)
+
+            #if(depth == maxdepth):
+                #debug.prnt_moves(match)
+                # debug.prnt_status(match, generator)
+                #time.sleep(1)
 
             match.undo_move(True)
         else:
@@ -362,7 +395,6 @@ def calc_node(match, maxdepth, depth):
 
     if(count == 0):
         status = rules.game_status(match)
-        gmove = None
         if(status == Match.STATUS['winner_black']):
             score = Match.SCORES[Match.PIECES['wKg']]
         elif(status == Match.STATUS['winner_white']):
@@ -383,6 +415,8 @@ def calc_move(match, maxdepth):
     #    alpha = 20000
     #    beta = -20000
 
+    global starttime
+    starttime = time.time()
     score, gmove = calc_node(match, maxdepth, 1)
 
     if(gmove != None):

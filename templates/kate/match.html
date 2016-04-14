@@ -45,6 +45,7 @@
             <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}" matchid="{{ match.id }}" style="padding-top: 5px;">
                 {% csrf_token %}
                 <textarea id="newcomment" name="newcomment" cols="40" rows="2" maxlength="200"></textarea>
+                <input type="text" name="switchflag" value="{{ switch }}" style="display: none;" />
                 <input type="submit" value="kommentieren" />
             </form>
         </div>

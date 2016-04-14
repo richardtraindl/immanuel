@@ -249,6 +249,7 @@ class Match(models.Model):
             if(len(self.move_list) > 0):
                 move = self.move_list.pop()
             else:
+                print("******************************************")
                 return None
 
         self.count -= 1

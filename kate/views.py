@@ -230,10 +230,6 @@ def do_move(request, matchid):
                     fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
                     if(match.next_color_human() == False):
                         gmove = calc.do_move(match, 3, 1)
-                        if(gmove == None):
-                            print("NO MOVE")
-                        else:
-                            print("MOVE FOUND")
                 else:
                     fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
             else:
@@ -273,12 +269,13 @@ def add_comment(request, matchid):
     match = get_object_or_404(Match, pk=matchid)
     if request.method == 'POST':
         newcomment = request.POST['newcomment']
+        switchflag = request.POST['switchflag']        
         if(len(newcomment) > 0):
             comment = Comment()
             comment.match_id = match.id
             comment.text = newcomment
             comment.save()
-    return HttpResponseRedirect(reverse('kate:match', args=(match.id, 0)))
+    return HttpResponseRedirect(reverse('kate:match', args=(match.id, switchflag)))
 
 
 def fetch_comments(request):
