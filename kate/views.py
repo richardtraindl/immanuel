@@ -209,6 +209,14 @@ def update(request, matchid):
     return render(request, 'kate/edit.html', { 'match': match } )
 
 
+
+def delete(request, matchid):
+    Match.objects.filter(id=matchid).delete()
+    return index(request)
+
+
+    return render(request, 'kate/index.html', { 'matches': matches } )
+
 def do_move(request, matchid):
     context = RequestContext(request)
     if request.method == 'POST':
@@ -227,9 +235,11 @@ def do_move(request, matchid):
                     move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
                     move.save()
                     match.save()
-                    fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
-                    if(match.next_color_human() == False):
-                        gmove = calc.do_move(match, 3, 1)
+                    status = rules.game_status(match)
+                    if(status == Match.STATUS['open']):                        
+                        fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
+                        if(match.next_color_human() == False):
+                            gmove = calc.do_move(match, 4, 1)
                 else:
                     fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
             else:

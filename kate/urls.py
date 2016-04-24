@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^create/$', views.create, name='create'),
     url(r'^(?P<matchid>[0-9]+)/edit/$', views.edit, name='edit'),
     url(r'^(?P<matchid>[0-9]+)/update/$', views.update, name='update'),
+    url(r'^(?P<matchid>[0-9]+)/delete/$', views.delete, name='delete'),
     url(r'^(?P<matchid>[0-9]+)/addcomment/$', views.add_comment, name='addcomment'),
     url(r'^fetchcomments/$', views.fetch_comments, name='fetchcomments'),
     url(r'^fetchboard/$', views.fetch_board, name='fetchboard'),

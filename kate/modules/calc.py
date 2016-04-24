@@ -221,10 +221,13 @@ class Generator(object):
                 self.rotate()
                 return True, gmove
             else:
+                if(errmsg == rules.ERROR_CODES['king-error']):
+                    self.rotate()
+                else:
                 # print("NOK: " + str(self.board_x) + " " + str(self.board_y) + " " + str(dstx) + " " + str(dsty))
                 # print(rules.ERROR_MSGS[errmsg])
-                if(self.rotate_dir() == False):
-                    return False, gmove
+                    if(self.rotate_dir() == False):
+                        return False, gmove
         return False, gmove
 
 
