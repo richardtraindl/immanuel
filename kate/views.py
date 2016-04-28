@@ -209,13 +209,10 @@ def update(request, matchid):
     return render(request, 'kate/edit.html', { 'match': match } )
 
 
-
 def delete(request, matchid):
     Match.objects.filter(id=matchid).delete()
     return index(request)
 
-
-    return render(request, 'kate/index.html', { 'matches': matches } )
 
 def do_move(request, matchid):
     context = RequestContext(request)

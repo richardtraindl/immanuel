@@ -151,7 +151,7 @@ class Match(models.Model):
                 move.move_type = move.TYPES['promotion']
                 move.captured_piece = dstpiece
                 move.prom_piece = prom_piece
-                self.score += (self.SCORES[prom_piece] - self.SCORES[srcpiece]) * -1
+                self.score -= (self.SCORES[prom_piece] - self.SCORES[srcpiece])
                 self.score += self.SCORES[dstpiece]
                 return move
             elif(dstpiece == Match.PIECES['blk'] and srcx != dstx):
@@ -329,7 +329,7 @@ class Match(models.Model):
                 piece = self.PIECES['bPw']
             self.writefield(move.srcx, move.srcy, piece)
             self.writefield(move.dstx, move.dsty, move.captured_piece)
-            self.score -= (self.SCORES[move.prom_piece] - self.SCORES[piece])
+            self.score += (self.SCORES[move.prom_piece] - self.SCORES[piece])
             self.score -= self.SCORES[move.captured_piece]
             return move
         else:
