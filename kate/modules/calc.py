@@ -314,12 +314,118 @@ class immanuelsThread(threading.Thread):
         return gmove
 
 
-def rate(color, gmove, new_gmove, score, new_score):
-    if((color == Match.COLORS['white'] and score < new_score) or 
-       (color == Match.COLORS['black'] and score > new_score)):
-        return new_score, new_gmove
+def rate(color, gmove, newgmove, score, newscore):
+    if((color == Match.COLORS['white'] and score < newscore) or 
+       (color == Match.COLORS['black'] and score > newscore)):
+        return newscore, newgmove
     else:
         return score, gmove
+
+
+def calc_max(match, maxdepth, depth, alpha, beta):
+    generator = Generator()
+    generator.match = match
+    gmove = None
+    color = match.next_color()
+    maxscore = -20000
+    count = 0
+
+    while(generator.active):
+        flag, newgmove = generator.generate_move()
+        if(flag):
+            count += 1
+            move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
+            match.move_list.append(move)
+
+            if(depth < maxdepth):
+                newscore, newgmove_sndlevel = calc_min(match, maxdepth, depth + 1, maxscore, beta)
+            else:
+                newscore = match.score
+
+            newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
+
+            match.undo_move(True)
+
+            if(newscore > maxscore):
+                maxscore = newscore
+                if(maxscore >= beta):
+                    break
+        else:
+            if(count == 0):
+                status = rules.game_status(match)
+                if(status == Match.STATUS['winner_black']):
+                    newscore = Match.SCORES[Match.PIECES['wKg']]
+                elif(status == Match.STATUS['winner_white']):
+                    newscore = Match.SCORES[Match.PIECES['bKg']]
+                elif(status == Match.STATUS['draw']):
+                    newscore = Match.SCORES[Match.PIECES['blk']]
+                else:
+                    newscore = match.score
+                return newscore, gmove
+    return maxscore, gmove
+
+
+def calc_min(match, maxdepth, depth, alpha, beta):
+    generator = Generator()
+    generator.match = match
+    gmove = None
+    color = match.next_color()
+    minscore = 20000
+    count = 0
+
+    while(generator.active):
+        flag, newgmove = generator.generate_move()
+        if(flag):
+            count += 1
+            move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
+            match.move_list.append(move)
+
+            if(depth < maxdepth):
+                newscore, newgmove_sndlevel = calc_max(match, maxdepth, depth + 1, alpha, minscore)
+            else:
+                newscore = match.score
+
+            newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
+
+            match.undo_move(True)
+
+            if(newscore < minscore):
+                minscore = newscore
+                if(minscore <= alpha):
+                    break
+        else:
+            if(count == 0):
+                status = rules.game_status(match)
+                if(status == Match.STATUS['winner_black']):
+                    newscore = Match.SCORES[Match.PIECES['wKg']]
+                elif(status == Match.STATUS['winner_white']):
+                    newscore = Match.SCORES[Match.PIECES['bKg']]
+                elif(status == Match.STATUS['draw']):
+                    newscore = Match.SCORES[Match.PIECES['blk']]
+                else:
+                    newscore = match.score
+                return newscore, gmove
+    return minscore, gmove
+
+
+def calc_move(match, maxdepth):
+    if(match.next_color() == Match.COLORS['white']):
+        score, gmove = calc_max(match, maxdepth, 1, -20000, 20000)
+    else:
+        score, gmove = calc_min(match, maxdepth, 1, -20000, 20000)
+
+    if(gmove != None):
+        print("result: " + str(score))
+        print(str(gmove.srcx) + " " + str(gmove.srcy)  + " " + str(gmove.dstx)  + " " +  str(gmove.dsty)  + " " + str(gmove.prom_piece))
+    else:
+        print("no results found!!!" + str(score))
+    
+    return gmove
+
+
+def do_move(match, maxdepth, delay):
+    thread = immanuelsThread(1, match, maxdepth, delay)
+    thread.start()
 
 
 def calc_node(match, maxdepth, depth):
@@ -410,7 +516,7 @@ def calc_node(match, maxdepth, depth):
     return score, gmove
 
 
-def calc_move(match, maxdepth):
+def calc_move_old(match, maxdepth):
     #if(match.next_color() == Match.COLORS['white']):
     #    alpha = -20000
     #    beta = 20000
@@ -434,7 +540,7 @@ def calc_move(match, maxdepth):
     return gmove
 
 
-def do_move(match, maxdepth, delay):
+def do_move_old(match, maxdepth, delay):
     thread = immanuelsThread(1, match, maxdepth, delay)
     thread.start()
 
