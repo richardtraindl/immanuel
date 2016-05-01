@@ -64,6 +64,8 @@ def is_white_ep_move_ok(match, srcx, srcy, dstx, dsty):
 
 def is_black_ep_move_ok(match, srcx, srcy, dstx, dsty):
     move = Move.objects.filter(match_id=match.id).order_by("count").last()
+    if(move == None):
+        return False
     piece = match.readfield(move.dstx, move.dsty)
     if(piece == Match.PIECES['wPw'] and move.srcx == move.dstx and move.dstx == dstx and move.dsty - 2 == move.srcy):
         return True

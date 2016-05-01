@@ -58,6 +58,12 @@ class Match(models.Model):
         'winner_black' : 4,
         'cancelled' : 5 }
 
+    LEVEL = {
+        'medium' : 1,
+        'high' : 2,
+        'professional' : 3,
+        'blitz' : 4 }
+
     status = models.PositiveSmallIntegerField(null=False, default=STATUS['open'])
     count = models.SmallIntegerField(null=False, default=0)
     score = models.SmallIntegerField(null=False, default=0)    
@@ -66,6 +72,7 @@ class Match(models.Model):
     white_player_human = models.BooleanField(null=False, default=True)
     black_player = models.CharField(max_length=100, blank=False)
     black_player_human = models.BooleanField(null=False, default=True)
+    level = models.SmallIntegerField(null=False, default=1)
     board = ArrayField(ArrayField(models.PositiveSmallIntegerField(null=False, blank=False, default=PIECES['blk']), size=8), size=8)
     fifty_moves_count = models.SmallIntegerField(null=False, default=0)
     wKg_x = models.SmallIntegerField(null=False, default=0)

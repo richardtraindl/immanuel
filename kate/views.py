@@ -168,10 +168,15 @@ def create(request):
             match.black_player_human = True
         else:
             match.black_player_human = False
-            
+
+        levellist = request.POST.getlist('level')
+        match.level = Match.LEVEL[levellist[0]]
+
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.setboardbase()
             match.save()
+            if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
+                gmove = calc.thread_do_move(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
     return render(request, 'kate/new.html', { 'white_player': match.white_player, 'white_player_human': match.white_player_human, 'black_player': match.black_player, 'black_player_human': match.black_player_human } )
 
@@ -202,9 +207,14 @@ def update(request, matchid):
             match.black_player_human = True
         else:
             match.black_player_human = False
-            
+
+        levellist = request.POST.getlist('level')
+        match.level = Match.LEVEL[levellist[0]]
+
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.save()
+            if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
+                gmove = calc.thread_do_move(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
     return render(request, 'kate/edit.html', { 'match': match } )
 
@@ -236,7 +246,7 @@ def do_move(request, matchid):
                     if(status == Match.STATUS['open']):                        
                         fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
                         if(match.next_color_human() == False):
-                            gmove = calc.do_move(match, 4, 1)
+                            gmove = calc.thread_do_move(match)
                 else:
                     fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
             else:
@@ -263,11 +273,10 @@ def do_move(request, matchid):
 def undo_move(request, matchid, switch=None):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
-    if(match.white_player_human and match.black_player_human):
-        move = match.undo_move(False)
-        if(move != None):
-            move.delete()
-            match.save()
+    move = match.undo_move(False)
+    if(move != None):
+        move.delete()
+        match.save()
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch, 1)))
 
 

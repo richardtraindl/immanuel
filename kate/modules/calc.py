@@ -286,15 +286,13 @@ def do_random_move(match, delay):
 
 
 class immanuelsThread(threading.Thread):
-    def __init__(self, threadID, match, maxdepth, delay):
+    def __init__(self, threadID, match):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.match = copy.copy(match)
         move = Move.objects.filter(match_id=match.id).order_by("count").last()
         if(move != None):
             self.match.move_list.append(move)
-        self.maxdepth = maxdepth
-        self.delay = delay
 
     def run(self):
         print("Starting " + str(self.threadID))
@@ -303,8 +301,17 @@ class immanuelsThread(threading.Thread):
               str(self.match.wKg_first_movecnt) + " "  + 
               str(self.match.wRk_a1_first_movecnt) + " "  + 
               str(self.match.wRk_h1_first_movecnt))
-        time.sleep(self.delay)
-        gmove = calc_move(self.match, self.maxdepth)
+
+        if(self.match.level == Match.LEVEL['medium']):
+            maxdepth = 3
+        elif(self.match.level == Match.LEVEL['high']):
+            maxdepth = 4
+        elif(self.match.level == Match.LEVEL['professional']):
+            maxdepth = 5
+        else:
+            maxdepth = 2
+
+        gmove = calc_move(self.match, maxdepth)
         if(gmove != None):
             move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
             move.save()
@@ -328,19 +335,41 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     gmove = None
     color = match.next_color()
     maxscore = -20000
+    oldscore = 0
     count = 0
 
     while(generator.active):
         flag, newgmove = generator.generate_move()
         if(flag):
             count += 1
+            oldscore = match.score
             move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
             match.move_list.append(move)
 
-            if(depth < maxdepth):
+            if(depth == 1):
+                lastmove = match.move_list[-1]
+                print("\n1: " 
+                        + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
+                        + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
+                        + str(lastmove.prom_piece))
+            elif(depth == 2):
+                print('.', end="")
+
+            if(depth <= maxdepth):
                 newscore, newgmove_sndlevel = calc_min(match, maxdepth, depth + 1, maxscore, beta)
             else:
-                newscore = match.score
+                # newscore = match.score
+                if(match.next_color() == Match.COLORS['white']):
+                    attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+                    promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty == 1
+                else:
+                    attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+                    promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty == 6
+
+                if((oldscore != match.score or attacked or promotion) and depth < maxdepth + 6):
+                    newscore, calc_move = calc_min(match, maxdepth, depth + 1, maxscore, beta)
+                else:
+                    newscore = match.score
 
             newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
 
@@ -371,19 +400,41 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     gmove = None
     color = match.next_color()
     minscore = 20000
+    oldscore = 0
     count = 0
 
     while(generator.active):
         flag, newgmove = generator.generate_move()
         if(flag):
             count += 1
+            oldscore = match.score
             move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
             match.move_list.append(move)
 
-            if(depth < maxdepth):
+            if(depth == 1):
+                lastmove = match.move_list[-1]
+                print("\n1: " 
+                        + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
+                        + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
+                        + str(lastmove.prom_piece))
+            elif(depth == 2):
+                print('.', end="")
+
+            if(depth <= maxdepth):
                 newscore, newgmove_sndlevel = calc_max(match, maxdepth, depth + 1, alpha, minscore)
             else:
-                newscore = match.score
+                # newscore = match.score
+                if(match.next_color() == Match.COLORS['white']):
+                    attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+                    promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty == 1
+                else:
+                    attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+                    promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty == 6
+
+                if((oldscore != match.score or attacked or promotion) and depth < maxdepth + 6):
+                    newscore, calc_move = calc_max(match, maxdepth, depth + 1, alpha, minscore)
+                else:
+                    newscore = match.score
 
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
 
@@ -423,124 +474,9 @@ def calc_move(match, maxdepth):
     return gmove
 
 
-def do_move(match, maxdepth, delay):
-    thread = immanuelsThread(1, match, maxdepth, delay)
+def thread_do_move(match):
+    thread = immanuelsThread(1, match)
     thread.start()
 
 
-def calc_node(match, maxdepth, depth):
-    generator = Generator()
-    generator.match = match 
-    color = match.next_color()
-    gmove = None
-    count = 0
-    global starttime
-
-    #if((time.time() - starttime) > 300):
-    #    starttime = time.time()
-    #    print(str(starttime))
-
-    if(color == Match.COLORS['white']):
-        score = -20000
-    else:
-        score = 20000
-
-    while(generator.active):
-        flag, new_gmove = generator.generate_move()
-        if(flag):
-            count += 1
-            old_score = match.score
-            move = match.do_move(new_gmove.srcx, new_gmove.srcy, new_gmove.dstx, new_gmove.dsty, new_gmove.prom_piece)
-            match.move_list.append(move)
-
-
-            if(depth == 1):
-                lastmove = match.move_list[1]
-                print(" 1: " 
-                        + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
-                        + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
-                        + str(lastmove.prom_piece))
-            elif(depth == 2):
-                lastmove = match.move_list[1]
-                sndlastmove = match.move_list[2]
-                print(" 1: " 
-                        + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
-                        + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
-                        + str(lastmove.prom_piece)
-                        + " 2: " 
-                        + values.index_to_koord(sndlastmove.srcx, sndlastmove.srcy) + " " 
-                        + values.index_to_koord(sndlastmove.dstx, sndlastmove.dsty) + " " 
-                        + str(sndlastmove.prom_piece))
-            else:
-                print('.', end="")
-
-
-            if(depth < maxdepth):
-                new_score, calc_move = calc_node(match, maxdepth, depth + 1)
-            else:
-                new_score = match.score
-                #if(match.next_color() == Match.COLORS['white']):
-                #    attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
-                #    promotion = match.readfield(new_gmove.dstx, new_gmove.dsty) == Match.PIECES['bPw'] and new_gmove.dsty == 1
-                #else:
-                #    attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
-                #    promotion = match.readfield(new_gmove.dstx, new_gmove.dsty) == Match.PIECES['wPw'] and new_gmove.dsty == 6
-
-                #if((old_score != match.score or attacked or promotion) and depth < 5):
-                #    new_score, calc_move = calc_node(match, maxdepth, depth + 1)
-                #else:
-                #    new_score = match.score
-
-            score, gmove = rate(color, gmove, new_gmove, score, new_score)
-
-            #if(depth == maxdepth):
-                #debug.prnt_moves(match)
-                # debug.prnt_status(match, generator)
-                #time.sleep(1)
-
-            match.undo_move(True)
-        else:
-            break
-
-    if(count == 0):
-        status = rules.game_status(match)
-        if(status == Match.STATUS['winner_black']):
-            score = Match.SCORES[Match.PIECES['wKg']]
-        elif(status == Match.STATUS['winner_white']):
-            score = Match.SCORES[Match.PIECES['bKg']]
-        elif(status == Match.STATUS['draw']):
-            score = Match.SCORES[Match.PIECES['blk']]
-        else:
-            score = match.score
-
-    return score, gmove
-
-
-def calc_move_old(match, maxdepth):
-    #if(match.next_color() == Match.COLORS['white']):
-    #    alpha = -20000
-    #    beta = 20000
-    #else:
-    #    alpha = 20000
-    #    beta = -20000
-
-    global starttime
-    starttime = time.time()
-    score, gmove = calc_node(match, maxdepth, 1)
-
-    if(gmove != None):
-        print("result: " + str(score))
-        print(str(gmove.srcx) + " " + str(gmove.srcy)  + " " + str(gmove.dstx)  + " " +  str(gmove.dsty)  + " " + str(gmove.prom_piece))
-              #values.index_to_koord(gmove.srcx, gmove.srcy) + " " + 
-              # values.index_to_koord(gmove.dstx, gmove.dsty) + " " + "blk")
-              # values.reverse_lookup(Match.PIECES, gmove.prom_piece))
-    else:
-        print("no results found!!!" + str(score))
-    
-    return gmove
-
-
-def do_move_old(match, maxdepth, delay):
-    thread = immanuelsThread(1, match, maxdepth, delay)
-    thread.start()
 
