@@ -57,8 +57,10 @@
             </div>
 
             <div>
-                {{ match.white_player }} &nbsp; {{ match.black_player }}<br>
-                Score: &nbsp;{{ match.score }}
+                {{ match.white_player }} &nbsp; vs. &nbsp; 
+                {{ match.black_player }} &nbsp; 
+                Level: &nbsp; {{ match.level }} &nbsp; 
+                Score: &nbsp; {{ match.score }}
             </div>
             
             <div id="board-wrapper">
@@ -193,7 +195,7 @@
                 $.get('/kate/fetchcomments', { matchid: matchid }, function(data){
                     $('#comments').html(data);
                 });
-            }, 5000);
+            }, 8000);
 
             setInterval(function(){
                 var matchid;
@@ -206,13 +208,9 @@
                         $('#board-wrapper').html(arr[0]);
                         $('#minutes').html(arr[1]);
                         performMove();
-                        /* var url;
-                        url = '/kate/' + matchid + '/' + switchflag + '/1' + '/match/';
-                        window.location.href = url; */
-                        // window.location.reload();
                     }
                 });
-            }, 10000);
+            }, 12000);
 
         });
     </script>

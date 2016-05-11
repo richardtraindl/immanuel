@@ -254,54 +254,24 @@ def random_move(match):
     return True, gmove_list[count]
 
 
-class immanuelsThread1(threading.Thread):
-    def __init__(self, threadID, match, delay):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.match = copy.copy(match)
-        print(str(self.match.wKg_x) + " "  + 
-              str(self.match.wKg_y) + " "  + 
-              str(self.match.wKg_first_movecnt) + " "  + 
-              str(self.match.wRk_a1_first_movecnt) + " "  + 
-              str(self.match.wRk_h1_first_movecnt))
-
-        move = Move.objects.filter(match_id=match.id).order_by("count").last()
-        if(move != None):
-            self.match.move_list.append(move)
-        self.delay = delay
-
-    def run(self):
-        print("Starting " + str(self.threadID))
-        time.sleep(self.delay)
-        flag, gmove = random_move(self.match)
-        if(flag):
-            move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-            move.save()
-            self.match.save()
-
-
-def do_random_move(match, delay):
-    thread = immanuelsThread1(2, match, delay)
-    thread.start()
-
-
 class immanuelsThread(threading.Thread):
-    def __init__(self, threadID, match):
+    def __init__(self, threadid, match):
         threading.Thread.__init__(self)
-        self.threadID = threadID
+        self.thread_id = threadid
         self.match = copy.copy(match)
-        move = Move.objects.filter(match_id=match.id).order_by("count").last()
-        if(move != None):
-            self.match.move_list.append(move)
+        match.remove_former_threads()
+        match.add_thread(self)
 
     def run(self):
-        print("Starting " + str(self.threadID))
+        print("Starting " + str(self.thread_id))
+        move = Move.objects.filter(match_id=self.match.id).order_by("count").last()
+        if(move != None):
+            self.match.move_list.append(move)
         print(str(self.match.wKg_x) + " "  + 
-              str(self.match.wKg_y) + " "  + 
-              str(self.match.wKg_first_movecnt) + " "  + 
-              str(self.match.wRk_a1_first_movecnt) + " "  + 
-              str(self.match.wRk_h1_first_movecnt))
-
+                str(self.match.wKg_y) + " "  + 
+                str(self.match.wKg_first_movecnt) + " "  + 
+                str(self.match.wRk_a1_first_movecnt) + " "  + 
+                str(self.match.wRk_h1_first_movecnt))
         if(self.match.level == Match.LEVEL['medium']):
             maxdepth = 3
             extdepth = 7
@@ -314,14 +284,14 @@ class immanuelsThread(threading.Thread):
         else:
             maxdepth = 2
             extdepth = 4
-
         gmove = calc_move(self.match, maxdepth, extdepth)
         if(gmove != None):
-            move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-            move.save()
-            self.match.save()
-            print("move saved")
-        print("Finish " + str(self.threadID))
+            curr_match = Match.objects.get(id=self.match.id)
+            if(curr_match.count == self.match.count and self.match.does_thread_exist(self)):
+                move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+                move.save()
+                self.match.save()
+                print("move saved")
         return gmove
 
 
@@ -341,7 +311,6 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
     maxscore = -20000
     oldscore = 0
     count = 0
-
     while(generator.active):
         flag, newgmove = generator.generate_move()
         if(flag):
@@ -349,16 +318,14 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
             oldscore = match.score
             move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
             match.move_list.append(move)
-
             if(depth == 1):
                 lastmove = match.move_list[-1]
-                print("\n1: " 
+                print("\ndepth: 1, match.id: " + str(match.id) + ", calculated move: "
                         + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
                         + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
                         + str(lastmove.prom_piece))
             elif(depth == 2):
                 print('.', end="")
-
             if(depth <= maxdepth):
                 newscore, newgmove_sndlevel = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)
             elif(depth <= extdepth):
@@ -375,11 +342,8 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                     newscore = match.score
             else:
                 newscore = match.score
-
             newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
-
             match.undo_move(True)
-
             if(newscore > maxscore):
                 maxscore = newscore
                 if(maxscore >= beta):
@@ -407,7 +371,6 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
     minscore = 20000
     oldscore = 0
     count = 0
-
     while(generator.active):
         flag, newgmove = generator.generate_move()
         if(flag):
@@ -415,18 +378,16 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
             oldscore = match.score
             move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
             match.move_list.append(move)
-
             if(depth == 1):
                 lastmove = match.move_list[-1]
-                print("\n1: " 
+                print("\ndepth: 1, match.id: " + str(match.id) + ", calculated move: "
                         + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
                         + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
                         + str(lastmove.prom_piece))
             elif(depth == 2):
                 print('.', end="")
-
             if(depth <= maxdepth):
-                newscore, newgmove_sndlevel = calc_max(match, maxdepth, depth + 1, alpha, minscore)
+                newscore, newgmove_sndlevel = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)
             elif(depth <= extdepth):
                 if(match.next_color() == Match.COLORS['white']):
                     attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
@@ -441,11 +402,8 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                     newscore = match.score
             else:
                 newscore = match.score
-
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
-
             match.undo_move(True)
-
             if(newscore < minscore):
                 minscore = newscore
                 if(minscore <= alpha):
@@ -470,19 +428,16 @@ def calc_move(match, maxdepth, extdepth):
         score, gmove = calc_max(match, maxdepth, extdepth, 1, -20000, 20000)
     else:
         score, gmove = calc_min(match, maxdepth, extdepth, 1, -20000, 20000)
-
     if(gmove != None):
         print("result: " + str(score))
         print(str(gmove.srcx) + " " + str(gmove.srcy)  + " " + str(gmove.dstx)  + " " +  str(gmove.dsty)  + " " + str(gmove.prom_piece))
     else:
         print("no results found!!!" + str(score))
-    
     return gmove
 
 
 def thread_do_move(match):
-    thread = immanuelsThread(1, match)
+    thread = immanuelsThread(random.randint(0, 100000), match)
     thread.start()
-
 
 

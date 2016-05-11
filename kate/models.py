@@ -85,16 +85,18 @@ class Match(models.Model):
     wRk_h1_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_a8_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_h8_first_movecnt = models.SmallIntegerField(null=False, default=0)
-    move_list = []
+    immanuels_thread_lock = threading.Lock()
+    immanuels_threads_list = []
 
+    def __init__(self, *args, **kwargs):
+        super(Match, self).__init__(*args, **kwargs)
+        self.move_list = []
 
     def writefield(self, x, y, value):
         self.board[y][x] = value
 
-
     def readfield(self, x, y):
         return self.board[y][x]
-
 
     def setboardbase(self):
         self.board = [ [0  for x in range(8)] for x in range(8) ]
@@ -133,7 +135,6 @@ class Match(models.Model):
         self.wRk_h1_first_movecnt = 0
         self.bRk_a8_first_movecnt = 0
         self.bRk_h8_first_movecnt = 0
-
 
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
         self.count += 1
@@ -246,7 +247,6 @@ class Match(models.Model):
         self.score += self.SCORES[dstpiece]
         return move
 
-
     def undo_move(self, calc):
         if(calc == False):
             move = Move.objects.filter(match_id=self.id).order_by("count").last()
@@ -347,20 +347,17 @@ class Match(models.Model):
             self.score -= self.SCORES[move.captured_piece]
             return move
 
-
     def next_color(self):
         if(self.count % 2 == 0 ):
             return Match.COLORS['white']
         else:
             return Match.COLORS['black']
 
-
     def next_color_human(self):
         if(self.count % 2 == 0 ):
             return self.white_player_human
         else:
             return self.black_player_human
-
 
     @staticmethod
     def color_of_piece(piece):
@@ -371,6 +368,32 @@ class Match(models.Model):
         else:
             return Match.COLORS['undefined']
 
+    def remove_former_threads(self):
+        with self.immanuels_thread_lock:
+            for item in self.immanuels_threads_list:
+                if(item.match.id == self.id):
+                    self.immanuels_threads_list.remove(item)
+
+    def add_thread(self, thread):
+        with self.immanuels_thread_lock:
+            self.immanuels_threads_list.append(thread)
+
+    def does_thread_exist(self, thread):
+        with self.immanuels_thread_lock:
+            for item in self.immanuels_threads_list:
+                if(item is thread):
+                    return True
+            return False
+
+
+    """
+    @classmethod
+    def remove_thread(cls, thread):
+        with cls.immanuels_thread_lock:
+            for item in cls.immanuels_threads_list:
+                if(item == thread):
+                    cls.immanuels_threads_list.remove(item)
+    """
 
 class Move(models.Model):
     TYPES = {

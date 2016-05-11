@@ -78,7 +78,6 @@ def html_board(match, switch, movesrc, movedst):
     htmldata += "<td>&nbsp;</td></tr></table>"
     return htmldata
 
-
 def fill_fmtmoves(match):
     fmtmoves = []
     
@@ -110,12 +109,10 @@ def html_moves(match):
 
     return htmldata
 
-
 def index(request):
     context = RequestContext(request)
     matches = Match.objects.order_by("begin").reverse()[:10]
     return render(request, 'kate/index.html', { 'matches': matches } )
-
 
 def match(request, matchid=None, switch=0, markmove=0):
     context = RequestContext(request)
@@ -143,11 +140,9 @@ def match(request, matchid=None, switch=0, markmove=0):
         rangeobj = range(7, -1, -1)
     return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } )
 
-
 def new(request):
     context = RequestContext(request)
     return render(request, 'kate/new.html', { 'white_player': "", 'white_player_human': True, 'black_player': "", 'black_player_human': True } )
-
 
 def create(request):
     context = RequestContext(request)
@@ -174,9 +169,10 @@ def create(request):
 
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.setboardbase()
+            match.immanuels_thread_id = None
             match.save()
             if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
-                gmove = calc.thread_do_move(match)
+                calc.thread_do_move(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
     return render(request, 'kate/new.html', { 'white_player': match.white_player, 'white_player_human': match.white_player_human, 'black_player': match.black_player, 'black_player_human': match.black_player_human } )
 
@@ -214,7 +210,7 @@ def update(request, matchid):
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.save()
             if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
-                gmove = calc.thread_do_move(match)
+                calc.thread_do_move(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
     return render(request, 'kate/edit.html', { 'match': match } )
 
@@ -246,7 +242,7 @@ def do_move(request, matchid):
                     if(status == Match.STATUS['open']):                        
                         fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
                         if(match.next_color_human() == False):
-                            gmove = calc.thread_do_move(match)
+                            calc.thread_do_move(match)
                 else:
                     fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
             else:
@@ -277,6 +273,8 @@ def undo_move(request, matchid, switch=None):
     if(move != None):
         move.delete()
         match.save()
+        if(match.status == Match.STATUS['open'] and match.next_color_human() == False):
+            calc.thread_do_move(match)
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch, 1)))
 
 
@@ -311,14 +309,16 @@ def fetch_board(request):
     movecnt = request.GET['movecnt']
     switchflag = request.GET['switchflag']
     match = Match.objects.get(id=matchid)
-    lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
-    if(lastmove != None):
-        movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
-        movedst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
-
-    if(int(movecnt) == match.count):
+    if(match == None):
         data = ""
     else:
-        data = html_board(match, int(switchflag), movesrc, movedst) + ":" + html_moves(match)
+        lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+        if(lastmove != None):
+            movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
+            movedst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
+        if(int(movecnt) == match.count):
+            data = ""
+        else:
+            data = html_board(match, int(switchflag), movesrc, movedst) + ":" + html_moves(match)
     return HttpResponse(data)
 
