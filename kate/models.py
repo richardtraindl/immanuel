@@ -502,6 +502,36 @@ class Move(models.Model):
             fmtmove= values.index_to_koord(self.srcx, self.srcy) + "x" + values.index_to_koord(self.dstx, self.dsty) + " e.p."
             return fmtmove
 
+    @staticmethod
+    def fill_fmtmoves(match):
+        fmtmoves = []
+        currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+        if(currmove == None):
+            return fmtmoves
+        else:
+            if(currmove.count % 2 == 0):
+                limit = 42
+            else:
+                limit = 41
+            moves = Move.objects.filter(match_id=match.id).order_by("count").reverse()[:limit]
+            for move in reversed(moves):
+                if(move.count % 2 == 1 ):
+                    fmtmoves.append("<tr><td>" + str( (move.count + 1) // 2) + ".</td>")
+                    fmtmoves.append("<td>" + move.format_move() + "&nbsp;</td>")
+                else:
+                    fmtmoves.append("<td>" + move.format_move() + "</td></tr>")
+            if(len(moves) % 2 == 1):
+                fmtmoves.append("<td>&nbsp;</td></tr>")
+            return fmtmoves
+
+    @staticmethod
+    def html_moves(match):
+        fmtmoves = []
+        fmtmoves = fill_fmtmoves(match)
+        htmldata = ""
+        for col in fmtmoves:
+            htmldata += col
+        return htmldata
 
 
 class Comment(models.Model):
