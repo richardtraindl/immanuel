@@ -136,6 +136,69 @@ class Match(models.Model):
         self.bRk_a8_first_movecnt = 0
         self.bRk_h8_first_movecnt = 0
 
+    def fill_fmtboard(self, switch):
+        fmtboard = [ [ [0  for k in range(2)] for x in range(8)] for x in range(8) ]
+        if(switch == 0):
+            rowstart = 7
+            rowend = -1
+            rowstep = -1
+            colstart = 0
+            colend = 8
+            colstep = 1
+        else:
+            rowstart = 0
+            rowend = 8
+            rowstep = 1
+            colstart = 7
+            colend = -1
+            colstep = -1
+        idx1 = 0
+        for i in range(rowstart, rowend, rowstep):
+            idx2 = 0
+            for j in range(colstart, colend, colstep):
+                fmtboard[idx1][idx2][0] = self.board[i][j]
+                field = chr(ord('a') + j) + chr(ord('1') + i)
+                fmtboard[idx1][idx2][1] = field
+                idx2 += 1
+            idx1 += 1
+        return fmtboard
+
+    def html_board(self, switch, movesrc, movedst):
+        fmtboard = self.fill_fmtboard(switch)
+        htmldata = "<table id='board' matchid='" + str(self.id) + "' movecnt='" + str(self.count) + "'>"
+        htmldata += "<tr id='board-letters1'><td>&nbsp;</td>"
+        if(switch == 0):
+            for i in range(8):
+                htmldata += "<td>" + chr(i + ord('A')) + "</td>"
+        else:
+            for i in range(8):
+                htmldata += "<td>" + chr(ord('H') - i) + "</td>"
+        htmldata += "<td>&nbsp;</td></tr>"
+        for row in fmtboard:
+            htmldata += "<tr><td class='board-label'>" + str(row[0][1])[1] + "</td>"
+            for col in row:
+                if(col[1] == movesrc or col[1] == movedst):
+                    htmldata += "<td id='" + str(col[1]) + "' class='hint' value='" + str(col[0]) + "'>"
+                else:
+                    htmldata += "<td id='" + str(col[1]) + "' value='" + str(col[0]) + "'>"
+    
+                if(col[0] == 0):
+                    htmldata += "&nbsp;"
+                else:
+                    piece = values.reverse_lookup(Match.PIECES, col[0])
+                    htmldata += "<img src='" + "/static/img/" + piece + ".png'>"
+                htmldata += "</td>"
+            htmldata += "<td class='board-label'>" + str(row[0][1])[1] + "</td></tr>"
+        htmldata += "<tr id='board-letters2'><td>&nbsp;</td>"
+        if(switch == 0):
+            for i in range(8):
+                htmldata += "<td>" + chr(i + ord('A')) + "</td>"
+        else:
+            for i in range(8):
+                htmldata += "<td>" + chr(ord('H') - i) + "</td>"
+        htmldata += "<td>&nbsp;</td></tr></table>"
+        return htmldata
+
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
         self.count += 1
 
