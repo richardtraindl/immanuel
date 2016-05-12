@@ -5,41 +5,12 @@ from django.template import RequestContext
 from kate.models import Match, Move, Comment
 from kate.modules import values, rules, calc
 
-def fill_fmtmoves(match):
-    fmtmoves = []
-    
-    currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
-    if(currmove == None):
-        return fmtmoves
-    else:
-        if(currmove.count % 2 == 0):
-            limit = 42
-        else:
-            limit = 41
-        moves = Move.objects.filter(match_id=match.id).order_by("count").reverse()[:limit]
-        for move in reversed(moves):
-            if(move.count % 2 == 1 ):
-                fmtmoves.append("<tr><td>" + str( (move.count + 1) // 2) + ".</td>")
-                fmtmoves.append("<td>" + move.format_move() + "&nbsp;</td>")
-            else:
-                fmtmoves.append("<td>" + move.format_move() + "</td></tr>")
-        if(len(moves) % 2 == 1):
-            fmtmoves.append("<td>&nbsp;</td></tr>")
-        return fmtmoves
-
-def html_moves(match):
-    fmtmoves = []
-    fmtmoves = fill_fmtmoves(match)
-    htmldata = ""
-    for col in fmtmoves:
-        htmldata += col
-
-    return htmldata
 
 def index(request):
     context = RequestContext(request)
     matches = Match.objects.order_by("begin").reverse()[:10]
     return render(request, 'kate/index.html', { 'matches': matches } )
+
 
 def match(request, matchid=None, switch=0, markmove=0):
     context = RequestContext(request)
@@ -48,7 +19,6 @@ def match(request, matchid=None, switch=0, markmove=0):
         match.setboardbase()
     else:
         match = Match.objects.get(id=matchid)
-
     movesrc = ''
     movedst = ''
     if(int(markmove) == 1):
@@ -56,9 +26,8 @@ def match(request, matchid=None, switch=0, markmove=0):
         if(lastmove != None):
             movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
             movedst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
-
-    fmtboard = fill_fmtboard(match, int(switch))
-    fmtmoves = fill_fmtmoves(match)
+    fmtboard = Move.fill_fmtboard(match, int(switch))
+    fmtmoves = Move.fill_fmtmoves(match)
     comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
     fmtmsg = "<p class='ok'></p>"
     if(int(switch) == 0):
@@ -67,33 +36,30 @@ def match(request, matchid=None, switch=0, markmove=0):
         rangeobj = range(7, -1, -1)
     return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } )
 
+
 def new(request):
     context = RequestContext(request)
     return render(request, 'kate/new.html', { 'white_player': "", 'white_player_human': True, 'black_player': "", 'black_player_human': True } )
+
 
 def create(request):
     context = RequestContext(request)
     if request.method == 'POST':
         match = Match()
         match.white_player = request.POST['white_player']
-
         human = request.POST.getlist('white_player_human')
         if(len(human) == 1):
             match.white_player_human = True
         else:
             match.white_player_human = False
-
         match.black_player = request.POST['black_player']
-
         human = request.POST.getlist('black_player_human')
         if(len(human) == 1):
             match.black_player_human = True
         else:
             match.black_player_human = False
-
         levellist = request.POST.getlist('level')
         match.level = Match.LEVEL[levellist[0]]
-
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.setboardbase()
             match.immanuels_thread_id = None
@@ -113,27 +79,21 @@ def edit(request, matchid):
 def update(request, matchid):
     context = RequestContext(request)
     match = get_object_or_404(Match, pk=matchid)
-    
     if request.method == 'POST':        
         match.white_player = request.POST['white_player']
-
         human = request.POST.getlist('white_player_human')
         if(len(human) == 1):
             match.white_player_human = True
         else:
             match.white_player_human = False
-
         match.black_player = request.POST['black_player']
-
         human = request.POST.getlist('black_player_human')
         if(len(human) == 1):
             match.black_player_human = True
         else:
             match.black_player_human = False
-
         levellist = request.POST.getlist('level')
         match.level = Match.LEVEL[levellist[0]]
-
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.save()
             if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
@@ -176,14 +136,12 @@ def do_move(request, matchid):
                 fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
         else:
             fmtmsg = "<p class='error'>Mensch ist nicht am Zug.</p>"
-
-        fmtboard = fill_fmtboard(match, int(switch))
-        fmtmoves = fill_fmtmoves(match)
+        fmtboard = match.fill_fmtboard(int(switch))
+        fmtmoves = Move.fill_fmtmoves(match)
         comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
         status = rules.game_status(match)
         if(status != Match.STATUS['open']):
             fmtmsg = "<p class='error'>" + values.reverse_lookup(Match.STATUS, status) + "</p>"
-        
         if(int(switch) == 0):
             rangeobj = range(8)
         else:
