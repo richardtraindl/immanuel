@@ -319,18 +319,14 @@ class Match(models.Model):
             if(len(self.move_list) > 0):
                 move = self.move_list.pop()
             else:
-                print("******************************************")
                 return None
-
         self.count -= 1
         self.fifty_moves_count = move.fifty_moves_count
-
         if(move.move_type == move.TYPES['standard']):
             piece = self.readfield(move.dstx, move.dsty)
             self.writefield(move.srcx, move.srcy, piece)
             self.writefield(move.dstx, move.dsty, move.captured_piece)
             self.score -= self.SCORES[move.captured_piece]
-
             if(piece == Match.PIECES['wKg']):
                 self.wKg_x = move.srcx
                 self.wKg_y = move.srcy
@@ -359,7 +355,6 @@ class Match(models.Model):
             self.writefield(move.dstx, move.dsty, self.PIECES['blk'])
             self.writefield(move.dstx - 1, move.dsty, self.PIECES['blk'])
             self.writefield(move.dstx + 1, move.dsty, rook)
-
             if(piece == Match.PIECES['wKg']):
                 self.wKg_x = move.srcx
                 self.wKg_y = move.srcy
@@ -370,7 +365,6 @@ class Match(models.Model):
                 self.bKg_y = move.srcy
                 self.bKg_first_movecnt = 0
                 self.bRk_h8_first_movecnt = 0
-
             return move
         elif(move.move_type == move.TYPES['long_castling']):
             piece = self.readfield(move.dstx, move.dsty)
@@ -379,7 +373,6 @@ class Match(models.Model):
             self.writefield(move.dstx, move.dsty, self.PIECES['blk'])
             self.writefield(move.dstx + 1, move.dsty, self.PIECES['blk'])
             self.writefield(move.dstx - 2, move.dsty, rook)
-
             if(piece == Match.PIECES['wKg']):
                 self.wKg_x = move.srcx
                 self.wKg_y = move.srcy
@@ -390,7 +383,6 @@ class Match(models.Model):
                 self.bKg_y = move.srcy
                 self.bKg_first_movecnt = 0
                 self.bRk_a8_first_movecnt = 0
-
             return move
         elif(move.move_type == move.TYPES['promotion']):
             if(move.dsty == 7):
@@ -449,15 +441,6 @@ class Match(models.Model):
             return False
 
 
-    """
-    @classmethod
-    def remove_thread(cls, thread):
-        with cls.immanuels_thread_lock:
-            for item in cls.immanuels_threads_list:
-                if(item == thread):
-                    cls.immanuels_threads_list.remove(item)
-    """
-
 class Move(models.Model):
     TYPES = {
         'standard' : 1,
@@ -465,7 +448,6 @@ class Move(models.Model):
         'long_castling' : 3,
         'promotion' : 4,
         'en_passant' : 5 }
-
     match= models.ForeignKey(Match, on_delete=models.CASCADE)
     count = models.PositiveSmallIntegerField(null=False)
     move_type = models.PositiveSmallIntegerField(null=False, default=TYPES['standard'])
