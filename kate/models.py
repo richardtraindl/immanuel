@@ -123,7 +123,6 @@ class Match(models.Model):
         self.board[7][5] = self.PIECES['bBp']
         self.board[7][6] = self.PIECES['bKn']
         self.board[7][7] = self.PIECES['bRk']
-
         self.fifty_moves_count = 0
         self.wKg_x = 4
         self.wKg_y = 0
@@ -201,7 +200,6 @@ class Match(models.Model):
 
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
         self.count += 1
-
         move = Move()
         move.match_id = self.id
         move.count = self.count
@@ -210,10 +208,8 @@ class Match(models.Model):
         move.dstx = dstx
         move.dsty = dsty
         move.fifty_moves_count = self.fifty_moves_count        
-
         srcpiece = self.readfield(srcx, srcy)
         dstpiece = self.readfield(dstx, dsty)
-
         if(srcpiece == Match.PIECES['wPw'] or srcpiece == self.PIECES['bPw']):
             if(prom_piece != Match.PIECES['blk']):
                 self.writefield(srcx, srcy, self.PIECES['blk']) 
@@ -276,14 +272,12 @@ class Match(models.Model):
                 move.move_type = move.TYPES['long_castling']
                 move.captured_piece = dstpiece
                 return move
-
         self.writefield(srcx, srcy, self.PIECES['blk'])
         self.writefield(dstx, dsty, srcpiece)
         if(dstpiece != self.PIECES['blk']):
             self.fifty_moves_count = 0
         else:
             self.fifty_moves_count += 1
-
         if(srcpiece == Match.PIECES['wKg']):
             self.wKg_x = dstx
             self.wKg_y = dsty
@@ -292,7 +286,6 @@ class Match(models.Model):
             self.bKg_x = dstx
             self.bKg_y = dsty
             self.bKg_first_movecnt = self.count
-
         if(srcpiece == Match.PIECES['wRk']):
             if(srcx == 0 and srcy == 0 and self.wRk_a1_first_movecnt == 0):
                 self.wRk_a1_first_movecnt = self.count
@@ -303,7 +296,6 @@ class Match(models.Model):
                 self.bRk_a8_first_movecnt = self.count
             elif(srcx == 7 and srcy == 7 and self.bRk_h8_first_movecnt == 0):
                 self.bRk_h8_first_movecnt = self.count
-
         move.fifty_moves_count = self.fifty_moves_count
         move.move_type = move.TYPES['standard']
         move.captured_piece = dstpiece
@@ -522,3 +514,18 @@ class Comment(models.Model):
     text = models.CharField(max_length=500)
 
 
+class LibMove(models.Model):
+    move_count = models.PositiveSmallIntegerField(null=False)
+    move_srcx = models.PositiveSmallIntegerField(null=False)
+    move_srcy = models.PositiveSmallIntegerField(null=False)
+    move_dstx = models.PositiveSmallIntegerField(null=False)
+    move_dsty = models.PositiveSmallIntegerField(null=False)
+    move_prom_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
+
+
+class LibMoveReply(models.Model):
+    libmove = models.ForeignKey(LibMove)
+    libmove_reply = models.ForeignKey(LibMove)
+
+
+    
