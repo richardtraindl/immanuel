@@ -527,5 +527,6 @@ class LibMoveReply(models.Model):
     libmove = models.ForeignKey(LibMove)
     libmove_reply = models.ForeignKey(LibMove)
 
+    class Meta:
+        unique_together = (("libmove", "libmove_reply"),)
 
-    
