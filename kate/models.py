@@ -521,7 +521,13 @@ class LibMove(models.Model):
     move_dstx = models.PositiveSmallIntegerField(null=False)
     move_dsty = models.PositiveSmallIntegerField(null=False)
     move_prom_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
-
+    
+    def populate(self, count, src, dst, prom_piece):
+        self.move_count = count
+        self.move_srcx, self.move_srcy = values.koord_to_index(src)
+        self.move_dstx, self.move_dsty = values.koord_to_index(dst)
+        self.move_prom_piece = prom_piece
+        self.save()
 
 class LibMoveReply(models.Model):
     libmove = models.ForeignKey(LibMove)
@@ -529,4 +535,9 @@ class LibMoveReply(models.Model):
 
     class Meta:
         unique_together = (("libmove", "libmove_reply"),)
+
+    def populate(self, libmove, libmove_reply):
+        self.libmove = libmove
+        self.libmove_reply = libmove_reply
+        self.save()
 
