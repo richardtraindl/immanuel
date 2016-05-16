@@ -37,18 +37,18 @@ class Match(models.Model):
 
     SCORES = {
         PIECES['blk'] : 0,
-        PIECES['wKg'] : -2000,
-        PIECES['wPw'] : -10,
-        PIECES['wRk'] : -50,
-        PIECES['wKn'] : -33,
-        PIECES['wBp'] : -35,
-        PIECES['wQu'] : -95,
-        PIECES['bKg'] : 2000,
-        PIECES['bPw'] : 10,
-        PIECES['bRk'] : 50,
-        PIECES['bKn'] : 33,
-        PIECES['bBp'] : 35,
-        PIECES['bQu'] : 95
+        PIECES['wKg'] : -20000,
+        PIECES['wPw'] : -100,
+        PIECES['wRk'] : -500,
+        PIECES['wKn'] : -330,
+        PIECES['wBp'] : -350,
+        PIECES['wQu'] : -950,
+        PIECES['bKg'] : 20000,
+        PIECES['bPw'] : 100,
+        PIECES['bRk'] : 500,
+        PIECES['bKn'] : 330,
+        PIECES['bBp'] : 350,
+        PIECES['bQu'] : 950
     }
 
     STATUS = {
@@ -66,7 +66,7 @@ class Match(models.Model):
 
     status = models.PositiveSmallIntegerField(null=False, default=STATUS['open'])
     count = models.SmallIntegerField(null=False, default=0)
-    score = models.SmallIntegerField(null=False, default=0)    
+    score = models.IntegerField(null=False, default=0)    
     begin = models.DateTimeField(default=timezone.now)
     white_player = models.CharField(max_length=100, blank=False)
     white_player_human = models.BooleanField(null=False, default=True)
@@ -501,7 +501,7 @@ class Move(models.Model):
     @staticmethod
     def html_moves(match):
         fmtmoves = []
-        fmtmoves = fill_fmtmoves(match)
+        fmtmoves = Move.fill_fmtmoves(match)
         htmldata = ""
         for col in fmtmoves:
             htmldata += col
@@ -512,32 +512,4 @@ class Comment(models.Model):
     match= models.ForeignKey(Match, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=500)
-
-
-class LibMove(models.Model):
-    move_count = models.PositiveSmallIntegerField(null=False)
-    move_srcx = models.PositiveSmallIntegerField(null=False)
-    move_srcy = models.PositiveSmallIntegerField(null=False)
-    move_dstx = models.PositiveSmallIntegerField(null=False)
-    move_dsty = models.PositiveSmallIntegerField(null=False)
-    move_prom_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
-    
-    def populate(self, count, src, dst, prom_piece):
-        self.move_count = count
-        self.move_srcx, self.move_srcy = values.koord_to_index(src)
-        self.move_dstx, self.move_dsty = values.koord_to_index(dst)
-        self.move_prom_piece = prom_piece
-        self.save()
-
-class LibMoveReply(models.Model):
-    libmove = models.ForeignKey(LibMove)
-    libmove_reply = models.ForeignKey(LibMove)
-
-    class Meta:
-        unique_together = (("libmove", "libmove_reply"),)
-
-    def populate(self, libmove, libmove_reply):
-        self.libmove = libmove
-        self.libmove_reply = libmove_reply
-        self.save()
 

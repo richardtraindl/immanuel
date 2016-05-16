@@ -1,5 +1,5 @@
 from kate.models import Match, Move
-from kate.modules import values, rules, debug
+from kate.modules import values, rules, openings, debug
 import random, threading, copy, time 
 
 
@@ -267,11 +267,7 @@ class immanuelsThread(threading.Thread):
         move = Move.objects.filter(match_id=self.match.id).order_by("count").last()
         if(move != None):
             self.match.move_list.append(move)
-        print(str(self.match.wKg_x) + " "  + 
-                str(self.match.wKg_y) + " "  + 
-                str(self.match.wKg_first_movecnt) + " "  + 
-                str(self.match.wRk_a1_first_movecnt) + " "  + 
-                str(self.match.wRk_h1_first_movecnt))
+
         if(self.match.level == Match.LEVEL['medium']):
             maxdepth = 3
             extdepth = 7
@@ -280,10 +276,10 @@ class immanuelsThread(threading.Thread):
             extdepth = 8
         elif(self.match.level == Match.LEVEL['professional']):
             maxdepth = 5
-            extdepth = 9
+            extdepth = 10
         else:
             maxdepth = 2
-            extdepth = 4
+            extdepth = 6
         gmove = calc_move(self.match, maxdepth, extdepth)
         if(gmove != None):
             curr_match = Match.objects.get(id=self.match.id)
@@ -303,12 +299,39 @@ def rate(color, gmove, newgmove, score, newscore):
         return score, gmove
 
 
+def rate_opening(match, color, gmove, score):
+    piece = match.readfield(gmove.dstx, gmove.dsty)
+    if(color == Match.COLORS['white']):
+        if(piece == Match.PIECES['wPw']):
+            if(gmove.srcy == 1 and gmove.dsty == 3 and 
+                (gmove.dstx == 2 or gmove.dstx == 3 or gmove.dstx == 4)):
+                return score + 3
+        elif(piece == Match.PIECES['wKn']):
+            if(gmove.srcy == 0):
+                return score + 2
+        elif(piece == Match.PIECES['wBp']):
+            if(gmove.srcy == 0):
+                return score + 1
+    else:
+        if(piece == Match.PIECES['bPw']):
+            if(gmove.srcy == 6 and gmove.dsty == 4 and 
+                (gmove.dstx == 2 or gmove.dstx == 3 or gmove.dstx == 4)):
+                return score - 3
+        elif(piece == Match.PIECES['bKn']):
+            if(gmove.srcy == 7):
+                return score - 2
+        elif(piece == Match.PIECES['bBp']):
+            if(gmove.srcy == 7):
+                return score - 1
+    return score
+
+
 def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
     generator = Generator()
     generator.match = match
     gmove = None
     color = match.next_color()
-    maxscore = -20000
+    maxscore = -200000
     oldscore = 0
     count = 0
     while(generator.active):
@@ -323,25 +346,28 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                 print("\ndepth: 1, match.id: " + str(match.id) + ", calculated move: "
                         + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
                         + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
-                        + str(lastmove.prom_piece))
+                        + values.reverse_lookup(Match.PIECES, lastmove.prom_piece))
             elif(depth == 2):
                 print('.', end="")
             if(depth <= maxdepth):
-                newscore, newgmove_sndlevel = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)
+                newscore = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)[0]
             elif(depth <= extdepth):
-                if(match.next_color() == Match.COLORS['white']):
+                if(color == Match.COLORS['white']):
                     attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
                     promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty == 1
                 else:
                     attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
                     promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty == 6
-
                 if(oldscore != match.score or attacked or promotion):
                     newscore, calc_move = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)
                 else:
                     newscore = match.score
             else:
                 newscore = match.score
+
+            if(match.count <= 10):
+                newscore = rate_opening(match, color, newgmove, newscore)
+
             newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
             match.undo_move(True)
             if(newscore > maxscore):
@@ -368,7 +394,7 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
     generator.match = match
     gmove = None
     color = match.next_color()
-    minscore = 20000
+    minscore = 200000
     oldscore = 0
     count = 0
     while(generator.active):
@@ -387,21 +413,24 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
             elif(depth == 2):
                 print('.', end="")
             if(depth <= maxdepth):
-                newscore, newgmove_sndlevel = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)
+                newscore = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)[0]
             elif(depth <= extdepth):
-                if(match.next_color() == Match.COLORS['white']):
+                if(color == Match.COLORS['white']):
                     attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
                     promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty == 1
                 else:
                     attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
                     promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty == 6
-
                 if(oldscore != match.score or attacked or promotion):
                     newscore, calc_move = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)
                 else:
                     newscore = match.score
             else:
                 newscore = match.score
+
+            if(match.count <= 10):
+                newscore = rate_opening(match, color, newgmove, newscore)
+
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
             match.undo_move(True)
             if(newscore < minscore):
@@ -424,10 +453,17 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
 
 
 def calc_move(match, maxdepth, extdepth):
-    if(match.next_color() == Match.COLORS['white']):
-        score, gmove = calc_max(match, maxdepth, extdepth, 1, -20000, 20000)
-    else:
-        score, gmove = calc_min(match, maxdepth, extdepth, 1, -20000, 20000)
+    gmove = None
+
+    if(match.count <= 6):
+        score, gmove = openings.calc_opening(match)
+    
+    if(gmove == None):
+        if(match.next_color() == Match.COLORS['white']):
+            score, gmove = calc_max(match, maxdepth, extdepth, 1, -200000, 200000)
+        else:
+            score, gmove = calc_min(match, maxdepth, extdepth, 1, -200000, 200000)
+
     if(gmove != None):
         print("result: " + str(score))
         print(str(gmove.srcx) + " " + str(gmove.srcy)  + " " + str(gmove.dstx)  + " " +  str(gmove.dsty)  + " " + str(gmove.prom_piece))

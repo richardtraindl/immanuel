@@ -251,7 +251,7 @@ def is_move_available(match):
     color = match.next_color()
     for y1 in range(8):
         for x1 in range(8):
-            piece = match.readfield(x1, y1);
+            piece = match.readfield(x1, y1)
             if(color == Match.color_of_piece(piece)):
                 if(color == Match.COLORS['white']):
                     prom_piece = Match.PIECES['wQu']
@@ -260,7 +260,7 @@ def is_move_available(match):
 
                 for y2 in range(8):
                     for x2 in range(8):
-                        flag, msg = is_move_valid(match, x1, y1, x2, y2, prom_piece)
+                        flag = is_move_valid(match, x1, y1, x2, y2, prom_piece)[0]
                         if(flag):
                             return True
     return False

@@ -18,3 +18,5 @@ def index_to_koord(x, y):
     row = chr(y + ord('1'))
     koord = str(col + row)
     return koord
+
+

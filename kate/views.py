@@ -26,7 +26,7 @@ def match(request, matchid=None, switch=0, markmove=0):
         if(lastmove != None):
             movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
             movedst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
-    fmtboard = Move.fill_fmtboard(match, int(switch))
+    fmtboard = match.fill_fmtboard(int(switch))
     fmtmoves = Move.fill_fmtmoves(match)
     comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
     fmtmsg = "<p class='ok'></p>"
@@ -204,6 +204,20 @@ def fetch_board(request):
         if(int(movecnt) == match.count):
             data = ""
         else:
-            data = html_board(match, int(switchflag), movesrc, movedst) + ":" + html_moves(match)
+            html_player = "<tr><td>&nbsp;</td><td>"
+            if(match.white_player_human == False):
+                html_player += "<span class='fbold'>" + match.white_player + "</span>"
+            else:
+                html_player += match.white_player
+
+            html_player += "</td><td>"
+            if(match.black_player_human == False):
+                html_player += "<span class='fbold'>" + match.black_player + "</span>"
+            else:
+                html_player += match.black_player
+
+            html_player += "</td></tr>"
+
+            data = match.html_board(int(switchflag), movesrc, movedst) + ":" + html_player + Move.html_moves(match)
     return HttpResponse(data)
 
