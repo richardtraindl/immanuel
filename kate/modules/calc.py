@@ -78,7 +78,7 @@ class GenMove(object):
 
 
 class Generator(object):
-    def __init__(self, match=None, active=True, steps=None, board_x=0, board_y=0, dir_idx=0, max_dir=0, step_idx=0, max_step=0):
+    def __init__(self, match=None, active=True, steps=None, board_x=0, board_y=0, dir_idx=0, max_dir=0, step_idx=0, max_step=0, opening_cnt=0):
         self.match = match
         self.active = active
         self.steps = steps
@@ -88,6 +88,7 @@ class Generator(object):
         self.max_dir = max_dir
         self.step_idx = step_idx
         self.max_step = max_step
+        self.opening_cnt = opening_cnt
 
     def read_steps(self):
         stepx = self.steps[self.dir_idx][self.step_idx][0]
@@ -139,6 +140,15 @@ class Generator(object):
                 self.active = False
                 return False
         return True
+
+    def generate_opening_move(self):
+        cnt, gmove = openings.generate_move(self.match, self.opening_cnt)
+        if(gmove == None):
+            self.active = False
+            return False, gmove
+        else:
+            self.opening_cnt = cnt + 1
+            return True, gmove
 
 
     def generate_move(self):
@@ -335,7 +345,11 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
     oldscore = 0
     count = 0
     while(generator.active):
-        flag, newgmove = generator.generate_move()
+        if(match.count <= 6):
+            flag, newgmove = generator.generate_opening_move()
+        else:
+            flag, newgmove = generator.generate_move()
+
         if(flag):
             count += 1
             oldscore = match.score
@@ -365,8 +379,8 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
             else:
                 newscore = match.score
 
-            if(match.count <= 10):
-                newscore = rate_opening(match, color, newgmove, newscore)
+            # if(match.count <= 10):
+            #    newscore = rate_opening(match, color, newgmove, newscore)
 
             newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
             match.undo_move(True)
@@ -398,7 +412,11 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
     oldscore = 0
     count = 0
     while(generator.active):
-        flag, newgmove = generator.generate_move()
+        if(match.count <= 6):
+            flag, newgmove = generator.generate_opening_move()
+        else:
+            flag, newgmove = generator.generate_move()
+
         if(flag):
             count += 1
             oldscore = match.score
@@ -428,8 +446,8 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
             else:
                 newscore = match.score
 
-            if(match.count <= 10):
-                newscore = rate_opening(match, color, newgmove, newscore)
+            # if(match.count <= 10):
+            #    newscore = rate_opening(match, color, newgmove, newscore)
 
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
             match.undo_move(True)
@@ -453,16 +471,10 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
 
 
 def calc_move(match, maxdepth, extdepth):
-    gmove = None
-
-    if(match.count <= 6):
-        score, gmove = openings.calc_opening(match)
-    
-    if(gmove == None):
-        if(match.next_color() == Match.COLORS['white']):
-            score, gmove = calc_max(match, maxdepth, extdepth, 1, -200000, 200000)
-        else:
-            score, gmove = calc_min(match, maxdepth, extdepth, 1, -200000, 200000)
+    if(match.next_color() == Match.COLORS['white']):
+        score, gmove = calc_max(match, maxdepth, extdepth, 1, -200000, 200000)
+    else:
+        score, gmove = calc_min(match, maxdepth, extdepth, 1, -200000, 200000)
 
     if(gmove != None):
         print("result: " + str(score))
