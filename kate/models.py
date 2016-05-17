@@ -513,3 +513,14 @@ class Comment(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=500)
 
+
+class OpeningMove(models.Model):
+    movecnt = models.PositiveSmallIntegerField(null=False)
+    src = models.CharField(max_length=2, blank=False)
+    dst = models.CharField(max_length=2, blank=False)
+    prom_piece = models.CharField(max_length=3, blank=False, default='blk')
+    
+    class Meta:
+        unique_together = (("movecnt", "src", "dst", "prom_piece"),)
+
+
