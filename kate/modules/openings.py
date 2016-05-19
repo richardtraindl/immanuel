@@ -1,7 +1,12 @@
-from kate.models import Match, Move
-from kate.modules import values, calc, rules
-import random
+from kate.models import OpeningMove
 
+
+def populate_openings(move_list)
+       previous = None
+       for move in move_list:
+              omove = OpeningMove(previous, move[0], move[1], move[2])
+              omove.save()
+              previous = omove
 
 WHITEMOVES1 = [ ("e2", "e4"), ("d2", "d4"), ("c2", "c4"), ("g1", "f3"), ("g1", "e2"), 
            ("b1", "c3"), ("b1", "d2"), ("g2", "g3"), ("e2", "e3"), ("d2", "d3"), 
