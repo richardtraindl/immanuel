@@ -1,91 +1,40 @@
-from kate.models import OpeningMove
+from kate.models import Match
+from kate.modules import values, rules, calc
 
 
-def populate_openings(move_list)
-       previous = None
-       for move in move_list:
-              omove = OpeningMove(previous, move[0], move[1], move[2])
-              try:
-                  omove.save()
-              except:
-                  omove = OpeningMove.objects.get(movecnt=move[0], src=move[1], dst=move[2])
-              if(omove == None):
-                  break
-              else:
-                  previous = omove
+WHITEMOVES = [ ("c4", "b5"), ("c4", "d5"), ("d4", "c5"), ("d4", "e5"), 
+               ("e4", "d5"), ("e4", "f5"), ("c5", "b6"), ("c5", "d6"), 
+               ("d5", "c6"), ("d5", "e6"), ("e5", "d6"), ("e5", "f6"), 
+               ("f5", "e6"), ("f5", "g6"), ("e2", "e4"), ("d2", "d4"), 
+               ("c2", "c4"), ("g1", "f3"), ("g1", "e2"), ("b1", "c3"), 
+               ("b1", "d2"), ("g2", "g3"), ("e2", "e3"), ("d2", "d3"), 
+               ("c2", "c3") ]
 
-
-WHITEMOVES1 = [ ("e2", "e4"), ("d2", "d4"), ("c2", "c4"), ("g1", "f3"), ("g1", "e2"), 
-           ("b1", "c3"), ("b1", "d2"), ("g2", "g3"), ("e2", "e3"), ("d2", "d3"), 
-           ("c2", "c3") ]
-
-BLACKMOVES1 = [ ("e7", "e5"), ("d7", "d5"), ("c7", "c5"), ("g8", "f6"), ("g8", "e7"), 
-           ("b8", "c6"), ("b8", "d7"), ("g7", "g6"), ("e7", "e6"), ("d7", "d6"), 
-           ("c7", "c6") ]
-CNT1 = 11
-
-WHITEMOVES2 = [ ("e2", "e4"), ("d2", "d4"), ("c2", "c4"), ("g1", "f3"), ("g1", "e2"), 
-           ("b1", "c3"), ("b1", "d2"), ("g2", "g3"), ("e2", "e3"), ("d2", "d3"), 
-           ("c2", "c3"), ("e4", "d5"), ("e4", "f5"), ("d4", "c5"), ("d4", "e5"), 
-           ("c4", "b5"), ("c4", "d5") ]
-
-BLACKMOVES2 = [ ("e7", "e5"), ("d7", "d5"), ("c7", "c5"), ("g8", "f6"), ("g8", "e7"), 
-           ("b8", "c6"), ("b8", "d7"), ("g7", "g6"), ("e7", "e6"), ("d7", "d6"), 
-           ("c7", "c6"), ("e5", "d4"), ("e5", "f4"), ("d5", "c4"), ("d5", "e4"),
-           ("c5", "b4"), ("c5", "d4") ]
-CNT2 = 17
-
-
-WHITEMOVES3 = [ ("e2", "e4"), ("d2", "d4"), ("c2", "c4"), ("g1", "f3"), ("g1", "e2"), 
-           ("b1", "c3"), ("b1", "d2"), ("g2", "g3"), ("e2", "e3"), ("d2", "d3"), 
-           ("c2", "c3"), ("e4", "d5"), ("e4", "f5"), ("d4", "c5"), ("d4", "e5"), 
-           ("c4", "b5"), ("c4", "d5") ]
-
-BLACKMOVES3 = [ ("e7", "e5"), ("d7", "d5"), ("c7", "c5"), ("g8", "f6"), ("g8", "e7"), 
-           ("b8", "c6"), ("b8", "d7"), ("g7", "g6"), ("e7", "e6"), ("d7", "d6"), 
-           ("c7", "c6"), ("e5", "d4"), ("e5", "f4"), ("d5", "c4"), ("d5", "e4"),
-           ("c5", "b4"), ("c5", "d4") ]
-CNT3 = 17
-
+BLACKMOVES = [ ("c5", "b4"), ("c5", "d4"), ("d5", "c4"), ("d5", "e4"),
+               ("e5", "d4"), ("e5", "f4"), ("c4", "b3"), ("c4", "d3"), 
+               ("d4", "c3"), ("d4", "e3"), ("e4", "d3"), ("e4", "f3"), 
+               ("f4", "e3"), ("f4", "g3"), ("e7", "e5"), ("d7", "d5"), 
+               ("c7", "c5"), ("g8", "f6"), ("g8", "e7"), ("b8", "c6"), 
+               ("b8", "d7"), ("g7", "g6"), ("e7", "e6"), ("d7", "d6"), 
+               ("c7", "c6") ]
+CNT = 25
 
 
 def generate_move(match, cnt):
     if(match.next_color() == Match.COLORS['white']):
-        if(match.count == 0):
-            print("w1")
-            move_list = WHITEMOVES1
-            count = CNT1
-        elif(match.count == 2):
-            print("w2")
-            move_list = WHITEMOVES2
-            count = CNT2
-        else:
-            print("w3+")
-            move_list = WHITEMOVES3
-            count = CNT3
+        move_list = WHITEMOVES
     else:
-        if(match.count == 1):
-            print("b1")
-            move_list = BLACKMOVES1
-            count = CNT1
-        elif(match.count == 3):
-            print("b2")
-            move_list = BLACKMOVES2
-            count = CNT2
-        else:
-            print("b3+")
-            move_list = BLACKMOVES3
-            count = CNT3
+        move_list = BLACKMOVES
 
-    if(cnt >= count):
-        return count + 1, None
+    if(cnt >= CNT):
+        return CNT + 1, None
 
-    for i in range(cnt, count):
+    for i in range(cnt, CNT):
         x1, y1 = values.koord_to_index(move_list[i][0])
         x2, y2 = values.koord_to_index(move_list[i][1])
         if(rules.is_move_valid(match, x1, y1, x2, y2, Match.PIECES['blk'])[0]):
             gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
             return i, gmove
 
-    return count + 1, None
+    return CNT + 1, None
 
