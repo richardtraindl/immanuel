@@ -515,13 +515,12 @@ class Comment(models.Model):
 
 
 class OpeningMove(models.Model):
-    previous = models.ForeignKey(OpeningMove, null=True)
+    previous = models.ForeignKey('OpeningMove', null=True)
     movecnt = models.PositiveSmallIntegerField(null=False)
     src = models.CharField(max_length=2, blank=False)
     dst = models.CharField(max_length=2, blank=False)
-    prom_piece = models.CharField(max_length=3, blank=False, default='blk')
-    
+
     class Meta:
-        unique_together = (("previous", "movecnt", "src", "dst", "prom_piece"),)
+        unique_together = (("previous", "movecnt", "src", "dst"),)
 
 
