@@ -5,8 +5,15 @@ def populate_openings(move_list)
        previous = None
        for move in move_list:
               omove = OpeningMove(previous, move[0], move[1], move[2])
-              omove.save()
-              previous = omove
+              try:
+                  omove.save()
+              except:
+                  omove = OpeningMove.objects.get(movecnt=move[0], src=move[1], dst=move[2])
+              if(omove == None):
+                  break
+              else:
+                  previous = omove
+
 
 WHITEMOVES1 = [ ("e2", "e4"), ("d2", "d4"), ("c2", "c4"), ("g1", "f3"), ("g1", "e2"), 
            ("b1", "c3"), ("b1", "d2"), ("g2", "g3"), ("e2", "e3"), ("d2", "d3"), 
