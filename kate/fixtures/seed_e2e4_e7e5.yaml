@@ -1,0 +1,189 @@
+- model: kate.OpeningMove
+  pk: 1
+  fields:
+    previous: null
+    movecnt: 1
+    src: "e2"
+    dst: "e4"
+- model: kate.OpeningMove
+  pk: 2
+  fields:
+    previous: 1
+    movecnt: 2
+    src: "e7"
+    dst: "e5"
+- model: kate.OpeningMove
+  pk: 3
+  fields:
+    previous: 2
+    movecnt: 3
+    src: "g1"
+    dst: "f3"
+- model: kate.OpeningMove
+  pk: 4
+  fields:
+    previous: 3
+    movecnt: 4
+    src: "b8"
+    dst: "c6"
+- model: kate.OpeningMove
+  pk: 5
+  fields:
+    previous: 4
+    movecnt: 5
+    src: "b1"
+    dst: "c3"
+- model: kate.OpeningMove
+  pk: 6
+  fields:
+    previous: 5
+    movecnt: 6
+    src: "g1"
+    dst: "f3"
+- model: kate.OpeningMove
+  pk: 7
+  fields:
+    previous: 4 
+    movecnt: 5
+    src: "d2"
+    dst: "d4"
+- model: kate.OpeningMove
+  pk: 8
+  fields:
+    previous: 7
+    movecnt: 6
+    src: "e5"
+    dst: "d4"
+- model: kate.OpeningMove
+  pk: 9
+  fields:
+    previous: 4 
+    movecnt: 5
+    src: "f1"
+    dst: "b5"
+- model: kate.OpeningMove
+  pk: 10
+  fields:
+    previous: 9 
+    movecnt: 6
+    src: "d7"
+    dst: "d6"
+- model: kate.OpeningMove
+  pk: 11
+  fields:
+    previous: 4
+    movecnt: 6
+    src: "d7"
+    dst: "d6"
+- model: kate.OpeningMove
+  pk: 12
+  fields:
+    previous: 3
+    movecnt: 4
+    src: "d7"
+    dst: "d6"
+- model: kate.OpeningMove
+  pk: 13
+  fields:
+    previous: 12
+    movecnt: 5
+    src: "d2"
+    dst: "d4"
+- model: kate.OpeningMove
+  pk: 14
+  fields:
+    previous: 13
+    movecnt: 6
+    src: "e5"
+    dst: "d4"
+- model: kate.OpeningMove
+  pk: 15
+  fields:
+    previous: 2 
+    movecnt: 3
+    src: "b1"
+    dst: "c3"
+- model: kate.OpeningMove
+  pk: 16
+  fields:
+    previous: 15
+    movecnt: 4
+    src: "g8"
+    dst: "f6"
+- model: kate.OpeningMove
+  pk: 17
+  fields:
+    previous: 16
+    movecnt: 5
+    src: "d2"
+    dst: "d4"
+- model: kate.OpeningMove
+  pk: 18
+  fields:
+    previous: 17
+    movecnt: 6
+    src: "e5"
+    dst: "d4"
+- model: kate.OpeningMove
+  pk: 19
+  fields:
+    previous: 16
+    movecnt: 5
+    src: "g1"
+    dst: "f3"
+- model: kate.OpeningMove
+  pk: 20
+  fields:
+    previous: 19
+    movecnt: 6
+    src: "d7"
+    dst: "d6"
+- model: kate.OpeningMove
+  pk: 21
+  fields:
+    previous: 19
+    movecnt: 6
+    src: "b8"
+    dst: "c6"
+- model: kate.OpeningMove
+  pk: 22
+  fields:
+    previous: 2
+    movecnt: 3
+    src: "d2"
+    dst: "d4"
+- model: kate.OpeningMove
+  pk: 23
+  fields:
+    previous: 22
+    movecnt: 4
+    src: "e5"
+    dst: "d4"
+- model: kate.OpeningMove
+  pk: 24
+  fields:
+    previous: 23
+    movecnt: 5
+    src: "d1"
+    dst: "d4"
+- model: kate.OpeningMove
+  pk: 25
+  fields:
+    previous: 24
+    movecnt: 6
+    src: "b8"
+    dst: "c6"
+- model: kate.OpeningMove
+  pk: 26
+  fields:
+    previous: 23
+    movecnt: 5
+    src: "g1"
+    dst: "f3"
+- model: kate.OpeningMove
+  pk: 27
+  fields:
+    previous: 26
+    movecnt: 6
+    src: "b8"
+    dst: "c6"
