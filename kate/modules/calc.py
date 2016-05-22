@@ -278,18 +278,20 @@ class immanuelsThread(threading.Thread):
         if(move != None):
             self.match.move_list.append(move)
 
-        if(self.match.level == Match.LEVEL['medium']):
+        if(self.match.level == Match.LEVEL['blitz']):
+            maxdepth = 2
+            extdepth = 6
+        elif(self.match.level == Match.LEVEL['medium']):
             maxdepth = 3
             extdepth = 7
         elif(self.match.level == Match.LEVEL['high']):
             maxdepth = 4
             extdepth = 8
-        elif(self.match.level == Match.LEVEL['professional']):
+        else:
+            # professional
             maxdepth = 5
             extdepth = 10
-        else:
-            maxdepth = 2
-            extdepth = 6
+
         gmove = calc_move(self.match, maxdepth, extdepth)
         if(gmove != None):
             curr_match = Match.objects.get(id=self.match.id)

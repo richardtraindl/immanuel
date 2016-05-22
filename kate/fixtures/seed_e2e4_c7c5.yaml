@@ -1,15 +1,148 @@
-- model: kate.OpeningMove
+
+
+
+
+
   pk: 
   fields:
-    previous: 
+    previous:
     movecnt:
     src: ""
     dst: ""
 
 
-# answer to e2-e4
-M21 = { (2, "c7", "c5", "blk"), (2, "d7", "d5", "blk"), (2, "e7", "e5", "blk"), (2, "g8", "f6", "blk"), 
+
+M21 = { (, "blk"), (2, "d7", "d5", "blk"), (2, "e7", "e5", "blk"), (2, "g8", "f6", "blk"), 
         (2, "g7", "g6", "blk"), (2, "d7", "d6", "blk"), (2, "e7", "e6", "blk") }
+
+
+
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
+- model: kate.OpeningMove
+  pk: 
+  fields:
+    previous:
+    movecnt:
+    src: ""
+    dst: ""
 # answer to c2-c4
 M23 = { (2, "c7", "c5", "blk"), (2, "d7", "d5", "blk"), (2, "e7", "e5", "blk"), (2, "g8", "f6", "blk"), 
         (2, "g7", "g6", "blk"), (2, "e7", "e6", "blk"), (2, "d7", "d6", "blk") }

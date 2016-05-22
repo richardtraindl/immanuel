@@ -59,10 +59,10 @@ class Match(models.Model):
         'cancelled' : 5 }
 
     LEVEL = {
-        'medium' : 1,
-        'high' : 2,
-        'professional' : 3,
-        'blitz' : 4 }
+        'blitz' : 1,
+        'medium' : 2,
+        'high' : 3,
+        'professional' : 4 }
 
     status = models.PositiveSmallIntegerField(null=False, default=STATUS['open'])
     count = models.SmallIntegerField(null=False, default=0)
