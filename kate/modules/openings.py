@@ -38,3 +38,48 @@ def generate_move(match, cnt):
 
     return CNT + 1, None
 
+
+def calc_move(match):
+    prev_omoves = OpeningMove.objects.filter(movecnt=match.count, prev_src=prevsrc, prev_dst=prevdst)
+    prev_list = prev_omoves.copy()
+
+    for prev_omove in prev_omoves:
+        previous = prev_omove
+
+        while(previous):
+            move = Move.objects.get(match_id=match.id, count=previous.match_cnt)
+            prevsrc = values.index_to_koord(move.srcx, move.srcy)
+            prevdst = values.index_to_koord(move.dstx, move.dsty)
+            if(previous.src != prevsrc or previous.dst != prevdst):
+                prev_list.remove(prev_omove)
+                break
+            previous = previous.previous
+
+    if(prev_list):
+        previous = prev_list[0]
+        omoves = OpeningMove.objects.filter(movecnt=match.count + 1, previous_id=previous.id)
+        idx = random.randint(1, len(omoves))
+        x1, y1 = values.koord_to_index(omoves[idx].src)
+        x2, y2 = values.koord_to_index(omoves[idx].dst)
+        gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
+        return gmove
+    else:
+        return None
+
+
+def calc_move2(match):
+    lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+
+    prevsrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
+    prevdst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
+    prevposition = match.export_board()
+
+    omoves = OpeningMove.objects.filter(movecnt=match.count + 1, prev_src=prevsrc, prev_dst=prevdst, prev_position=prevposition)
+    if(omoves):
+        idx = random.randint(1, len(omoves)) - 1
+        x1, y1 = values.koord_to_index(omoves[idx].src)
+        x2, y2 = values.koord_to_index(omoves[idx].dst)
+        gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
+        return gmove
+    else:
+        return None

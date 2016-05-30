@@ -35,6 +35,22 @@ class Match(models.Model):
         'bQu' : 14 
     }
 
+    EXPORT_PIECES = {
+        0 : '0',
+        1 : '1',
+        2 : '2',
+        3 : '3',
+        4 : '4',
+        5 : '5',
+        6 : '6',
+        9 : '9',
+        10 : 'A',
+        11 : 'B',
+        12 : 'C',
+        13 : 'D',
+        14 : 'E' 
+    }
+
     SCORES = {
         PIECES['blk'] : 0,
         PIECES['wKg'] : -20000,
@@ -197,6 +213,14 @@ class Match(models.Model):
                 htmldata += "<td>" + chr(ord('H') - i) + "</td>"
         htmldata += "<td>&nbsp;</td></tr></table>"
         return htmldata
+
+    def export_board(self):
+        strboard = ""
+        for y in range(8):
+            for x in range(8):
+                piece = self.readfield(x, y)
+                strboard += self.EXPORT_PIECES[piece]
+        return strboard
 
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
         self.count += 1
@@ -453,6 +477,9 @@ class Move(models.Model):
     prom_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
     fifty_moves_count = models.SmallIntegerField(null=False)
 
+    class Meta:
+        unique_together = (("match", "count"),)
+
     def format_move(self):
         if(self.move_type == self.TYPES['standard']):
             if(self.captured_piece == 0):
@@ -509,7 +536,7 @@ class Move(models.Model):
 
 
 class Comment(models.Model):
-    match= models.ForeignKey(Match, on_delete=models.CASCADE)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=500)
 
@@ -522,5 +549,4 @@ class OpeningMove(models.Model):
 
     class Meta:
         unique_together = (("previous", "movecnt", "src", "dst"),)
-
 
