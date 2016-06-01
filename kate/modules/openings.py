@@ -1,5 +1,6 @@
-from kate.models import Match
+from kate.models import Match, Move, OpeningMove
 from kate.modules import values, rules, calc
+import random, copy
 
 
 WHITEMOVES = [ ("c4", "b5"), ("c4", "d5"), ("d4", "c5"), ("d4", "e5"), 
@@ -39,15 +40,27 @@ def generate_move(match, cnt):
     return CNT + 1, None
 
 
-def calc_move(match):
-    prev_omoves = OpeningMove.objects.filter(movecnt=match.count, prev_src=prevsrc, prev_dst=prevdst)
-    prev_list = prev_omoves.copy()
+def retrieve_move(match):
+    if(match.count == 0):
+        omoves = OpeningMove.objects.filter(movecnt=1)
+        idx = random.randint(0, len(omoves) - 1)
+        x1, y1 = values.koord_to_index(omoves[idx].src)
+        x2, y2 = values.koord_to_index(omoves[idx].dst)
+        gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
+        print("------------ opening move found! --------------")
+        return gmove
+
+    lastmove = Move.objects.get(match_id=match.id, count=match.count)
+    movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
+    movedst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
+    prev_omoves = OpeningMove.objects.filter(movecnt=match.count, src=movesrc, dst=movedst)
+    prev_list = list(prev_omoves)
 
     for prev_omove in prev_omoves:
-        previous = prev_omove
+        previous = prev_omove.previous
 
         while(previous):
-            move = Move.objects.get(match_id=match.id, count=previous.match_cnt)
+            move = Move.objects.get(match_id=match.id, count=previous.movecnt)
             prevsrc = values.index_to_koord(move.srcx, move.srcy)
             prevdst = values.index_to_koord(move.dstx, move.dsty)
             if(previous.src != prevsrc or previous.dst != prevdst):
@@ -58,15 +71,21 @@ def calc_move(match):
     if(prev_list):
         previous = prev_list[0]
         omoves = OpeningMove.objects.filter(movecnt=match.count + 1, previous_id=previous.id)
-        idx = random.randint(1, len(omoves))
-        x1, y1 = values.koord_to_index(omoves[idx].src)
-        x2, y2 = values.koord_to_index(omoves[idx].dst)
-        gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
-        return gmove
+        if(omoves):
+            idx = random.randint(0, len(omoves) - 1)
+            x1, y1 = values.koord_to_index(omoves[idx].src)
+            x2, y2 = values.koord_to_index(omoves[idx].dst)
+            gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
+            print("------------ opening move found! --------------")
+            return gmove
+        else:
+            print("############ 2222 NO opening move found! ###############")
+            return None
     else:
+        print("############ NO opening move found! ###############")
         return None
 
-
+"""
 def calc_move2(match):
     lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
 
@@ -83,3 +102,4 @@ def calc_move2(match):
         return gmove
     else:
         return None
+"""

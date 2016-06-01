@@ -348,7 +348,11 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
     count = 0
     while(generator.active):
         if(match.count <= 6):
-            flag, newgmove = generator.generate_opening_move()
+            newgmove = openings.retrieve_move(match)
+            if(newgmove):
+                return match.score, newgmove
+            else:
+                flag, newgmove = generator.generate_opening_move()
         else:
             flag, newgmove = generator.generate_move()
 
@@ -415,7 +419,11 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
     count = 0
     while(generator.active):
         if(match.count <= 6):
-            flag, newgmove = generator.generate_opening_move()
+            newgmove = openings.retrieve_move(match)
+            if(newgmove):
+                return match.score, newgmove
+            else:
+                flag, newgmove = generator.generate_opening_move()
         else:
             flag, newgmove = generator.generate_move()
 

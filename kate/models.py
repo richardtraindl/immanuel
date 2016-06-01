@@ -464,7 +464,7 @@ class Move(models.Model):
         'long_castling' : 3,
         'promotion' : 4,
         'en_passant' : 5 }
-    match= models.ForeignKey(Match, on_delete=models.CASCADE)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, null=False)
     count = models.PositiveSmallIntegerField(null=False)
     move_type = models.PositiveSmallIntegerField(null=False, default=TYPES['standard'])
     srcx = models.PositiveSmallIntegerField(null=False)
