@@ -85,21 +85,3 @@ def retrieve_move(match):
         print("############ NO opening move found! ###############")
         return None
 
-"""
-def calc_move2(match):
-    lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
-
-    prevsrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
-    prevdst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
-    prevposition = match.export_board()
-
-    omoves = OpeningMove.objects.filter(movecnt=match.count + 1, prev_src=prevsrc, prev_dst=prevdst, prev_position=prevposition)
-    if(omoves):
-        idx = random.randint(1, len(omoves)) - 1
-        x1, y1 = values.koord_to_index(omoves[idx].src)
-        x2, y2 = values.koord_to_index(omoves[idx].dst)
-        gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
-        return gmove
-    else:
-        return None
-"""
