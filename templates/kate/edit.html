@@ -68,24 +68,24 @@
                         <td colspan=2>
                             <select name="level" size="1">
                             {% if match.level == 1 %}
+                                <option selected>blitz</option>
+                            {% else %}  
+                                <option>blitz</option>
+                            {% endif %}
+                            {% if match.level == 2 %}
                                 <option selected>medium</option>
                             {% else %}  
                                 <option>medium</option>
                             {% endif %}
-                            {% if match.level == 2 %}
+                            {% if match.level == 3 %}
                                 <option selected>high</option>
-                            {% else %}  
+                            {% else %}
                                 <option>high</option>
                             {% endif %}
-                            {% if match.level == 3 %}
+                            {% if match.level == 4 %}
                                 <option selected>professional</option>
                             {% else %}  
                                 <option>professional</option>
-                            {% endif %}
-                            {% if match.level == 4 %}
-                                <option selected>blitz</option>
-                            {% else %}  
-                                <option>blitz</option>
                             {% endif %}
                             </select>
                         </td>
