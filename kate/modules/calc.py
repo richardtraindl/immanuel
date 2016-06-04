@@ -348,12 +348,7 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
     count = 0
 
     while(generator.active):
-        newgmove = openings.retrieve_move(match)
-        if(newgmove):
-            return match.score, newgmove
-        else:
-            flag, newgmove = generator.generate_move()
-
+        flag, newgmove = generator.generate_move()
         if(flag):
             count += 1
             oldscore = match.score
@@ -417,11 +412,7 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
     count = 0
 
     while(generator.active):
-        newgmove = openings.retrieve_move(match)
-        if(newgmove):
-            return match.score, newgmove
-        else:
-            flag, newgmove = generator.generate_move()
+        flag, newgmove = generator.generate_move()
 
         if(flag):
             count += 1
@@ -477,7 +468,11 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
 
 
 def calc_move(match, maxdepth, extdepth):
-    if(match.next_color() == Match.COLORS['white']):
+    gmove = openings.retrieve_move(match)
+
+    if(gmove):
+        score = match.score
+    elif(match.next_color() == Match.COLORS['white']):
         score, gmove = calc_max(match, maxdepth, extdepth, 1, -200000, 200000)
     else:
         score, gmove = calc_min(match, maxdepth, extdepth, 1, -200000, 200000)

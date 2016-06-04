@@ -43,12 +43,16 @@ def generate_move(match, cnt):
 def retrieve_move(match):
     if(match.count == 0):
         omoves = OpeningMove.objects.filter(movecnt=1)
-        idx = random.randint(0, len(omoves) - 1)
-        x1, y1 = values.koord_to_index(omoves[idx].src)
-        x2, y2 = values.koord_to_index(omoves[idx].dst)
-        gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
-        print("------------ opening move found! --------------")
-        return gmove
+        if(omoves):
+            idx = random.randint(0, len(omoves) - 1)
+            x1, y1 = values.koord_to_index(omoves[idx].src)
+            x2, y2 = values.koord_to_index(omoves[idx].dst)
+            gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
+            print("------------ opening move found! --------------")
+            return gmove
+        else:
+            print("############ No opening move found ############")
+            return None
 
     lastmove = Move.objects.get(match_id=match.id, count=match.count)
     movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
@@ -60,7 +64,11 @@ def retrieve_move(match):
         previous = prev_omove.previous
 
         while(previous):
-            move = Move.objects.get(match_id=match.id, count=previous.movecnt)
+            try:
+                move = Move.objects.get(match_id=match.id, count=previous.movecnt)
+            except Move.DoesNotExist:
+                print("---------None---------")
+                return None
             prevsrc = values.index_to_koord(move.srcx, move.srcy)
             prevdst = values.index_to_koord(move.dstx, move.dsty)
             if(previous.src != prevsrc or previous.dst != prevdst):
@@ -79,9 +87,9 @@ def retrieve_move(match):
             print("------------ opening move found! --------------")
             return gmove
         else:
-            print("############ 2222 NO opening move found! ###############")
+            print("############ 1: No opening move found! ###############")
             return None
     else:
-        print("############ NO opening move found! ###############")
+        print("############ 2: No opening move found! ###############")
         return None
 
