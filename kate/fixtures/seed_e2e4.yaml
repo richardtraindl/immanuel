@@ -753,7 +753,7 @@
     previous: 603
     movecnt: 6
     src: "d5"
-    dst: "b3"
+    dst: "b6"
 - model: kate.OpeningMove
   pk: 605
   fields:

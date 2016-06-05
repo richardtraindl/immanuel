@@ -99,7 +99,6 @@ class Generator(object):
             prom_piece = Match.PIECES['blk']
         return stepx, stepy, prom_piece
 
-
     def rotate(self):
         if(self.step_idx + 1 < self.max_step):
             self.step_idx += 1
@@ -113,7 +112,6 @@ class Generator(object):
                 return self.rotate_field()
         return True
 
-
     def rotate_dir(self):
             self.step_idx = 0
 
@@ -123,7 +121,6 @@ class Generator(object):
             else:
                 self.dir_idx = 0
                 return self.rotate_field()
-
 
     def rotate_field(self):
         self.steps = None
@@ -140,16 +137,6 @@ class Generator(object):
                 self.active = False
                 return False
         return True
-
-    def generate_opening_move(self):
-        cnt, gmove = openings.generate_move(self.match, self.opening_cnt)
-        if(gmove == None):
-            self.active = False
-            return False, gmove
-        else:
-            self.opening_cnt = cnt + 1
-            return True, gmove
-
 
     def generate_move(self):
         gmove = GenMove()
@@ -241,29 +228,6 @@ class Generator(object):
         return False, gmove
 
 
-def random_move(match):
-    generator = Generator()
-    generator.match = match
-    gmove_list = []
-
-    while(True):
-        flag, gmove = generator.generate_move()
-        if(flag == True):
-            gmove_list.append(gmove)
-        else:
-            break
-
-    count = len(gmove_list)
-    if(count == 0):
-        return False, gmove
-
-    count = random.randint(0, count - 1)
-    print(values.index_to_koord(gmove_list[count].srcx, gmove_list[count].srcy) + " " + \
-          values.index_to_koord(gmove_list[count].dstx, gmove_list[count].dsty) + " " + \
-          str(gmove_list[count].prom_piece))
-    return True, gmove_list[count]
-
-
 class immanuelsThread(threading.Thread):
     def __init__(self, threadid, match):
         threading.Thread.__init__(self)
@@ -303,39 +267,38 @@ class immanuelsThread(threading.Thread):
         return gmove
 
 
+def rate_position(match):
+    supported_whites = 0
+    attacked_whites = 0
+    supported_blacks = 0
+    attacked_blacks = 0
+    for y in range(0, 8, 1):
+        for x in range(0, 8, 1):
+            piece = match.readfield(x, y)
+            if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
+                continue
+            elif(Match.color_of_piece(piece) == Match.COLORS['white']):
+                if(rules.attacked(match, x, y, Match.COLORS['white'])):
+                    supported_whites += 1
+                if(rules.attacked(match, x, y, Match.COLORS['black'])):
+                    attacked_whites += 1
+            else:
+                if(rules.attacked(match, x, y, Match.COLORS['black'])):
+                    supported_blacks += 1
+                if(rules.attacked(match, x, y, Match.COLORS['white'])):
+                    attacked_blacks += 1
+        
+    rate_white = (supported_whites - attacked_whites)
+    rate_black = (supported_blacks - attacked_blacks) * -1
+    return rate_white + rate_black
+
+
 def rate(color, gmove, newgmove, score, newscore):
     if((color == Match.COLORS['white'] and score < newscore) or 
        (color == Match.COLORS['black'] and score > newscore)):
         return newscore, newgmove
     else:
         return score, gmove
-
-
-def rate_opening(match, color, gmove, score):
-    piece = match.readfield(gmove.dstx, gmove.dsty)
-    if(color == Match.COLORS['white']):
-        if(piece == Match.PIECES['wPw']):
-            if(gmove.srcy == 1 and gmove.dsty == 3 and 
-                (gmove.dstx == 2 or gmove.dstx == 3 or gmove.dstx == 4)):
-                return score + 3
-        elif(piece == Match.PIECES['wKn']):
-            if(gmove.srcy == 0):
-                return score + 2
-        elif(piece == Match.PIECES['wBp']):
-            if(gmove.srcy == 0):
-                return score + 1
-    else:
-        if(piece == Match.PIECES['bPw']):
-            if(gmove.srcy == 6 and gmove.dsty == 4 and 
-                (gmove.dstx == 2 or gmove.dstx == 3 or gmove.dstx == 4)):
-                return score - 3
-        elif(piece == Match.PIECES['bKn']):
-            if(gmove.srcy == 7):
-                return score - 2
-        elif(piece == Match.PIECES['bBp']):
-            if(gmove.srcy == 7):
-                return score - 1
-    return score
 
 
 def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
@@ -378,9 +341,7 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
             else:
                 newscore = match.score
 
-            # if(match.count <= 10):
-            #    newscore = rate_opening(match, color, newgmove, newscore)
-
+            newscore += rate_position(match)
             newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
             match.undo_move(True)
             if(newscore > maxscore):
@@ -443,9 +404,7 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
             else:
                 newscore = match.score
 
-            # if(match.count <= 10):
-            #    newscore = rate_opening(match, color, newgmove, newscore)
-
+            newscore += rate_position(match)
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
             match.undo_move(True)
             if(newscore < minscore):
