@@ -6,6 +6,11 @@ from kate.models import Match, Move, Comment
 from kate.modules import values, rules, calc
 
 
+def calc_move_for_immanuel(match):
+    if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
+        calc.thread_do_move(match)
+
+
 def index(request):
     context = RequestContext(request)
     matches = Match.objects.order_by("begin").reverse()[:10]
@@ -34,6 +39,9 @@ def match(request, matchid=None, switch=0, markmove=0):
         rangeobj = range(8)
     else:
         rangeobj = range(7, -1, -1)
+        
+    calc_move_for_immanuel(match)
+
     return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } )
 
 
@@ -64,8 +72,6 @@ def create(request):
             match.setboardbase()
             match.immanuels_thread_id = None
             match.save()
-            if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
-                calc.thread_do_move(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
     return render(request, 'kate/new.html', { 'white_player': match.white_player, 'white_player_human': match.white_player_human, 'black_player': match.black_player, 'black_player_human': match.black_player_human } )
 
@@ -96,8 +102,6 @@ def update(request, matchid):
         match.level = Match.LEVEL[levellist[0]]
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.save()
-            if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
-                calc.thread_do_move(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
     return render(request, 'kate/edit.html', { 'match': match } )
 
@@ -158,8 +162,6 @@ def undo_move(request, matchid, switch=None):
     if(move != None):
         move.delete()
         match.save()
-        if(match.status == Match.STATUS['open'] and match.next_color_human() == False):
-            calc.thread_do_move(match)
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch, 1)))
 
 
