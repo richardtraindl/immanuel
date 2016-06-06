@@ -39,8 +39,6 @@ def match(request, matchid=None, switch=0, markmove=0):
         rangeobj = range(8)
     else:
         rangeobj = range(7, -1, -1)
-        
-    calc_move_for_immanuel(match)
 
     return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } )
 
@@ -72,6 +70,7 @@ def create(request):
             match.setboardbase()
             match.immanuels_thread_id = None
             match.save()
+            calc_move_for_immanuel(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
     return render(request, 'kate/new.html', { 'white_player': match.white_player, 'white_player_human': match.white_player_human, 'black_player': match.black_player, 'black_player_human': match.black_player_human } )
 
@@ -102,6 +101,7 @@ def update(request, matchid):
         match.level = Match.LEVEL[levellist[0]]
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.save()
+            calc_move_for_immanuel(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
     return render(request, 'kate/edit.html', { 'match': match } )
 
@@ -125,31 +125,33 @@ def do_move(request, matchid):
                 dstx,dsty = values.koord_to_index(movedst)
                 prom_piece = match.PIECES[prompiece]
                 flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
-                if(flag == True):
+                status = rules.game_status(match)
+                if(flag == True and status == Match.STATUS['open']):
                     move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
                     move.save()
                     match.save()
-                    status = rules.game_status(match)
-                    if(status == Match.STATUS['open']):                        
-                        fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
-                        if(match.next_color_human() == False):
-                            calc.thread_do_move(match)
+                    calc_move_for_immanuel(match)
+                    fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
                 else:
                     fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
             else:
                 fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
         else:
             fmtmsg = "<p class='error'>Mensch ist nicht am Zug.</p>"
+
         fmtboard = match.fill_fmtboard(int(switch))
         fmtmoves = Move.fill_fmtmoves(match)
         comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
+
         status = rules.game_status(match)
         if(status != Match.STATUS['open']):
             fmtmsg = "<p class='error'>" + values.reverse_lookup(Match.STATUS, status) + "</p>"
+
         if(int(switch) == 0):
             rangeobj = range(8)
         else:
             rangeobj = range(7, -1, -1)
+
         return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } )
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
@@ -162,6 +164,7 @@ def undo_move(request, matchid, switch=None):
     if(move != None):
         move.delete()
         match.save()
+        calc_move_for_immanuel(match)
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch, 1)))
 
 

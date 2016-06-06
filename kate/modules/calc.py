@@ -339,9 +339,8 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                 else:
                     newscore = match.score
             else:
-                newscore = match.score
+                newscore = match.score + rate_position(match)
 
-            newscore += rate_position(match)
             newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
             match.undo_move(True)
             if(newscore > maxscore):
@@ -402,9 +401,8 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                 else:
                     newscore = match.score
             else:
-                newscore = match.score
+                newscore = match.score + rate_position(match)
 
-            newscore += rate_position(match)
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
             match.undo_move(True)
             if(newscore < minscore):

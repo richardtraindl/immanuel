@@ -234,35 +234,35 @@ class Match(models.Model):
         move.fifty_moves_count = self.fifty_moves_count        
         srcpiece = self.readfield(srcx, srcy)
         dstpiece = self.readfield(dstx, dsty)
-        if(srcpiece == Match.PIECES['wPw'] or srcpiece == self.PIECES['bPw']):
+        if(srcpiece == Match.PIECES['wPw'] or srcpiece == Match.PIECES['bPw']):
             if(prom_piece != Match.PIECES['blk']):
-                self.writefield(srcx, srcy, self.PIECES['blk']) 
+                self.writefield(srcx, srcy, Match.PIECES['blk']) 
                 self.writefield(dstx, dsty, prom_piece)
                 self.fifty_moves_count = 0
-                move.move_type = move.TYPES['promotion']
+                move.move_type = Move.TYPES['promotion']
                 move.captured_piece = dstpiece
                 move.prom_piece = prom_piece
-                self.score -= (self.SCORES[prom_piece] - self.SCORES[srcpiece])
-                self.score += self.SCORES[dstpiece]
+                self.score -= (Match.SCORES[prom_piece] - Match.SCORES[srcpiece])
+                self.score += Match.SCORES[dstpiece]
                 return move
             elif(dstpiece == Match.PIECES['blk'] and srcx != dstx):
-                self.writefield(srcx, srcy, self.PIECES['blk'])
+                self.writefield(srcx, srcy, Match.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
                 self.fifty_moves_count = 0
-                move.move_type = move.TYPES['en_passant']
+                move.move_type = Move.TYPES['en_passant']
                 move.e_p_fieldx = dstx
                 move.e_p_fieldy = srcy
                 pawn = self.readfield(move.e_p_fieldx, move.e_p_fieldy)
-                self.writefield(move.e_p_fieldx, move.e_p_fieldy, self.PIECES['blk'])
+                self.writefield(move.e_p_fieldx, move.e_p_fieldy, Match.PIECES['blk'])
                 move.captured_piece = pawn
-                self.score += self.SCORES[pawn]
+                self.score += Match.SCORES[pawn]
                 return move 
-        elif(srcpiece == Match.PIECES['wKg'] or srcpiece == self.PIECES['bKg']):
+        elif(srcpiece == Match.PIECES['wKg'] or srcpiece == Match.PIECES['bKg']):
             if(srcx - dstx == -2):
                 self.writefield(srcx, srcy, self.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
                 rook = self.readfield(srcx + 3, srcy)
-                self.writefield(srcx + 3, srcy, self.PIECES['blk'])
+                self.writefield(srcx + 3, srcy, Match.PIECES['blk'])
                 self.writefield(dstx - 1, dsty, rook)
                 self.fifty_moves_count += 1
                 if(srcpiece == Match.PIECES['wKg']):
@@ -274,14 +274,14 @@ class Match(models.Model):
                     self.bKg_y = dsty              
                     self.bKg_first_movecnt = self.count
                 
-                move.move_type = move.TYPES['short_castling']
+                move.move_type = Move.TYPES['short_castling']
                 move.captured_piece = dstpiece
                 return move
             elif(srcx - dstx == 2):
-                self.writefield(srcx, srcy, self.PIECES['blk'])
+                self.writefield(srcx, srcy, Match.PIECES['blk'])
                 self.writefield(dstx, dsty, srcpiece)
                 rook = self.readfield(srcx - 4, srcy)
-                self.writefield(srcx - 4, srcy, self.PIECES['blk'])
+                self.writefield(srcx - 4, srcy, Match.PIECES['blk'])
                 self.writefield(dstx + 1, dsty, rook)
                 self.fifty_moves_count += 1
                 if(srcpiece == Match.PIECES['wKg']):
@@ -293,12 +293,12 @@ class Match(models.Model):
                     self.bKg_y = dsty              
                     self.bKg_first_movecnt = self.count
                 
-                move.move_type = move.TYPES['long_castling']
+                move.move_type = Move.TYPES['long_castling']
                 move.captured_piece = dstpiece
                 return move
-        self.writefield(srcx, srcy, self.PIECES['blk'])
+        self.writefield(srcx, srcy, Match.PIECES['blk'])
         self.writefield(dstx, dsty, srcpiece)
-        if(dstpiece != self.PIECES['blk']):
+        if(dstpiece != Match.PIECES['blk']):
             self.fifty_moves_count = 0
         else:
             self.fifty_moves_count += 1
@@ -321,9 +321,9 @@ class Match(models.Model):
             elif(srcx == 7 and srcy == 7 and self.bRk_h8_first_movecnt == 0):
                 self.bRk_h8_first_movecnt = self.count
         move.fifty_moves_count = self.fifty_moves_count
-        move.move_type = move.TYPES['standard']
+        move.move_type = Move.TYPES['standard']
         move.captured_piece = dstpiece
-        self.score += self.SCORES[dstpiece]
+        self.score += Match.SCORES[dstpiece]
         return move
 
     def undo_move(self, calc):
