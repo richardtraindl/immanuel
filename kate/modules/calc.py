@@ -1,5 +1,5 @@
 from kate.models import Match, Move
-from kate.modules import values, rules, openings, debug
+from kate.modules import values, rules, openings, calc_helper, debug
 import random, threading, copy, time 
 
 
@@ -267,32 +267,6 @@ class immanuelsThread(threading.Thread):
         return gmove
 
 
-def rate_position(match):
-    supported_whites = 0
-    attacked_whites = 0
-    supported_blacks = 0
-    attacked_blacks = 0
-    for y in range(0, 8, 1):
-        for x in range(0, 8, 1):
-            piece = match.readfield(x, y)
-            if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
-                continue
-            elif(Match.color_of_piece(piece) == Match.COLORS['white']):
-                if(rules.attacked(match, x, y, Match.COLORS['white'])):
-                    supported_whites += 1
-                if(rules.attacked(match, x, y, Match.COLORS['black'])):
-                    attacked_whites += 1
-            else:
-                if(rules.attacked(match, x, y, Match.COLORS['black'])):
-                    supported_blacks += 1
-                if(rules.attacked(match, x, y, Match.COLORS['white'])):
-                    attacked_blacks += 1
-        
-    rate_white = (supported_whites - attacked_whites)
-    rate_black = (supported_blacks - attacked_blacks) * -1
-    return rate_white + rate_black
-
-
 def rate(color, gmove, newgmove, score, newscore):
     if((color == Match.COLORS['white'] and score < newscore) or 
        (color == Match.COLORS['black'] and score > newscore)):
@@ -325,6 +299,7 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                         + values.reverse_lookup(Match.PIECES, lastmove.prom_piece))
             elif(depth == 2):
                 print('.', end="")
+
             if(depth <= maxdepth):
                 newscore = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)[0]
             elif(depth <= extdepth):
@@ -339,7 +314,9 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                 else:
                     newscore = match.score
             else:
-                newscore = match.score + rate_position(match)
+                newscore = match.score + calc_helper.eval_contacts(match)
+                if(match.count <= 10):
+                    newscore += calc_helper.count_moves(match)
 
             newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
             match.undo_move(True)
@@ -387,6 +364,7 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                         + str(lastmove.prom_piece))
             elif(depth == 2):
                 print('.', end="")
+
             if(depth <= maxdepth):
                 newscore = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)[0]
             elif(depth <= extdepth):
@@ -401,7 +379,9 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                 else:
                     newscore = match.score
             else:
-                newscore = match.score + rate_position(match)
+                newscore = match.score + calc_helper.eval_contacts(match)
+                if(match.count <= 10):
+                    newscore += calc_helper.count_moves(match)
 
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
             match.undo_move(True)
