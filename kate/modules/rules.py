@@ -1,5 +1,5 @@
 from kate.models import Match
-from kate.modules import values, pawn, rook, knight, bishop, queen, king
+from kate.modules import pawn, rook, knight, bishop, queen, king
 
 
 ERROR_CODES = {

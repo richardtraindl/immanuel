@@ -1,12 +1,12 @@
 from django import template
 from kate.models import Match
-from kate.modules import values
+from kate.modules import helper
 
 register = template.Library()
 
 @register.filter(name='imgsrc')
 def imgsrc(value):
-    piece = values.reverse_lookup(Match.PIECES, value)
+    piece = helper.reverse_lookup(Match.PIECES, value)
     return "img/" + piece + ".png"
 
 @register.filter(name='alternate')

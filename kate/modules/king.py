@@ -1,5 +1,5 @@
 from kate.models import Match
-from kate.modules import values, rules
+from kate.modules import rules
 
 
 STEP_1N_X = 0

@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
-from django.db.models.signals import post_save
-from kate.modules import values
 import threading
 
 
@@ -150,77 +148,6 @@ class Match(models.Model):
         self.wRk_h1_first_movecnt = 0
         self.bRk_a8_first_movecnt = 0
         self.bRk_h8_first_movecnt = 0
-
-    def fill_fmtboard(self, switch):
-        fmtboard = [ [ [0  for k in range(2)] for x in range(8)] for x in range(8) ]
-        if(switch == 0):
-            rowstart = 7
-            rowend = -1
-            rowstep = -1
-            colstart = 0
-            colend = 8
-            colstep = 1
-        else:
-            rowstart = 0
-            rowend = 8
-            rowstep = 1
-            colstart = 7
-            colend = -1
-            colstep = -1
-        idx1 = 0
-        for i in range(rowstart, rowend, rowstep):
-            idx2 = 0
-            for j in range(colstart, colend, colstep):
-                fmtboard[idx1][idx2][0] = self.board[i][j]
-                field = chr(ord('a') + j) + chr(ord('1') + i)
-                fmtboard[idx1][idx2][1] = field
-                idx2 += 1
-            idx1 += 1
-        return fmtboard
-
-    def html_board(self, switch, movesrc, movedst):
-        fmtboard = self.fill_fmtboard(switch)
-        htmldata = "<table id='board' matchid='" + str(self.id) + "' movecnt='" + str(self.count) + "'>"
-        htmldata += "<tr id='board-letters1'><td>&nbsp;</td>"
-        if(switch == 0):
-            for i in range(8):
-                htmldata += "<td>" + chr(i + ord('A')) + "</td>"
-        else:
-            for i in range(8):
-                htmldata += "<td>" + chr(ord('H') - i) + "</td>"
-        htmldata += "<td>&nbsp;</td></tr>"
-        for row in fmtboard:
-            htmldata += "<tr><td class='board-label'>" + str(row[0][1])[1] + "</td>"
-            for col in row:
-                if(col[1] == movesrc or col[1] == movedst):
-                    htmldata += "<td id='" + str(col[1]) + "' class='hint' value='" + str(col[0]) + "'>"
-                else:
-                    htmldata += "<td id='" + str(col[1]) + "' value='" + str(col[0]) + "'>"
-    
-                if(col[0] == 0):
-                    htmldata += "&nbsp;"
-                else:
-                    piece = values.reverse_lookup(Match.PIECES, col[0])
-                    htmldata += "<img src='" + "/static/img/" + piece + ".png'>"
-                htmldata += "</td>"
-            htmldata += "<td class='board-label'>" + str(row[0][1])[1] + "</td></tr>"
-        htmldata += "<tr id='board-letters2'><td>&nbsp;</td>"
-        if(switch == 0):
-            for i in range(8):
-                htmldata += "<td>" + chr(i + ord('A')) + "</td>"
-        else:
-            for i in range(8):
-                htmldata += "<td>" + chr(ord('H') - i) + "</td>"
-        htmldata += "<td>&nbsp;</td></tr></table>"
-        return htmldata
-
-    def export_board(self):
-        strboard = ""
-        for y in range(8):
-            for x in range(8):
-                piece = self.readfield(x, y)
-                strboard += self.EXPORT_PIECES[piece]
-        return strboard
 
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
         self.count += 1
@@ -439,6 +366,19 @@ class Match(models.Model):
         else:
             return Match.COLORS['undefined']
 
+    @staticmethod
+    def koord_to_index(koord):
+        x = ord(koord[0]) - ord('a')
+        y = ord(koord[1]) - ord('1')
+        return x,y
+
+    @staticmethod
+    def index_to_koord(x, y):
+        col = chr(x + ord('a'))
+        row = chr(y + ord('1'))
+        koord = str(col + row)
+        return koord
+
     def remove_former_threads(self):
         with self.immanuels_thread_lock:
             for item in self.immanuels_threads_list:
@@ -486,7 +426,7 @@ class Move(models.Model):
                 hyphen = "-"
             else:
                 hyphen = "x"
-            fmtmove= values.index_to_koord(self.srcx, self.srcy) + hyphen + values.index_to_koord(self.dstx, self.dsty)
+            fmtmove = Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty)
             return fmtmove
         elif(self.move_type == self.TYPES['short_castling']):
             return "0-0"
@@ -497,43 +437,11 @@ class Move(models.Model):
                 hyphen = "-"
             else:
                 hyphen = "x"
-            fmtmove= values.index_to_koord(self.srcx, self.srcy) + hyphen + values.index_to_koord(self.dstx, self.dsty) + " " + values.reverse_lookup(Match.PIECES, self.prom_piece)
+            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty) + " " + values.reverse_lookup(Match.PIECES, self.prom_piece)
             return fmtmove
         else:
-            fmtmove= values.index_to_koord(self.srcx, self.srcy) + "x" + values.index_to_koord(self.dstx, self.dsty) + " e.p."
+            fmtmove= values.index_to_koord(self.srcx, self.srcy) + "x" + Match.index_to_koord(self.dstx, self.dsty) + " e.p."
             return fmtmove
-
-    @staticmethod
-    def fill_fmtmoves(match):
-        fmtmoves = []
-        currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
-        if(currmove == None):
-            return fmtmoves
-        else:
-            if(currmove.count % 2 == 0):
-                limit = 42
-            else:
-                limit = 41
-            moves = Move.objects.filter(match_id=match.id).order_by("count").reverse()[:limit]
-            for move in reversed(moves):
-                if(move.count % 2 == 1 ):
-                    fmtmoves.append("<tr><td>" + str( (move.count + 1) // 2) + ".</td>")
-                    fmtmoves.append("<td>" + move.format_move() + "&nbsp;</td>")
-                else:
-                    fmtmoves.append("<td>" + move.format_move() + "</td></tr>")
-            if(len(moves) % 2 == 1):
-                fmtmoves.append("<td>&nbsp;</td></tr>")
-            return fmtmoves
-
-    @staticmethod
-    def html_moves(match):
-        fmtmoves = []
-        fmtmoves = Move.fill_fmtmoves(match)
-        htmldata = ""
-        for col in fmtmoves:
-            htmldata += col
-        return htmldata
-
 
 class Comment(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE)

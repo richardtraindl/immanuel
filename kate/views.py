@@ -3,12 +3,108 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from kate.models import Match, Move, Comment
-from kate.modules import values, rules, calc
+from kate.modules import helper, rules, calc
 
 
 def calc_move_for_immanuel(match):
     if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
         calc.thread_do_move(match)
+
+
+def fill_fmtboard(match, switch):
+    fmtboard = [ [ [0  for k in range(2)] for x in range(8)] for x in range(8) ]
+    if(switch == 0):
+        rowstart = 7
+        rowend = -1
+        rowstep = -1
+        colstart = 0
+        colend = 8
+        colstep = 1
+    else:
+        rowstart = 0
+        rowend = 8
+        rowstep = 1
+        colstart = 7
+        colend = -1
+        colstep = -1
+    idx1 = 0
+    for i in range(rowstart, rowend, rowstep):
+        idx2 = 0
+        for j in range(colstart, colend, colstep):
+            fmtboard[idx1][idx2][0] = match.board[i][j]
+            field = chr(ord('a') + j) + chr(ord('1') + i)
+            fmtboard[idx1][idx2][1] = field
+            idx2 += 1
+        idx1 += 1
+    return fmtboard
+
+
+def html_board(match, switch, movesrc, movedst):
+    fmtboard = fill_fmtboard(match, switch)
+    htmldata = "<table id='board' matchid='" + str(match.id) + "' movecnt='" + str(match.count) + "'>"
+    htmldata += "<tr id='board-letters1'><td>&nbsp;</td>"
+    if(switch == 0):
+        for i in range(8):
+            htmldata += "<td>" + chr(i + ord('A')) + "</td>"
+    else:
+        for i in range(8):
+            htmldata += "<td>" + chr(ord('H') - i) + "</td>"
+    htmldata += "<td>&nbsp;</td></tr>"
+    for row in fmtboard:
+        htmldata += "<tr><td class='board-label'>" + str(row[0][1])[1] + "</td>"
+        for col in row:
+            if(col[1] == movesrc or col[1] == movedst):
+                htmldata += "<td id='" + str(col[1]) + "' class='hint' value='" + str(col[0]) + "'>"
+            else:
+                htmldata += "<td id='" + str(col[1]) + "' value='" + str(col[0]) + "'>"
+
+            if(col[0] == 0):
+                htmldata += "&nbsp;"
+            else:
+                piece = helper.reverse_lookup(Match.PIECES, col[0])
+                htmldata += "<img src='" + "/static/img/" + piece + ".png'>"
+            htmldata += "</td>"
+        htmldata += "<td class='board-label'>" + str(row[0][1])[1] + "</td></tr>"
+    htmldata += "<tr id='board-letters2'><td>&nbsp;</td>"
+    if(switch == 0):
+        for i in range(8):
+            htmldata += "<td>" + chr(i + ord('A')) + "</td>"
+    else:
+        for i in range(8):
+            htmldata += "<td>" + chr(ord('H') - i) + "</td>"
+    htmldata += "<td>&nbsp;</td></tr></table>"
+    return htmldata
+
+
+def fill_fmtmoves(match):
+    fmtmoves = []
+    currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+    if(currmove == None):
+        return fmtmoves
+    else:
+        if(currmove.count % 2 == 0):
+            limit = 42
+        else:
+            limit = 41
+        moves = Move.objects.filter(match_id=match.id).order_by("count").reverse()[:limit]
+        for move in reversed(moves):
+            if(move.count % 2 == 1 ):
+                fmtmoves.append("<tr><td>" + str( (move.count + 1) // 2) + ".</td>")
+                fmtmoves.append("<td>" + move.format_move() + "&nbsp;</td>")
+            else:
+                fmtmoves.append("<td>" + move.format_move() + "</td></tr>")
+        if(len(moves) % 2 == 1):
+            fmtmoves.append("<td>&nbsp;</td></tr>")
+        return fmtmoves
+
+
+def html_moves(match):
+    fmtmoves = []
+    fmtmoves = fill_fmtmoves(match)
+    htmldata = ""
+    for col in fmtmoves:
+        htmldata += col
+    return htmldata
 
 
 def index(request):
@@ -29,10 +125,10 @@ def match(request, matchid=None, switch=0, markmove=0):
     if(int(markmove) == 1):
         lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
         if(lastmove != None):
-            movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
-            movedst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
-    fmtboard = match.fill_fmtboard(int(switch))
-    fmtmoves = Move.fill_fmtmoves(match)
+            movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
+            movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
+    fmtboard = fill_fmtboard(match, int(switch))
+    fmtmoves = fill_fmtmoves(match)
     comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
     fmtmsg = "<p class='ok'></p>"
     if(int(switch) == 0):
@@ -121,8 +217,8 @@ def do_move(request, matchid):
         switch = request.POST['switch']
         if(match.next_color_human()):
             if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
-                srcx,srcy = values.koord_to_index(movesrc)
-                dstx,dsty = values.koord_to_index(movedst)
+                srcx,srcy = Match.koord_to_index(movesrc)
+                dstx,dsty = Match.koord_to_index(movedst)
                 prom_piece = match.PIECES[prompiece]
                 flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
                 status = rules.game_status(match)
@@ -139,13 +235,13 @@ def do_move(request, matchid):
         else:
             fmtmsg = "<p class='error'>Mensch ist nicht am Zug.</p>"
 
-        fmtboard = match.fill_fmtboard(int(switch))
-        fmtmoves = Move.fill_fmtmoves(match)
+        fmtboard = fill_fmtboard(match, int(switch))
+        fmtmoves = fill_fmtmoves(match)
         comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
 
         status = rules.game_status(match)
         if(status != Match.STATUS['open']):
-            fmtmsg = "<p class='error'>" + values.reverse_lookup(Match.STATUS, status) + "</p>"
+            fmtmsg = "<p class='error'>" + helper.reverse_lookup(Match.STATUS, status) + "</p>"
 
         if(int(switch) == 0):
             rangeobj = range(8)
@@ -204,8 +300,8 @@ def fetch_board(request):
     else:
         lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
         if(lastmove != None):
-            movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
-            movedst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
+            movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
+            movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
         if(int(movecnt) == match.count):
             data = ""
         else:
@@ -223,6 +319,6 @@ def fetch_board(request):
 
             html_player += "</td></tr>"
 
-            data = match.html_board(int(switchflag), movesrc, movedst) + ":" + html_player + Move.html_moves(match)
+            data = html_board(match, int(switchflag), movesrc, movedst) + ":" + html_player + html_moves(match)
     return HttpResponse(data)
 

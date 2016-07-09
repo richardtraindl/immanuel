@@ -1,5 +1,5 @@
 from kate.models import Match, Move
-from kate.modules import values, rules, openings, calc_helper, debug
+from kate.modules import helper, rules, openings, calc_helper, debug
 import random, threading, copy, time 
 
 
@@ -244,17 +244,17 @@ class immanuelsThread(threading.Thread):
 
         if(self.match.level == Match.LEVEL['blitz']):
             maxdepth = 2
-            extdepth = 6
+            extdepth = 4
         elif(self.match.level == Match.LEVEL['medium']):
             maxdepth = 3
-            extdepth = 7
+            extdepth = 5
         elif(self.match.level == Match.LEVEL['high']):
             maxdepth = 4
-            extdepth = 8
+            extdepth = 6
         else:
             # professional
             maxdepth = 5
-            extdepth = 10
+            extdepth = 8
 
         gmove = calc_move(self.match, maxdepth, extdepth)
         if(gmove != None):
@@ -294,9 +294,9 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
             if(depth == 1):
                 lastmove = match.move_list[-1]
                 print("\ndepth: 1, match.id: " + str(match.id) + ", calculated move: "
-                        + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
-                        + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
-                        + values.reverse_lookup(Match.PIECES, lastmove.prom_piece))
+                        + Match.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
+                        + Match.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
+                        + helper.reverse_lookup(Match.PIECES, lastmove.prom_piece))
             elif(depth == 2):
                 print('.', end="")
 
@@ -309,14 +309,15 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                 else:
                     attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
                     promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty == 6
+
                 if(oldscore != match.score or attacked or promotion):
                     newscore, calc_move = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)
                 else:
                     newscore = match.score
             else:
-                newscore = match.score + calc_helper.eval_contacts(match)
-                if(match.count <= 10):
-                    newscore += calc_helper.count_moves(match)
+                pos_score = calc_helper.eval_pos(match) / 5
+                # print("pos_score: " + str(pos_score))
+                newscore = match.score + pos_score
 
             newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
             match.undo_move(True)
@@ -359,8 +360,8 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
             if(depth == 1):
                 lastmove = match.move_list[-1]
                 print("\ndepth: 1, match.id: " + str(match.id) + ", calculated move: "
-                        + values.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
-                        + values.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
+                        + Match.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
+                        + Match.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
                         + str(lastmove.prom_piece))
             elif(depth == 2):
                 print('.', end="")
@@ -374,14 +375,15 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                 else:
                     attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
                     promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty == 6
+
                 if(oldscore != match.score or attacked or promotion):
                     newscore, calc_move = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)
                 else:
                     newscore = match.score
             else:
-                newscore = match.score + calc_helper.eval_contacts(match)
-                if(match.count <= 10):
-                    newscore += calc_helper.count_moves(match)
+                pos_score = calc_helper.eval_pos(match) / 5
+                # print("pos_score: " + str(pos_score))
+                newscore = match.score + pos_score
 
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
             match.undo_move(True)

@@ -1,5 +1,5 @@
 from kate.models import Match, Move, OpeningMove
-from kate.modules import values, rules, calc
+from kate.modules import rules, calc
 import random, copy
 
 
@@ -31,8 +31,8 @@ def generate_move(match, cnt):
         return CNT + 1, None
 
     for i in range(cnt, CNT):
-        x1, y1 = values.koord_to_index(move_list[i][0])
-        x2, y2 = values.koord_to_index(move_list[i][1])
+        x1, y1 = Match.koord_to_index(move_list[i][0])
+        x2, y2 = Match.koord_to_index(move_list[i][1])
         if(rules.is_move_valid(match, x1, y1, x2, y2, Match.PIECES['blk'])[0]):
             gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
             return i, gmove
@@ -45,8 +45,8 @@ def retrieve_move(match):
         omoves = OpeningMove.objects.filter(movecnt=1)
         if(omoves):
             idx = random.randint(0, len(omoves) - 1)
-            x1, y1 = values.koord_to_index(omoves[idx].src)
-            x2, y2 = values.koord_to_index(omoves[idx].dst)
+            x1, y1 = Match.koord_to_index(omoves[idx].src)
+            x2, y2 = Match.koord_to_index(omoves[idx].dst)
             gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
             print("------------ opening move found! --------------")
             return gmove
@@ -55,8 +55,8 @@ def retrieve_move(match):
             return None
 
     lastmove = Move.objects.get(match_id=match.id, count=match.count)
-    movesrc = values.index_to_koord(lastmove.srcx, lastmove.srcy)
-    movedst = values.index_to_koord(lastmove.dstx, lastmove.dsty)
+    movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
+    movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
     prev_omoves = OpeningMove.objects.filter(movecnt=match.count, src=movesrc, dst=movedst)
     prev_list = list(prev_omoves)
 
@@ -69,8 +69,8 @@ def retrieve_move(match):
             except Move.DoesNotExist:
                 print("---------None---------")
                 return None
-            prevsrc = values.index_to_koord(move.srcx, move.srcy)
-            prevdst = values.index_to_koord(move.dstx, move.dsty)
+            prevsrc = Match.index_to_koord(move.srcx, move.srcy)
+            prevdst = Match.index_to_koord(move.dstx, move.dsty)
             if(previous.src != prevsrc or previous.dst != prevdst):
                 prev_list.remove(prev_omove)
                 break
@@ -81,8 +81,8 @@ def retrieve_move(match):
         omoves = OpeningMove.objects.filter(movecnt=match.count + 1, previous_id=previous.id)
         if(omoves):
             idx = random.randint(0, len(omoves) - 1)
-            x1, y1 = values.koord_to_index(omoves[idx].src)
-            x2, y2 = values.koord_to_index(omoves[idx].dst)
+            x1, y1 = Match.koord_to_index(omoves[idx].src)
+            x2, y2 = Match.koord_to_index(omoves[idx].dst)
             gmove = calc.GenMove(x1, y1, x2, y2, Match.PIECES['blk'])
             print("------------ opening move found! --------------")
             return gmove
