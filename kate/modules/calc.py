@@ -315,7 +315,7 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                 else:
                     newscore = match.score
             else:
-                pos_score = calc_helper.eval_pos(match) / 5
+                pos_score = calc_helper.eval_pos(match)
                 # print("pos_score: " + str(pos_score))
                 newscore = match.score + pos_score
 
@@ -381,7 +381,7 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                 else:
                     newscore = match.score
             else:
-                pos_score = calc_helper.eval_pos(match) / 5
+                pos_score = calc_helper.eval_pos(match)
                 # print("pos_score: " + str(pos_score))
                 newscore = match.score + pos_score
 
