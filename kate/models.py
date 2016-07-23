@@ -198,9 +198,9 @@ class Match(models.Model):
                     self.wKg_first_movecnt = self.count
                 else:
                     self.bKg_x = dstx
-                    self.bKg_y = dsty              
+                    self.bKg_y = dsty
                     self.bKg_first_movecnt = self.count
-                
+
                 move.move_type = Move.TYPES['short_castling']
                 move.captured_piece = dstpiece
                 return move
@@ -217,9 +217,9 @@ class Match(models.Model):
                     self.wKg_first_movecnt = self.count
                 else:
                     self.bKg_x = dstx
-                    self.bKg_y = dsty              
+                    self.bKg_y = dsty
                     self.bKg_first_movecnt = self.count
-                
+
                 move.move_type = Move.TYPES['long_castling']
                 move.captured_piece = dstpiece
                 return move
@@ -232,11 +232,13 @@ class Match(models.Model):
         if(srcpiece == Match.PIECES['wKg']):
             self.wKg_x = dstx
             self.wKg_y = dsty
-            self.wKg_first_movecnt = self.count
+            if(self.wKg_first_movecnt == 0):
+                self.wKg_first_movecnt = self.count
         elif(srcpiece == Match.PIECES['bKg']):
             self.bKg_x = dstx
             self.bKg_y = dsty
-            self.bKg_first_movecnt = self.count
+            if(self.bKg_first_movecnt == 0):
+                self.bKg_first_movecnt = self.count
         if(srcpiece == Match.PIECES['wRk']):
             if(srcx == 0 and srcy == 0 and self.wRk_a1_first_movecnt == 0):
                 self.wRk_a1_first_movecnt = self.count

@@ -16,18 +16,18 @@ def eval_contacts(match):
                 continue
             elif(Match.color_of_piece(piece) == Match.COLORS['white']):
                 if(rules.attacked(match, x, y, Match.COLORS['white'])):
-                    if(rules.attacked(match, x, y, Match.COLORS['black'])):
-                        supported_whites += 4
-                    else:
-                        supported_whites += 1
+                    #if(rules.attacked(match, x, y, Match.COLORS['black'])):
+                        #supported_whites += 2
+                    #else:
+                    supported_whites += 1
                 if(rules.attacked(match, x, y, Match.COLORS['black'])):
                     attacked_whites += 1
             else:
                 if(rules.attacked(match, x, y, Match.COLORS['black'])):
-                    if(rules.attacked(match, x, y, Match.COLORS['white'])):
-                        supported_blacks += 4
-                    else:
-                        supported_blacks += 1
+                    #if(rules.attacked(match, x, y, Match.COLORS['white'])):
+                        #supported_blacks += 2
+                    #else:
+                    supported_blacks += 1
                 if(rules.attacked(match, x, y, Match.COLORS['white'])):
                     attacked_blacks += 1
 
@@ -45,33 +45,35 @@ def eval_piece_moves(match, srcx, srcy):
         return movecnt
         
     if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
-        steps = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+        dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 8
         stepcnt = 7
     if(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
-        steps = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
+        dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
         dircnt = 4
         stepcnt = 7
     elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
-        steps = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+        dirs = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 4
         stepcnt = 7
     elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
-        steps =  [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
+        dirs =  [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
         dircnt = 8
         stepcnt = 1
     else:
         return movecnt
 
-    for i in range(dircnt):
-        for j in range(stepcnt):
-            dstx = srcx + steps[i][0]
-            dsty = srcx + steps[i][1]
+    for j in range(dircnt):
+        stepx = dirs[j][0]
+        stepy = dirs[j][1]
+        dstx = srcx
+        dsty = srcy
+        for i in range(stepcnt):
+            dstx += stepx
+            dsty += stepy
             if(rules.is_move_inbounds(srcx, srcy, dstx, dsty)):
                 if(rules.is_move_valid(match, srcx, srcy, dstx, dsty, Match.PIECES['blk'])):
                     movecnt += 1
-                dstx = dstx + steps[i][0]
-                dsty = dsty + steps[i][1]
             else:
                 break
 
@@ -88,15 +90,41 @@ def eval_move_cnt(match):
     return movecnt
 
 
+
+def eval_developments(match):
+    developed_whites = 0
+    developed_blacks = 0
+
+    for y in range(0, 8, 1):
+        for x in range(0, 8, 1):
+            piece = match.readfield(x, y)
+            if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
+                continue
+            elif(Match.color_of_piece(piece) == Match.COLORS['white']):
+                if(piece == Match.PIECES['wKn'] or piece == Match.PIECES['wBp'] or piece == Match.PIECES['wQu']):
+                    if(y > 0):
+                        developed_whites += 1
+            else:
+                if(piece == Match.PIECES['bKn'] or piece == Match.PIECES['bBp'] or piece == Match.PIECES['bQu']):
+                    if(y < 7):
+                        developed_blacks += 1
+
+    return developed_whites + (developed_blacks * -1)
+
+
 def eval_pos(match):
     movecnt = eval_move_cnt(match)
-    # print("movecnts: " + str(movecnt))
+    print("movecnts: " + str(movecnt))
 
     contacts = eval_contacts(match)
-    # print("contacts: " + str(contacts))
+    print("contacts: " + str(contacts))
+
+    developments = eval_developments(match)
+    print("developments: " + str(developments))
+    print("****************************")
 
     if(match.next_color() == Match.COLORS['white']):
-        return (movecnt + contacts)
+        return (movecnt + contacts + developments)
     else:
-        return (movecnt + contacts)
+        return (movecnt + contacts + developments)
 

@@ -284,6 +284,9 @@ def game_status(match):
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
+    #print(" counts " + str(match.wKg_first_movecnt) + " " + str(match.wRk_h1_first_movecnt)  + " " + str(match.wRk_a1_first_movecnt))
+    #print(" counts " + str(match.bKg_first_movecnt) + " " + str(match.bRk_h8_first_movecnt)  + " " + str(match.bRk_a8_first_movecnt))
+    #print("-------------------------------------------")
     if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
         return False, ERROR_CODES['out-of-bounds']
 

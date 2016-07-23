@@ -44,8 +44,8 @@ KG_STEPS = [ [[0, 1]],
              [[-1, -1]],
              [[-1, 0]],
              [[-1, 1]],
-             [[0, 2]],
-             [[0, -2]] ]
+             [[2, 0]],
+             [[-2, 0]] ]
 
 
 WPW_STEPS = [ [[0, 1]],
@@ -243,18 +243,18 @@ class immanuelsThread(threading.Thread):
             self.match.move_list.append(move)
 
         if(self.match.level == Match.LEVEL['blitz']):
-            maxdepth = 2
-            extdepth = 4
+            maxdepth = 1
+            extdepth = 3
         elif(self.match.level == Match.LEVEL['medium']):
             maxdepth = 3
             extdepth = 5
         elif(self.match.level == Match.LEVEL['high']):
-            maxdepth = 4
-            extdepth = 6
+            maxdepth = 5
+            extdepth = 7
         else:
             # professional
-            maxdepth = 5
-            extdepth = 8
+            maxdepth = 7
+            extdepth = 9
 
         gmove = calc_move(self.match, maxdepth, extdepth)
         if(gmove != None):
@@ -313,10 +313,10 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                 if(oldscore != match.score or attacked or promotion):
                     newscore, calc_move = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)
                 else:
-                    newscore = match.score
+                    pos_score = calc_helper.eval_pos(match)
+                    newscore = match.score + pos_score
             else:
                 pos_score = calc_helper.eval_pos(match)
-                # print("pos_score: " + str(pos_score))
                 newscore = match.score + pos_score
 
             newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
@@ -379,10 +379,10 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                 if(oldscore != match.score or attacked or promotion):
                     newscore, calc_move = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)
                 else:
-                    newscore = match.score
+                    pos_score = calc_helper.eval_pos(match)
+                    newscore = match.score + pos_score
             else:
                 pos_score = calc_helper.eval_pos(match)
-                # print("pos_score: " + str(pos_score))
                 newscore = match.score + pos_score
 
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
