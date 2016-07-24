@@ -439,10 +439,10 @@ class Move(models.Model):
                 hyphen = "-"
             else:
                 hyphen = "x"
-            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty) + " " + values.reverse_lookup(Match.PIECES, self.prom_piece)
+            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty) + " " + helper.reverse_lookup(Match.PIECES, self.prom_piece)
             return fmtmove
         else:
-            fmtmove= values.index_to_koord(self.srcx, self.srcy) + "x" + Match.index_to_koord(self.dstx, self.dsty) + " e.p."
+            fmtmove= helper.index_to_koord(self.srcx, self.srcy) + "x" + Match.index_to_koord(self.dstx, self.dsty) + " e.p."
             return fmtmove
 
 class Comment(models.Model):

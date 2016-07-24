@@ -246,15 +246,15 @@ class immanuelsThread(threading.Thread):
             maxdepth = 1
             extdepth = 3
         elif(self.match.level == Match.LEVEL['medium']):
+            maxdepth = 2
+            extdepth = 4
+        elif(self.match.level == Match.LEVEL['high']):
             maxdepth = 3
             extdepth = 5
-        elif(self.match.level == Match.LEVEL['high']):
-            maxdepth = 5
-            extdepth = 7
         else:
             # professional
-            maxdepth = 7
-            extdepth = 9
+            maxdepth = 4
+            extdepth = 6
 
         gmove = calc_move(self.match, maxdepth, extdepth)
         if(gmove != None):

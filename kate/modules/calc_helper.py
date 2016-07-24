@@ -1,5 +1,5 @@
 from kate.models import Match, Move
-from kate.modules import rules, debug
+from kate.modules import rules, debug, helper
 
 
 def eval_contacts(match):
@@ -48,7 +48,7 @@ def eval_piece_moves(match, srcx, srcy):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 8
         stepcnt = 7
-    if(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
+    elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
         dircnt = 4
         stepcnt = 7
@@ -71,10 +71,10 @@ def eval_piece_moves(match, srcx, srcy):
         for i in range(stepcnt):
             dstx += stepx
             dsty += stepy
-            if(rules.is_move_inbounds(srcx, srcy, dstx, dsty)):
-                if(rules.is_move_valid(match, srcx, srcy, dstx, dsty, Match.PIECES['blk'])):
-                    movecnt += 1
-            else:
+            flag,errcode = rules.is_move_valid(match, srcx, srcy, dstx, dsty, Match.PIECES['blk'])
+            if(flag):
+                movecnt += 1
+            elif(errcode == rules.ERROR_CODES['out-of-bounds']):
                 break
 
     return movecnt
@@ -119,8 +119,12 @@ def eval_pos(match):
     contacts = eval_contacts(match)
     print("contacts: " + str(contacts))
 
-    developments = eval_developments(match)
-    print("developments: " + str(developments))
+    if(match.count < 12):
+        developments = eval_developments(match)
+        print("developments: " + str(developments))
+    else:
+        developments = 0
+
     print("****************************")
 
     if(match.next_color() == Match.COLORS['white']):
