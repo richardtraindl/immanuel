@@ -48,12 +48,12 @@ def eval_piece_moves(match, srcx, srcy):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 8
         stepcnt = 7
-        value = 0.5
+        value = 0.4
     elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
         dircnt = 4
         stepcnt = 7
-        value = 1
+        value = 0.5
     elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
         dirs = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 4

@@ -304,13 +304,17 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                 newscore = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)[0]
             elif(depth <= extdepth):
                 if(color == Match.COLORS['white']):
-                    attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+                    wkg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+                    bkg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+                    kings_attacked = wkg_attacked or bkg_attacked
                     promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty == 1
                 else:
-                    attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+                    bkg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+                    wkg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+                    kings_attacked = wkg_attacked or bkg_attacked
                     promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty == 6
 
-                if(oldscore != match.score or attacked or promotion):
+                if(oldscore != match.score or kings_attacked or promotion):
                     newscore, calc_move = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)
                 else:
                     pos_score = calc_helper.eval_pos(match)
@@ -370,13 +374,17 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                 newscore = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)[0]
             elif(depth <= extdepth):
                 if(color == Match.COLORS['white']):
-                    attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+                    wkg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+                    bkg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+                    kings_attacked = wkg_attacked or bkg_attacked
                     promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty == 1
                 else:
-                    attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+                    bkg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+                    wkg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+                    kings_attacked = wkg_attacked or bkg_attacked
                     promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty == 6
 
-                if(oldscore != match.score or attacked or promotion):
+                if(oldscore != match.score or kings_attacked or promotion):
                     newscore, calc_move = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)
                 else:
                     pos_score = calc_helper.eval_pos(match)
