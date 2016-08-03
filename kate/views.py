@@ -129,7 +129,7 @@ def match(request, matchid=None, switch=0, markmove=0):
             movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
     fmtboard = fill_fmtboard(match, int(switch))
     fmtmoves = fill_fmtmoves(match)
-    comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
+    comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:3]
     fmtmsg = "<p class='ok'></p>"
     if(int(switch) == 0):
         rangeobj = range(8)
@@ -237,7 +237,7 @@ def do_move(request, matchid):
 
         fmtboard = fill_fmtboard(match, int(switch))
         fmtmoves = fill_fmtmoves(match)
-        comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:5]
+        comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:3]
 
         status = rules.game_status(match)
         if(status != Match.STATUS['open']):
@@ -282,7 +282,7 @@ def fetch_comments(request):
     context = RequestContext(request)
     if request.method == 'GET':
         matchid = request.GET['matchid']
-        comments = Comment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:5]
+        comments = Comment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:3]
         data = ""
         for comment in reversed(comments):
             data += "<p>" + comment.text + "</p>"

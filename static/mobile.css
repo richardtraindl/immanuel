@@ -1,0 +1,46 @@
+/* CSS for mobile */
+
+
+* {
+    font-size: 24px;
+}
+
+#chat p {
+    font-size: 18px;
+}
+
+#comments{
+    height: 80px;
+}
+
+#board-wrapper {
+    margin: 0px auto;
+    width: 100%;
+}
+
+#board td {
+    width: 64px; 
+    height: 64px;
+}
+
+#board img {
+    width: 64px; 
+    height: 64px;
+}
+
+#board-letters1 td, #board-letters2 td, .board-label {
+    font-size: 20px !important;
+}
+
+#board-letters1 td:first-child, #board-letters1 td:nth-child(10),
+#board-letters2 td:first-child, #board-letters2 td:nth-child(10) {
+    width: 32px !important;
+}
+
+#board-letters1 td, #board-letters2 td {
+    height: 32px !important;
+}
+
+#minutes table {
+    margin: 0px 0px 0px 30px;
+}

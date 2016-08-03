@@ -82,7 +82,7 @@ div[class*='row_'] {
     width: 7.33%;
 }
 
-@media only screen and (max-width: 679px) {
+@media only screen and (max-width: 1024px) {
     header, header * {
         display: inline-block;
     }

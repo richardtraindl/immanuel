@@ -117,22 +117,19 @@ def eval_developments(match):
 
 
 def eval_pos(match):
-    movecnt = eval_move_cnt(match)
-    print("movecnts: " + str(movecnt))
-
     contacts = eval_contacts(match)
-    print("contacts: " + str(contacts))
-
+    
     if(match.count < 12):
+        movecnt = eval_move_cnt(match)        
         developments = eval_developments(match)
-        print("developments: " + str(developments))
     else:
+        movecnt = 0
         developments = 0
 
+    print("contacts: " + str(contacts))
+    print("movecnts: " + str(movecnt))
+    print("developments: " + str(developments))
     print("****************************")
 
-    if(match.next_color() == Match.COLORS['white']):
-        return (movecnt + contacts + developments)
-    else:
-        return (movecnt + contacts + developments)
+    return (movecnt + contacts + developments)
 
