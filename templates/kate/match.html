@@ -171,8 +171,13 @@
                             {% endif %}
                         </td>
                     </tr>
-                    {% for col in fmtmoves %}
-                        {{ col|safe }}
+                    {% for move in moves %}
+                        {% if move.count|iseven == False %}
+                            <tr><td>{{ move.count|chesscnt }}. &nbsp;</td>
+                            <td>{{ move.format_move }}</td>
+                        {% else %}
+                            <td>{{ move.format_move }}</td></tr>
+                        {% endif %}
                     {% endfor %}
                 </table>
             </div>

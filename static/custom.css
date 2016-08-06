@@ -183,16 +183,8 @@ nav li a:active {
 }
 
 #minutes table {
-    margin: 0px auto;
-}
-
-#minutes td:first-child {
-    min-width: 30px;
-    width: 30px;
-}
-
-#minutes td {
-    min-width: 80px;
+    width: 200px;
+    margin: 0px;
 }
 
 button, input[type="submit"]{

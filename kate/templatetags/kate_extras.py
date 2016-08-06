@@ -35,6 +35,14 @@ def letter(value):
 def lower(value):
     return value.lower()
 
+@register.filter(name='iseven')
+def iseven(count):
+    return ((count % 2) == 0)
+
+@register.filter(name='chesscnt')
+def chesscnt(count):
+    return ((count + 1) // 2)
+
     # {{ somevariable|lower:"0" }}
 
 
