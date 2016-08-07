@@ -66,9 +66,9 @@ def match(request, matchid=None, switch=0, markmove=0):
     currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
     if(currmove != None):
         if(currmove.count % 2 == 0):
-            limit = 32
+            limit = 22
         else:
-            limit = 31
+            limit = 21
         qmoves = Move.objects.filter(match_id=match.id).order_by("-count")[:limit]
         for qmove in reversed(qmoves):
             moves.append(qmove)
@@ -286,9 +286,9 @@ def html_moves(match):
     htmlmoves = "<table>"
     htmlmoves += "<tr><td>&nbsp;</td>"
     if(match.white_player_human == False):
-        htmlmoves += "<td><span class='fbold'>" + match.white_player + "</span></td>"
+        htmlmoves += "<td><span class='fbold'>&nbsp;" + match.white_player + "</span></td>"
     else:
-        htmlmoves += "<td>" + match.white_player + "</td>"
+        htmlmoves += "<td>&nbsp;" + match.white_player + "</td>"
     if(match.black_player_human == False):
         htmlmoves += "<td><span class='fbold'>" + match.black_player + "</span></td>"
     else:
@@ -297,9 +297,9 @@ def html_moves(match):
     currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
     if(currmove != None):
         if(currmove.count % 2 == 0):
-            limit = 42
+            limit = 22
         else:
-            limit = 41
+            limit = 21
         moves = Move.objects.filter(match_id=match.id).order_by("count").reverse()[:limit]
         for move in reversed(moves):
             if(move.count % 2 == 1 ):
