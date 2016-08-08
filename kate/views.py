@@ -203,7 +203,6 @@ def do_move(request, matchid):
         else:
             rangeobj = range(7, -1, -1)
 
-        #return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'fmtmoves': fmtmoves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } )
         return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } )
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
@@ -300,7 +299,8 @@ def html_moves(match):
             limit = 22
         else:
             limit = 21
-        moves = Move.objects.filter(match_id=match.id).order_by("count").reverse()[:limit]
+        #moves = Move.objects.filter(match_id=match.id).order_by("count").reverse()[:limit]
+        moves = Move.objects.filter(match_id=match.id).order_by("-count")[:limit]
         for move in reversed(moves):
             if(move.count % 2 == 1 ):
                 htmlmoves += "<tr><td>" + str( (move.count + 1) // 2) + ".</td>"
