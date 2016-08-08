@@ -185,9 +185,9 @@ def do_move(request, matchid):
         currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
         if(currmove != None):
             if(currmove.count % 2 == 0):
-                limit = 32
+                limit = 22
             else:
-                limit = 31
+                limit = 21
             qmoves = Move.objects.filter(match_id=match.id).order_by("-count")[:limit]
             for qmove in reversed(qmoves):
                 moves.append(qmove)
@@ -285,9 +285,9 @@ def html_moves(match):
     htmlmoves = "<table>"
     htmlmoves += "<tr><td>&nbsp;</td>"
     if(match.white_player_human == False):
-        htmlmoves += "<td><span class='fbold'>&nbsp;" + match.white_player + "</span></td>"
+        htmlmoves += "<td><span class='fbold'>" + match.white_player + "</span>&nbsp;</td>"
     else:
-        htmlmoves += "<td>&nbsp;" + match.white_player + "</td>"
+        htmlmoves += "<td>" + match.white_player + "&nbsp;</td>"
     if(match.black_player_human == False):
         htmlmoves += "<td><span class='fbold'>" + match.black_player + "</span></td>"
     else:
@@ -303,8 +303,8 @@ def html_moves(match):
         moves = Move.objects.filter(match_id=match.id).order_by("-count")[:limit]
         for move in reversed(moves):
             if(move.count % 2 == 1 ):
-                htmlmoves += "<tr><td>" + str( (move.count + 1) // 2) + ".</td>"
-                htmlmoves += "<td>" + move.format_move() + "&nbsp;</td>"
+                htmlmoves += "<tr><td>" + str( (move.count + 1) // 2) + ". &nbsp;</td>"
+                htmlmoves += "<td>" + move.format_move() + "</td>"
             else:
                 htmlmoves += "<td>" + move.format_move() + "</td></tr>"
         if(len(moves) % 2 == 1):
