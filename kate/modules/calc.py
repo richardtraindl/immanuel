@@ -317,11 +317,9 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                 if(oldscore != match.score or kings_attacked or promotion):
                     newscore, calc_move = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)
                 else:
-                    pos_score = calc_helper.evaluate_position(match)
-                    newscore = match.score + pos_score
+                    newscore = match.score + calc_helper.evaluate_position(match)
             else:
-                pos_score = calc_helper.evaluate_position(match)
-                newscore = match.score + pos_score
+                newscore = match.score + calc_helper.evaluate_position(match)
 
             newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
             match.undo_move(True)
@@ -387,11 +385,9 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                 if(oldscore != match.score or kings_attacked or promotion):
                     newscore, calc_move = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)
                 else:
-                    pos_score = calc_helper.evaluate_position(match)
-                    newscore = match.score + pos_score
+                    newscore = match.score + calc_helper.evaluate_position(match)
             else:
-                pos_score = calc_helper.evaluate_position(match)
-                newscore = match.score + pos_score
+                newscore = match.score + calc_helper.evaluate_position(match)
 
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
             match.undo_move(True)
