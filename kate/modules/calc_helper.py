@@ -2,7 +2,7 @@ from kate.models import Match, Move
 from kate.modules import rules, debug, helper
 
 
-def eval_contacts(match):
+def evaluate_contacts(match):
     supported_whites = 0
     attacked_whites = 0
     supported_blacks = 0
@@ -15,28 +15,18 @@ def eval_contacts(match):
             if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
                 continue
             elif(Match.color_of_piece(piece) == Match.COLORS['white']):
-                if(rules.attacked(match, x, y, Match.COLORS['white'])):
-                    #if(rules.attacked(match, x, y, Match.COLORS['black'])):
-                        #supported_whites += 2
-                    #else:
-                    supported_whites += 1
-                if(rules.attacked(match, x, y, Match.COLORS['black'])):
-                    attacked_whites += 1
+                supported_whites += count_attacks(match, x, y, Match.COLORS['white'])
+                attacked_whites += count_attacks(match, x, y, Match.COLORS['black'])
             else:
-                if(rules.attacked(match, x, y, Match.COLORS['black'])):
-                    #if(rules.attacked(match, x, y, Match.COLORS['white'])):
-                        #supported_blacks += 2
-                    #else:
-                    supported_blacks += 1
-                if(rules.attacked(match, x, y, Match.COLORS['white'])):
-                    attacked_blacks += 1
+                supported_blacks += count_attacks(match, x, y, Match.COLORS['black'])
+                attacked_blacks += count_attacks(match, x, y, Match.COLORS['white'])
 
     eval_white = (supported_whites - attacked_whites)
     eval_black = (supported_blacks - attacked_blacks) * -1
     return eval_white + eval_black
 
 
-def eval_piece_moves(match, srcx, srcy):
+def evaluate_piece_moves(match, srcx, srcy):
     color = match.next_color()
     piece = match.readfield(srcx, srcy)
     movecnt = 0
@@ -84,18 +74,17 @@ def eval_piece_moves(match, srcx, srcy):
     return movecnt
 
 
-def eval_move_cnt(match):
+def evaluate_movecnt(match):
     movecnt = 0
 
     for y1 in range(8):
         for x1 in range(8):
-            movecnt += eval_piece_moves(match, x1, y1)
+            movecnt += evaluate_piece_moves(match, x1, y1)
 
     return movecnt
 
 
-
-def eval_developments(match):
+def evaluate_developments(match):
     developed_whites = 0
     developed_blacks = 0
 
@@ -116,15 +105,14 @@ def eval_developments(match):
     return developed_whites + (developed_blacks * -1)
 
 
-def eval_pos(match):
+def evaluate_position(match):
+    movecnt = 0
+    developments = 0
     contacts = eval_contacts(match)
-    
-    if(match.count < 12):
-        movecnt = eval_move_cnt(match)        
-        developments = eval_developments(match)
-    else:
-        movecnt = 0
-        developments = 0
+
+    if(match.count < 16):
+        movecnt = evaluate_movecnt(match)
+        developments = evaluate_developments(match)
 
     print("contacts: " + str(contacts))
     print("movecnts: " + str(movecnt))
