@@ -285,9 +285,9 @@ def html_moves(match):
     htmlmoves = "<table>"
     htmlmoves += "<tr><td>&nbsp;</td>"
     if(match.white_player_human == False):
-        htmlmoves += "<td><span class='fbold'>" + match.white_player + "</span>&nbsp;</td>"
+        htmlmoves += "<td><span class='fbold'>" + match.white_player + "</span></td>"
     else:
-        htmlmoves += "<td>" + match.white_player + "&nbsp;</td>"
+        htmlmoves += "<td>" + match.white_player + "</td>"
     if(match.black_player_human == False):
         htmlmoves += "<td><span class='fbold'>" + match.black_player + "</span></td>"
     else:
@@ -299,11 +299,10 @@ def html_moves(match):
             limit = 22
         else:
             limit = 21
-        #moves = Move.objects.filter(match_id=match.id).order_by("count").reverse()[:limit]
         moves = Move.objects.filter(match_id=match.id).order_by("-count")[:limit]
         for move in reversed(moves):
             if(move.count % 2 == 1 ):
-                htmlmoves += "<tr><td>" + str( (move.count + 1) // 2) + ". &nbsp;</td>"
+                htmlmoves += "<tr><td>" + str( (move.count + 1) // 2) + ".</td>"
                 htmlmoves += "<td>" + move.format_move() + "</td>"
             else:
                 htmlmoves += "<td>" + move.format_move() + "</td></tr>"

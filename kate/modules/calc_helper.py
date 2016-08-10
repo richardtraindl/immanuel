@@ -15,11 +15,11 @@ def evaluate_contacts(match):
             if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
                 continue
             elif(Match.color_of_piece(piece) == Match.COLORS['white']):
-                supported_whites += count_attacks(match, x, y, Match.COLORS['white'])
-                attacked_whites += count_attacks(match, x, y, Match.COLORS['black'])
+                supported_whites += rules.count_attacks(match, x, y, Match.COLORS['white'])
+                attacked_whites += rules.count_attacks(match, x, y, Match.COLORS['black'])
             else:
-                supported_blacks += count_attacks(match, x, y, Match.COLORS['black'])
-                attacked_blacks += count_attacks(match, x, y, Match.COLORS['white'])
+                supported_blacks += rules.count_attacks(match, x, y, Match.COLORS['black'])
+                attacked_blacks += rules.count_attacks(match, x, y, Match.COLORS['white'])
 
     eval_white = (supported_whites - attacked_whites)
     eval_black = (supported_blacks - attacked_blacks) * -1
@@ -118,7 +118,7 @@ def evaluate_developments(match):
 
 
 def evaluate_position(match):
-    contacts = eval_contacts(match)
+    contacts = evaluate_contacts(match)
     movecnt = evaluate_movecnt(match)
 
     if(match.count < 16):
@@ -126,10 +126,10 @@ def evaluate_position(match):
     else:
         developments = 0
 
-    print("contacts: " + str(contacts))
-    print("movecnts: " + str(movecnt))
-    print("developments: " + str(developments))
-    print("****************************")
+    #print("contacts: " + str(contacts))
+    #print("movecnts: " + str(movecnt))
+    #print("developments: " + str(developments))
+    #print("****************************")
 
     return (movecnt + contacts + developments)
 

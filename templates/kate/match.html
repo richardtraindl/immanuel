@@ -158,9 +158,9 @@
                         </td>
                         <td>
                             {% if match.white_player_human == False %}
-                                <span class="fbold">{{ match.white_player }}&nbsp;</span>
+                                <span class="fbold">{{ match.white_player }}</span>
                             {% else %}
-                                {{ match.white_player }}&nbsp;
+                                {{ match.white_player }}
                             {% endif %}
                         </td>
                         <td>
@@ -173,7 +173,7 @@
                     </tr>
                     {% for move in moves %}
                         {% if move.count|iseven == False %}
-                            <tr><td>{{ move.count|chesscnt }}. &nbsp;</td>
+                            <tr><td>{{ move.count|chesscnt }}.</td>
                             <td>{{ move.format_move }}</td>
                         {% else %}
                             <td>{{ move.format_move }}</td></tr>
@@ -201,7 +201,7 @@
                 $.get('/kate/fetchcomments', { matchid: matchid }, function(data){
                     $('#comments').html(data);
                 });
-            }, 8000);
+            }, 10000);
 
             setInterval(function(){
                 var matchid;

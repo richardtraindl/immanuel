@@ -185,6 +185,10 @@ nav li a:active {
     margin: 0px;
 }
 
+#minutes td {
+    padding-right: 10px;
+}
+
 button, input[type="submit"]{
     min-width: 100px;
     height: 30px;
