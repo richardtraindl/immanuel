@@ -43,7 +43,7 @@ def evaluate_piece_moves(match, srcx, srcy):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
         dircnt = 4
         stepcnt = 7
-        value = 0.5
+        value = 1
     elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
         dirs = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 4
@@ -94,11 +94,23 @@ def evaluate_developments(match):
             if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
                 continue
             elif(Match.color_of_piece(piece) == Match.COLORS['white']):
-                if(piece == Match.PIECES['wKn'] or piece == Match.PIECES['wBp'] or piece == Match.PIECES['wQu']):
+                if(piece == Match.PIECES['wKn']):
+                    if(y > 0):
+                        developed_whites += 3
+                elif(piece == Match.PIECES['wBp']):
+                    if(y > 0):
+                        developed_whites += 2
+                elif(piece == Match.PIECES['wQu']):
                     if(y > 0):
                         developed_whites += 1
             else:
-                if(piece == Match.PIECES['bKn'] or piece == Match.PIECES['bBp'] or piece == Match.PIECES['bQu']):
+                if(piece == Match.PIECES['bKn']):
+                    if(y < 7):
+                        developed_blacks += 3
+                elif(piece == Match.PIECES['bBp']):
+                    if(y < 7):
+                        developed_blacks += 2
+                elif(piece == Match.PIECES['bQu']):
                     if(y < 7):
                         developed_blacks += 1
 
@@ -106,13 +118,13 @@ def evaluate_developments(match):
 
 
 def evaluate_position(match):
-    movecnt = 0
-    developments = 0
     contacts = eval_contacts(match)
+    movecnt = evaluate_movecnt(match)
 
     if(match.count < 16):
-        movecnt = evaluate_movecnt(match)
         developments = evaluate_developments(match)
+    else:
+        developments = 0
 
     print("contacts: " + str(contacts))
     print("movecnts: " + str(movecnt))
