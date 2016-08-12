@@ -21,9 +21,7 @@ def evaluate_contacts(match):
                 supported_blacks += rules.count_attacks(match, x, y, Match.COLORS['black'])
                 attacked_blacks += rules.count_attacks(match, x, y, Match.COLORS['white'])
 
-    eval_white = (supported_whites - attacked_whites)
-    eval_black = (supported_blacks - attacked_blacks) * -1
-    return eval_white + eval_black
+    return (supported_whites - attacked_whites) - (supported_blacks - attacked_blacks)
 
 
 def evaluate_piece_moves(match, srcx, srcy):
@@ -38,22 +36,22 @@ def evaluate_piece_moves(match, srcx, srcy):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 8
         stepcnt = 7
-        value = 0.4
+        value = 0.2
     elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
         dircnt = 4
         stepcnt = 7
-        value = 1
+        value = 0.4
     elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
         dirs = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 4
         stepcnt = 7
-        value = 1
+        value = 0.6
     elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
         dirs =  [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
         dircnt = 8
         stepcnt = 1
-        value = 1
+        value = 0.6
     else:
         return movecnt
 
@@ -81,7 +79,10 @@ def evaluate_movecnt(match):
         for x1 in range(8):
             movecnt += evaluate_piece_moves(match, x1, y1)
 
-    return movecnt
+    if(match.next_color() == Match.COLORS['white']):
+        return movecnt
+    else:
+        return (movecnt * -1)
 
 
 def evaluate_developments(match):
@@ -106,15 +107,15 @@ def evaluate_developments(match):
             else:
                 if(piece == Match.PIECES['bKn']):
                     if(y < 7):
-                        developed_blacks += 3
+                        developed_blacks -= 3
                 elif(piece == Match.PIECES['bBp']):
                     if(y < 7):
-                        developed_blacks += 2
+                        developed_blacks -= 2
                 elif(piece == Match.PIECES['bQu']):
                     if(y < 7):
-                        developed_blacks += 1
+                        developed_blacks -= 1
 
-    return developed_whites + (developed_blacks * -1)
+    return developed_whites + developed_blacks
 
 
 def evaluate_position(match):
@@ -126,10 +127,10 @@ def evaluate_position(match):
     else:
         developments = 0
 
-    #print("contacts: " + str(contacts))
-    #print("movecnts: " + str(movecnt))
-    #print("developments: " + str(developments))
-    #print("****************************")
+    print("contacts: " + str(contacts))
+    print("movecnts: " + str(movecnt))
+    print("developments: " + str(developments))
+    print("****************************")
 
     return (movecnt + contacts + developments)
 
