@@ -360,13 +360,9 @@ def calc_min(match, maxdepth, depth, alpha, beta):
             move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
             match.move_list.append(move)
             if(depth == 1):
-                lastmove = match.move_list[-1]
-                print("\ndepth: 1, match.id: " + str(match.id) + ", calculated move: "
-                        + Match.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
-                        + Match.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
-                        + str(lastmove.prom_piece))
-            elif(depth == 2):
-                print('.', end="")
+                # lastmove = match.move_list[-1]
+                print("\ncalculate ")
+                prnt_move(match, newgmove)
 
             if(depth <= maxdepth):
                 newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
@@ -403,7 +399,17 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                     newscore = Match.SCORES[Match.PIECES['blk']]
                 else:
                     newscore = match.score
+
+                if(depth == 1):
+                    print("\ncandidate ")
+                    prnt_move(match, gmove)
+                    print(" score: " + str(newscore))
                 return newscore, gmove
+
+    if(depth == 1):
+        print("\ncandidate ")
+        prnt_move(match, gmove)
+        print(" score: " + str(minscore))
     return minscore, gmove
 
 
