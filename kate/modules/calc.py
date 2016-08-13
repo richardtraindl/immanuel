@@ -242,21 +242,17 @@ class immanuelsThread(threading.Thread):
         if(move != None):
             self.match.move_list.append(move)
 
-        if(self.match.level == Match.LEVEL['blitz']):
+        if(self.match.level == Match.LEVEL['low']):
             maxdepth = 1
-            extdepth = 5
         elif(self.match.level == Match.LEVEL['medium']):
             maxdepth = 2
-            extdepth = 6
         elif(self.match.level == Match.LEVEL['high']):
             maxdepth = 3
-            extdepth = 7
         else:
             # professional
             maxdepth = 4
-            extdepth = 8
 
-        gmove = calc_move(self.match, maxdepth, extdepth)
+        gmove = calc_move(self.match, maxdepth)
         if(gmove != None):
             curr_match = Match.objects.get(id=self.match.id)
             if(curr_match.count == self.match.count and self.match.does_thread_exist(self)):
@@ -275,7 +271,7 @@ def rate(color, gmove, newgmove, score, newscore):
         return score, gmove
 
 
-def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
+def calc_max(match, maxdepth, depth, alpha, beta):
     generator = Generator()
     generator.match = match
     gmove = None
@@ -301,8 +297,8 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                 print('.', end="")
 
             if(depth <= maxdepth):
-                newscore = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)[0]
-            elif(depth <= extdepth):
+                newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
+            elif(depth <= maxdepth + 2):
                 wkg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
                 bkg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
 
@@ -310,9 +306,11 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
                 black_promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty <= 1
 
                 if(oldscore != match.score or wkg_attacked or bkg_attacked or white_promotion or black_promotion):
-                    newscore, calc_move = calc_min(match, maxdepth, extdepth, depth + 1, maxscore, beta)
+                    newscore, calc_move = calc_min(match, maxdepth, depth + 1, maxscore, beta)
                 else:
                     newscore = match.score + calc_helper.evaluate_position(match)
+            elif(depth <= maxdepth + 4 and oldscore != match.score):
+                newscore, calc_move = calc_min(match, maxdepth, depth + 1, maxscore, beta)
             else:
                 newscore = match.score + calc_helper.evaluate_position(match)
 
@@ -337,7 +335,7 @@ def calc_max(match, maxdepth, extdepth, depth, alpha, beta):
     return maxscore, gmove
 
 
-def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
+def calc_min(match, maxdepth, depth, alpha, beta):
     generator = Generator()
     generator.match = match
     gmove = None
@@ -364,8 +362,8 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                 print('.', end="")
 
             if(depth <= maxdepth):
-                newscore = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)[0]
-            elif(depth <= extdepth):
+                newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
+            elif(depth <= maxdepth + 2):
                 wkg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
                 bkg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
 
@@ -373,9 +371,11 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
                 black_promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty <= 1
 
                 if(oldscore != match.score or wkg_attacked or bkg_attacked or white_promotion or black_promotion):
-                    newscore, calc_move = calc_max(match, maxdepth, extdepth, depth + 1, alpha, minscore)
+                    newscore, calc_move = calc_max(match, maxdepth, depth + 1, alpha, minscore)
                 else:
                     newscore = match.score + calc_helper.evaluate_position(match)
+            elif(depth <= maxdepth + 4 and oldscore != match.score):
+                newscore, calc_move = calc_max(match, maxdepth, depth + 1, alpha, minscore)
             else:
                 newscore = match.score + calc_helper.evaluate_position(match)
 
@@ -400,15 +400,15 @@ def calc_min(match, maxdepth, extdepth, depth, alpha, beta):
     return minscore, gmove
 
 
-def calc_move(match, maxdepth, extdepth):
+def calc_move(match, maxdepth):
     gmove = openings.retrieve_move(match)
 
     if(gmove):
         score = match.score
     elif(match.next_color() == Match.COLORS['white']):
-        score, gmove = calc_max(match, maxdepth, extdepth, 1, -200000, 200000)
+        score, gmove = calc_max(match, maxdepth, 1, -200000, 200000)
     else:
-        score, gmove = calc_min(match, maxdepth, extdepth, 1, -200000, 200000)
+        score, gmove = calc_min(match, maxdepth, 1, -200000, 200000)
 
     if(gmove != None):
         print("result: " + str(score))
