@@ -69,7 +69,7 @@ BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']], [0,
 
 
 prnt_move(match, move):
-    print("\nmatch.id: " + str(match.id) + 
+    print("match.id: " + str(match.id) + 
           ", move: " +
               Match.index_to_koord(move.srcx, move.srcy) + " " +
               Match.index_to_koord(move.dstx, move.dsty) + " " +
@@ -299,13 +299,9 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
             match.move_list.append(move)
             if(depth == 1):
-                lastmove = match.move_list[-1]
-                print("\ndepth: 1, match.id: " + str(match.id) + ", calculated move: "
-                        + Match.index_to_koord(lastmove.srcx, lastmove.srcy) + " " 
-                        + Match.index_to_koord(lastmove.dstx, lastmove.dsty) + " " 
-                        + helper.reverse_lookup(Match.PIECES, lastmove.prom_piece))
-            elif(depth == 2):
-                print('.', end="")
+                # lastmove = match.move_list[-1]
+                print("/ncalculate ")
+                prnt_move(match, newgmove)
 
             if(depth <= maxdepth):
                 newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
