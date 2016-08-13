@@ -43,6 +43,10 @@ def iseven(count):
 def chesscnt(count):
     return ((count + 1) // 2)
 
+@register.filter(name='matchlevel')
+def matchlevel(level):
+    return helper.reverse_lookup(Match.LEVEL, level)
+
     # {{ somevariable|lower:"0" }}
 
 
