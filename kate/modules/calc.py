@@ -68,6 +68,15 @@ BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']], [0,
                 [[-1, -1, Match.PIECES['bQu']], [-1, -1, Match.PIECES['bRk']], [-1, -1, Match.PIECES['bBp']], [-1, -1, Match.PIECES['bKn']]] ]
 
 
+prnt_genmove(match, depth, genmove):
+    print("\ndepth: " + str(depth) + 
+          ", match.id: " + str(match.id) + 
+          ", calculated move: " +
+              Match.index_to_koord(genmove.srcx, genmove.srcy) + " " +
+              Match.index_to_koord(genmove.dstx, genmove.dsty) + " " +
+              helper.reverse_lookup(Match.PIECES, genmove.prom_piece))
+
+
 class GenMove(object):
     def __init__(self, srcx=None, srcy=None, dstx=None, dsty=None, prom_piece=None):
         self.srcx = srcx
