@@ -84,7 +84,7 @@ header {
 nav {
     padding: 5px;
     margin: 0px;
-    background-color: lightblue;
+    background-color: LightBlue;
 }
 
 nav ul {
@@ -145,7 +145,7 @@ nav li a:active {
 }
 
 #board  {
-    background-color: white;
+    background-color: White;
 }
 
 #board td {
@@ -154,7 +154,7 @@ nav li a:active {
 }
 
 #board tr:nth-child(odd) td:nth-child(even), #board tr:nth-child(even) td:nth-child(odd) {
-    background: gray;
+    background: Gray;
 }
 
 #board img {
@@ -213,14 +213,15 @@ a.btn, a.btn:visited, a.btn:hover {
   text-decoration: none; 
 }
 
-.error, .ok {
+.ok {
     font-weight: bold;
 }
 
 .error{
-    color: red;
+    color: Red;
+    font-weight: bold;
 }
 
 .hint {
-    background-color: lightblue !important;
+    background-color: LightBlue !important;
 }
