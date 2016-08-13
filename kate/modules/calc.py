@@ -300,7 +300,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             match.move_list.append(move)
             if(depth == 1):
                 # lastmove = match.move_list[-1]
-                print("/ncalculate ")
+                print("\ncalculate ")
                 prnt_move(match, newgmove)
 
             if(depth <= maxdepth):
@@ -338,7 +338,16 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                     newscore = Match.SCORES[Match.PIECES['blk']]
                 else:
                     newscore = match.score
+
+                if(depth == 1):
+                    print("\ncandidate ")
+                    prnt_move(match, gmove)
+                    print(" score: " + str(newscore))
                 return newscore, gmove
+    if(depth == 1):
+        print("\ncandidate ")
+        prnt_move(match, gmove)
+        print(" score: " + str(maxscore))
     return maxscore, gmove
 
 
