@@ -139,7 +139,7 @@ nav li a:active {
     padding: 0px;
     margin: 0px 5px 5px 0px;
     background-color: Beige;
-    min-height: 30px;
+    min-height: 20px;
     max-height: 30px;
     overflow: auto;
 }
