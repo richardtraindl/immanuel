@@ -46,9 +46,3 @@ def chesscnt(count):
 @register.filter(name='matchlevel')
 def matchlevel(level):
     return helper.reverse_lookup(Match.LEVEL, level)
-
-    # {{ somevariable|lower:"0" }}
-
-
-
-
