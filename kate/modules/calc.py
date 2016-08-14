@@ -68,12 +68,12 @@ BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']], [0,
                 [[-1, -1, Match.PIECES['bQu']], [-1, -1, Match.PIECES['bRk']], [-1, -1, Match.PIECES['bBp']], [-1, -1, Match.PIECES['bKn']]] ]
 
 
-prnt_move(msg, match, move):
+def prnt_move(msg, match, move):
     print(msg + " match.id: " + str(match.id) + 
-          ", move: " +
-              Match.index_to_koord(move.srcx, move.srcy) + " " +
-              Match.index_to_koord(move.dstx, move.dsty) + " " +
-              helper.reverse_lookup(Match.PIECES, move.prom_piece))
+        ", move: " +
+        Match.index_to_koord(move.srcx, move.srcy) + " " +
+        Match.index_to_koord(move.dstx, move.dsty) + " " +
+        helper.reverse_lookup(Match.PIECES, move.prom_piece))
 
 
 class GenMove(object):
@@ -287,6 +287,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     generator.match = match
     gmove = None
     color = match.next_color()
+    newscore = None
     maxscore = -200000
     oldscore = 0
     count = 0
@@ -301,6 +302,9 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             if(depth == 1):
                 # lastmove = match.move_list[-1]
                 prnt_move("\ncalculate ", match, newgmove)
+                if(newscore != None):
+                    prnt_move("candidate ", match, gmove)
+                    print(" score: " + str(newscore))
 
             if(depth <= maxdepth):
                 newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
@@ -342,9 +346,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                     prnt_move("\ncandidate ", match, gmove)
                     print(" score: " + str(newscore))
                 return newscore, gmove
-    if(depth == 1):
-        prnt_move("\ncandidate ", match, gmove)
-        print(" score: " + str(maxscore))
+
     return maxscore, gmove
 
 
@@ -353,6 +355,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     generator.match = match
     gmove = None
     color = match.next_color()
+    newscore = None
     minscore = 200000
     oldscore = 0
     count = 0
@@ -368,6 +371,9 @@ def calc_min(match, maxdepth, depth, alpha, beta):
             if(depth == 1):
                 # lastmove = match.move_list[-1]
                 prnt_move("\ncalculate ", match, newgmove)
+                if(newscore != None):
+                    prnt_move("candidate ", match, gmove)
+                    print(" score: " + str(newscore))
 
             if(depth <= maxdepth):
                 newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
@@ -390,6 +396,9 @@ def calc_min(match, maxdepth, depth, alpha, beta):
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
             match.undo_move(True)
             if(newscore < minscore):
+                if(depth == 1):
+                    prnt_move("\ncandidate ", match, gmove)
+                    print(" score: " + str(newscore))
                 minscore = newscore
                 if(minscore <= alpha):
                     break
@@ -410,9 +419,6 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                     print(" score: " + str(newscore))
                 return newscore, gmove
 
-    if(depth == 1):
-        prnt_move("\ncandidate ", match, gmove)
-        print(" score: " + str(minscore))
     return minscore, gmove
 
 
@@ -428,7 +434,7 @@ def calc_move(match, maxdepth):
 
     if(gmove != None):
         print("result: " + str(score))
-        print(str(gmove.srcx) + " " + str(gmove.srcy)  + " " + str(gmove.dstx)  + " " +  str(gmove.dsty)  + " " + str(gmove.prom_piece))
+        prnt_move("", match, gmove)
     else:
         print("no results found!!!" + str(score))
     return gmove
