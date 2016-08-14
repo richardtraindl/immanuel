@@ -68,12 +68,11 @@ BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']], [0,
                 [[-1, -1, Match.PIECES['bQu']], [-1, -1, Match.PIECES['bRk']], [-1, -1, Match.PIECES['bBp']], [-1, -1, Match.PIECES['bKn']]] ]
 
 
-def prnt_move(msg, match, move):
-    print(msg + " match.id: " + str(match.id) + 
-        ", move: " +
+def prnt_move(msg, move):
+    print(msg + 
         Match.index_to_koord(move.srcx, move.srcy) + " " +
         Match.index_to_koord(move.dstx, move.dsty) + " " +
-        helper.reverse_lookup(Match.PIECES, move.prom_piece))
+        helper.reverse_lookup(Match.PIECES, move.prom_piece), end="")
 
 
 class GenMove(object):
@@ -300,11 +299,13 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
             match.move_list.append(move)
             if(depth == 1):
-                # lastmove = match.move_list[-1]
-                prnt_move("\ncalculate ", match, newgmove)
+                msg = "\nmatch.id:" + str(match.id) + " calculate "
+                prnt_move(msg, newgmove)
                 if(newscore != None):
-                    prnt_move("candidate ", match, gmove)
+                    prnt_move(" CANDIDATE ", gmove)
                     print(" score: " + str(newscore))
+                else:
+                    print("")
 
             if(depth <= maxdepth):
                 newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
@@ -343,7 +344,8 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                     newscore = match.score
 
                 if(depth == 1):
-                    prnt_move("\ncandidate ", match, gmove)
+                    msg = "\nmatch.id:" + str(match.id) + " CANDIDATE "
+                    prnt_move(msg, gmove)
                     print(" score: " + str(newscore))
                 return newscore, gmove
 
@@ -369,11 +371,13 @@ def calc_min(match, maxdepth, depth, alpha, beta):
             move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
             match.move_list.append(move)
             if(depth == 1):
-                # lastmove = match.move_list[-1]
-                prnt_move("\ncalculate ", match, newgmove)
+                msg = "\nmatch.id:" + str(match.id) + " calculate "
+                prnt_move(msg, newgmove)
                 if(newscore != None):
-                    prnt_move("candidate ", match, gmove)
+                    prnt_move(" CANDIDATE ", gmove)
                     print(" score: " + str(newscore))
+                else:
+                    print("")
 
             if(depth <= maxdepth):
                 newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
@@ -396,9 +400,6 @@ def calc_min(match, maxdepth, depth, alpha, beta):
             newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
             match.undo_move(True)
             if(newscore < minscore):
-                if(depth == 1):
-                    prnt_move("\ncandidate ", match, gmove)
-                    print(" score: " + str(newscore))
                 minscore = newscore
                 if(minscore <= alpha):
                     break
@@ -415,7 +416,8 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                     newscore = match.score
 
                 if(depth == 1):
-                    prnt_move("\ncandidate ", match, gmove)
+                    msg = "\nmatch.id:" + str(match.id) + " CANDIDATE "
+                    prnt_move(msg, gmove)
                     print(" score: " + str(newscore))
                 return newscore, gmove
 
@@ -433,8 +435,9 @@ def calc_move(match, maxdepth):
         score, gmove = calc_min(match, maxdepth, 1, -200000, 200000)
 
     if(gmove != None):
-        print("result: " + str(score))
-        prnt_move("", match, gmove)
+        msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
+        prnt_move(msg, gmove)
+        print("")
     else:
         print("no results found!!!" + str(score))
     return gmove
