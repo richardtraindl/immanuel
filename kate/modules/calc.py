@@ -313,11 +313,11 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                 black_promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty <= 1
 
                 if(oldscore != match.score or wkg_attacked or bkg_attacked or white_promotion or black_promotion):
-                    newscore, gmove = calc_min(match, maxdepth, depth + 1, maxscore, beta)
+                    newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
                 else:
                     newscore = match.score + calc_helper.evaluate_position(match)
             elif(depth <= maxdepth + 4 and oldscore != match.score):
-                newscore, gmove = calc_min(match, maxdepth, depth + 1, maxscore, beta)
+                newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
             else:
                 newscore = match.score + calc_helper.evaluate_position(match)
 
@@ -383,11 +383,11 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                 black_promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty <= 1
 
                 if(oldscore != match.score or wkg_attacked or bkg_attacked or white_promotion or black_promotion):
-                    newscore, gmove = calc_max(match, maxdepth, depth + 1, alpha, minscore)
+                    newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
                 else:
                     newscore = match.score + calc_helper.evaluate_position(match)
             elif(depth <= maxdepth + 4 and oldscore != match.score):
-                newscore, gmove = calc_max(match, maxdepth, depth + 1, alpha, minscore)
+                newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
             else:
                 newscore = match.score + calc_helper.evaluate_position(match)
 
