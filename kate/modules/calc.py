@@ -68,8 +68,8 @@ BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']], [0,
                 [[-1, -1, Match.PIECES['bQu']], [-1, -1, Match.PIECES['bRk']], [-1, -1, Match.PIECES['bBp']], [-1, -1, Match.PIECES['bKn']]] ]
 
 
-prnt_move(match, move):
-    print("match.id: " + str(match.id) + 
+prnt_move(msg, match, move):
+    print(msg + " match.id: " + str(match.id) + 
           ", move: " +
               Match.index_to_koord(move.srcx, move.srcy) + " " +
               Match.index_to_koord(move.dstx, move.dsty) + " " +
@@ -300,8 +300,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             match.move_list.append(move)
             if(depth == 1):
                 # lastmove = match.move_list[-1]
-                print("\ncalculate ")
-                prnt_move(match, newgmove)
+                prnt_move("\ncalculate ", match, newgmove)
 
             if(depth <= maxdepth):
                 newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
@@ -340,13 +339,11 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                     newscore = match.score
 
                 if(depth == 1):
-                    print("\ncandidate ")
-                    prnt_move(match, gmove)
+                    prnt_move("\ncandidate ", match, gmove)
                     print(" score: " + str(newscore))
                 return newscore, gmove
     if(depth == 1):
-        print("\ncandidate ")
-        prnt_move(match, gmove)
+        prnt_move("\ncandidate ", match, gmove)
         print(" score: " + str(maxscore))
     return maxscore, gmove
 
@@ -370,8 +367,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
             match.move_list.append(move)
             if(depth == 1):
                 # lastmove = match.move_list[-1]
-                print("\ncalculate ")
-                prnt_move(match, newgmove)
+                prnt_move("\ncalculate ", match, newgmove)
 
             if(depth <= maxdepth):
                 newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
@@ -410,14 +406,12 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                     newscore = match.score
 
                 if(depth == 1):
-                    print("\ncandidate ")
-                    prnt_move(match, gmove)
+                    prnt_move("\ncandidate ", match, gmove)
                     print(" score: " + str(newscore))
                 return newscore, gmove
 
     if(depth == 1):
-        print("\ncandidate ")
-        prnt_move(match, gmove)
+        prnt_move("\ncandidate ", match, gmove)
         print(" score: " + str(minscore))
     return minscore, gmove
 
