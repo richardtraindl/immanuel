@@ -18,7 +18,7 @@ ERROR_CODES = {
 ERROR_MSGS = {
     ERROR_CODES['none'] : "Zug ist OK.",
     ERROR_CODES['general-error'] : "Allgemeiner Fehler",
-    ERROR_CODES['wrong-color'] : "Farbe nicht am Zug",
+    ERROR_CODES['wrong-color'] : "Farbe ist nicht am Zug",
     ERROR_CODES['out-of-bounds'] : "Falsches Feld",
     ERROR_CODES['pawn-error'] : "Bauernzug Fehler",
     ERROR_CODES['rook-error'] : "Turmzug Fehler",

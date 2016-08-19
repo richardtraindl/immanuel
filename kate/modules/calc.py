@@ -240,8 +240,8 @@ class immanuelsThread(threading.Thread):
         threading.Thread.__init__(self)
         self.thread_id = threadid
         self.match = copy.copy(match)
-        match.remove_former_threads()
-        match.add_thread(self)
+        Match.remove_former_threads(match)
+        Match.add_thread(self)
 
     def run(self):
         print("Starting " + str(self.thread_id))
@@ -262,7 +262,7 @@ class immanuelsThread(threading.Thread):
         gmove = calc_move(self.match, maxdepth)
         if(gmove != None):
             curr_match = Match.objects.get(id=self.match.id)
-            if(curr_match.count == self.match.count and self.match.does_thread_exist(self)):
+            if(curr_match.count == self.match.count and Match.does_thread_exist(self)):
                 move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
                 move.save()
                 self.match.save()
@@ -302,6 +302,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                 msg = "\nmatch.id:" + str(match.id) + " calculate "
                 prnt_move(msg, newgmove)
                 if(newscore != None):
+                    match.populate_candiate(gmove)
                     prnt_move(" CANDIDATE ", gmove)
                     print(" score: " + str(newscore))
                 else:
@@ -347,6 +348,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                     msg = "\nmatch.id:" + str(match.id) + " CANDIDATE "
                     prnt_move(msg, gmove)
                     print(" score: " + str(newscore))
+                    match.populate_candiate(gmove)
                 return newscore, gmove
 
     return maxscore, gmove
@@ -376,6 +378,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                 if(newscore != None):
                     prnt_move(" CANDIDATE ", gmove)
                     print(" score: " + str(newscore))
+                    match.populate_candiate(gmove)
                 else:
                     print("")
 
@@ -419,6 +422,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                     msg = "\nmatch.id:" + str(match.id) + " CANDIDATE "
                     prnt_move(msg, gmove)
                     print(" score: " + str(newscore))
+                    match.populate_candiate(gmove)
                 return newscore, gmove
 
     return minscore, gmove

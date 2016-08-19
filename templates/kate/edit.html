@@ -16,7 +16,7 @@
     <div class="grid">
         <div class="row_12_of_12">
             <h2>
-                <a href="{% url 'kate:match' match.id %}">ABBRECHEN</a>
+                <a href="{% url 'kate:match' match.id switch %}">ABBRECHEN</a>
             </h2>
         </div>
     </div>
@@ -26,7 +26,7 @@
 {% block content %}
     <div class="grid">
         <div class="row_12_of_12">
-            <form id="new" method="post" action="{% url 'kate:update' match.id %}">
+            <form id="edit" method="post" action="{% url 'kate:update' match.id switch %}">
                 {% csrf_token %}
                 <table>
                     <tr>
@@ -39,9 +39,9 @@
                         <td>
                             <label>&nbsp; Mensch &nbsp;</label>
                         {% if match.white_player_human %}
-                            <input type="checkbox" name="white_player_human" value="{{ white_player_human }}" checked="checked" />
+                            <input type="checkbox" name="white_player_human" value="white_player_human" checked="checked" />
                         {% else %}
-                            <input type="checkbox" name="white_player_human" value="{{ white_player_human }}" />
+                            <input type="checkbox" name="white_player_human" value="white_player_human" />
                         {% endif %}
                         </td>                        
                     </tr>
@@ -55,9 +55,9 @@
                         <td>
                             <label>&nbsp; Mensch &nbsp;</label>
                         {% if match.black_player_human %}
-                            <input type="checkbox" name="black_player_human" value="{{ black_player_human }}" checked="checked" />
+                            <input type="checkbox" name="black_player_human" value="black_player_human" checked="checked" />
                         {% else %}
-                            <input type="checkbox" name="black_player_human" value="{{ black_player_human }}" />
+                            <input type="checkbox" name="black_player_human" value="black_player_human" />
                         {% endif %}
                         </td>                        
                     </tr>

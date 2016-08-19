@@ -45,23 +45,24 @@ def index(request):
     return render(request, 'kate/index.html', { 'matches': matches } )
 
 
-def match(request, matchid=None, switch=0, markmove=0):
+def match(request, matchid=None, switch=0):
     context = RequestContext(request)
-    if matchid == None:
+    if(matchid == None):
         match = Match(white_player=None, black_player=None)
         match.setboardbase()
     else:
         match = Match.objects.get(id=matchid)
 
-    movesrc = ''
-    movedst = ''
-    if(int(markmove) == 1):
-        lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
-        if(lastmove != None):
-            movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
-            movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
+    lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+    if(lastmove):
+        movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
+        movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
+    else:
+        movesrc = ''
+        movedst = ''
+
     fmtboard = fill_fmtboard(match, int(switch))
-    
+
     moves = []
     currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
     if(currmove != None):
@@ -90,22 +91,24 @@ def new(request):
 
 def create(request):
     context = RequestContext(request)
-    if request.method == 'POST':
+    if(request.method == 'POST'):
         match = Match()
+
         match.white_player = request.POST['white_player']
-        human = request.POST.getlist('white_player_human')
-        if(len(human) == 1):
+        if(request.POST.get('white_player_human')):
             match.white_player_human = True
         else:
             match.white_player_human = False
+
         match.black_player = request.POST['black_player']
-        human = request.POST.getlist('black_player_human')
-        if(len(human) == 1):
+        if(request.POST.get('black_player_human')):
             match.black_player_human = True
         else:
             match.black_player_human = False
+
         levellist = request.POST.getlist('level')
         match.level = Match.LEVEL[levellist[0]]
+
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.setboardbase()
             match.immanuels_thread_id = None
@@ -115,35 +118,36 @@ def create(request):
     return render(request, 'kate/new.html', { 'white_player': match.white_player, 'white_player_human': match.white_player_human, 'black_player': match.black_player, 'black_player_human': match.black_player_human } )
 
 
-def edit(request, matchid):
+def edit(request, matchid, switch=0):
     context = RequestContext(request)
     match = get_object_or_404(Match, pk=matchid)
-    return render(request, 'kate/edit.html', { 'match': match } )
+    return render(request, 'kate/edit.html', { 'match': match, 'switch': switch } )
 
 
-def update(request, matchid):
+def update(request, matchid, switch=0):
     context = RequestContext(request)
     match = get_object_or_404(Match, pk=matchid)
-    if request.method == 'POST':        
+    if(request.method == 'POST'):
         match.white_player = request.POST['white_player']
-        human = request.POST.getlist('white_player_human')
-        if(len(human) == 1):
+        if(request.POST.get('white_player_human')):
             match.white_player_human = True
         else:
             match.white_player_human = False
+
         match.black_player = request.POST['black_player']
-        human = request.POST.getlist('black_player_human')
-        if(len(human) == 1):
+        if(request.POST.get('black_player_human')):
             match.black_player_human = True
         else:
             match.black_player_human = False
+
         levellist = request.POST.getlist('level')
         match.level = Match.LEVEL[levellist[0]]
+
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.save()
             calc_move_for_immanuel(match)
-            return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
-    return render(request, 'kate/edit.html', { 'match': match } )
+            return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch,)))
+    return render(request, 'kate/edit.html', { 'match': match, 'switch': switch } )
 
 
 def delete(request, matchid):
@@ -177,7 +181,7 @@ def do_move(request, matchid):
             else:
                 fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
         else:
-            fmtmsg = "<p class='error'>Mensch ist nicht am Zug.</p>"
+            fmtmsg = "<p class='error'>Farbe ist nicht am Zug.</p>"
 
         fmtboard = fill_fmtboard(match, int(switch))
 
@@ -203,7 +207,9 @@ def do_move(request, matchid):
         else:
             rangeobj = range(7, -1, -1)
 
-        return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } )
+        candidate = ""
+
+        return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'candidate': candidate } )
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
 
@@ -332,3 +338,17 @@ def fetch_board(request):
 
     return HttpResponse(data)
 
+
+def fetch_candidate(request):
+    context = RequestContext(request)
+    if request.method == 'GET':
+        matchid = request.GET['matchid']
+        match = Match.objects.get(id=matchid)
+        thread = Match.get_active_thread(match)
+        if(thread and thread.match.candidate_srcx):
+            data = "<p>current calculated move: "
+            data += Match.index_to_koord(thread.match.candidate_srcx, thread.match.candidate_srcy) + "-" + Match.index_to_koord(thread.match.candidate_dstx, thread.match.candidate_dsty)
+            data += "</p>"
+        else:
+            data = "<p>-----</p>"
+    return HttpResponse(data)

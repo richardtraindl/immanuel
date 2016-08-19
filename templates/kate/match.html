@@ -22,7 +22,7 @@
                 <a href="{% url 'kate:index' %}">SPIEL LADEN</a> |
                 <a href="{% url 'kate:match' match.id switch|invert %}">BRETT DREHEN</a> |
                 <a href="{% url 'kate:undomove' match.id switch %}" onclick="return confirm('Wollen sie den letzten Zug zurücknehmen?')">ZUG RÜCKNEHMEN</a> |
-                <a href="{% url 'kate:edit' match.id %}">SPIEL ÄNDERN</a>
+                <a href="{% url 'kate:edit' match.id switch %}">SPIEL ÄNDERN</a>
             </h2>
         </div>
     </div>
@@ -30,23 +30,25 @@
 
 
 {% block chat %}
-    <div class="grid">
-        <div id="comments" class="row_6_of_12">
-        {% for comment in comments reversed %}
-            <p>{{ comment.text }}</p>
-        {% endfor %}
+    {% if match.white_player_human and match.black_player_human %}
+        <div class="grid">
+            <div id="comments" class="row_6_of_12">
+            {% for comment in comments reversed %}
+                <p>{{ comment.text }}</p>
+            {% endfor %}
+            </div>
+            
+            <div class="row_6_of_12">
+                <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}" matchid="{{ match.id }}" style="padding-top: 5px;">
+                    {% csrf_token %}
+                    <textarea id="newcomment" name="newcomment"></textarea>
+                    <!-- textarea id="newcomment" name="newcomment" cols="40" rows="2" maxlength="200"></textarea -->
+                    <input type="text" name="switchflag" value="{{ switch }}" style="display: none;" />
+                    <input type="submit" value="kommentieren" />
+                </form>
+            </div>
         </div>
-        
-        <div class="row_6_of_12">
-            <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}" matchid="{{ match.id }}" style="padding-top: 5px;">
-                {% csrf_token %}
-                <textarea id="newcomment" name="newcomment"></textarea>
-                <!-- textarea id="newcomment" name="newcomment" cols="40" rows="2" maxlength="200"></textarea -->
-                <input type="text" name="switchflag" value="{{ switch }}" style="display: none;" />
-                <input type="submit" value="kommentieren" />
-            </form>
-        </div>
-    </div>
+    {% endif %}
 {% endblock %}
 
 
@@ -56,6 +58,12 @@
             <div id="msg">
                 {{ msg|safe }}
             </div>
+
+        {% if match.is_immanuel %}
+            <div id="candidate">
+                <p>&nbsp;</p>                
+            </div>
+        {% endif %}
 
             <div>
                 {{ match.white_player }} &nbsp; vs. &nbsp; 
@@ -195,14 +203,6 @@
                 $("#move").submit()
             });
 
-            setInterval(function() {
-                var matchid;
-                matchid = $('#addcomment').attr("matchid");
-                $.get('/kate/fetchcomments', { matchid: matchid }, function(data){
-                    $('#comments').html(data);
-                });
-            }, 10000);
-
             setInterval(function(){
                 var matchid;
                 matchid = $('#board').attr("matchid");
@@ -217,6 +217,24 @@
                     }
                 });
             }, 12000);
+
+        {% if match.is_immanuel %}
+            setInterval(function(){
+                var matchid;
+                matchid = $('#board').attr("matchid");
+                $.get('/kate/fetchcandidate', { matchid: matchid }, function(data){
+                    $('#candidate').html(data);
+                });
+            }, 10000);
+        {% else %}
+            setInterval(function() {
+                var matchid;
+                matchid = $('#addcomment').attr("matchid");
+                $.get('/kate/fetchcomments', { matchid: matchid }, function(data){
+                    $('#comments').html(data);
+                });
+            }, 10000);
+        {% endif %}
 
         });
     </script>

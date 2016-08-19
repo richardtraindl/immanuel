@@ -102,12 +102,17 @@ class Match(models.Model):
     wRk_h1_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_a8_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_h8_first_movecnt = models.SmallIntegerField(null=False, default=0)
-    immanuels_thread_lock = threading.Lock()
-    immanuels_threads_list = []
+    _immanuels_thread_lock = threading.Lock()
+    _immanuels_threads_list = []
 
     def __init__(self, *args, **kwargs):
         super(Match, self).__init__(*args, **kwargs)
         self.move_list = []
+        self.candidate_srcx = None
+        self.candidate_srcy = None
+        self.candidate_dstx = None
+        self.candidate_dsty = None
+        self.candidate_prom_piece = None
 
     def writefield(self, x, y, value):
         self.board[y][x] = value
@@ -362,6 +367,17 @@ class Match(models.Model):
         else:
             return self.black_player_human
 
+    def populate_candiate(self, gmove):
+        if(gmove):
+            self.candidate_srcx = gmove.srcx
+            self.candidate_srcy = gmove.srcy
+            self.candidate_dstx = gmove.dstx
+            self.candidate_dsty = gmove.dsty
+            self.candidate_prom_piece = gmove.prom_piece
+
+    def is_immanuel(self):
+        return (self.white_player_human == False or self.black_player_human == False)
+
     @staticmethod
     def color_of_piece(piece):
         if(piece >= Match.PIECES['wKg'] and piece <= Match.PIECES['wQu']):
@@ -384,19 +400,30 @@ class Match(models.Model):
         koord = str(col + row)
         return koord
 
-    def remove_former_threads(self):
-        with self.immanuels_thread_lock:
-            for item in self.immanuels_threads_list:
-                if(item.match.id == self.id):
-                    self.immanuels_threads_list.remove(item)
+    @classmethod
+    def remove_former_threads(cls, match):
+        with cls._immanuels_thread_lock:
+            for item in cls._immanuels_threads_list:
+                if(item.match.id == match.id):
+                    cls._immanuels_threads_list.remove(item)
+    
+    @classmethod
+    def add_thread(cls, thread):
+        with cls._immanuels_thread_lock:
+            cls._immanuels_threads_list.append(thread)
 
-    def add_thread(self, thread):
-        with self.immanuels_thread_lock:
-            self.immanuels_threads_list.append(thread)
+    @classmethod
+    def get_active_thread(cls, match):
+        with cls._immanuels_thread_lock:
+            for item in cls._immanuels_threads_list:
+                if(item.match.id == match.id):
+                    return item
+        return None
 
-    def does_thread_exist(self, thread):
-        with self.immanuels_thread_lock:
-            for item in self.immanuels_threads_list:
+    @classmethod
+    def does_thread_exist(cls, thread):
+        with cls._immanuels_thread_lock:
+            for item in cls._immanuels_threads_list:
                 if(item is thread):
                     return True
             return False
