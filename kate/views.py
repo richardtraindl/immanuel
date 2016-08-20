@@ -350,5 +350,5 @@ def fetch_candidate(request):
             data += Match.index_to_koord(thread.match.candidate_srcx, thread.match.candidate_srcy) + "-" + Match.index_to_koord(thread.match.candidate_dstx, thread.match.candidate_dsty)
             data += "</p>"
         else:
-            data = "<p>-----</p>"
+            data = "<p>current calculated move: </p>"
     return HttpResponse(data)

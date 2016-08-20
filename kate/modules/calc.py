@@ -301,7 +301,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             if(depth == 1):
                 msg = "\nmatch.id:" + str(match.id) + " calculate "
                 prnt_move(msg, newgmove)
-                if(newscore != None):
+                if(newscore and gmove):
                     match.populate_candiate(gmove)
                     prnt_move(" CANDIDATE ", gmove)
                     print(" score: " + str(newscore))
@@ -375,7 +375,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
             if(depth == 1):
                 msg = "\nmatch.id:" + str(match.id) + " calculate "
                 prnt_move(msg, newgmove)
-                if(newscore != None):
+                if(newscore and gmove):
                     prnt_move(" CANDIDATE ", gmove)
                     print(" score: " + str(newscore))
                     match.populate_candiate(gmove)

@@ -404,8 +404,9 @@ class Match(models.Model):
     def remove_former_threads(cls, match):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
-                if(item.match.id == match.id):
+                if(item.match.id == match.id or item.isAlive() == False):
                     cls._immanuels_threads_list.remove(item)
+                    item.join()
     
     @classmethod
     def add_thread(cls, thread):
@@ -416,7 +417,7 @@ class Match(models.Model):
     def get_active_thread(cls, match):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
-                if(item.match.id == match.id):
+                if(item.match.id == match.id and item.isAlive()):
                     return item
         return None
 
