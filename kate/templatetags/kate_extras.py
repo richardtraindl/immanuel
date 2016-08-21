@@ -1,4 +1,5 @@
 from django import template
+from django import datetime
 from kate.models import Match
 from kate.modules import helper
 
@@ -53,4 +54,8 @@ def booltoint(value):
         return 1
     else:
         return 0
+
+@register.filter(name='fmtdate')
+def fmtdate(value):
+   return value.strftime("%Y-%m-%d")
 
