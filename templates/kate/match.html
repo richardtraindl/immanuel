@@ -7,8 +7,9 @@
 {% block header %}
     <div class="grid">
         <div class="row_12_of_12">
-            <h1>Schachspiel</h1>
-            <p> {{ match.white_player }} &nbsp; versus &nbsp; {{ match.black_player }}, &nbsp; {{ match.begin }}</p>
+            <h1>Game</h1>
+            <h2>{{ match.white_player }} &nbsp; versus &nbsp; {{ match.black_player }}, &nbsp;
+                {{ match.begin }} &nbsp; Level: &nbsp; {{ match.level|matchlevel }}</h2>
         </div>
     </div>
 {% endblock %}
@@ -59,19 +60,16 @@
                 {{ msg|safe }}
             </div>
 
+            <div>
+                <h3>Score: &nbsp; {{ match.score }}</h3>
+            </div>
+
         {% if match.is_immanuel %}
             <div id="candidate">
                 <p>current calculated move: </p>
             </div>
         {% endif %}
 
-            <div>
-                {{ match.white_player }} &nbsp; vs. &nbsp; 
-                {{ match.black_player }} &nbsp; 
-                Level: &nbsp; {{ match.level|matchlevel }} &nbsp;
-                Score: &nbsp; {{ match.score }}
-            </div>
-            
             <div id="board-wrapper">
                 <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
                     <tr id="board-letters1">
