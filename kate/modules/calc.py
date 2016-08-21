@@ -217,10 +217,8 @@ class Generator(object):
             stepx, stepy, prom_piece = self.read_steps()
             dstx = self.board_x + stepx
             dsty = self.board_y + stepy
-            # print(str(self.board_x) + " " + str(self.board_y) + " " + str(dstx) + " " + str(dsty))
             flag, errmsg = rules.is_move_valid(self.match, self.board_x, self.board_y, dstx, dsty, prom_piece)
             if(flag):
-                # print("OK: " + str(self.board_x) + " " + str(self.board_y) + " " + str(dstx) + " " + str(dsty))
                 gmove = GenMove(self.board_x, self.board_y, dstx, dsty, prom_piece)
                 self.rotate()
                 return True, gmove
@@ -228,8 +226,6 @@ class Generator(object):
                 if(errmsg == rules.ERROR_CODES['king-error']):
                     self.rotate()
                 else:
-                # print("NOK: " + str(self.board_x) + " " + str(self.board_y) + " " + str(dstx) + " " + str(dsty))
-                # print(rules.ERROR_MSGS[errmsg])
                     if(self.rotate_dir() == False):
                         return False, gmove
         return False, gmove
@@ -305,8 +301,6 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                     match.populate_candiate(gmove)
                     prnt_move(" CANDIDATE ", gmove)
                     print(" score: " + str(newscore))
-                else:
-                    print("")
 
             if(depth <= maxdepth):
                 newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
@@ -379,8 +373,6 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                     prnt_move(" CANDIDATE ", gmove)
                     print(" score: " + str(newscore))
                     match.populate_candiate(gmove)
-                else:
-                    print("")
 
             if(depth <= maxdepth):
                 newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
