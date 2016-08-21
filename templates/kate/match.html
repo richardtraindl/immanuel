@@ -9,7 +9,7 @@
         <div class="row_12_of_12">
             <h1>Game</h1>
             <h2>{{ match.white_player }} &nbsp; versus &nbsp; {{ match.black_player }}, &nbsp;
-                {{ match.begin }} &nbsp; Level: &nbsp; {{ match.level|matchlevel }}</h2>
+                {{ match.begin|fmtdate }} &nbsp; Level: &nbsp; {{ match.level|matchlevel }}</h2>
         </div>
     </div>
 {% endblock %}
