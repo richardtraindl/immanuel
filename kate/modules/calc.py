@@ -232,15 +232,15 @@ class Generator(object):
 
 
 class immanuelsThread(threading.Thread):
-    def __init__(self, threadid, match):
+    def __init__(self, name, match):
         threading.Thread.__init__(self)
-        self.thread_id = threadid
+        self.name = name
         self.match = copy.copy(match)
-        Match.remove_former_threads(match)
+        Match.remove_outdated_threads(match)
         Match.add_thread(self)
 
     def run(self):
-        print("Starting " + str(self.thread_id))
+        print("Starting " + str(self.name))
         move = Move.objects.filter(match_id=self.match.id).order_by("count").last()
         if(move != None):
             self.match.move_list.append(move)
@@ -440,7 +440,7 @@ def calc_move(match, maxdepth):
 
 
 def thread_do_move(match):
-    thread = immanuelsThread(random.randint(0, 100000), match)
+    thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
     thread.start()
 
 

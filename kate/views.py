@@ -111,7 +111,6 @@ def create(request):
 
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.setboardbase()
-            match.immanuels_thread_id = None
             match.save()
             calc_move_for_immanuel(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
@@ -346,9 +345,9 @@ def fetch_candidate(request):
         match = Match.objects.get(id=matchid)
         thread = Match.get_active_thread(match)
         if(thread and thread.match.candidate_srcx):
-            data = "<p>current calculated move: "
+            data = "<p>move candidate: "
             data += Match.index_to_koord(thread.match.candidate_srcx, thread.match.candidate_srcy) + "-" + Match.index_to_koord(thread.match.candidate_dstx, thread.match.candidate_dsty)
             data += "</p>"
         else:
-            data = "<p>current calculated move: </p>"
+            data = "<p>move candidate: None</p>"
     return HttpResponse(data)

@@ -1,5 +1,5 @@
 from django import template
-from django import datetime
+import datetime
 from kate.models import Match
 from kate.modules import helper
 

@@ -401,7 +401,7 @@ class Match(models.Model):
         return koord
 
     @classmethod
-    def remove_former_threads(cls, match):
+    def remove_outdated_threads(cls, match):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
                 if(item.match.id == match.id or item.isAlive() == False):

@@ -7,9 +7,10 @@
 {% block header %}
     <div class="grid">
         <div class="row_12_of_12">
-            <h1>Game</h1>
-            <h2>{{ match.white_player }} &nbsp; versus &nbsp; {{ match.black_player }}, &nbsp;
-                {{ match.begin|fmtdate }} &nbsp; Level: &nbsp; {{ match.level|matchlevel }}</h2>
+            <h1><a href="{% url 'kate:match' match.id switch %}">Game</a></h1>
+            <h2>{{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }} , &nbsp; 
+                Created on: &nbsp; {{ match.begin|fmtdate }} ,&nbsp;
+                Level: &nbsp; {{ match.level|matchlevel }}</h2>
         </div>
     </div>
 {% endblock %}
@@ -19,11 +20,13 @@
     <div class="grid">
         <div class="row_12_of_12">
             <h2>
-                <a href="{% url 'kate:new' %}">NEUES SPIEL</a> |
-                <a href="{% url 'kate:index' %}">SPIEL LADEN</a> |
-                <a href="{% url 'kate:match' match.id switch|invert %}">BRETT DREHEN</a> |
-                <a href="{% url 'kate:undomove' match.id switch %}" onclick="return confirm('Wollen sie den letzten Zug zurücknehmen?')">ZUG RÜCKNEHMEN</a> |
-                <a href="{% url 'kate:edit' match.id switch %}">SPIEL ÄNDERN</a>
+                <a href="{% url 'kate:match' match.id switch|invert %}">SWITCH BOARD</a> |
+                <a href="{% url 'kate:undomove' match.id switch %}" onclick="return confirm('Withdraw last move?')">WITHDRAW MOVE</a> |
+                <a href="{% url 'kate:edit' match.id switch %}">EDIT GAME</a> |
+                <a href="{% url 'kate:new' %}">NEW GAME</a> |
+                <a href="{% url 'kate:index' %}">LOAD GAME</a>
+                
+
             </h2>
         </div>
     </div>
@@ -43,7 +46,6 @@
                 <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}" matchid="{{ match.id }}" style="padding-top: 5px;">
                     {% csrf_token %}
                     <textarea id="newcomment" name="newcomment"></textarea>
-                    <!-- textarea id="newcomment" name="newcomment" cols="40" rows="2" maxlength="200"></textarea -->
                     <input type="text" name="switchflag" value="{{ switch }}" style="display: none;" />
                     <input type="submit" value="kommentieren" />
                 </form>
@@ -59,16 +61,6 @@
             <div id="msg">
                 {{ msg|safe }}
             </div>
-
-            <div>
-                <h3>Score: &nbsp; {{ match.score }}</h3>
-            </div>
-
-        {% if match.is_immanuel %}
-            <div id="candidate">
-                <p>current calculated move: </p>
-            </div>
-        {% endif %}
 
             <div id="board-wrapper">
                 <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
@@ -156,11 +148,22 @@
         </div>
 
         <div class="row_4_of_12">
+            <div>
+                <p>Score: &nbsp; {{ match.score }}</p>
+            </div>
+
+        {% if match.is_immanuel %}
+            <div id="candidate">
+                <p>move candidate: None</p>
+            </div>
+        {% endif %}
+
             <div id="minutes">
+                <p>Minutes</p>
                 <table>
                     <tr>
                         <td>
-                            &nbsp;
+                            # &nbsp;
                         </td>
                         <td>
                             {% if match.white_player_human == False %}
