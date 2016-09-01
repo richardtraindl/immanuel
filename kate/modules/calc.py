@@ -235,7 +235,7 @@ class immanuelsThread(threading.Thread):
     def __init__(self, name, match):
         threading.Thread.__init__(self)
         self.name = name
-        self.match = copy.copy(match)
+        self.match = copy.deepcopy(match)
         Match.remove_outdated_threads(match)
         Match.add_thread(self)
 

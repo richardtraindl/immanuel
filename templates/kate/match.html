@@ -226,7 +226,7 @@
                 $.get('/kate/fetchcandidate', { matchid: matchid }, function(data){
                     $('#candidate').html(data);
                 });
-            }, 10000);
+            }, 13000);
         {% else %}
             setInterval(function() {
                 var matchid;
@@ -234,7 +234,7 @@
                 $.get('/kate/fetchcomments', { matchid: matchid }, function(data){
                     $('#comments').html(data);
                 });
-            }, 10000);
+            }, 9000);
         {% endif %}
 
         });
