@@ -43,7 +43,7 @@
             </div>
             
             <div class="row_6_of_12">
-                <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}" matchid="{{ match.id }}" style="padding-top: 5px;">
+                <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}" matchid="{{ match.id }}">
                     {% csrf_token %}
                     <textarea id="newcomment" name="newcomment"></textarea>
                     <input type="text" name="switchflag" value="{{ switch }}" style="display: none;" />
@@ -154,7 +154,7 @@
 
         {% if match.is_immanuel %}
             <div id="candidate">
-                <p>move candidate: None</p>
+                <p>move candidate: ---</p>
             </div>
         {% endif %}
 

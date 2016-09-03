@@ -344,10 +344,13 @@ def fetch_candidate(request):
         matchid = request.GET['matchid']
         match = Match.objects.get(id=matchid)
         thread = Match.get_active_thread(match)
-        if(thread and thread.match.candidate_srcx):
+        if(thread and not thread.match.candidate_srcx):
+            data = "<p>thread found with matchid: " + str(thread.match.id) + "</p>"
+            thread.match.candidate_srcx
+        elif(thread and thread.match.candidate_srcx):
             data = "<p>move candidate: "
             data += Match.index_to_koord(thread.match.candidate_srcx, thread.match.candidate_srcy) + "-" + Match.index_to_koord(thread.match.candidate_dstx, thread.match.candidate_dsty)
             data += "</p>"
         else:
-            data = "<p>move candidate: None</p>"
+            data = "<p>move candidate: ---</p>"
     return HttpResponse(data)
