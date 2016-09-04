@@ -154,7 +154,7 @@
 
         {% if match.is_immanuel %}
             <div id="candidate">
-                <p>move candidate: ---</p>
+                <p>&nbsp;</p>
             </div>
         {% endif %}
 
@@ -209,32 +209,32 @@
                 matchid = $('#board').attr("matchid");
                 movecnt = $('#board').attr("movecnt");
                 switchflag = $('#switch').attr("value");
-                $.get('/kate/fetchboard', { matchid: matchid, movecnt: movecnt, switchflag: switchflag }, function(data){
+                $.get('/kate/fetchmatch', { matchid: matchid, movecnt: movecnt, switchflag: switchflag }, function(data){
                     if(data.length > 0){
-                        var arr = data.split(':');
-                        $('#board-wrapper').html(arr[0]);
-                        $('#minutes').html(arr[1]);
-                        performMove();
+                        var arr = data.split('§');
+                        if(arr[0].length > 0){
+                            $('#board-wrapper').html(arr[0]);
+                            $('#minutes').html(arr[1]);
+                            $('#candidate').html("<p>&nbsp</p>");
+                            performMove();
+                        }
+                        if(arr[2].length > 0){
+                            $('#candidate').html(arr[2]);
+                        }
                     }
                 });
             }, 12000);
 
-        {% if match.is_immanuel %}
-            setInterval(function(){
-                var matchid;
-                matchid = $('#board').attr("matchid");
-                $.get('/kate/fetchcandidate', { matchid: matchid }, function(data){
-                    $('#candidate').html(data);
-                });
-            }, 13000);
-        {% else %}
+        {% if match.is_immanuel == False %}
             setInterval(function() {
                 var matchid;
                 matchid = $('#addcomment').attr("matchid");
                 $.get('/kate/fetchcomments', { matchid: matchid }, function(data){
-                    $('#comments').html(data);
+                    if(data.length > 0){
+                        $('#comments').html(data);
+                    }
                 });
-            }, 9000);
+            }, 11000);
         {% endif %}
 
         });

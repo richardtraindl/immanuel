@@ -15,6 +15,5 @@ urlpatterns = [
     url(r'^(?P<matchid>[0-9]+)/delete/$', views.delete, name='delete'),
     url(r'^(?P<matchid>[0-9]+)/addcomment/$', views.add_comment, name='addcomment'),
     url(r'^fetchcomments/$', views.fetch_comments, name='fetchcomments'),
-    url(r'^fetchboard/$', views.fetch_board, name='fetchboard'),
-    url(r'^fetchcandidate/$', views.fetch_candidate, name='fetchcandidate'),
+    url(r'^fetchmatch/$', views.fetch_match, name='fetchmatch'),
 ]

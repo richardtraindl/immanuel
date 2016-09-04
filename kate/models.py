@@ -108,11 +108,6 @@ class Match(models.Model):
     def __init__(self, *args, **kwargs):
         super(Match, self).__init__(*args, **kwargs)
         self.move_list = []
-        self.candidate_srcx = None
-        self.candidate_srcy = None
-        self.candidate_dstx = None
-        self.candidate_dsty = None
-        self.candidate_prom_piece = None
 
     def writefield(self, x, y, value):
         self.board[y][x] = value
@@ -367,14 +362,6 @@ class Match(models.Model):
         else:
             return self.black_player_human
 
-    def populate_candiate(self, gmove):
-        if(gmove):
-            self.candidate_srcx = gmove.srcx
-            self.candidate_srcy = gmove.srcy
-            self.candidate_dstx = gmove.dstx
-            self.candidate_dsty = gmove.dsty
-            self.candidate_prom_piece = gmove.prom_piece
-
     def is_immanuel(self):
         return (self.white_player_human == False or self.black_player_human == False)
 
@@ -404,7 +391,7 @@ class Match(models.Model):
     def remove_outdated_threads(cls, match):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
-                if(item.match.id == match.id or item.isAlive() == False):
+                if(item.match.id == match.id or item.is_alive() == False):
                     cls._immanuels_threads_list.remove(item)
                     item.join()
     
@@ -417,7 +404,7 @@ class Match(models.Model):
     def get_active_thread(cls, match):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
-                if(item.match.id == match.id and item.isAlive()):
+                if(item.match.id == match.id and item.is_alive()):
                     return item
         return None
 

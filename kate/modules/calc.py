@@ -236,6 +236,11 @@ class immanuelsThread(threading.Thread):
         threading.Thread.__init__(self)
         self.name = name
         self.match = copy.deepcopy(match)
+        self.candidate_srcx = None
+        self.candidate_srcy = None
+        self.candidate_dstx = None
+        self.candidate_dsty = None
+        self.candidate_prom_piece = None
         Match.remove_outdated_threads(match)
         Match.add_thread(self)
 
@@ -268,6 +273,14 @@ class immanuelsThread(threading.Thread):
 
         return gmove
 
+    def populate_candiate(self, gmove):
+        if(gmove):
+            self.candidate_srcx = gmove.srcx
+            self.candidate_srcy = gmove.srcy
+            self.candidate_dstx = gmove.dstx
+            self.candidate_dsty = gmove.dsty
+            self.candidate_prom_piece = gmove.prom_piece
+
 
 def rate(color, gmove, newgmove, score, newscore):
     if((color == Match.COLORS['white'] and score < newscore) or 
@@ -297,10 +310,12 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             if(depth == 1):
                 msg = "\nmatch.id:" + str(match.id) + " calculate "
                 prnt_move(msg, newgmove)
-                if(newscore and gmove):
-                    match.populate_candiate(gmove)
+                if(gmove):
                     prnt_move(" CANDIDATE ", gmove)
                     print(" score: " + str(newscore))
+                    thread = Match.get_active_thread(match)
+                    if(thread and newscore):
+                        thread.populate_candiate(gmove)
 
             if(depth <= maxdepth):
                 newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
@@ -342,7 +357,9 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                     msg = "\nmatch.id:" + str(match.id) + " CANDIDATE "
                     prnt_move(msg, gmove)
                     print(" score: " + str(newscore))
-                    match.populate_candiate(gmove)
+                    thread = Match.get_active_thread(match)
+                    if(thread):
+                        thread.populate_candiate(gmove)
                 return newscore, gmove
 
     return maxscore, gmove
@@ -369,10 +386,12 @@ def calc_min(match, maxdepth, depth, alpha, beta):
             if(depth == 1):
                 msg = "\nmatch.id:" + str(match.id) + " calculate "
                 prnt_move(msg, newgmove)
-                if(newscore and gmove):
+                if(gmove):
                     prnt_move(" CANDIDATE ", gmove)
                     print(" score: " + str(newscore))
-                    match.populate_candiate(gmove)
+                    thread = Match.get_active_thread(match)
+                    if(thread and newscore):
+                        thread.populate_candiate(gmove)
 
             if(depth <= maxdepth):
                 newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
@@ -414,7 +433,9 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                     msg = "\nmatch.id:" + str(match.id) + " CANDIDATE "
                     prnt_move(msg, gmove)
                     print(" score: " + str(newscore))
-                    match.populate_candiate(gmove)
+                    thread = Match.get_active_thread(match)
+                    if(thread):
+                        thread.populate_candiate(gmove)
                 return newscore, gmove
 
     return minscore, gmove

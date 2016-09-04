@@ -317,40 +317,33 @@ def html_moves(match):
     return htmlmoves
 
 
-def fetch_board(request):
+def fetch_match(request):
     context = RequestContext(request)
     matchid = request.GET['matchid']
     movecnt = request.GET['movecnt']
     switchflag = request.GET['switchflag']
     match = Match.objects.get(id=matchid)
     if(match == None):
-        data = ""
+        data = "§§"
     else:
         lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
         if(lastmove != None):
             movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
             movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
         if(int(movecnt) == match.count):
-            data = ""
+            data = "§"
         else:
-            data = html_board(match, int(switchflag), movesrc, movedst) + ":" + html_moves(match)
+            data = html_board(match, int(switchflag), movesrc, movedst) + "§" + html_moves(match)
 
-    return HttpResponse(data)
-
-
-def fetch_candidate(request):
-    context = RequestContext(request)
-    if request.method == 'GET':
-        matchid = request.GET['matchid']
-        match = Match.objects.get(id=matchid)
         thread = Match.get_active_thread(match)
-        if(thread and not thread.match.candidate_srcx):
-            data = "<p>thread found with matchid: " + str(thread.match.id) + "</p>"
-            thread.match.candidate_srcx
-        elif(thread and thread.match.candidate_srcx):
-            data = "<p>move candidate: "
-            data += Match.index_to_koord(thread.match.candidate_srcx, thread.match.candidate_srcy) + "-" + Match.index_to_koord(thread.match.candidate_dstx, thread.match.candidate_dsty)
+        if(thread and not thread.candidate_srcx):
+            data += "§<p>thread found with matchid: " + str(thread.match.id) + "</p>"
+        elif(thread and thread.candidate_srcx):
+            data += "§<p>move candidate: "
+            data += Match.index_to_koord(thread.candidate_srcx, thread.candidate_srcy) + "-" + Match.index_to_koord(thread.candidate_dstx, thread.candidate_dsty)
             data += "</p>"
         else:
-            data = "<p>move candidate: ---</p>"
+            data += "§"
+
     return HttpResponse(data)
+
