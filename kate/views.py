@@ -221,7 +221,7 @@ def undo_move(request, matchid, switch=None):
         move.delete()
         match.save()
         calc_move_for_immanuel(match)
-    return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch, 1)))
+    return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
 
 
 def add_comment(request, matchid):
