@@ -104,6 +104,9 @@ def evaluate_developments(match):
                 elif(piece == Match.PIECES['wQu']):
                     if(y > 0):
                         developed_whites += 1
+                elif(piece == Match.PIECES['wKg']):
+                    if(y == 0 and (x == 6 or x == 2)):
+                        developed_whites += 2
             else:
                 if(piece == Match.PIECES['bKn']):
                     if(y < 7):
@@ -114,12 +117,16 @@ def evaluate_developments(match):
                 elif(piece == Match.PIECES['bQu']):
                     if(y < 7):
                         developed_blacks -= 1
+                elif(piece == Match.PIECES['bKg']):
+                    if(y == 7 and (x == 6 or x == 2)):
+                        developed_blacks -= 2
 
     return developed_whites + developed_blacks
 
 
 def evaluate_position(match):
     contacts = evaluate_contacts(match)
+
     movecnt = evaluate_movecnt(match)
 
     if(match.count < 16):
