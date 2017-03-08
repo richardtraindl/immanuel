@@ -52,25 +52,29 @@ def pw_dir(srcx, srcy, dstx, dsty, piece):
 
 
 def is_white_ep_move_ok(match, srcx, srcy, dstx, dsty):
-    move = Move.objects.filter(match_id=match.id).order_by("count").last()
-    if(move == None):
+    # move = Move.objects.filter(match_id=match.id).order_by("count").last()
+    if(match.move_list == None):
         return False
-    piece = match.readfield(move.dstx, move.dsty)
-    if(piece == Match.PIECES['bPw'] and move.srcx == move.dstx and move.dstx == dstx and move.dsty + 2 == move.srcy):
-        return True
     else:
-        return False
+        move = self.move_list[-1]
+        piece = match.readfield(srcx, dsty)
+        if(piece == Match.PIECES['bPw'] and move.srcx == move.dstx and move.dstx == dstx and move.srcy - 2 == move.dsty):
+            return True
+        else:
+            return False
 
 
 def is_black_ep_move_ok(match, srcx, srcy, dstx, dsty):
-    move = Move.objects.filter(match_id=match.id).order_by("count").last()
-    if(move == None):
+    # move = Move.objects.filter(match_id=match.id).order_by("count").last()
+    if(match.move_list == None):
         return False
-    piece = match.readfield(move.dstx, move.dsty)
-    if(piece == Match.PIECES['wPw'] and move.srcx == move.dstx and move.dstx == dstx and move.dsty - 2 == move.srcy):
-        return True
     else:
-        return False
+        move = self.move_list[-1]
+        piece = match.readfield(srcx, dsty)
+        if(piece == Match.PIECES['wPw'] and move.srcx == move.dstx and move.dstx == dstx and move.srcy + 2 == move.dsty):
+            return True
+        else:
+            return False
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):

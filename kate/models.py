@@ -174,6 +174,7 @@ class Match(models.Model):
                 move.prom_piece = prom_piece
                 self.score -= (Match.SCORES[prom_piece] - Match.SCORES[srcpiece])
                 self.score += Match.SCORES[dstpiece]
+                self.move_list.append(move)
                 return move
             elif(dstpiece == Match.PIECES['blk'] and srcx != dstx):
                 self.writefield(srcx, srcy, Match.PIECES['blk'])
@@ -186,6 +187,7 @@ class Match(models.Model):
                 self.writefield(move.e_p_fieldx, move.e_p_fieldy, Match.PIECES['blk'])
                 move.captured_piece = pawn
                 self.score += Match.SCORES[pawn]
+                self.move_list.append(move)
                 return move 
         elif(srcpiece == Match.PIECES['wKg'] or srcpiece == Match.PIECES['bKg']):
             if(srcx - dstx == -2):
@@ -206,6 +208,7 @@ class Match(models.Model):
 
                 move.move_type = Move.TYPES['short_castling']
                 move.captured_piece = dstpiece
+                self.move_list.append(move)
                 return move
             elif(srcx - dstx == 2):
                 self.writefield(srcx, srcy, Match.PIECES['blk'])
@@ -225,6 +228,7 @@ class Match(models.Model):
 
                 move.move_type = Move.TYPES['long_castling']
                 move.captured_piece = dstpiece
+                self.move_list.append(move)
                 return move
         self.writefield(srcx, srcy, Match.PIECES['blk'])
         self.writefield(dstx, dsty, srcpiece)
@@ -256,6 +260,7 @@ class Match(models.Model):
         move.move_type = Move.TYPES['standard']
         move.captured_piece = dstpiece
         self.score += Match.SCORES[dstpiece]
+        self.move_list.append(move)
         return move
 
     def undo_move(self, calc):
@@ -364,6 +369,22 @@ class Match(models.Model):
 
     def is_immanuel(self):
         return (self.white_player_human == False or self.black_player_human == False)
+
+    def is_last_move_capture(self):
+        if(self.move_list != None):
+            move = self.move_list[-1]
+            if(move.captured_piece != Match.PIECES['blk']):
+                return True
+
+        return False
+    
+    def is_last_move_promotion(self):
+        if(self.move_list != None):
+            move = self.move_list[-1]
+            if(move.prom_piece != Match.PIECES['blk']):
+                return True
+
+        return False
 
     @staticmethod
     def color_of_piece(piece):

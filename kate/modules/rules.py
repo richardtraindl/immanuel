@@ -294,6 +294,72 @@ def count_attacks(match, srcx, srcy, opp_color):
     return count
 
 
+def eval_attacks(match, srcx, srcy, opp_color):
+    value = 0
+
+    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
+    for i in range(4):
+        stepx = RK_STEPS[i][0]
+        stepy = RK_STEPS[i][1]
+        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
+        if(dstx != UNDEF_X):
+            piece = match.readfield(dstx, dsty)
+            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) or
+                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) ):
+                value += Match.SCORES[piece] // 30
+
+    BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+    for i in range(4):
+        stepx = BP_STEPS[i][0]
+        stepy = BP_STEPS[i][1]
+        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
+        if(dstx != UNDEF_X):
+            piece = match.readfield(dstx, dsty)
+            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) or
+                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) ):
+                value += Match.SCORES[piece] // 30
+
+    KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
+    for i in range(8):
+        dstx = srcx + KN_STEPS[i][0]
+        dsty = srcy + KN_STEPS[i][1]
+        if(is_inbounds(dstx, dsty)):
+            piece = match.readfield(dstx, dsty)
+            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKn']) or
+                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKn']) ):
+                value += Match.SCORES[piece] // 30
+
+    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
+    for i in range(8):
+        dstx = srcx + KG_STEPS[i][0]
+        dsty = srcy + KG_STEPS[i][1]
+        if(is_inbounds(dstx, dsty)):
+            piece = match.readfield(dstx, dsty)
+            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) or
+                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) ):
+                value += Match.SCORES[piece] // 300
+
+    wPW_STEPS = [ [1, 1], [-1, 1] ]
+    for i in range(2):
+        dstx = srcx + wPW_STEPS[i][0]
+        dsty = srcy + wPW_STEPS[i][1]
+        if(is_inbounds(dstx, dsty)):
+            piece = match.readfield(dstx, dsty)
+            if(opp_color == Match.COLORS['black'] and piece == Match.PIECES['bPw']):
+                value += Match.SCORES[piece] // 30
+
+    bPW_STEPS = [ [1, -1], [-1, -1] ]
+    for i in range(2):
+        dstx = srcx + bPW_STEPS[i][0]
+        dsty = srcy + bPW_STEPS[i][1]
+        if(is_inbounds(dstx, dsty)):
+            piece = match.readfield(dstx, dsty)
+            if(opp_color == Match.COLORS['white'] and piece == Match.PIECES['wPw']):
+                value += Match.SCORES[piece] // 30
+
+    return value
+
+
 def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
     piece = match.readfield(srcx, srcy)
     match.writefield(srcx, srcy, Match.PIECES['blk'])

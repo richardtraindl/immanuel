@@ -16,10 +16,12 @@ def evaluate_contacts(match):
                 continue
             elif(Match.color_of_piece(piece) == Match.COLORS['white']):
                 supported_whites += rules.count_attacks(match, x, y, Match.COLORS['white'])
-                attacked_whites += rules.count_attacks(match, x, y, Match.COLORS['black'])
+                attacked_whites += rules.eval_attacks(match, x, y, Match.COLORS['black'])
+                # attacked_whites += rules.count_attacks(match, x, y, Match.COLORS['black'])
             else:
                 supported_blacks += rules.count_attacks(match, x, y, Match.COLORS['black'])
-                attacked_blacks += rules.count_attacks(match, x, y, Match.COLORS['white'])
+                attacked_blacks += rules.eval_attacks(match, x, y, Match.COLORS['white'])
+                #attacked_blacks += rules.count_attacks(match, x, y, Match.COLORS['white'])
 
     return (supported_whites - attacked_whites) - (supported_blacks - attacked_blacks)
 
@@ -69,7 +71,7 @@ def evaluate_piece_moves(match, srcx, srcy):
             elif(errcode == rules.ERROR_CODES['out-of-bounds']):
                 break
 
-    return (movecnt // 10)
+    return (movecnt)
 
 
 def evaluate_movecnt(match):
@@ -95,6 +97,7 @@ def evaluate_developments(match):
             if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
                 continue
             elif(Match.color_of_piece(piece) == Match.COLORS['white']):
+                """
                 if(piece == Match.PIECES['wKn']):
                     if(y > 0):
                         developed_whites += 3
@@ -104,22 +107,29 @@ def evaluate_developments(match):
                 elif(piece == Match.PIECES['wQu']):
                     if(y > 0):
                         developed_whites += 1
-                elif(piece == Match.PIECES['wKg']):
-                    if(y == 0 and (x == 6 or x == 2)):
-                        developed_whites += 2
+                """
+                if(piece == Match.PIECES['wKg']):
+                    if(y == 0 and x == 6 and match.readfield(x-1, y+1) == Match.PIECES['wPw'] and match.readfield(x, y+1) == Match.PIECES['wPw']):
+                        developed_whites += 20
+                    elif(y == 0 and x == 2 and match.readfield(x, y+1) == Match.PIECES['wPw'] and match.readfield(x-1, y+1) == Match.PIECES['wPw'] and match.readfield(x-2, y+1) == Match.PIECES['wPw']):
+                        developed_whites += 20
             else:
+                """
                 if(piece == Match.PIECES['bKn']):
                     if(y < 7):
-                        developed_blacks -= 3
+                        developed_blacks += -3
                 elif(piece == Match.PIECES['bBp']):
                     if(y < 7):
-                        developed_blacks -= 2
+                        developed_blacks += -2
                 elif(piece == Match.PIECES['bQu']):
                     if(y < 7):
-                        developed_blacks -= 1
-                elif(piece == Match.PIECES['bKg']):
-                    if(y == 7 and (x == 6 or x == 2)):
-                        developed_blacks -= 2
+                        developed_blacks += -1
+                """
+                if(piece == Match.PIECES['bKg']):
+                    if(y == 7 and x == 6 and match.readfield(x-1, y-1) == Match.PIECES['bPw'] and match.readfield(x, y-1) == Match.PIECES['bPw']):
+                        developed_blacks += -20
+                    elif(y == 7 and x == 2 and match.readfield(x, y-1) == Match.PIECES['bPw'] and match.readfield(x-1, y-1) == Match.PIECES['bPw'] and match.readfield(x-2, y-1) == Match.PIECES['bPw']):
+                        developed_blacks += -20
 
     return developed_whites + developed_blacks
 
@@ -129,15 +139,15 @@ def evaluate_position(match):
 
     movecnt = evaluate_movecnt(match)
 
-    if(match.count < 16):
+    if(match.count < 24):
         developments = evaluate_developments(match)
     else:
         developments = 0
 
-    #print("contacts: " + str(contacts))
-    #print("movecnts: " + str(movecnt))
-    #print("developments: " + str(developments))
-    #print("****************************")
+    # print("contacts: " + str(contacts))
+    # print("movecnts: " + str(movecnt))
+    # print("developments: " + str(developments))
+    # print("****************************")
 
     return (movecnt + contacts + developments)
 
