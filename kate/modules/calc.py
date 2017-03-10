@@ -265,24 +265,24 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
         elif(depth <= maxdepth + 1):
             if(match.next_color() == Match.COLORS['white']):
-                wkg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
-                # white_promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty >= 6    
-                
-                if(is_move_capture or is_move_promotion or is_former_move_capture or is_former_move_promotion or wkg_attacked):
-                    newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
-                else:
-                    newscore = match.score + calc_helper.evaluate_position(match)
+                kg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
             else:
-                bkg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
-                # black_promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty <= 1
-                if(is_move_capture or is_move_promotion or is_former_move_capture or is_former_move_promotion or bkg_attacked):
-                    newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
-                else:
-                    newscore = match.score + calc_helper.evaluate_position(match)
-        elif(depth <= maxdepth + 4 and (is_move_capture or is_move_promotion)):
-            newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
+                kg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+
+            if(is_move_capture or is_move_promotion or is_former_move_capture or is_former_move_promotion or kg_attacked):
+                newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
+            else:
+                newscore = match.score + calc_helper.evaluate_position(match)
         else:
-            newscore = match.score + calc_helper.evaluate_position(match)
+            if(match.next_color() == Match.COLORS['white']):
+                kg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+            else:
+                kg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+
+            if(depth <= maxdepth + 4 and (is_move_capture or is_move_promotion or kg_attacked)):
+                newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
+            else:
+                newscore = match.score + calc_helper.evaluate_position(match)
 
         newscore, gmove = rate(color, gmove, newgmove, maxscore, newscore)
         match.undo_move(True)
@@ -352,23 +352,24 @@ def calc_min(match, maxdepth, depth, alpha, beta):
             newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
         elif(depth <= maxdepth + 1):
             if(match.next_color() == Match.COLORS['white']):
-                wkg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
-                # white_promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty >= 6
-                if(is_move_capture or is_move_promotion or is_former_move_capture or is_former_move_promotion or wkg_attacked):
-                    newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
-                else:
-                    newscore = match.score + calc_helper.evaluate_position(match)
+                kg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
             else:
-                bkg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
-                # black_promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['bPw'] and newgmove.dsty <= 1
-                if(is_move_capture or is_move_promotion or is_former_move_capture or is_former_move_promotion or bkg_attacked):
-                    newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
-                else:
-                    newscore = match.score + calc_helper.evaluate_position(match)
-        elif(depth <= maxdepth + 4 and (is_move_capture or is_move_promotion)):
-            newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
+                kg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+
+            if(is_move_capture or is_move_promotion or is_former_move_capture or is_former_move_promotion or kg_attacked):
+                newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
+            else:
+                newscore = match.score + calc_helper.evaluate_position(match)
         else:
-            newscore = match.score + calc_helper.evaluate_position(match)
+            if(match.next_color() == Match.COLORS['white']):
+                kg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+            else:
+                kg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+
+            if(depth <= maxdepth + 4 and (is_move_capture or is_move_promotion or kg_attacked)):
+                newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
+            else:
+                newscore = match.score + calc_helper.evaluate_position(match)
 
         newscore, gmove = rate(color, gmove, newgmove, minscore, newscore)
         match.undo_move(True)
