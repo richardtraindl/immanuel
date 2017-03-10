@@ -263,7 +263,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
 
         if(depth <= maxdepth):
             newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
-        elif(depth <= maxdepth + 2):
+        elif(depth <= maxdepth + 1):
             if(match.next_color() == Match.COLORS['white']):
                 wkg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
                 # white_promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty >= 6    
@@ -350,7 +350,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
 
         if(depth <= maxdepth):
             newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
-        elif(depth <= maxdepth + 2):
+        elif(depth <= maxdepth + 1):
             if(match.next_color() == Match.COLORS['white']):
                 wkg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
                 # white_promotion = match.readfield(newgmove.dstx, newgmove.dsty) == Match.PIECES['wPw'] and newgmove.dsty >= 6
