@@ -174,15 +174,8 @@ def attacked(match, srcx, srcy, opp_color):
     if(knight.does_kn_attack_field(match, opp_color, srcx, srcy)):
         return True
 
-    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
-    for i in range(8):
-        dstx = srcx + KG_STEPS[i][0]
-        dsty = srcy + KG_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) or
-                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) ):
-                return True
+    if(king.does_kg_attack_field(match, opp_color, srcx, srcy)):
+        return True
 
     wPW_STEPS = [ [1, 1], [-1, 1] ]
     for i in range(2):
