@@ -214,11 +214,11 @@ def does_support_attacked(match, srcx, srcy):
 def count_attacks(match, srcx, srcy):
     count = 0
 
-    count =+ rook.count_attacks(match, srcx, srcy)
-    count =+ knight.count_attacks(match, srcx, srcy)
-    count =+ bishop.count_attacks(match, srcx, srcy)
-    count =+ king.count_attacks(match, srcx, srcy)
-    count =+ pawn.count_attacks(match, srcx, srcy)
+    count += rook.count_attacks(match, srcx, srcy)
+    count += knight.count_attacks(match, srcx, srcy)
+    count += bishop.count_attacks(match, srcx, srcy)
+    count += king.count_attacks(match, srcx, srcy)
+    count += pawn.count_attacks(match, srcx, srcy)
 
     return count
 
