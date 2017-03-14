@@ -211,68 +211,14 @@ def does_support_attacked(match, srcx, srcy):
     return False
 
 
-def count_attacks(match, srcx, srcy, opp_color):
+def count_attacks(match, srcx, srcy):
     count = 0
 
-    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
-    for i in range(4):
-        stepx = RK_STEPS[i][0]
-        stepy = RK_STEPS[i][1]
-        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
-        if(dstx != UNDEF_X):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) or
-                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) ):
-                count += 1
-
-    BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
-    for i in range(4):
-        stepx = BP_STEPS[i][0]
-        stepy = BP_STEPS[i][1]
-        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
-        if(dstx != UNDEF_X):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) or
-                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) ):
-                count += 1
-
-    KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
-    for i in range(8):
-        dstx = srcx + KN_STEPS[i][0]
-        dsty = srcy + KN_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKn']) or
-                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKn']) ):
-                count += 1
-
-    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
-    for i in range(8):
-        dstx = srcx + KG_STEPS[i][0]
-        dsty = srcy + KG_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) or
-                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) ):
-                count += 1
-
-    wPW_STEPS = [ [1, 1], [-1, 1] ]
-    for i in range(2):
-        dstx = srcx + wPW_STEPS[i][0]
-        dsty = srcy + wPW_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if(opp_color == Match.COLORS['black'] and piece == Match.PIECES['bPw']):
-                count += 1
-
-    bPW_STEPS = [ [1, -1], [-1, -1] ]
-    for i in range(2):
-        dstx = srcx + bPW_STEPS[i][0]
-        dsty = srcy + bPW_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if(opp_color == Match.COLORS['white'] and piece == Match.PIECES['wPw']):
-                count += 1
+    count =+ rook.count_attacks(match, srcx, srcy)
+    count =+ knight.count_attacks(match, srcx, srcy)
+    count =+ bishop.count_attacks(match, srcx, srcy)
+    count =+ king.count_attacks(match, srcx, srcy)
+    count =+ pawn.count_attacks(match, srcx, srcy)
 
     return count
 
