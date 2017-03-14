@@ -20,7 +20,7 @@ STEP_2N1W_X = -1
 STEP_2N1W_Y = 2
 
 
-def does_kn_attack_field(match, color, fieldx, fieldy):
+def is_field_attacked(match, color, fieldx, fieldy):
     KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
     for i in range(8):
         x1 = fieldx + KN_STEPS[i][0]
@@ -31,6 +31,19 @@ def does_kn_attack_field(match, color, fieldx, fieldy):
                 (color == Match.COLORS['black'] and piece == Match.PIECES['bKn']) ):
                 return True
     return True
+
+
+def does_attack_opponent(match, opp_color, srcx, srcy):
+    KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
+    for i in range(8):
+        x1 = srcx + KN_STEPS[i][0]
+        y1 = srcy + KN_STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( piece != Match.PIECES['blk'] and opp_color != Match.color_of_piece(piece) ):
+                return True
+
+    return False
 
 
 def kn_dir(srcx, srcy, dstx, dsty):
