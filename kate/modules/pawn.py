@@ -61,10 +61,35 @@ def does_attack(match, srcx, srcy):
         y1 = srcy + STEPS[i][1]
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( color != Match.color_of_piece(piece) ):
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 return True
 
     return False
+
+
+def count_attacks(match, srcx, srcy):
+    count = 0
+    pawn = match.readfield(srcx, srcy)
+
+    if(pawn != Match.PIECES['wPw'] and pawn != Match.PIECES['bPw']):
+        return count
+
+    color = Match.color_of_piece(pawn)
+
+    if(color == Match.COLORS['white']):
+        STEPS = WPW_STEPS
+    else:
+        STEPS = BPW_STEPS
+
+    for i in range(2):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                count += 1
+
+        return count
 
 
 def does_support_attacked(match, srcx, srcy):
