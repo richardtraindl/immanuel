@@ -48,6 +48,27 @@ def does_attack(match, srcx, srcy):
     return False
 
 
+def count_attacks(match, srcx, srcy):
+    count = 0
+    bishop = match.readfield(srcx, srcy)
+
+    if(bishop != Match.PIECES['wBp'] and bishop != Match.PIECES['bBp']):
+        return count
+
+    color = Match.color_of_piece(bishop)
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = search(match, srcx, srcy, stepx , stepy)
+        if(x1 != UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                count += 1
+
+        return count
+
+
 def does_support_attacked(match, srcx, srcy):
     bishop = match.readfield(srcx, srcy)
 
