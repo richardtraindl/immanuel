@@ -45,6 +45,10 @@ def is_field_attacked(match, color, fieldx, fieldy):
 
 def does_attack(match, srcx, srcy):
     pawn = match.readfield(srcx, srcy)
+
+    if(pawn != Match.PIECES['wPw'] and pawn != Match.PIECES['bPw']):
+        return False
+
     color = Match.color_of_piece(pawn)
 
     if(color == Match.COLORS['white']):
@@ -65,6 +69,10 @@ def does_attack(match, srcx, srcy):
 
 def does_support_attacked(match, srcx, srcy):
     pawn = match.readfield(srcx, srcy)
+
+    if(pawn != Match.PIECES['wPw'] and pawn != Match.PIECES['bPw']):
+        return False
+
     color = Match.color_of_piece(pawn)
 
     if(color == Match.COLORS['white']):
