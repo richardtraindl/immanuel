@@ -50,6 +50,7 @@ def does_attack(match, srcx, srcy):
 
 def count_attacks(match, srcx, srcy):
     count = 0
+
     bishop = match.readfield(srcx, srcy)
 
     if(bishop != Match.PIECES['wBp'] and bishop != Match.PIECES['bBp']):
