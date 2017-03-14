@@ -30,7 +30,7 @@ def is_field_attacked(match, color, fieldx, fieldy):
     for i in range(8):
         x1 = fieldx + STEPS[i][0]
         y1 = fieldy + STEPS[i][1]
-        if(is_inbounds(x1, y1)):
+        if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
                 (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
@@ -38,7 +38,7 @@ def is_field_attacked(match, color, fieldx, fieldy):
     return False
 
 
-def does_attack(match, opp_color, srcx, srcy):
+def does_attack(match, srcx, srcy):
     king = match.readfield(srcx, srcy)
 
     if(king != Match.PIECES['wKg'] and king != Match.PIECES['bKg']):
@@ -49,7 +49,7 @@ def does_attack(match, opp_color, srcx, srcy):
     for i in range(8):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
-        if(is_inbounds(x1, y1)):
+        if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 return True
@@ -70,12 +70,12 @@ def count_attacks(match, srcx, srcy):
     for i in range(8):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
-        if(is_inbounds(x1, y1)):
+        if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 count += 1
 
-        return count
+    return count
 
 
 def score_attacks(match, srcx, srcy):
@@ -86,17 +86,17 @@ def score_attacks(match, srcx, srcy):
     if(king != Match.PIECES['wKg'] and king != Match.PIECES['bKg']):
         return score
 
-        color = Match.color_of_piece(king)
+    color = Match.color_of_piece(king)
 
     for i in range(8):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
-        if(is_inbounds(x1, y1)):
+        if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 score += Match.SCORES[piece]
 
-        return score
+    return score
 
 
 def does_support_attacked(match, srcx, srcy):
@@ -110,17 +110,16 @@ def does_support_attacked(match, srcx, srcy):
     for i in range(8):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
-        if(is_inbounds(x1, y1)):
+        if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(piece == Match.PIECES['blk']):
                 continue
             if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1):
+                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)):
                     return True
 
     return False
-                   
-                   
+
 
 def kg_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS
@@ -172,7 +171,7 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     match.writefield(srcx, srcy, Match.PIECES['blk'])
     for i in range(3):
         castlingx = srcx + i
-        attacked = rules.attacked(match, castlingx, srcy, opp_color)
+        attacked = rules.is_field_attacked(match, opp_color, castlingx, srcy)
         if(attacked == True):            
             match.writefield(srcx, srcy, king)
             return False
@@ -203,7 +202,7 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     match.writefield(srcx, srcy, Match.PIECES['blk'])
     for i in range(0, -3, -1):
         castlingx = srcx + i
-        attacked = rules.attacked(match, castlingx, srcy, opp_color)
+        attacked = rules.is_field_attacked(match, opp_color, castlingx, srcy)
         if(attacked == True):
             match.writefield(srcx, srcy, king)
             return False
@@ -231,7 +230,7 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
     captured = match.readfield(dstx, dsty)
     match.writefield(srcx, srcy, Match.PIECES['blk'])
     match.writefield(dstx, dsty, king)
-    attacked = rules.attacked(match, dstx, dsty, opp_color)
+    attacked = rules.is_field_attacked(match, opp_color, dstx, dsty)
     match.writefield(srcx, srcy, king)
     match.writefield(dstx, dsty, captured)
     if(attacked == True):

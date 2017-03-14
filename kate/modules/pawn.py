@@ -35,12 +35,13 @@ def is_field_attacked(match, color, fieldx, fieldy):
     for i in range(2):
         x1 = fieldx + STEPS[i][0]
         y1 = fieldy + STEPS[i][1]
-        if(is_inbounds(x1, y1)):
+        if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['wPw']) or
-                (color == Match.COLORS['black'] and piece == Match.PIECES['bPw']):
+                (color == Match.COLORS['black'] and piece == Match.PIECES['bPw']) ):
                 return True
-   return True
+
+    return False
 
 
 def does_attack(match, srcx, srcy):
@@ -59,7 +60,7 @@ def does_attack(match, srcx, srcy):
     for i in range(2):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
-        if(is_inbounds(x1, y1)):
+        if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 return True
@@ -85,12 +86,12 @@ def count_attacks(match, srcx, srcy):
     for i in range(2):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
-        if(is_inbounds(x1, y1)):
+        if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 count += 1
 
-        return count
+    return count
 
 
 def score_attacks(match, srcx, srcy):
@@ -101,17 +102,22 @@ def score_attacks(match, srcx, srcy):
     if(pawn != Match.PIECES['wPw'] and pawn != Match.PIECES['bPw']):
         return score
 
-        color = Match.color_of_piece(pawn)
+    color = Match.color_of_piece(pawn)
+
+    if(color == Match.COLORS['white']):
+        STEPS = WPW_STEPS
+    else:
+        STEPS = BPW_STEPS
 
     for i in range(2):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
-        if(is_inbounds(x1, y1)):
+        if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 score += Match.SCORES[piece]
 
-        return score
+    return score
 
 
 def does_support_attacked(match, srcx, srcy):
@@ -130,12 +136,12 @@ def does_support_attacked(match, srcx, srcy):
     for i in range(2):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
-        if(is_inbounds(x1, y1)):
+        if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
                 continue
             if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1):
+                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)):
                     return True
 
     return False
@@ -229,11 +235,11 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):
             return False
     elif(direction == DIRS['2north']):
         midpiece = match.readfield(dstx, srcy + 1)
-        if(midpiece != Match.PIECES['blk'] or dstpiece != Match.PIECES['blk']):
+        if(midpiece != Match.PIECES['blk'] and dstpiece != Match.PIECES['blk']):
             return False
     elif(direction == DIRS['2south']):
         midpiece = match.readfield(dstx, srcy - 1)
-        if(midpiece != Match.PIECES['blk'] or dstpiece != Match.PIECES['blk']):
+        if(midpiece != Match.PIECES['blk'] and dstpiece != Match.PIECES['blk']):
             return False
     if(direction == DIRS['north-west'] or direction == DIRS['north-east']):
         if(dstcolor != Match.COLORS['black']):

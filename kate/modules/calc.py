@@ -180,17 +180,18 @@ def generate_moves(match, gmoves, movefilter):
                             capture = calc_helper.is_capture(match, gmove)
                             promotion = calc_helper.is_promotion(match, gmove)
                             castling = calc_helper.is_castling(match, gmove)
-                            # attack
-                            # support attacked pieces
-                            # escape for attacked pieces
-                            if(capture or promotion or castling):
+                            attack = calc_helper.does_attack(match, gmove)
+                            support = calc_helper.does_support_attacked(match, gmove)
+                            attacked_king = calc_helper.is_king_attacked(match, gmove)
+                            # escape for attacked pieces rules.
+                            if(capture or promotion or castling or attack or support or attacked_king):
                                 moves.append(gmove)
                         else: # MOVEFILTER['SMALL']
                             capture = calc_helper.is_capture(match, gmove)
                             promotion = calc_helper.is_promotion(match, gmove)
                             castling = calc_helper.is_castling(match, gmove)
-                            # attack king
-                            if(capture or promotion or castling):
+                            attacked_king = calc_helper.is_king_attacked(match, gmove)
+                            if(capture or promotion or castling or attacked_king):
                                 moves.append(gmove)
                     elif(errmsg != rules.ERROR_CODES['king-error']):
                         break
@@ -271,9 +272,9 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     gmoves = []
 
     if(match.next_color() == Match.COLORS['white']):
-        kg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+        kg_attacked = rules.is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
     else:
-        kg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+        kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked or depth <= maxdepth):
         movefilter = MOVEFILTER['ALL']
@@ -343,9 +344,9 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     gmoves = []
 
     if(match.next_color() == Match.COLORS['white']):
-        kg_attacked = rules.attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+        kg_attacked = rules.is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
     else:
-        kg_attacked = rules.attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+        kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked or depth <= maxdepth):
         movefilter = MOVEFILTER['ALL']

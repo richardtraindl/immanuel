@@ -13,12 +13,14 @@ def is_capture(match, move):
                 return True
 
     return False
-        
+
+
 def is_promotion(match, move):
     if(move.prom_piece != None):
         return True
     else:
         return False
+
 
 def is_castling(match, move):
     piece = match.readfield(move.srcx, move.srcy)
@@ -28,81 +30,17 @@ def is_castling(match, move):
 
     return False
 
+
 def does_attack(match, move):
-    piece = match.readfield(move.srcx, move.srcy)
+    return rules.does_attack(match, move.dstx, move.dsty)
 
-    if(piece == Match.PIECES['wPw']):
-        if(is_move_inbounds(move.dstx + pawn.WHITE_1N1E_X, move.dsty + pawn.WHITE_1N1E_Y)):
-            att_piece1 = match.readfield(move.dstx + pawn.WHITE_1N1E_X, move.dsty + pawn.WHITE_1N1E_Y)
-            if(color_of_piece(att_piece1) == Match.COLORS['black']):
-                return True
-        if(is_move_inbounds(move.dstx + pawn.WHITE_1N1W_X, move.dsty + pawn.WHITE_1N1W_Y)):
-            att_piece2 = match.readfield(move.dstx + pawn.WHITE_1N1W_X, move.dsty + pawn.WHITE_1N1W_Y)
-            if(color_of_piece(att_piece2) == Match.COLORS['black']):
-                return True
 
-        return False
-    elif(piece == Match.PIECES['bPw']):
-        if(is_move_inbounds(move.dstx + pawn.BLACK_1S1E_X, move.dsty + pawn.BLACK_1S1E_Y)):
-            att_piece1 = match.readfield(move.dstx + pawn.BLACK_1S1E_X, move.dsty + pawn.BLACK_1S1E_Y)
-            if(color_of_piece(att_piece1) == Match.COLORS['white']):
-                return True
-        if(is_move_inbounds(move.dstx + pawn.BLACK_1S1W_X, move.dsty + pawn.BLACK_1S1W_Y)):
-            att_piece2 = match.readfield(move.dstx + pawn.BLACK_1S1W_X, move.dsty + pawn.BLACK_1S1W_Y)
-            if(color_of_piece(att_piece2) == Match.COLORS['white']):
-                return True
+def does_support_attacked(match, move):
+    return rules.does_support_attacked(match, move.dstx, move.dsty)
 
-        return False
-    elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
-        rkdir = rk_dir(move.srcx, move.srcy, move.dstx, move.dsty)
-        if(rkdir == rules.DIRS['north'] or rkdir == rules.DIRS['south']):
-            RK_STEPS = [ [[1, 0], [-1, 0] ]
-        else:
-            RK_STEPS = [ [0, 1], [0, -1] ]
-        for i in range(2):
-            stepx = RK_STEPS[i][0]
-            stepy = RK_STEPS[i][1]
-            x1, y1 = search(match, move.srcx, move.srcy, stepx, stepy)
-            if(x1 != UNDEF_X):
-                att_piece = match.readfield(x1, y1)
-                if(color_of_piece(piece) != color_of_piece(att_piece) and color_of_piece(att_piece) != Match.COLORS['undefined']):
-                    return True
-        return False
-    elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
-        bpdir = rk_dir(move.srcx, move.srcy, move.dstx, move.dsty)
-        if(bpdir == rules.DIRS['north-east'] or bpdir == rules.DIRS['south-west']):
-            BP_STEPS = [ [-1, 1], [1, -1] ]
-        else:
-            BP_STEPS = [ [1, 1], [-1, -1] ]
-        for i in range(2):
-            stepx = BP_STEPS[i][0]
-            stepy = BP_STEPS[i][1]
-            x1, y1 = search(match, move.srcx, move.srcy, stepx, stepy)
-            if(x1 != UNDEF_X):
-                att_piece = match.readfield(x1, y1)
-                if(color_of_piece(piece) != color_of_piece(att_piece) and color_of_piece(att_piece) != Match.COLORS['undefined']):
-                    return True
-        return False
-    elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
-        KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
-        for i in range(8):
-            x1 = move.srcx + KN_STEPS[i][0]
-            y2 = move.srcy + KN_STEPS[i][1]
-            if(is_inbounds(x1, y1)):
-                att_piece = match.readfield(x1, y1)
-                if(color_of_piece(piece) != color_of_piece(att_piece) and color_of_piece(att_piece) != Match.COLORS['undefined']):
-                    return True
-    elif(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
-        KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
-        for i in range(8):
-            x1 = move.srcx + KG_STEPS[i][0]
-            y1 = move.srcy + KG_STEPS[i][1]
-            if(is_inbounds(x1, y1)):
-                att_piece = match.readfield(x1, y1)
-                if(color_of_piece(piece) != color_of_piece(att_piece) and color_of_piece(att_piece) != Match.COLORS['undefined']):
-                    return True
-    else:
-        return False
+
+def is_king_attacked(match, move):
+    return rules.is_king_attacked(match, move.srcx, move.srcy)
 
 
 def pieces_attacked(match, color):
@@ -115,7 +53,7 @@ def pieces_attacked(match, color):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
             if(Match.color_of_piece(piece) == opp_color):
-                if(rules.attacked(match, x, y, opp_color)):
+                if(rules.is_field_attacked(match, opp_color, x, y)):
                     return True
             else:
                 continue
@@ -136,12 +74,12 @@ def evaluate_contacts(match):
             if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
                 continue
             elif(Match.color_of_piece(piece) == Match.COLORS['white']):
-                supported_whites += rules.count_attacks(match, x, y, Match.COLORS['white'])
-                attacked_whites += rules.eval_attacks(match, x, y, Match.COLORS['black'])
+                supported_whites += rules.count_attacks(match, x, y)
+                attacked_whites += rules.score_attacks(match, x, y)
                 # attacked_whites += rules.count_attacks(match, x, y, Match.COLORS['black'])
             else:
-                supported_blacks += rules.count_attacks(match, x, y, Match.COLORS['black'])
-                attacked_blacks += rules.eval_attacks(match, x, y, Match.COLORS['white'])
+                supported_blacks += rules.count_attacks(match, x, y)
+                attacked_blacks += rules.score_attacks(match, x, y)
                 #attacked_blacks += rules.count_attacks(match, x, y, Match.COLORS['white'])
 
     return (supported_whites - attacked_whites) - (supported_blacks - attacked_blacks)

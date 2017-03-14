@@ -14,12 +14,12 @@ WEST_Y = 0
 STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
 
 
-def is_field_attacked(match, color, fieldx, fieldy)
+def is_field_attacked(match, color, fieldx, fieldy):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = search(match, fieldx, fieldy, stepx, stepy)
-        if(x1 != UNDEF_X):
+        x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if( (color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) or
                 (color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) ):
@@ -39,8 +39,8 @@ def does_attack(match, srcx, srcy):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = search(match, srcx, srcy, stepx , stepy)
-        if(x1 != UNDEF_X):
+        x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
+        if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 return True
@@ -61,13 +61,13 @@ def count_attacks(match, srcx, srcy):
         for i in range(4):
             stepx = STEPS[i][0]
             stepy = STEPS[i][1]
-            x1, y1 = search(match, srcx, srcy, stepx , stepy)
-            if(x1 != UNDEF_X):
+            x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
+            if(x1 != rules.UNDEF_X):
                 piece = match.readfield(x1, y1)
                 if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                     count += 1
 
-        return count
+    return count
 
 
 def score_attacks(match, srcx, srcy):
@@ -83,13 +83,13 @@ def score_attacks(match, srcx, srcy):
         for i in range(4):
             stepx = STEPS[i][0]
             stepy = STEPS[i][1]
-            x1, y1 = search(match, srcx, srcy, stepx , stepy)
-            if(x1 != UNDEF_X):
+            x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
+            if(x1 != rules.UNDEF_X):
                 piece = match.readfield(x1, y1)
                 if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                     score += Match.SCORES[piece]
 
-        return score
+    return score
 
 
 def does_support_attacked(match, srcx, srcy):
@@ -103,13 +103,13 @@ def does_support_attacked(match, srcx, srcy):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = search(match, srcx, srcy, stepx , stepy)
-        if(x1 != UNDEF_X):
+        x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
+        if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
                 continue
             if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1):
+                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)):
                     return True
 
     return False

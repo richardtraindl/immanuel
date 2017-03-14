@@ -286,7 +286,7 @@ def is_move_available(match):
 
 def game_status(match):
     if(match.next_color() == Match.COLORS['white']):
-        flag = is_field_attacked(match,  Match.COLORS['black'], match.wKg_x, match.wKg_y)
+        flag = is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
     else:
         flag = is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
