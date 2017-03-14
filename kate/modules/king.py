@@ -24,7 +24,7 @@ STEP_LG_CASTLING_X = -2
 STEP_LG_CASTLING_Y = 0
 
 
-def does_kg_attack_field(match, color, fieldx, fieldy):
+def is_field_attacked(match, color, fieldx, fieldy):
     KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
     for i in range(8):
         x1 = fieldx + KG_STEPS[i][0]
@@ -34,6 +34,19 @@ def does_kg_attack_field(match, color, fieldx, fieldy):
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
                 (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
                 return True
+    return False
+
+
+def does_attack_opponent(match, opp_color, srcx, srcy):
+    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
+    for i in range(8):
+        x1 = srcx + KG_STEPS[i][0]
+        y1 = srcy + KG_STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( piece != Match.PIECES['blk'] and opp_color != Match.color_of_piece(piece) ):
+                return True
+
     return False
 
 
