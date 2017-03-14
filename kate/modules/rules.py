@@ -177,23 +177,8 @@ def attacked(match, srcx, srcy, opp_color):
     if(king.does_kg_attack_field(match, opp_color, srcx, srcy)):
         return True
 
-    wPW_STEPS = [ [1, 1], [-1, 1] ]
-    for i in range(2):
-        dstx = srcx + wPW_STEPS[i][0]
-        dsty = srcy + wPW_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if(opp_color == Match.COLORS['black'] and piece == Match.PIECES['bPw']):
-                return True
-
-    bPW_STEPS = [ [1, -1], [-1, -1] ]
-    for i in range(2):
-        dstx = srcx + bPW_STEPS[i][0]
-        dsty = srcy + bPW_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if(opp_color == Match.COLORS['white'] and piece == Match.PIECES['wPw']):
-                return True
+    if(pawn.does_pw_attack_field(match, opp_color, srcx, srcy)):
+        return True
 
     return False
 
