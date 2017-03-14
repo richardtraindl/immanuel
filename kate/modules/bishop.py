@@ -27,7 +27,7 @@ def is_field_attacked(match, color, fieldx, fieldy):
     return False
 
 
-def does_attack_opponent(match, opp_color, srcx, srcy):
+def does_attack(match, opp_color, srcx, srcy):
     BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
     for i in range(4):
         stepx = BP_STEPS[i][0]
