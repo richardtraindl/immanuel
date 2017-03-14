@@ -12,7 +12,7 @@ WEST_X = -1
 WEST_Y = 0
 
 
-def does_rk_attack_field(match, color, fieldx, fieldy)
+def is_field_attacked(match, color, fieldx, fieldy)
     RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
     for i in range(4):
         stepx = RK_STEPS[i][0]
@@ -22,6 +22,20 @@ def does_rk_attack_field(match, color, fieldx, fieldy)
             piece = match.readfield(x1, y1)
             if( (color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) or
                 (color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) ):
+                return True
+
+    return False
+
+
+def does_attack_opponent(match, opp_color, srcx, srcy):
+    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
+    for i in range(4):
+        stepx = RK_STEPS[i][0]
+        stepy = RK_STEPS[i][1]
+        x1, y1 = search(match, srcx, srcy, stepx , stepy)
+        if(x1 != UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if( piece != Match.PIECES['blk'] and opp_color != Match.color_of_piece(piece) ):
                 return True
 
     return False
