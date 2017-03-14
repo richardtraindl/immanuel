@@ -19,6 +19,102 @@ STEP_1N2W_Y = 1
 STEP_2N1W_X = -1
 STEP_2N1W_Y = 2
 
+STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
+
+
+def is_field_attacked(match, color, fieldx, fieldy):
+    for i in range(8):
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKn']) or
+                (color == Match.COLORS['black'] and piece == Match.PIECES['bKn']) ):
+                return True
+    return True
+
+
+def does_attack(match, srcx, srcy):
+    knight = match.readfield(srcx, srcy)
+
+    if(knight != Match.PIECES['wKn'] and knight != Match.PIECES['bKn']):
+        return False
+
+    color = Match.color_of_piece(knight)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                return True
+
+    return False
+
+
+def count_attacks(match, srcx, srcy):
+    count = 0
+    knight = match.readfield(srcx, srcy)
+
+    if(knight != Match.PIECES['wKn'] and knight != Match.PIECES['bKn']):
+        return count
+
+    color = Match.color_of_piece(knight)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                count += 1
+
+        return count
+
+
+def score_attacks(match, srcx, srcy):
+    score = 0
+
+    knight = match.readfield(srcx, srcy)
+
+    if(knight != Match.PIECES['wKn'] and knight != Match.PIECES['bKn']):
+        return score
+
+        color = Match.color_of_piece(knight)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                score += Match.SCORES[piece]
+
+        return score
+
+
+def does_support_attacked(match, srcx, srcy):
+    knight = match.readfield(srcx, srcy)
+
+    if(knight != Match.PIECES['wKn'] and knight != Match.PIECES['bKn']):
+        return False
+
+    color = Match.color_of_piece(knight)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+                continue
+            if( color == Match.color_of_piece(piece) ):
+                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1):
+                    return True
+
+    return False
+
 
 def kn_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS
@@ -42,7 +138,6 @@ def kn_dir(srcx, srcy, dstx, dsty):
         return DIRS['valid']
     else:
         return DIRS['undefined']
-
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):

@@ -68,16 +68,6 @@ UNDEF_X = 8
 UNDEF_Y = 8
 
 
-def is_move_color_ok_OLD(piece, count):
-    color = Match.color_of_piece(piece)
-    if(count % 2 == 0 and color == Match.COLORS['white']):
-        return True
-    elif(count % 2 == 1 and color == Match.COLORS['black']):
-        return True
-    else:
-        return False
-
-
 def is_inbounds(x, y):
     if(x < 0 or x > 7 or y < 0 or y > 7):
         return False
@@ -164,200 +154,96 @@ def pin_dir(match, scrx, srcy):
     return DIRS['undefined']
 
 
-def attacked(match, srcx, srcy, opp_color):
-    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
-    for i in range(4):
-        stepx = RK_STEPS[i][0]
-        stepy = RK_STEPS[i][1]
-        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
-        if(dstx != UNDEF_X):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) or
-                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) ):
-                return True
+def is_field_attacked(match, color, srcx, srcy):
+    if(rook.is_field_attacked(match, color, srcx, srcy)):
+        return True
 
-    BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
-    for i in range(4):
-        stepx = BP_STEPS[i][0]
-        stepy = BP_STEPS[i][1]
-        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
-        if(dstx != UNDEF_X):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) or
-                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) ):
-                return True
+    if(bishop.is_field_attacked(match, color, srcx, srcy)):
+        return True
 
-    KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
-    for i in range(8):
-        dstx = srcx + KN_STEPS[i][0]
-        dsty = srcy + KN_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKn']) or
-                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKn']) ):
-                return True
+    if(knight.is_field_attacked(match, color, srcx, srcy)):
+        return True
 
-    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
-    for i in range(8):
-        dstx = srcx + KG_STEPS[i][0]
-        dsty = srcy + KG_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) or
-                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) ):
-                return True
+    if(king.is_field_attacked(match, color, srcx, srcy)):
+        return True
 
-    wPW_STEPS = [ [1, 1], [-1, 1] ]
-    for i in range(2):
-        dstx = srcx + wPW_STEPS[i][0]
-        dsty = srcy + wPW_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if(opp_color == Match.COLORS['black'] and piece == Match.PIECES['bPw']):
-                return True
-
-    bPW_STEPS = [ [1, -1], [-1, -1] ]
-    for i in range(2):
-        dstx = srcx + bPW_STEPS[i][0]
-        dsty = srcy + bPW_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if(opp_color == Match.COLORS['white'] and piece == Match.PIECES['wPw']):
-                return True
+    if(pawn.is_field_attacked(match, color, srcx, srcy)):
+        return True
 
     return False
 
 
-def count_attacks(match, srcx, srcy, opp_color):
+def does_attack(match, srcx, srcy):
+    if( rook.does_attack(match, srcx, srcy) ):
+        return True
+
+    if( bishop.does_attack(match, srcx, srcy) ):
+        return True
+
+    if( knight.does_attack(match, srcx, srcy) ):
+        return True
+
+    if( king.does_attack(match, srcx, srcy) ):
+        return True
+
+    if( pawn.does_attack(match, srcx, srcy) ):
+        return True
+
+    return False
+
+
+def does_support_attacked(match, srcx, srcy):
+    if( rook.does_support_attacked(match, srcx, srcy) ):
+        return True
+
+    if( bishop.does_support_attacked(match, srcx, srcy) ):
+        return True
+
+    if( knight.does_support_attacked(match, srcx, srcy) ):
+        return True
+
+    if( king.does_support_attacked(match, srcx, srcy) ):
+        return True
+
+    if( pawn.does_support_attacked(match, srcx, srcy) ):
+        return True
+
+    return False
+
+
+def count_attacks(match, srcx, srcy):
     count = 0
 
-    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
-    for i in range(4):
-        stepx = RK_STEPS[i][0]
-        stepy = RK_STEPS[i][1]
-        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
-        if(dstx != UNDEF_X):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) or
-                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) ):
-                count += 1
-
-    BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
-    for i in range(4):
-        stepx = BP_STEPS[i][0]
-        stepy = BP_STEPS[i][1]
-        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
-        if(dstx != UNDEF_X):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) or
-                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) ):
-                count += 1
-
-    KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
-    for i in range(8):
-        dstx = srcx + KN_STEPS[i][0]
-        dsty = srcy + KN_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKn']) or
-                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKn']) ):
-                count += 1
-
-    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
-    for i in range(8):
-        dstx = srcx + KG_STEPS[i][0]
-        dsty = srcy + KG_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) or
-                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) ):
-                count += 1
-
-    wPW_STEPS = [ [1, 1], [-1, 1] ]
-    for i in range(2):
-        dstx = srcx + wPW_STEPS[i][0]
-        dsty = srcy + wPW_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if(opp_color == Match.COLORS['black'] and piece == Match.PIECES['bPw']):
-                count += 1
-
-    bPW_STEPS = [ [1, -1], [-1, -1] ]
-    for i in range(2):
-        dstx = srcx + bPW_STEPS[i][0]
-        dsty = srcy + bPW_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if(opp_color == Match.COLORS['white'] and piece == Match.PIECES['wPw']):
-                count += 1
+    count += rook.count_attacks(match, srcx, srcy)
+    count += knight.count_attacks(match, srcx, srcy)
+    count += bishop.count_attacks(match, srcx, srcy)
+    count += king.count_attacks(match, srcx, srcy)
+    count += pawn.count_attacks(match, srcx, srcy)
 
     return count
 
 
-def eval_attacks(match, srcx, srcy, opp_color):
-    value = 0
+def score_attacks(match, srcx, srcy):
+    score = 0
 
-    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
-    for i in range(4):
-        stepx = RK_STEPS[i][0]
-        stepy = RK_STEPS[i][1]
-        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
-        if(dstx != UNDEF_X):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) or
-                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) ):
-                value += Match.SCORES[piece] // 30
+    score += rook.score_attacks(match, srcx, srcy)
+    score += knight.score_attacks(match, srcx, srcy)
+    score += bishop.score_attacks(match, srcx, srcy)
+    score += king.score_attacks(match, srcx, srcy)
+    score += pawn.score_attacks(match, srcx, srcy)
 
-    BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
-    for i in range(4):
-        stepx = BP_STEPS[i][0]
-        stepy = BP_STEPS[i][1]
-        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
-        if(dstx != UNDEF_X):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) or
-                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) ):
-                value += Match.SCORES[piece] // 30
+    return score
 
-    KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
-    for i in range(8):
-        dstx = srcx + KN_STEPS[i][0]
-        dsty = srcy + KN_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKn']) or
-                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKn']) ):
-                value += Match.SCORES[piece] // 30
 
-    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
-    for i in range(8):
-        dstx = srcx + KG_STEPS[i][0]
-        dsty = srcy + KG_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) or
-                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) ):
-                value += Match.SCORES[piece] // 300
+def is_king_attacked(match, x1, y1):
+    king = match.readfield(x1, y1)
 
-    wPW_STEPS = [ [1, 1], [-1, 1] ]
-    for i in range(2):
-        dstx = srcx + wPW_STEPS[i][0]
-        dsty = srcy + wPW_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if(opp_color == Match.COLORS['black'] and piece == Match.PIECES['bPw']):
-                value += Match.SCORES[piece] // 30
+    if(king != Match.PIECES['wKg'] and king != Match.PIECES['bKg']):
+        return False
 
-    bPW_STEPS = [ [1, -1], [-1, -1] ]
-    for i in range(2):
-        dstx = srcx + bPW_STEPS[i][0]
-        dsty = srcy + bPW_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if(opp_color == Match.COLORS['white'] and piece == Match.PIECES['wPw']):
-                value += Match.SCORES[piece] // 30
+    color = Match.color_of_piece(king)
 
-    return value
+    return is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)
 
 
 def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
@@ -369,9 +255,9 @@ def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
     color = Match.color_of_piece(piece)
 
     if(color == Match.COLORS['white']):
-        flag = attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+        flag = is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
     else:
-        flag = attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+        flag = is_field_attacked(match,  Match.COLORS['white'], match.bKg_x, match.bKg_y)
         
     match.writefield(dstx, dsty, dstpiece)
     match.writefield(srcx, srcy, piece)
@@ -400,9 +286,9 @@ def is_move_available(match):
 
 def game_status(match):
     if(match.next_color() == Match.COLORS['white']):
-        flag = attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+        flag = is_field_attacked(match,  Match.COLORS['black'], match.wKg_x, match.wKg_y)
     else:
-        flag = attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+        flag = is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(is_move_available(match)):
         return Match.STATUS['open']

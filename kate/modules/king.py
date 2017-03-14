@@ -23,6 +23,104 @@ STEP_SH_CASTLING_Y = 0
 STEP_LG_CASTLING_X = -2
 STEP_LG_CASTLING_Y = 0
 
+STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
+
+
+def is_field_attacked(match, color, fieldx, fieldy):
+    for i in range(8):
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
+                (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
+                return True
+    return False
+
+
+def does_attack(match, opp_color, srcx, srcy):
+    king = match.readfield(srcx, srcy)
+
+    if(king != Match.PIECES['wKg'] and king != Match.PIECES['bKg']):
+        return False
+
+    color = Match.color_of_piece(piece) 
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                return True
+
+    return False
+
+
+def count_attacks(match, srcx, srcy):
+    count = 0
+
+    king = match.readfield(srcx, srcy)
+
+    if(king != Match.PIECES['wKg'] and king != Match.PIECES['bKg']):
+        return count
+
+    color = Match.color_of_piece(king)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                count += 1
+
+        return count
+
+
+def score_attacks(match, srcx, srcy):
+    score = 0
+
+    king = match.readfield(srcx, srcy)
+
+    if(king != Match.PIECES['wKg'] and king != Match.PIECES['bKg']):
+        return score
+
+        color = Match.color_of_piece(king)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                score += Match.SCORES[piece]
+
+        return score
+
+
+def does_support_attacked(match, srcx, srcy):
+    king = match.readfield(srcx, srcy)
+
+    if(king != Match.PIECES['wKg'] and king != Match.PIECES['bKg']):
+        return False
+
+    color = Match.color_of_piece(king)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if(piece == Match.PIECES['blk']):
+                continue
+            if( color == Match.color_of_piece(piece) ):
+                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1):
+                    return True
+
+    return False
+                   
+                   
 
 def kg_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS
