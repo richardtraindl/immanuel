@@ -12,7 +12,7 @@ SEAST_X = 1
 SEAST_Y = -1
 
 
-def does_bp_attack_field(match, color, fieldx, fieldy):
+def is_field_attacked(match, color, fieldx, fieldy):
     BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
     for i in range(4):
         stepx = BP_STEPS[i][0]
@@ -27,7 +27,7 @@ def does_bp_attack_field(match, color, fieldx, fieldy):
     return False
 
 
-def does_bp_attack_opp(match, opp_color, srcx, srcy):
+def does_attack_opponent(match, opp_color, srcx, srcy):
     BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
     for i in range(4):
         stepx = BP_STEPS[i][0]
