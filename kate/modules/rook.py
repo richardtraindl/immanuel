@@ -42,6 +42,21 @@ def rk_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
     else:
         return direction, rules.UNDEF_X, rules.UNDEF_Y
 
+    
+def does_rk_attack_field(match, color, fieldx, fieldy)
+    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
+    for i in range(4):
+        stepx = RK_STEPS[i][0]
+        stepy = RK_STEPS[i][1]
+        x1, y1 = search(match, fieldx, fieldy, stepx, stepy)
+        if(x1 != UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if( (color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) or
+                (color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) ):
+                return True
+
+    return False
+
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
     DIRS = rules.DIRS
