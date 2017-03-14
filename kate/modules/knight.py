@@ -19,12 +19,13 @@ STEP_1N2W_Y = 1
 STEP_2N1W_X = -1
 STEP_2N1W_Y = 2
 
+STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
+
 
 def is_field_attacked(match, color, fieldx, fieldy):
-    KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
     for i in range(8):
-        x1 = fieldx + KN_STEPS[i][0]
-        y1 = fieldy + KN_STEPS[i][1]
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKn']) or
@@ -34,14 +35,28 @@ def is_field_attacked(match, color, fieldx, fieldy):
 
 
 def does_attack(match, opp_color, srcx, srcy):
-    KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
     for i in range(8):
-        x1 = srcx + KN_STEPS[i][0]
-        y1 = srcy + KN_STEPS[i][1]
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( piece != Match.PIECES['blk'] and opp_color != Match.color_of_piece(piece) ):
                 return True
+
+    return False
+
+
+def does_support_attacked(match, srcx, srcy, opp_color):
+    knight = match.readfield(srcx, srcy)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( Match.color_of_piece(knight) == Match.color_of_piece(piece) ):
+                if(rules.is_field_attacked(match, opp_color, x1, y1):
+                    return True
 
     return False
 
