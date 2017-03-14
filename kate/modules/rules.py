@@ -168,26 +168,11 @@ def attacked(match, srcx, srcy, opp_color):
     if(rook.does_rk_attack_field(match, opp_color, srcx, srcy)):
         return True
 
-    BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
-    for i in range(4):
-        stepx = BP_STEPS[i][0]
-        stepy = BP_STEPS[i][1]
-        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
-        if(dstx != UNDEF_X):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) or
-                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) ):
-                return True
+    if(bishop.does_bp_attack_field(match, opp_color, srcx, srcy)):
+        return True
 
-    KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
-    for i in range(8):
-        dstx = srcx + KN_STEPS[i][0]
-        dsty = srcy + KN_STEPS[i][1]
-        if(is_inbounds(dstx, dsty)):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and piece == Match.PIECES['bKn']) or
-                (opp_color == Match.COLORS['white'] and piece == Match.PIECES['wKn']) ):
-                return True
+    if(knight.does_kn_attack_field(match, opp_color, srcx, srcy)):
+        return True
 
     KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
     for i in range(8):
