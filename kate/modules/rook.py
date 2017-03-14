@@ -30,6 +30,10 @@ def is_field_attacked(match, color, fieldx, fieldy)
 
 def does_attack(match, srcx, srcy):
     rook = match.readfield(srcx, srcy)
+
+    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['bRk']):
+        return False
+
     color = Match.color_of_piece(rook)
 
     for i in range(4):
@@ -46,6 +50,10 @@ def does_attack(match, srcx, srcy):
 
 def does_support_attacked(match, srcx, srcy):
     rook = match.readfield(srcx, srcy)
+
+    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['bRk']):
+        return False
+
     color = Match.color_of_piece(rook)
 
     for i in range(4):
