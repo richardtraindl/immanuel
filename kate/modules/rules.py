@@ -343,6 +343,17 @@ def eval_attacks(match, srcx, srcy, opp_color):
     return value
 
 
+def is_king_attacked(match, x1, y1):
+    king = match.readfield(x1, y1)
+
+    if(king != Match.PIECES['wKg'] and king != Match.PIECES['bKg']):
+        return False
+
+    color = Match.color_of_piece(king)
+
+    return is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)
+
+
 def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
     piece = match.readfield(srcx, srcy)
     match.writefield(srcx, srcy, Match.PIECES['blk'])
