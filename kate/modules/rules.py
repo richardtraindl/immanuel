@@ -165,16 +165,8 @@ def pin_dir(match, scrx, srcy):
 
 
 def attacked(match, srcx, srcy, opp_color):
-    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
-    for i in range(4):
-        stepx = RK_STEPS[i][0]
-        stepy = RK_STEPS[i][1]
-        dstx, dsty = search(match, srcx, srcy, stepx, stepy)
-        if(dstx != UNDEF_X):
-            piece = match.readfield(dstx, dsty)
-            if( (opp_color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bRk'])) or
-                (opp_color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wRk'])) ):
-                return True
+    if(rook.does_rk_attack_field(match, opp_color, srcx, srcy)):
+        return True
 
     BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
     for i in range(4):
