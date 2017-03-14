@@ -164,20 +164,58 @@ def pin_dir(match, scrx, srcy):
     return DIRS['undefined']
 
 
-def attacked(match, srcx, srcy, opp_color):
-    if(rook.does_rk_attack_field(match, opp_color, srcx, srcy)):
+def is_field_attacked(match, srcx, srcy, opp_color):
+    if(rook.is_field_attacked(match, opp_color, srcx, srcy)):
         return True
 
-    if(bishop.does_bp_attack_field(match, opp_color, srcx, srcy)):
+    if(bishop.is_field_attacked(match, opp_color, srcx, srcy)):
         return True
 
-    if(knight.does_kn_attack_field(match, opp_color, srcx, srcy)):
+    if(knight.is_field_attacked(match, opp_color, srcx, srcy)):
         return True
 
-    if(king.does_kg_attack_field(match, opp_color, srcx, srcy)):
+    if(king.is_field_attacked(match, opp_color, srcx, srcy)):
         return True
 
-    if(pawn.does_pw_attack_field(match, opp_color, srcx, srcy)):
+    if(pawn.is_field_attacked(match, opp_color, srcx, srcy)):
+        return True
+
+    return False
+
+
+def does_attack(match, srcx, srcy, opp_color):
+    if(rook.does_attack(match, opp_color, srcx, srcy)):
+        return True
+
+    if(bishop.does_attack(match, opp_color, srcx, srcy)):
+        return True
+
+    if(knight.does_attack(match, opp_color, srcx, srcy)):
+        return True
+
+    if(king.does_attack(match, opp_color, srcx, srcy)):
+        return True
+
+    if(pawn.does_attack(match, opp_color, srcx, srcy)):
+        return True
+
+    return False
+
+
+def does_support_attacked(match, srcx, srcy, opp_color):
+    if(rook.does_support_attacked(match, opp_color, srcx, srcy)):
+        return True
+
+    if(bishop.does_support_attacked(match, opp_color, srcx, srcy)):
+        return True
+
+    if(knight.does_support_attacked(match, opp_color, srcx, srcy)):
+        return True
+
+    if(king.does_support_attacked(match, opp_color, srcx, srcy)):
+        return True
+
+    if(pawn.does_support_attacked(match, opp_color, srcx, srcy)):
         return True
 
     return False
@@ -324,9 +362,9 @@ def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
     color = Match.color_of_piece(piece)
 
     if(color == Match.COLORS['white']):
-        flag = attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+        flag = is_field_attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
     else:
-        flag = attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+        flag = is_field_attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
         
     match.writefield(dstx, dsty, dstpiece)
     match.writefield(srcx, srcy, piece)
@@ -355,9 +393,9 @@ def is_move_available(match):
 
 def game_status(match):
     if(match.next_color() == Match.COLORS['white']):
-        flag = attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
+        flag = is_field_attacked(match, match.wKg_x, match.wKg_y, Match.COLORS['black'])
     else:
-        flag = attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
+        flag = is_field_attacked(match, match.bKg_x, match.bKg_y, Match.COLORS['white'])
 
     if(is_move_available(match)):
         return Match.STATUS['open']
