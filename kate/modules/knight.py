@@ -68,7 +68,7 @@ def count_attacks(match, srcx, srcy):
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
-                rcount += 1
+                count += 1
 
         return count
 
