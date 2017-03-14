@@ -28,21 +28,25 @@ def is_field_attacked(match, color, fieldx, fieldy)
     return False
 
 
-def does_attack(match, opp_color, srcx, srcy):
+def does_attack(match, srcx, srcy):
+    rook = match.readfield(srcx, srcy)
+    color = Match.color_of_piece(rook)
+
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = search(match, srcx, srcy, stepx , stepy)
         if(x1 != UNDEF_X):
             piece = match.readfield(x1, y1)
-            if( piece != Match.PIECES['blk'] and opp_color != Match.color_of_piece(piece) ):
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 return True
 
     return False
 
 
-def does_support_attacked(match, srcx, srcy, opp_color):
+def does_support_attacked(match, srcx, srcy):
     rook = match.readfield(srcx, srcy)
+    color = Match.color_of_piece(rook)
 
     for i in range(4):
         stepx = STEPS[i][0]
@@ -50,8 +54,10 @@ def does_support_attacked(match, srcx, srcy, opp_color):
         x1, y1 = search(match, srcx, srcy, stepx , stepy)
         if(x1 != UNDEF_X):
             piece = match.readfield(x1, y1)
-            if( Match.color_of_piece(rook) == Match.color_of_piece(piece) and (piece != Match.PIECES['wKg'] or piece != Match.PIECES['bKg']) ):
-                if(rules.is_field_attacked(match, opp_color, x1, y1):
+            if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+                continue
+            if( color == Match.color_of_piece(piece) ):
+                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1):
                     return True
 
     return False
