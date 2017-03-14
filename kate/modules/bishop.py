@@ -43,14 +43,14 @@ def does_attack(match, opp_color, srcx, srcy):
 
 def does_support_attacked(match, srcx, srcy, opp_color):
     bishop = match.readfield(srcx, srcy)
-    color = Match.color_of_piece(bishop)
+
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = search(match, srcx, srcy, stepx , stepy)
         if(x1 != UNDEF_X):
             piece = match.readfield(x1, y1)
-            if( color == Match.color_of_piece(piece) and (piece != Match.PIECES['wKg'] or piece != Match.PIECES['bKg']) ):
+            if( Match.color_of_piece(bishop) == Match.color_of_piece(piece) and (piece != Match.PIECES['wKg'] or piece != Match.PIECES['bKg']) ):
                 if(rules.is_field_attacked(match, opp_color, x1, y1):
                     return True
 
