@@ -23,12 +23,13 @@ STEP_SH_CASTLING_Y = 0
 STEP_LG_CASTLING_X = -2
 STEP_LG_CASTLING_Y = 0
 
+STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
+
 
 def is_field_attacked(match, color, fieldx, fieldy):
-    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
     for i in range(8):
-        x1 = fieldx + KG_STEPS[i][0]
-        y1 = fieldy + KG_STEPS[i][1]
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
@@ -38,14 +39,28 @@ def is_field_attacked(match, color, fieldx, fieldy):
 
 
 def does_attack(match, opp_color, srcx, srcy):
-    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
     for i in range(8):
-        x1 = srcx + KG_STEPS[i][0]
-        y1 = srcy + KG_STEPS[i][1]
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( piece != Match.PIECES['blk'] and opp_color != Match.color_of_piece(piece) ):
                 return True
+
+    return False
+
+
+def does_support_attacked(match, srcx, srcy, opp_color):
+    king = match.readfield(srcx, srcy)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( Match.color_of_piece(king) == Match.color_of_piece(piece) ):
+                if(rules.is_field_attacked(match, opp_color, x1, y1):
+                    return True
 
     return False
 
