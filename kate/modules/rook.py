@@ -11,12 +11,13 @@ EAST_Y = 0
 WEST_X = -1
 WEST_Y = 0
 
+STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
+
 
 def is_field_attacked(match, color, fieldx, fieldy)
-    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
     for i in range(4):
-        stepx = RK_STEPS[i][0]
-        stepy = RK_STEPS[i][1]
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
         x1, y1 = search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != UNDEF_X):
             piece = match.readfield(x1, y1)
@@ -28,15 +29,30 @@ def is_field_attacked(match, color, fieldx, fieldy)
 
 
 def does_attack(match, opp_color, srcx, srcy):
-    RK_STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
     for i in range(4):
-        stepx = RK_STEPS[i][0]
-        stepy = RK_STEPS[i][1]
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
         x1, y1 = search(match, srcx, srcy, stepx , stepy)
         if(x1 != UNDEF_X):
             piece = match.readfield(x1, y1)
             if( piece != Match.PIECES['blk'] and opp_color != Match.color_of_piece(piece) ):
                 return True
+
+    return False
+
+
+def does_support_attacked(match, srcx, srcy, opp_color):
+    rook = match.readfield(srcx, srcy)
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = search(match, srcx, srcy, stepx , stepy)
+        if(x1 != UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if( Match.color_of_piece(rook) == Match.color_of_piece(piece) and (piece != Match.PIECES['wKg'] or piece != Match.PIECES['bKg']) ):
+                if(rules.is_field_attacked(match, opp_color, x1, y1):
+                    return True
 
     return False
 
