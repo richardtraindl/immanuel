@@ -17,11 +17,25 @@ def does_bp_attack_field(match, color, fieldx, fieldy):
     for i in range(4):
         stepx = BP_STEPS[i][0]
         stepy = BP_STEPS[i][1]
-        x1, y1 = search(match, fieldx, srcy, fieldy, stepy)
+        x1, y1 = search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != UNDEF_X):
             piece = match.readfield(x1, y1)
             if( (color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) or
                 (color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) ):
+                return True
+
+    return False
+
+
+def does_bp_attack_opp(match, opp_color, srcx, srcy):
+    BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+    for i in range(4):
+        stepx = BP_STEPS[i][0]
+        stepy = BP_STEPS[i][1]
+        x1, y1 = search(match, srcx, srcy, stepx , stepy)
+        if(x1 != UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if( piece != Match.PIECES['blk'] and opp_color != Match.color_of_piece(piece) ):
                 return True
 
     return False
