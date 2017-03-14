@@ -50,6 +50,7 @@ def does_attack(match, srcx, srcy):
 
 def count_attacks(match, srcx, srcy):
     count = 0
+
     rook = match.readfield(srcx, srcy)
 
     if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['bRk']):
