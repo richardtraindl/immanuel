@@ -1,5 +1,126 @@
 from kate.models import Match, Move
-from kate.modules import rules, debug, helper
+from kate.modules import rules, pawn, debug, helper
+
+
+def is_capture(match, move):
+    dstpiece = match.readfield(move.dstx, move.dsty)
+    if(dstpiece != Match.PIECES['blk']):
+        return True
+    else:
+        piece = match.readfield(move.srcx, move.srcy)
+        if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
+            if(move.srcx != move.dstx and dstpiece == Match.PIECES['blk']):
+                return True
+
+    return False
+        
+def is_promotion(match, move):
+    if(move.prom_piece != None):
+        return True
+    else:
+        return False
+
+def is_castling(match, move):
+    piece = match.readfield(move.srcx, move.srcy)
+    if(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+        if(move.srcx - move.dstx == 2 or move.srcx - move.dstx == -2):
+            return True
+
+    return False
+
+def does_attack(match, move):
+    piece = match.readfield(move.srcx, move.srcy)
+
+    if(piece == Match.PIECES['wPw']):
+        if(is_move_inbounds(move.dstx + pawn.WHITE_1N1E_X, move.dsty + pawn.WHITE_1N1E_Y)):
+            att_piece1 = match.readfield(move.dstx + pawn.WHITE_1N1E_X, move.dsty + pawn.WHITE_1N1E_Y)
+            if(color_of_piece(att_piece1) == Match.COLORS['black']):
+                return True
+        if(is_move_inbounds(move.dstx + pawn.WHITE_1N1W_X, move.dsty + pawn.WHITE_1N1W_Y)):
+            att_piece2 = match.readfield(move.dstx + pawn.WHITE_1N1W_X, move.dsty + pawn.WHITE_1N1W_Y)
+            if(color_of_piece(att_piece2) == Match.COLORS['black']):
+                return True
+
+        return False
+    elif(piece == Match.PIECES['bPw']):
+        if(is_move_inbounds(move.dstx + pawn.BLACK_1S1E_X, move.dsty + pawn.BLACK_1S1E_Y)):
+            att_piece1 = match.readfield(move.dstx + pawn.BLACK_1S1E_X, move.dsty + pawn.BLACK_1S1E_Y)
+            if(color_of_piece(att_piece1) == Match.COLORS['white']):
+                return True
+        if(is_move_inbounds(move.dstx + pawn.BLACK_1S1W_X, move.dsty + pawn.BLACK_1S1W_Y)):
+            att_piece2 = match.readfield(move.dstx + pawn.BLACK_1S1W_X, move.dsty + pawn.BLACK_1S1W_Y)
+            if(color_of_piece(att_piece2) == Match.COLORS['white']):
+                return True
+
+        return False
+    elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
+        rkdir = rk_dir(move.srcx, move.srcy, move.dstx, move.dsty)
+        if(rkdir == rules.DIRS['north'] or rkdir == rules.DIRS['south']):
+            RK_STEPS = [ [[1, 0], [-1, 0] ]
+        else:
+            RK_STEPS = [ [0, 1], [0, -1] ]
+        for i in range(2):
+            stepx = RK_STEPS[i][0]
+            stepy = RK_STEPS[i][1]
+            x1, y1 = search(match, move.srcx, move.srcy, stepx, stepy)
+            if(x1 != UNDEF_X):
+                att_piece = match.readfield(x1, y1)
+                if(color_of_piece(piece) != color_of_piece(att_piece) and color_of_piece(att_piece) != Match.COLORS['undefined']):
+                    return True
+        return False
+    elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
+        bpdir = rk_dir(move.srcx, move.srcy, move.dstx, move.dsty)
+        if(bpdir == rules.DIRS['north-east'] or bpdir == rules.DIRS['south-west']):
+            BP_STEPS = [ [-1, 1], [1, -1] ]
+        else:
+            BP_STEPS = [ [1, 1], [-1, -1] ]
+        for i in range(2):
+            stepx = BP_STEPS[i][0]
+            stepy = BP_STEPS[i][1]
+            x1, y1 = search(match, move.srcx, move.srcy, stepx, stepy)
+            if(x1 != UNDEF_X):
+                att_piece = match.readfield(x1, y1)
+                if(color_of_piece(piece) != color_of_piece(att_piece) and color_of_piece(att_piece) != Match.COLORS['undefined']):
+                    return True
+        return False
+    elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
+        KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
+        for i in range(8):
+            x1 = move.srcx + KN_STEPS[i][0]
+            y2 = move.srcy + KN_STEPS[i][1]
+            if(is_inbounds(x1, y1)):
+                att_piece = match.readfield(x1, y1)
+                if(color_of_piece(piece) != color_of_piece(att_piece) and color_of_piece(att_piece) != Match.COLORS['undefined']):
+                    return True
+    elif(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+        KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
+        for i in range(8):
+            x1 = move.srcx + KG_STEPS[i][0]
+            y1 = move.srcy + KG_STEPS[i][1]
+            if(is_inbounds(x1, y1)):
+                att_piece = match.readfield(x1, y1)
+                if(color_of_piece(piece) != color_of_piece(att_piece) and color_of_piece(att_piece) != Match.COLORS['undefined']):
+                    return True
+    else:
+        return False
+
+
+def pieces_attacked(match, color):
+    if(color == Match.COLORS['white']):
+        opp_color = Match.COLORS['black']
+    else:
+        opp_color = Match.COLORS['white']
+    
+    for y in range(0, 8, 1):
+        for x in range(0, 8, 1):
+            piece = match.readfield(x, y)
+            if(Match.color_of_piece(piece) == opp_color):
+                if(rules.attacked(match, x, y, opp_color)):
+                    return True
+            else:
+                continue
+
+    return False
 
 
 def evaluate_contacts(match):
@@ -127,11 +248,11 @@ def evaluate_developments(match):
                 """
                 if(piece == Match.PIECES['bKg']):
                     if(y == 7 and x == 6 and match.readfield(x-1, y-1) == Match.PIECES['bPw'] and match.readfield(x, y-1) == Match.PIECES['bPw']):
-                        developed_blacks += -20
+                        developed_blacks += 20
                     elif(y == 7 and x == 2 and match.readfield(x, y-1) == Match.PIECES['bPw'] and match.readfield(x-1, y-1) == Match.PIECES['bPw'] and match.readfield(x-2, y-1) == Match.PIECES['bPw']):
-                        developed_blacks += -20
+                        developed_blacks += 20
 
-    return developed_whites + developed_blacks
+    return developed_whites - developed_blacks
 
 
 def evaluate_position(match):

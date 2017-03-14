@@ -16,5 +16,3 @@ DATABASES = {
 ALLOWED_HOSTS = ['127.0.0.1']
 
 DEBUG = True
-
-STATIC_ROOT = '/static'

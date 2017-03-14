@@ -371,20 +371,26 @@ class Match(models.Model):
         return (self.white_player_human == False or self.black_player_human == False)
 
     def is_last_move_capture(self):
-        if(self.move_list != None):
+        if(len(self.move_list) > 0):
             move = self.move_list[-1]
             if(move.captured_piece != Match.PIECES['blk']):
                 return True
 
         return False
-    
+
     def is_last_move_promotion(self):
-        if(self.move_list != None):
+        if(len(self.move_list) > 0):
             move = self.move_list[-1]
             if(move.prom_piece != Match.PIECES['blk']):
                 return True
 
         return False
+
+    def read_move_list(self, idx):
+        if(len(self.move_list) > 0):
+            return self.move_list[idx]
+        else:
+            return None
 
     @staticmethod
     def color_of_piece(piece):
