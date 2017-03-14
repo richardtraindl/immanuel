@@ -51,7 +51,7 @@ def does_attack(match, opp_color, srcx, srcy):
         y1 = srcy + STEPS[i][1]
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( Match.REVERSED_COLORS[king] == Match.color_of_piece(piece) ):
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 return True
 
     return False
@@ -72,7 +72,7 @@ def count_attacks(match, srcx, srcy):
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
-                rcount += 1
+                count += 1
 
         return count
 
