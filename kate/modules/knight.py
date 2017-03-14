@@ -33,7 +33,7 @@ def is_field_attacked(match, color, fieldx, fieldy):
     return True
 
 
-def does_attack_opponent(match, opp_color, srcx, srcy):
+def does_attack(match, opp_color, srcx, srcy):
     KN_STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
     for i in range(8):
         x1 = srcx + KN_STEPS[i][0]
