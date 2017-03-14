@@ -57,6 +57,26 @@ def does_attack(match, opp_color, srcx, srcy):
     return False
 
 
+def count_attacks(match, srcx, srcy):
+    count = 0
+    king = match.readfield(srcx, srcy)
+
+    if(king != Match.PIECES['wKg'] and king != Match.PIECES['bKg']):
+        return count
+
+    color = Match.color_of_piece(king)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                rcount += 1
+
+        return count
+
+
 def does_support_attacked(match, srcx, srcy):
     king = match.readfield(srcx, srcy)
 
