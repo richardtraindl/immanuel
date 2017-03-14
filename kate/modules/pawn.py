@@ -20,16 +20,20 @@ BLACK_1S1E_Y = -1
 BLACK_1S1W_X = -1
 BLACK_1S1W_Y = -1
 
+WPW_BACK_STEPS = [ [1, -1], [-1, -1] ]
+BPW_BACK_STEPS = [ [1, 1], [-1, 1] ]
+WPW_STEPS = [ [1, 1], [-1, 1] ]
+BPW_STEPS = [ [1, -1], [-1, -1] ]
 
 def is_field_attacked(match, color, fieldx, fieldy):
     if(color == Match.COLORS['white']):
-        PW_STEPS = [ [1, -1], [-1, -1] ]
+        STEPS = WPW_BACK_STEPS
     else:
-        PW_STEPS = [ [1, 1], [-1, 1] ]
+        STEPS = BPW_BACK_STEPS
 
     for i in range(2):
-        x1 = fieldx + PW_STEPS[i][0]
-        y1 = fieldy + PW_STEPS[i][1]
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['wPw']) or
@@ -38,19 +42,45 @@ def is_field_attacked(match, color, fieldx, fieldy):
    return True
 
 
-def does_attack(match, opp_color, srcx, srcy):
+def does_attack(match, srcx, srcy):
+    pawn = match.readfield(srcx, srcy)
+    color = Match.color_of_piece(pawn)
+
     if(color == Match.COLORS['white']):
-        PW_STEPS = [ [1, -1], [-1, -1] ]
+        STEPS = WPW_STEPS
     else:
-        PW_STEPS = [ [1, 1], [-1, 1] ]
+        STEPS = BPW_STEPS
 
     for i in range(2):
-        x1 = srcx + PW_STEPS[i][0]
-        y1 = srcy + PW_STEPS[i][1]
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( piece != Match.PIECES['blk'] and opp_color != Match.color_of_piece(piece) ):
+            if( color != Match.color_of_piece(piece) ):
                 return True
+
+    return False
+
+
+def does_support_attacked(match, srcx, srcy):
+    pawn = match.readfield(srcx, srcy)
+    color = Match.color_of_piece(pawn)
+
+    if(color == Match.COLORS['white']):
+        STEPS = WPW_STEPS
+    else:
+        STEPS = BPW_STEPS
+
+    for i in range(2):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+                continue
+            if( color == Match.color_of_piece(piece) ):
+                if(rules.is_field_attacked(match, Match.REVERSE_COLORS[color], x1, y1):
+                    return True
 
     return False
 
