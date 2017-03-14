@@ -69,6 +69,28 @@ def count_attacks(match, srcx, srcy):
         return count
 
 
+def score_attacks(match, srcx, srcy):
+    score = 0
+
+    rook = match.readfield(srcx, srcy)
+
+    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['bRk']):
+        return score
+
+        color = Match.color_of_piece(rook)
+
+        for i in range(4):
+            stepx = STEPS[i][0]
+            stepy = STEPS[i][1]
+            x1, y1 = search(match, srcx, srcy, stepx , stepy)
+            if(x1 != UNDEF_X):
+                piece = match.readfield(x1, y1)
+                if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                    score += Match.SCORES[piece]
+
+        return score
+
+
 def does_support_attacked(match, srcx, srcy):
     rook = match.readfield(srcx, srcy)
 
