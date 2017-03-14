@@ -54,7 +54,7 @@ def does_support_attacked(match, srcx, srcy, opp_color):
         y1 = srcy + STEPS[i][1]
         if(is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( Match.color_of_piece(knight) == Match.color_of_piece(piece) ):
+            if( Match.color_of_piece(knight) == Match.color_of_piece(piece) and (piece != Match.PIECES['wKg'] or piece != Match.PIECES['bKg']) ):
                 if(rules.is_field_attacked(match, opp_color, x1, y1):
                     return True
 
