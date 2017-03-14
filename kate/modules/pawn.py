@@ -38,7 +38,7 @@ def is_field_attacked(match, color, fieldx, fieldy):
    return True
 
 
-def does_attack_opponent(match, opp_color, srcx, srcy):
+def does_attack(match, opp_color, srcx, srcy):
     if(color == Match.COLORS['white']):
         PW_STEPS = [ [1, -1], [-1, -1] ]
     else:
