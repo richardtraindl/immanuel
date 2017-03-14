@@ -21,7 +21,7 @@ BLACK_1S1W_X = -1
 BLACK_1S1W_Y = -1
 
 
-def does_pw_attack_field(match, color, fieldx, fieldy):
+def is_field_attacked(match, color, fieldx, fieldy):
     if(color == Match.COLORS['white']):
         PW_STEPS = [ [1, -1], [-1, -1] ]
     else:
@@ -36,6 +36,23 @@ def does_pw_attack_field(match, color, fieldx, fieldy):
                 (color == Match.COLORS['black'] and piece == Match.PIECES['bPw']):
                 return True
    return True
+
+
+def does_attack_opponent(match, opp_color, srcx, srcy):
+    if(color == Match.COLORS['white']):
+        PW_STEPS = [ [1, -1], [-1, -1] ]
+    else:
+        PW_STEPS = [ [1, 1], [-1, 1] ]
+
+    for i in range(2):
+        x1 = srcx + PW_STEPS[i][0]
+        y1 = srcy + PW_STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( piece != Match.PIECES['blk'] and opp_color != Match.color_of_piece(piece) ):
+                return True
+
+    return False
 
 
 def pw_dir(srcx, srcy, dstx, dsty, piece):
