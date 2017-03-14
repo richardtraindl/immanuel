@@ -24,6 +24,19 @@ STEP_LG_CASTLING_X = -2
 STEP_LG_CASTLING_Y = 0
 
 
+def does_kg_attack_field(match, color, fieldx, fieldy):
+    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
+    for i in range(8):
+        x1 = fieldx + KG_STEPS[i][0]
+        y1 = fieldy + KG_STEPS[i][1]
+        if(is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
+                (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
+                return True
+    return False
+
+
 def kg_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS
     step_x = dstx - srcx
@@ -112,18 +125,6 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
 
     match.writefield(srcx, srcy, king)
     return True
-
-def does_kg_attack_field(match, color, fieldx, fieldy):
-    KG_STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
-    for i in range(8):
-        x1 = fieldx + KG_STEPS[i][0]
-        y1 = fieldy + KG_STEPS[i][1]
-        if(is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-            if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
-                (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
-                return True
-    return False
 
 
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
