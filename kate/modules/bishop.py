@@ -12,6 +12,21 @@ SEAST_X = 1
 SEAST_Y = -1
 
 
+def does_bp_attack_field(match, color, fieldx, fieldy):
+    BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+    for i in range(4):
+        stepx = BP_STEPS[i][0]
+        stepy = BP_STEPS[i][1]
+        x1, y1 = search(match, fieldx, srcy, fieldy, stepy)
+        if(x1 != UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if( (color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) or
+                (color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) ):
+                return True
+
+    return False
+
+
 def bp_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS
     if( (srcx - dstx) == (srcy - dsty) and (srcy < dsty) ):
@@ -43,21 +58,6 @@ def bp_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
         return direction, rules.UNDEF_X, rules.UNDEF_Y
 
     
-def does_bp_attack_field(match, color, fieldx, fieldy):
-    BP_STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
-    for i in range(4):
-        stepx = BP_STEPS[i][0]
-        stepy = BP_STEPS[i][1]
-        x1, y1 = search(match, fieldx, srcy, fieldy, stepy)
-        if(x1 != UNDEF_X):
-            piece = match.readfield(x1, y1)
-            if( (color == Match.COLORS['white'] and (piece == Match.PIECES['wQu'] or piece == Match.PIECES['wBp'])) or
-                (color == Match.COLORS['black'] and (piece == Match.PIECES['bQu'] or piece == Match.PIECES['bBp'])) ):
-                return True
-
-    return False
-
-
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
     DIRS = rules.DIRS
     direction, stepx, stepy = bp_step(None, srcx, srcy, dstx, dsty)
