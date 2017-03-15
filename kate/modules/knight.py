@@ -141,7 +141,7 @@ def kn_dir(srcx, srcy, dstx, dsty):
         return DIRS['undefined']
 
 
-def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
+def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
     DIRS = rules.DIRS
     direction = kn_dir(srcx, srcy, dstx, dsty)
     if(direction == DIRS['undefined']):
