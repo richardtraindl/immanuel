@@ -235,11 +235,11 @@ def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):
             return False
     elif(direction == DIRS['2north']):
         midpiece = match.readfield(dstx, srcy + 1)
-        if(midpiece != Match.PIECES['blk'] and dstpiece != Match.PIECES['blk']):
+        if(midpiece != Match.PIECES['blk'] or dstpiece != Match.PIECES['blk']):
             return False
     elif(direction == DIRS['2south']):
         midpiece = match.readfield(dstx, srcy - 1)
-        if(midpiece != Match.PIECES['blk'] and dstpiece != Match.PIECES['blk']):
+        if(midpiece != Match.PIECES['blk'] or dstpiece != Match.PIECES['blk']):
             return False
     if(direction == DIRS['north-west'] or direction == DIRS['north-east']):
         if(dstcolor != Match.COLORS['black']):
