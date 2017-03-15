@@ -209,6 +209,73 @@ def is_black_ep_move_ok(match, srcx, srcy, dstx, dsty):
         return False
 
 
+def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
+    DIRS = rules.DIRS
+    direction = pw_dir(srcx, srcy, dstx, dsty, piece)
+    if(direction == DIRS['undefined']):
+        return False
+
+    pin_dir = rules.pin_dir(match, srcx, srcy)
+
+    dstpiece = match.readfield(dstx, dsty)
+
+    # check pins
+    if(piece == Match.PIECES['wPw']):
+        if(direction == DIRS['north'] or direction == DIRS['2north']):
+            if(pin_dir != DIRS['north'] and pin_dir != DIRS['south'] and pin_dir != DIRS['undefined']):
+                return False
+        elif(direction == DIRS['north-west']):
+            if(pin_dir != DIRS['north-west'] and pin_dir != DIRS['south-east'] and pin_dir != DIRS['undefined']):
+                return False
+        elif(direction == DIRS['north-east']):
+            if(pin_dir != DIRS['north-east'] and pin_dir != DIRS['south-west'] and pin_dir != DIRS['undefined']):
+                return False
+
+        # check fields
+        if(direction == DIRS['north'] and dstpiece != Match.PIECES['blk']):
+            return False
+        elif(direction == DIRS['2north']):
+            midpiece = match.readfield(dstx, srcy + 1)
+            if(midpiece != Match.PIECES['blk'] or dstpiece != Match.PIECES['blk']):
+                return False
+        elif(direction == DIRS['north-west'] or direction == DIRS['north-east']):
+            if(Match.color_of_piece(dstpiece) != Match.COLORS['black']):
+                return is_white_ep_move_ok(match, srcx, srcy, dstx, dsty)
+        else:
+            return False
+
+        if(dsty == 7 and not (prom_piece == Match.PIECES['wQu'] or prom_piece == Match.PIECES['wRk'] or prom_piece == Match.PIECES['wBp'] or prom_piece == Match.PIECES['wKn'])):
+            return False
+    else:
+        # check pins
+        if(direction == DIRS['south'] or direction == DIRS['2south']):
+            if(pin_dir != DIRS['north'] and pin_dir != DIRS['south'] and pin_dir != DIRS['undefined']):
+                return False
+        elif(direction == DIRS['south-east']):
+            if(pin_dir != DIRS['north-west'] and pin_dir != DIRS['south-east'] and pin_dir != DIRS['undefined']):
+                return False
+        elif(direction == DIRS['south-west']):
+            if(pin_dir != DIRS['north-east'] and pin_dir != DIRS['south-west'] and pin_dir != DIRS['undefined']):
+                return False
+        
+        # check fields
+        if(direction == DIRS['south'] and dstpiece != Match.PIECES['blk']):
+            return False
+        elif(direction == DIRS['2south']):
+            midpiece = match.readfield(dstx, srcy - 1)
+            if(midpiece != Match.PIECES['blk'] or dstpiece != Match.PIECES['blk']):
+                return False
+        elif(direction == DIRS['south-east'] or direction == DIRS['south-west']):
+            if(Match.color_of_piece(dstpiece) != Match.COLORS['white']):
+                return is_black_ep_move_ok(match, srcx, srcy, dstx, dsty)
+
+        if(dsty == 0 and not (prom_piece == Match.PIECES['bQu'] or prom_piece == Match.PIECES['bRk'] or prom_piece == Match.PIECES['bBp'] or prom_piece == Match.PIECES['bKn'])):
+            return False
+
+    return True
+
+
+# OLD
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):
     DIRS = rules.DIRS
     direction = pw_dir(srcx, srcy, dstx, dsty, piece)
