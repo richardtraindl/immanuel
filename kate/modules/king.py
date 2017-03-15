@@ -211,7 +211,7 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     return True
 
 
-def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
+def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
     DIRS = rules.DIRS
 
     color = Match.color_of_piece(piece)
