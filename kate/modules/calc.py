@@ -69,9 +69,9 @@ BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']], [0,
 
 
 MOVEFILTER = {
-                'ALL' : 0,
-                'LARGE' : 1,
-                'SMALL' : 2 }
+                'none' : 0,
+                'few' : 1,
+                'most' : 2 }
 
 
 def prnt_move(msg, move):
@@ -174,33 +174,33 @@ def generate_moves(match, gmoves, movefilter):
                     flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
-                        if(movefilter == MOVEFILTER['ALL']):
+                        if(movefilter == MOVEFILTER['none']):
                             moves.append(gmove)
-                        elif(movefilter == MOVEFILTER['LARGE']):
+                        elif(movefilter == MOVEFILTER['few']):
                             capture = calc_helper.is_capture(match, gmove)
                             promotion = calc_helper.is_promotion(match, gmove)
                             castling = calc_helper.is_castling(match, gmove)
                             attack = calc_helper.does_attack(match, gmove)
                             support = calc_helper.does_support_attacked(match, gmove)
-                            attacked_king = calc_helper.is_king_attacked(match, gmove)
+                            # attacked_king = calc_helper.is_king_attacked(match, gmove)
                             # escape for attacked pieces rules.
-                            if(capture or promotion or castling or attack or support or attacked_king):
+                            if(capture or promotion or castling or attack or support):
                                 moves.append(gmove)
-                        else: # MOVEFILTER['SMALL']
+                        else: # MOVEFILTER['most']
                             capture = calc_helper.is_capture(match, gmove)
                             promotion = calc_helper.is_promotion(match, gmove)
                             castling = calc_helper.is_castling(match, gmove)
-                            attacked_king = calc_helper.is_king_attacked(match, gmove)
-                            if(capture or promotion or castling or attacked_king):
+                            # attacked_king = calc_helper.is_king_attacked(match, gmove)
+                            if(capture or promotion or castling):
                                 moves.append(gmove)
                     elif(errmsg != rules.ERROR_CODES['king-error']):
                         break
     gmoves.extend(kn_moves)
     gmoves.extend(bp_moves)
     gmoves.extend(rk_moves)
-    gmoves.extend(pw_moves)
     gmoves.extend(kg_moves)
     gmoves.extend(qu_moves)
+    gmoves.extend(pw_moves)
 
 
 class immanuelsThread(threading.Thread):
@@ -276,12 +276,12 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
-    if(kg_attacked or depth <= maxdepth):
-        movefilter = MOVEFILTER['ALL']
-    elif(depth <= maxdepth + 1):
-        movefilter = MOVEFILTER['LARGE']
+    if(kg_attacked or depth <= min(maxdepth, 3)):
+        movefilter = MOVEFILTER['none']
+    elif(depth <= maxdepth + 2):
+        movefilter = MOVEFILTER['few']
     else:
-        movefilter = MOVEFILTER['SMALL']
+        movefilter = MOVEFILTER['most']
 
     generate_moves(match, gmoves, movefilter)
     for newgmove in gmoves:
@@ -299,7 +299,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                 if(thread and newscore):
                     thread.populate_candiate(gmove)
 
-        if(depth <= maxdepth + 2):
+        if(depth <= maxdepth + 2 or kg_attacked):
             newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
         else:
             newscore = match.score + calc_helper.evaluate_position(match)
@@ -348,12 +348,12 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
-    if(kg_attacked or depth <= maxdepth):
-        movefilter = MOVEFILTER['ALL']
-    elif(depth <= maxdepth + 1):
-        movefilter = MOVEFILTER['LARGE']
+    if(kg_attacked or depth <=  min(maxdepth, 3)):
+        movefilter = MOVEFILTER['none']
+    elif(depth <= maxdepth + 2):
+        movefilter = MOVEFILTER['few']
     else:
-        movefilter = MOVEFILTER['SMALL']
+        movefilter = MOVEFILTER['most']
 
     generate_moves(match, gmoves, movefilter)
     for newgmove in gmoves:
@@ -371,7 +371,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                 if(thread and newscore):
                     thread.populate_candiate(gmove)
 
-        if(depth <= maxdepth + 2):
+        if(depth <= maxdepth + 2 or kg_attacked):
             newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
         else:
             newscore = match.score + calc_helper.evaluate_position(match)

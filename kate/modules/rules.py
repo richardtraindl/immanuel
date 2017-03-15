@@ -333,7 +333,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
         else:
             return False, ERROR_CODES['knight-error']
     elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
-        if(bishop.is_move_validk(match, srcx, srcy, dstx, dsty, piece)):
+        if(bishop.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
             return True, ERROR_CODES['none']
         else:
             return False, ERROR_CODES['bishop-error']
