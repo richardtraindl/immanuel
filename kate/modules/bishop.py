@@ -146,7 +146,7 @@ def bp_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
         return direction, rules.UNDEF_X, rules.UNDEF_Y
 
     
-def is_move_ok(match, srcx, srcy, dstx, dsty, piece):
+def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
     DIRS = rules.DIRS
     direction, stepx, stepy = bp_step(None, srcx, srcy, dstx, dsty)
     if(direction == DIRS['undefined']):
