@@ -318,34 +318,34 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
             return False, ERROR_CODES['king-error']
 
     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
-        if(not pawn.is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece)):
+        if(pawn.is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece)):
+            return True, ERROR_CODES['none']
+        else:
             return False, ERROR_CODES['pawn-error']
-        else:
-            return True, ERROR_CODES['none']
     elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
-        if(not rook.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
+        if(rook.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
+            return True, ERROR_CODES['none']
+        else:
             return False, ERROR_CODES['rook-error']
-        else:
-            return True, ERROR_CODES['none']
     elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
-        if(not knight.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
+        if(knight.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
+            return True, ERROR_CODES['none']
+        else:
             return False, ERROR_CODES['knight-error']
-        else:
-            return True, ERROR_CODES['none']
     elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
-        if(not bishop.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
+        if(bishop.is_move_validk(match, srcx, srcy, dstx, dsty, piece)):
+            return True, ERROR_CODES['none']
+        else:
             return False, ERROR_CODES['bishop-error']
-        else:
-            return True, ERROR_CODES['none']
     elif(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
-        if(not queen.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
+        if(queen.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
+            return True, ERROR_CODES['none']
+        else:
             return False, ERROR_CODES['queen-error']
-        else:
-            return True, ERROR_CODES['none']
     elif(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
-        if(not king.is_move_ok(match, srcx, srcy, dstx, dsty, piece)):
-            return False, ERROR_CODES['king-error']
-        else:
+        if(king.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
             return True, ERROR_CODES['none']
+        else:
+            return False, ERROR_CODES['king-error']
     else:
         return False, ERROR_CODES['general-error']
