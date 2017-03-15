@@ -219,8 +219,8 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
 
     dstpiece = match.readfield(dstx, dsty)
 
-    # check pins
     if(piece == Match.PIECES['wPw']):
+        # check pins
         if(direction == DIRS['north'] or direction == DIRS['2north']):
             if(pin_dir != DIRS['north'] and pin_dir != DIRS['south'] and pin_dir != DIRS['undefined']):
                 return False
@@ -235,7 +235,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
         if(direction == DIRS['north'] and dstpiece != Match.PIECES['blk']):
             return False
         elif(direction == DIRS['2north']):
-            midpiece = match.readfield(dstx, srcy + 1)
+            midpiece = match.readfield(dstx, srcy + WHITE_1N_Y)
             if(midpiece != Match.PIECES['blk'] or dstpiece != Match.PIECES['blk']):
                 return False
         elif(direction == DIRS['north-west'] or direction == DIRS['north-east']):
@@ -244,7 +244,8 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
         else:
             return False
 
-        if(dsty == 7 and not (prom_piece == Match.PIECES['wQu'] or prom_piece == Match.PIECES['wRk'] or prom_piece == Match.PIECES['wBp'] or prom_piece == Match.PIECES['wKn'])):
+        # check promotion
+        if(dsty == 7 and prom_piece != Match.PIECES['wQu'] and prom_piece != Match.PIECES['wRk'] and prom_piece != Match.PIECES['wBp'] and prom_piece != Match.PIECES['wKn']):
             return False
     else:
         # check pins
@@ -262,14 +263,15 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
         if(direction == DIRS['south'] and dstpiece != Match.PIECES['blk']):
             return False
         elif(direction == DIRS['2south']):
-            midpiece = match.readfield(dstx, srcy - 1)
+            midpiece = match.readfield(dstx, srcy + BLACK_1S_Y)
             if(midpiece != Match.PIECES['blk'] or dstpiece != Match.PIECES['blk']):
                 return False
         elif(direction == DIRS['south-east'] or direction == DIRS['south-west']):
             if(Match.color_of_piece(dstpiece) != Match.COLORS['white']):
                 return is_black_ep_move_ok(match, srcx, srcy, dstx, dsty)
 
-        if(dsty == 0 and not (prom_piece == Match.PIECES['bQu'] or prom_piece == Match.PIECES['bRk'] or prom_piece == Match.PIECES['bBp'] or prom_piece == Match.PIECES['bKn'])):
+        # check promotion
+        if(dsty == 0 and prom_piece != Match.PIECES['bQu'] and prom_piece != Match.PIECES['bRk'] and prom_piece != Match.PIECES['bBp'] and prom_piece != Match.PIECES['bKn']):
             return False
 
     return True
