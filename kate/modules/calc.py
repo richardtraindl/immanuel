@@ -210,9 +210,9 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
-    if(kg_attacked or depth <= min(maxdepth, 3)):
+    if(kg_attacked or depth <= maxdepth):
         movefilter = MOVEFILTER['none']
-    elif(depth <= maxdepth + 2):
+    elif(depth <= maxdepth + 3):
         movefilter = MOVEFILTER['few']
     else:
         movefilter = MOVEFILTER['most']
@@ -282,9 +282,9 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
-    if(kg_attacked or depth <=  min(maxdepth, 3)):
+    if(kg_attacked or depth <= maxdepth):
         movefilter = MOVEFILTER['none']
-    elif(depth <= maxdepth + 2):
+    elif(depth <= maxdepth + 3):
         movefilter = MOVEFILTER['few']
     else:
         movefilter = MOVEFILTER['most']
