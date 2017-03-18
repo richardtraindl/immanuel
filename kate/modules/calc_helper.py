@@ -2,6 +2,48 @@ from kate.models import Match, Move
 from kate.modules import rules, pawn, debug, helper
 
 
+def analyse(match):
+    analyses = []
+    qu_analyses = []
+    rk_analyses = []
+    bp_analyses = []
+    kn_analyses = []
+    pw_analyses = []
+    
+    color = match.next_color()
+    opp_color = Match.REVERSED_COLORS[color]
+
+    for y1 in range(8):
+        for x1 in range(8):
+            piece = match.readfield(x1, y1)
+            if(color == Match.color_of_piece(piece)):
+                if(piece == Match.PIECES['wPw'] or Match.PIECES['bPw']):
+                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                        pw_analyses.append("pw")
+                elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
+                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                        rk_analyses.append("rk")
+                elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
+                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                        bp_analyses.append("bp")
+                elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
+                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                        kn_analyses.append("kn")
+                elif(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
+                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                        qu_analyses.append("qu")
+                else:
+                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                        analyses.append("kg")
+
+    analyses.extend(qu_analyses)
+    analyses.extend(rk_analyses)
+    analyses.extend(bp_analyses)
+    analyses.extend(kn_analyses)
+    analyses.extend(pw_manalyses)
+    return analyses
+
+
 def is_capture(match, move):
     dstpiece = match.readfield(move.dstx, move.dsty)
     if(dstpiece != Match.PIECES['blk']):
@@ -37,6 +79,15 @@ def does_attack(match, move):
 
 def does_support_attacked(match, move):
     return rules.does_support_attacked(match, move.dstx, move.dsty)
+
+
+def does_attacked_flee(match, move):
+    opp_color = Match.REVERSED_COLORS[match.next_color()]
+    
+    if( rules.is_field_attacked(match, opp_color, move.srcx, move.srcy) ):
+        return True
+
+    return False
 
 
 def is_king_attacked(match, move):

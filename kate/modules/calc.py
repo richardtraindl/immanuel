@@ -1,71 +1,6 @@
 from kate.models import Match, Move
-from kate.modules import helper, rules, openings, calc_helper, debug
+from kate.modules import helper, rules, pawn, rook, bishop, knight, queen, king, openings, calc_helper, debug
 import random, threading, copy, time 
-
-
-
-RK_STEPS = [ [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]],
-          [[0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7]],
-          [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]],
-          [[-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0]] ]
-
-
-BP_STEPS = [ [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7]],
-             [[-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7]],
-             [[1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7]],
-             [[-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7]] ]
-
-
-QU_STEPS = [ [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]],
-             [[0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7]],
-             [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]],
-             [[-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0]],
-             [[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7]],
-             [[-1, -1], [-2, -2], [-3, -3], [-4, -4], [-5, -5], [-6, -6], [-7, -7]],
-             [[1, -1], [2, -2], [3, -3], [4, -4], [5, -5], [6, -6], [7, -7]],
-             [[-1, 1], [-2, 2], [-3, 3], [-4, 4], [-5, 5], [-6, 6], [-7, 7]] ]
-
-
-KN_STEPS = [ [[1, 2]],
-             [[2, 1]],
-             [[2, -1]], 
-             [[1, -2]],
-             [[-1, -2]],
-             [[-2, -1]],
-             [[-2, 1]],
-             [[-1, 2]] ]
-
-
-KG_STEPS = [ [[0, 1]],
-             [[1, 1]],
-             [[1, 0]], 
-             [[1, -1]],
-             [[0, -1]], 
-             [[-1, -1]],
-             [[-1, 0]],
-             [[-1, 1]],
-             [[2, 0]],
-             [[-2, 0]] ]
-
-
-WPW_STEPS = [ [[0, 1]],
-              [[0, 2]],
-              [[1, 1]], 
-              [[-1, 1]] ]
-
-WPROM_STEPS = [ [[0, 1, Match.PIECES['wQu']], [1, 1, Match.PIECES['wQu']], [-1, 1, Match.PIECES['wQu']], [0, 1, Match.PIECES['wRk']]],
-                [[1, 1, Match.PIECES['wRk']], [-1, 1, Match.PIECES['wRk']], [0, 1, Match.PIECES['wBp']], [1, 1, Match.PIECES['wBp']]],
-                [[-1, 1, Match.PIECES['wBp']], [0, 1, Match.PIECES['wKn']], [1, 1, Match.PIECES['wKn']], [-1, 1, Match.PIECES['wKn']]] ]
-
-
-BPW_STEPS = [ [[0, -1]],
-              [[0, -2]],
-              [[-1, -1]], 
-              [[1, -1]] ]
-
-BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']], [0, -1, Match.PIECES['bBp']], [0, -1, Match.PIECES['bKn']]],
-                [[1, -1, Match.PIECES['bQu']], [1, -1, Match.PIECES['bRk']], [1, -1, Match.PIECES['bBp']], [1, -1, Match.PIECES['bKn']]],
-                [[-1, -1, Match.PIECES['bQu']], [-1, -1, Match.PIECES['bRk']], [-1, -1, Match.PIECES['bBp']], [-1, -1, Match.PIECES['bKn']]] ]
 
 
 MOVEFILTER = {
@@ -123,46 +58,46 @@ def generate_moves(match, gmoves, movefilter):
                 if(piece == Match.PIECES['wPw']):
                     moves = pw_moves
                     if(y < 6):
-                        steps = WPW_STEPS
+                        steps = pawn.GEN_WSTEPS
                         max_dir = 4
                         max_step = 1
                     else:
-                        steps = WPROM_STEPS
+                        steps = pawn.GEN_WPROM_STEPS
                         max_dir = 3
                         max_step = 4
                 elif(piece == Match.PIECES['bPw']):
                     moves = pw_moves
                     if(y > 1):
-                        steps = BPW_STEPS
+                        steps = pawn.GEN_BSTEPS
                         max_dir = 4
                         max_step = 1
                     else:
-                        steps = BPROM_STEPS
+                        steps = pawn.GEN_BPROM_STEPS
                         max_dir = 3
                         max_step = 4
                 elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
                     moves = rk_moves
-                    steps = RK_STEPS
+                    steps = rook.GEN_STEPS
                     max_dir = 4
                     max_step = 7
                 elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
                     moves = bp_moves
-                    steps = BP_STEPS
+                    steps = bishop.GEN_STEPS
                     max_dir = 4
                     max_step = 7
                 elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
                     moves = kn_moves
-                    steps = KN_STEPS
+                    steps = knight.GEN_STEPS
                     max_dir = 8
                     max_step = 1
                 elif(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
                     moves = qu_moves
-                    steps = QU_STEPS
+                    steps = queen.GEN_STEPS
                     max_dir = 8
                     max_step = 7
                 else:
                     moves = kg_moves
-                    steps = KG_STEPS
+                    steps = king.GEN_STEPS
                     max_dir = 10
                     max_step = 1
 
@@ -182,16 +117,15 @@ def generate_moves(match, gmoves, movefilter):
                             castling = calc_helper.is_castling(match, gmove)
                             attack = calc_helper.does_attack(match, gmove)
                             support = calc_helper.does_support_attacked(match, gmove)
-                            # attacked_king = calc_helper.is_king_attacked(match, gmove)
-                            # escape for attacked pieces rules.
-                            if(capture or promotion or castling or attack or support):
+                            escapes = calc_helper.does_attacked_flee(match, gmove)
+                            if(capture or promotion or castling or attack or support or escapes):
                                 moves.append(gmove)
                         else: # MOVEFILTER['most']
                             capture = calc_helper.is_capture(match, gmove)
                             promotion = calc_helper.is_promotion(match, gmove)
                             castling = calc_helper.is_castling(match, gmove)
-                            # attacked_king = calc_helper.is_king_attacked(match, gmove)
-                            if(capture or promotion or castling):
+                            escapes = calc_helper.does_attacked_flee(match, gmove)
+                            if(capture or promotion or castling or escapes):
                                 moves.append(gmove)
                     elif(errmsg != rules.ERROR_CODES['king-error']):
                         break

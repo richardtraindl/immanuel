@@ -25,6 +25,24 @@ BPW_BACK_STEPS = [ [1, 1], [-1, 1] ]
 WPW_STEPS = [ [1, 1], [-1, 1] ]
 BPW_STEPS = [ [1, -1], [-1, -1] ]
 
+GEN_WSTEPS = [ [[0, 1]],
+               [[0, 2]],
+               [[1, 1]], 
+               [[-1, 1]] ]
+
+GEN_WPROM_STEPS = [ [[0, 1, Match.PIECES['wQu']], [1, 1, Match.PIECES['wQu']], [-1, 1, Match.PIECES['wQu']], [0, 1, Match.PIECES['wRk']]],
+                    [[1, 1, Match.PIECES['wRk']], [-1, 1, Match.PIECES['wRk']], [0, 1, Match.PIECES['wBp']], [1, 1, Match.PIECES['wBp']]],
+                    [[-1, 1, Match.PIECES['wBp']], [0, 1, Match.PIECES['wKn']], [1, 1, Match.PIECES['wKn']], [-1, 1, Match.PIECES['wKn']]] ]
+
+GEN_BSTEPS = [ [[0, -1]],
+               [[0, -2]],
+               [[-1, -1]], 
+               [[1, -1]] ]
+
+GEN_BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']], [0, -1, Match.PIECES['bBp']], [0, -1, Match.PIECES['bKn']]],
+                    [[1, -1, Match.PIECES['bQu']], [1, -1, Match.PIECES['bRk']], [1, -1, Match.PIECES['bBp']], [1, -1, Match.PIECES['bKn']]],
+                    [[-1, -1, Match.PIECES['bQu']], [-1, -1, Match.PIECES['bRk']], [-1, -1, Match.PIECES['bBp']], [-1, -1, Match.PIECES['bKn']]] ]
+
 
 def is_field_attacked(match, color, fieldx, fieldy):
     if(color == Match.COLORS['white']):
@@ -187,7 +205,9 @@ def is_white_ep_move_ok(match, srcx, srcy, dstx, dsty):
 
     piece = match.readfield(dstx, dsty)
     opp_piece = match.readfield(move.dstx, move.dsty)
-    if(piece == Match.PIECES['blk'] and opp_piece == Match.PIECES['bPw'] and move.srcx == move.dstx and move.dstx == dstx and move.srcy - 2 == move.dsty):
+    if(piece == Match.PIECES['blk'] and opp_piece == Match.PIECES['bPw'] and 
+       srcy == 5 and move.srcx == move.dstx and move.dstx == dstx and 
+       move.srcy - 2 == move.dsty):
         return True
     else:
         return False
@@ -203,7 +223,9 @@ def is_black_ep_move_ok(match, srcx, srcy, dstx, dsty):
 
     piece = match.readfield(dstx, dsty)
     opp_piece = match.readfield(move.dstx, move.dsty)
-    if(piece == Match.PIECES['blk'] and opp_piece == Match.PIECES['wPw'] and move.srcx == move.dstx and move.dstx == dstx and move.srcy + 2 == move.dsty):
+    if(piece == Match.PIECES['blk'] and opp_piece == Match.PIECES['wPw'] and 
+       srcy == 4 and move.srcx == move.dstx and move.dstx == dstx and 
+       move.srcy + 2 == move.dsty):
         return True
     else:
         return False
