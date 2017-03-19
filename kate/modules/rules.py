@@ -220,7 +220,7 @@ def count_attacks(match, srcx, srcy):
     count += king.count_attacks(match, srcx, srcy)
     count += pawn.count_attacks(match, srcx, srcy)
 
-    return count
+    return count * 10
 
 
 def score_attacks(match, srcx, srcy):
@@ -232,7 +232,7 @@ def score_attacks(match, srcx, srcy):
     score += king.score_attacks(match, srcx, srcy)
     score += pawn.score_attacks(match, srcx, srcy)
 
-    return score
+    return score // 50
 
 
 def is_king_attacked(match, x1, y1):

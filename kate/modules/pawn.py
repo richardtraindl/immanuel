@@ -263,8 +263,6 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
         elif(direction == DIRS['north-west'] or direction == DIRS['north-east']):
             if(Match.color_of_piece(dstpiece) != Match.COLORS['black']):
                 return is_white_ep_move_ok(match, srcx, srcy, dstx, dsty)
-        else:
-            return False
 
         # check promotion
         if(dsty == 7 and prom_piece != Match.PIECES['wQu'] and prom_piece != Match.PIECES['wRk'] and prom_piece != Match.PIECES['wBp'] and prom_piece != Match.PIECES['wKn']):
