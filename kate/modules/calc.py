@@ -38,14 +38,12 @@ def read_steps(steps, dir_idx, step_idx):
     return stepx, stepy, prom_piece
 
 
-def generate_moves(match, gmoves, movefilter):
+def generate_moves(match, gmoves, maxcnt):
+    count = 0
     color = match.next_color()
-    kg_moves = []
-    qu_moves = []
-    rk_moves = []
-    bp_moves = []
-    kn_moves = []
-    pw_moves = []
+    top_moves = []
+    mid_moves = []
+    low_moves = []
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -56,7 +54,6 @@ def generate_moves(match, gmoves, movefilter):
                 dir_idx = 0
                 step_idx = 0
                 if(piece == Match.PIECES['wPw']):
-                    moves = pw_moves
                     if(y < 6):
                         steps = pawn.GEN_WSTEPS
                         max_dir = 4
@@ -66,7 +63,6 @@ def generate_moves(match, gmoves, movefilter):
                         max_dir = 3
                         max_step = 4
                 elif(piece == Match.PIECES['bPw']):
-                    moves = pw_moves
                     if(y > 1):
                         steps = pawn.GEN_BSTEPS
                         max_dir = 4
@@ -76,27 +72,22 @@ def generate_moves(match, gmoves, movefilter):
                         max_dir = 3
                         max_step = 4
                 elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
-                    moves = rk_moves
                     steps = rook.GEN_STEPS
                     max_dir = 4
                     max_step = 7
                 elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
-                    moves = bp_moves
                     steps = bishop.GEN_STEPS
                     max_dir = 4
                     max_step = 7
                 elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
-                    moves = kn_moves
                     steps = knight.GEN_STEPS
                     max_dir = 8
                     max_step = 1
                 elif(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
-                    moves = qu_moves
                     steps = queen.GEN_STEPS
                     max_dir = 8
                     max_step = 7
                 else:
-                    moves = kg_moves
                     steps = king.GEN_STEPS
                     max_dir = 10
                     max_step = 1
@@ -109,32 +100,32 @@ def generate_moves(match, gmoves, movefilter):
                     flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
-                        if(movefilter == MOVEFILTER['none']):
-                            moves.append(gmove)
-                        elif(movefilter == MOVEFILTER['few']):
-                            capture = calc_helper.is_capture(match, gmove)
-                            promotion = calc_helper.is_promotion(match, gmove)
-                            castling = calc_helper.is_castling(match, gmove)
+                        capture = calc_helper.is_capture(match, gmove)
+                        promotion = calc_helper.is_promotion(match, gmove)
+                        castling = calc_helper.is_castling(match, gmove)
+                        if(capture or promotion or castling):
+                            top_moves.append(gmove)
+                        else:
                             attack = calc_helper.does_attack(match, gmove)
                             support = calc_helper.does_support_attacked(match, gmove)
                             escapes = calc_helper.does_attacked_flee(match, gmove)
-                            if(capture or promotion or castling or attack or support or escapes):
-                                moves.append(gmove)
-                        else: # MOVEFILTER['most']
-                            capture = calc_helper.is_capture(match, gmove)
-                            promotion = calc_helper.is_promotion(match, gmove)
-                            castling = calc_helper.is_castling(match, gmove)
-                            escapes = calc_helper.does_attacked_flee(match, gmove)
-                            if(capture or promotion or castling or escapes):
-                                moves.append(gmove)
+                            if(attack or support or escapes):
+                                mid_moves.append(gmove)
+                            else:
+                                low_moves.append(gmove)
+
+                        count += 1
+                        if(count > maxcnt):
+                            gmoves.extend(top_moves)
+                            gmoves.extend(mid_moves)
+                            gmoves.extend(low_moves)
+                            return
                     elif(errmsg != rules.ERROR_CODES['king-error']):
                         break
-    gmoves.extend(kn_moves)
-    gmoves.extend(bp_moves)
-    gmoves.extend(rk_moves)
-    gmoves.extend(kg_moves)
-    gmoves.extend(qu_moves)
-    gmoves.extend(pw_moves)
+
+    gmoves.extend(top_moves)
+    gmoves.extend(mid_moves)
+    gmoves.extend(low_moves)
 
 
 class immanuelsThread(threading.Thread):
@@ -159,13 +150,13 @@ class immanuelsThread(threading.Thread):
             self.match.move_list.append(move)
 
         if(self.match.level == Match.LEVEL['low']):
-            maxdepth = 1
-        elif(self.match.level == Match.LEVEL['medium']):
             maxdepth = 2
-        elif(self.match.level == Match.LEVEL['high']):
+        elif(self.match.level == Match.LEVEL['medium']):
             maxdepth = 3
+        elif(self.match.level == Match.LEVEL['high']):
+            maxdepth = 4
         else:
-            maxdepth = 4 # professional
+            maxdepth = 5 # professional
 
         gmove = calc_move(self.match, maxdepth)
         if(gmove != None):
@@ -211,13 +202,11 @@ def calc_max(match, maxdepth, depth, alpha, beta):
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked or depth <= maxdepth):
-        movefilter = MOVEFILTER['none']
-    elif(depth <= maxdepth + 3):
-        movefilter = MOVEFILTER['few']
+        maxcnt = 160
     else:
-        movefilter = MOVEFILTER['most']
+        maxcnt = 16
 
-    generate_moves(match, gmoves, movefilter)
+    generate_moves(match, gmoves, maxcnt)
     for newgmove in gmoves:
         oldscore = match.score
 
@@ -228,7 +217,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             prnt_move(msg, newgmove)
             if(gmove):
                 prnt_move(" CANDIDATE ", gmove)
-                print(" score: " + str(newscore))
+                print(" score: " + str(newscore) + " / " + str(maxscore))
                 thread = Match.get_active_thread(match)
                 if(thread and newscore):
                     thread.populate_candiate(gmove)
@@ -283,13 +272,11 @@ def calc_min(match, maxdepth, depth, alpha, beta):
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked or depth <= maxdepth):
-        movefilter = MOVEFILTER['none']
-    elif(depth <= maxdepth + 3):
-        movefilter = MOVEFILTER['few']
+        maxcnt = 160
     else:
-        movefilter = MOVEFILTER['most']
+        maxcnt = 16
 
-    generate_moves(match, gmoves, movefilter)
+    generate_moves(match, gmoves, maxcnt)
     for newgmove in gmoves:
         oldscore = match.score
 
@@ -300,7 +287,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
             prnt_move(msg, newgmove)
             if(gmove):
                 prnt_move(" CANDIDATE ", gmove)
-                print(" score: " + str(newscore))
+                print(" score: " + str(newscore) + " / " + str(maxscore))
                 thread = Match.get_active_thread(match)
                 if(thread and newscore):
                     thread.populate_candiate(gmove)
