@@ -3,12 +3,6 @@ from kate.modules import helper, rules, pawn, rook, bishop, knight, queen, king,
 import random, threading, copy, time 
 
 
-MOVEFILTER = {
-                'top' : 3,
-                'mid' : 2,
-                'low' : 1 }
-
-
 def prnt_move(msg, move):
     if(move == None):
         print("no move.....")
@@ -35,9 +29,8 @@ def read_steps(steps, dir_idx, step_idx):
     return stepx, stepy, prom_piece
 
 
-def generate_moves(match, maxcnt):
-    count = 0
-    movefilter = MOVEFILTER['low']
+def generate_moves(match):
+    importance = 0
     color = match.next_color()
     moves = []
     top_moves = []
@@ -105,29 +98,23 @@ def generate_moves(match, maxcnt):
                         if(capture or promotion or castling):
                             movefilter = MOVEFILTER['top']
                             top_moves.append(gmove)
+                            importance += 1
                         else:
                             attack = calc_helper.does_attack(match, gmove)
                             support = calc_helper.does_support_attacked(match, gmove)
                             escapes = calc_helper.does_attacked_flee(match, gmove)
                             if(attack or support or escapes):
-                                movefilter = max( movefilter, MOVEFILTER['mid'] )
                                 mid_moves.append(gmove)
                             else:
                                 low_moves.append(gmove)
 
-                        count += 1
-                        if(count > maxcnt):
-                            moves.extend(top_moves)
-                            moves.extend(mid_moves)
-                            moves.extend(low_moves)
-                            return moves, movefilter
                     elif(errmsg != rules.ERROR_CODES['king-error']):
                         break
 
     moves.extend(top_moves)
     moves.extend(mid_moves)
     moves.extend(low_moves)
-    return moves, movefilter
+    return moves, importance
 
 
 class immanuelsThread(threading.Thread):
@@ -203,16 +190,16 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
+    gmoves, importance = generate_moves(match)
+
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
-    elif(depth <= 4):
-        maxcnt = 20
+    elif(depth <= maxdepth + 3):
+        maxcnt = max(20, importance)
     else:
-        maxcnt = 4   
+        maxcnt = max(4, importance)
 
-    gmoves, movefilter = generate_moves(match, maxcnt)
-
-    for newgmove in gmoves:
+    for newgmove in gmoves[:maxcnt]:
         oldscore = match.score
 
         move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
@@ -227,7 +214,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                 if(thread and newscore):
                     thread.populate_candiate(gmove)
 
-        if(depth <= maxdepth or kg_attacked or (movefilter == MOVEFILTER['top'] and depth <= 7)):
+        if(depth <= maxdepth or kg_attacked or (importance > 0 and depth <= 7)):
             newscore = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
         else:
             newscore = match.score + calc_helper.evaluate_position(match)
@@ -276,16 +263,16 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
+    gmoves, importance = generate_moves(match)
+
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
-    elif(depth <= 4):
-        maxcnt = 20
+    elif(depth <= maxdepth + 3):
+        maxcnt = max(20, importance)
     else:
-        maxcnt = 10
+        maxcnt = max(4, importance)
 
-    gmoves, movefilter = generate_moves(match, maxcnt)
-
-    for newgmove in gmoves:
+    for newgmove in gmoves[:maxcnt]:
         oldscore = match.score
 
         move = match.do_move(newgmove.srcx, newgmove.srcy, newgmove.dstx, newgmove.dsty, newgmove.prom_piece)
@@ -300,7 +287,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                 if(thread and newscore):
                     thread.populate_candiate(gmove)
 
-        if(depth <= maxdepth or kg_attacked or (movefilter == MOVEFILTER['top'] and depth <= 7)):
+        if(depth <= maxdepth or kg_attacked or (importance > 0 and depth <= 7)):
             newscore = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
         else:
             newscore = match.score + calc_helper.evaluate_position(match)
