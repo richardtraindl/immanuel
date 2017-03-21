@@ -96,7 +96,6 @@ def generate_moves(match):
                         promotion = calc_helper.is_promotion(match, gmove)
                         castling = calc_helper.is_castling(match, gmove)
                         if(capture or promotion or castling):
-                            movefilter = MOVEFILTER['top']
                             top_moves.append(gmove)
                             topmovecnt += 1
                         else:
@@ -210,7 +209,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                 if(thread and score):
                     thread.populate_candiate(candidate)
 
-        if(depth <= maxdepth or kg_attacked or (topmovecnt > 0 and depth <= 7)):
+        if(depth <= maxdepth or kg_attacked or (topmovecnt > 0 and depth <= 6)):
             score = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
         else:
             score = match.score + calc_helper.evaluate_position(match)
@@ -281,7 +280,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                 if(thread and score):
                     thread.populate_candiate(candidate)
 
-        if(depth <= maxdepth or kg_attacked or (topmovecnt > 0 and depth <= 7)):
+        if(depth <= maxdepth or kg_attacked or (topmovecnt > 0 and depth <= 6)):
             score = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
         else:
             score = match.score + calc_helper.evaluate_position(match)

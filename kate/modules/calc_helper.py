@@ -245,7 +245,8 @@ def evaluate_developments(match):
 
 
 def evaluate_position(match):
-    contacts = evaluate_contacts(match)
+    contacts = 0
+    # contacts = evaluate_contacts(match)
 
     movecnt = evaluate_movecnt(match)
 
@@ -259,5 +260,5 @@ def evaluate_position(match):
     # print("developments: " + str(developments))
     # print("****************************")
 
-    return 0 # (movecnt + contacts + developments)
+    return (movecnt + contacts + developments)
 
