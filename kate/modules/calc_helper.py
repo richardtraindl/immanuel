@@ -58,10 +58,10 @@ def is_capture(match, move):
 
 
 def is_promotion(match, move):
-    if(move.prom_piece != None):
-        return True
-    else:
+    if(move.prom_piece == Match.PIECES['blk']):
         return False
+    else:
+        return True
 
 
 def is_castling(match, move):
@@ -133,7 +133,7 @@ def evaluate_contacts(match):
                 attacked_blacks += rules.score_attacks(match, x, y)
                 #attacked_blacks += rules.count_attacks(match, x, y, Match.COLORS['white'])
 
-    return (supported_whites - attacked_whites) - (supported_blacks - attacked_blacks)
+    return 0 # (supported_whites - attacked_whites) - (supported_blacks - attacked_blacks)
 
 
 def evaluate_piece_moves(match, srcx, srcy):
@@ -237,11 +237,11 @@ def evaluate_developments(match):
                 """
                 if(piece == Match.PIECES['bKg']):
                     if(y == 7 and x == 6 and match.readfield(x-1, y-1) == Match.PIECES['bPw'] and match.readfield(x, y-1) == Match.PIECES['bPw']):
-                        developed_blacks += 20
+                        developed_blacks += -20
                     elif(y == 7 and x == 2 and match.readfield(x, y-1) == Match.PIECES['bPw'] and match.readfield(x-1, y-1) == Match.PIECES['bPw'] and match.readfield(x-2, y-1) == Match.PIECES['bPw']):
-                        developed_blacks += 20
+                        developed_blacks += -20
 
-    return developed_whites - developed_blacks
+    return developed_whites + developed_blacks
 
 
 def evaluate_position(match):
@@ -259,5 +259,5 @@ def evaluate_position(match):
     # print("developments: " + str(developments))
     # print("****************************")
 
-    return (movecnt + contacts + developments)
+    return 0 # (movecnt + contacts + developments)
 

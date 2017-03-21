@@ -25,19 +25,20 @@ BPW_BACK_STEPS = [ [1, 1], [-1, 1] ]
 WPW_STEPS = [ [1, 1], [-1, 1] ]
 BPW_STEPS = [ [1, -1], [-1, -1] ]
 
-GEN_WSTEPS = [ [[0, 1]],
-               [[0, 2]],
-               [[1, 1]], 
-               [[-1, 1]] ]
+blank = Match.PIECES['blk']
+GEN_WSTEPS = [ [[0, 1, blank]],
+               [[0, 2, blank]],
+               [[1, 1, blank]], 
+               [[-1, 1, blank]] ]
 
 GEN_WPROM_STEPS = [ [[0, 1, Match.PIECES['wQu']], [1, 1, Match.PIECES['wQu']], [-1, 1, Match.PIECES['wQu']], [0, 1, Match.PIECES['wRk']]],
                     [[1, 1, Match.PIECES['wRk']], [-1, 1, Match.PIECES['wRk']], [0, 1, Match.PIECES['wBp']], [1, 1, Match.PIECES['wBp']]],
                     [[-1, 1, Match.PIECES['wBp']], [0, 1, Match.PIECES['wKn']], [1, 1, Match.PIECES['wKn']], [-1, 1, Match.PIECES['wKn']]] ]
 
-GEN_BSTEPS = [ [[0, -1]],
-               [[0, -2]],
-               [[-1, -1]], 
-               [[1, -1]] ]
+GEN_BSTEPS = [ [[0, -1, blank]],
+               [[0, -2, blank]],
+               [[-1, -1, blank]], 
+               [[1, -1, blank]] ]
 
 GEN_BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']], [0, -1, Match.PIECES['bBp']], [0, -1, Match.PIECES['bKn']]],
                     [[1, -1, Match.PIECES['bQu']], [1, -1, Match.PIECES['bRk']], [1, -1, Match.PIECES['bBp']], [1, -1, Match.PIECES['bKn']]],
@@ -98,8 +99,10 @@ def count_attacks(match, srcx, srcy):
 
     if(color == Match.COLORS['white']):
         STEPS = WPW_STEPS
+        counter = 1
     else:
         STEPS = BPW_STEPS
+        counter = -1
 
     for i in range(2):
         x1 = srcx + STEPS[i][0]
@@ -107,7 +110,7 @@ def count_attacks(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
-                count += 1
+                count += counter
 
     return count
 

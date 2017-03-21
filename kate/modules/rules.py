@@ -220,7 +220,7 @@ def count_attacks(match, srcx, srcy):
     count += king.count_attacks(match, srcx, srcy)
     count += pawn.count_attacks(match, srcx, srcy)
 
-    return count * 10
+    return count * 3
 
 
 def score_attacks(match, srcx, srcy):

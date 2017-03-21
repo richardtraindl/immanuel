@@ -13,10 +13,11 @@ WEST_Y = 0
 
 STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
 
-GEN_STEPS = [ [[0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]],
-              [[0, -1], [0, -2], [0, -3], [0, -4], [0, -5], [0, -6], [0, -7]],
-              [[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0]],
-              [[-1, 0], [-2, 0], [-3, 0], [-4, 0], [-5, 0], [-6, 0], [-7, 0]] ]
+blank = Match.PIECES['blk']
+GEN_STEPS = [ [[0, 1, blank], [0, 2, blank], [0, 3, blank], [0, 4, blank], [0, 5, blank], [0, 6, blank], [0, 7, blank]],
+              [[0, -1, blank], [0, -2, blank], [0, -3, blank], [0, -4, blank], [0, -5, blank], [0, -6, blank], [0, -7, blank]],
+              [[1, 0, blank], [2, 0, blank], [3, 0, blank], [4, 0, blank], [5, 0, blank], [6, 0, blank], [7, 0, blank]],
+              [[-1, 0, blank], [-2, 0, blank], [-3, 0, blank], [-4, 0, blank], [-5, 0, blank], [-6, 0, blank], [-7, 0, blank]] ]
 
 
 def is_field_attacked(match, color, fieldx, fieldy):
@@ -36,7 +37,7 @@ def is_field_attacked(match, color, fieldx, fieldy):
 def does_attack(match, srcx, srcy):
     rook = match.readfield(srcx, srcy)
 
-    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['bRk']):
+    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['wQu'] and rook != Match.PIECES['bRk'] and rook != Match.PIECES['bQu']):
         return False
 
     color = Match.color_of_piece(rook)
@@ -58,19 +59,24 @@ def count_attacks(match, srcx, srcy):
 
     rook = match.readfield(srcx, srcy)
 
-    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['bRk']):
+    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['wQu'] and rook != Match.PIECES['bRk'] and rook != Match.PIECES['bQu']):
         return count
 
-        color = Match.color_of_piece(rook)
+    color = Match.color_of_piece(rook)
 
-        for i in range(4):
-            stepx = STEPS[i][0]
-            stepy = STEPS[i][1]
-            x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
-            if(x1 != rules.UNDEF_X):
-                piece = match.readfield(x1, y1)
-                if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
-                    count += 1
+    if(color == Match.COLORS['white']):
+        counter = 1
+    else:
+        counter = -1
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
+        if(x1 != rules.UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+                count += counter
 
     return count
 
@@ -80,7 +86,7 @@ def score_attacks(match, srcx, srcy):
 
     rook = match.readfield(srcx, srcy)
 
-    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['bRk']):
+    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['wQu'] and rook != Match.PIECES['bRk'] and rook != Match.PIECES['bQu']):
         return score
 
         color = Match.color_of_piece(rook)
@@ -100,7 +106,7 @@ def score_attacks(match, srcx, srcy):
 def does_support_attacked(match, srcx, srcy):
     rook = match.readfield(srcx, srcy)
 
-    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['bRk']):
+    if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['wQu'] and rook != Match.PIECES['bRk'] and rook != Match.PIECES['bQu']):
         return False
 
     color = Match.color_of_piece(rook)

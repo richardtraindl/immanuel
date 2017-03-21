@@ -25,16 +25,17 @@ STEP_LG_CASTLING_Y = 0
 
 STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
 
-GEN_STEPS = [ [[0, 1]],
-              [[1, 1]],
-              [[1, 0]], 
-              [[1, -1]],
-              [[0, -1]], 
-              [[-1, -1]],
-              [[-1, 0]],
-              [[-1, 1]],
-              [[2, 0]],
-              [[-2, 0]] ]
+blank = Match.PIECES['blk']
+GEN_STEPS = [ [[0, 1, blank]],
+              [[1, 1, blank]],
+              [[1, 0, blank]], 
+              [[1, -1, blank]],
+              [[0, -1, blank]], 
+              [[-1, -1, blank]],
+              [[-1, 0, blank]],
+              [[-1, 1, blank]],
+              [[2, 0, blank]],
+              [[-2, 0, blank]] ]
 
 
 def is_field_attacked(match, color, fieldx, fieldy):
@@ -78,13 +79,18 @@ def count_attacks(match, srcx, srcy):
 
     color = Match.color_of_piece(king)
 
+    if(color == Match.COLORS['white']):
+        counter = 1
+    else:
+        counter = -1
+
     for i in range(8):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
-                count += 1
+                count += counter
 
     return count
 
