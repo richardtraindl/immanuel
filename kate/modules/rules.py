@@ -215,9 +215,13 @@ def count_attacks(match, srcx, srcy):
     count = 0
 
     count += rook.count_attacks(match, srcx, srcy)
+
     count += knight.count_attacks(match, srcx, srcy)
+
     count += bishop.count_attacks(match, srcx, srcy)
+
     count += king.count_attacks(match, srcx, srcy)
+
     count += pawn.count_attacks(match, srcx, srcy)
 
     return count * 3
@@ -227,10 +231,30 @@ def score_attacks(match, srcx, srcy):
     score = 0
 
     score += rook.score_attacks(match, srcx, srcy)
+
     score += knight.score_attacks(match, srcx, srcy)
+
     score += bishop.score_attacks(match, srcx, srcy)
+
     score += king.score_attacks(match, srcx, srcy)
+
     score += pawn.score_attacks(match, srcx, srcy)
+
+    return score // 50
+
+
+def score_supports_of_attacked(match, srcx, srcy):
+    score = 0
+    
+    score += rook.score_supports_of_attacked(match, srcx, srcy)
+
+    score += bishop.score_supports_of_attacked(match, srcx, srcy)
+
+    score += knight.score_supports_of_attacked(match, srcx, srcy)
+
+    score += king.score_supports_of_attacked(match, srcx, srcy)
+
+    score += pawn.score_supports_of_attacked(match, srcx, srcy)
 
     return score // 50
 
