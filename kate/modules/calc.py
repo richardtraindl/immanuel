@@ -31,6 +31,7 @@ def read_steps(steps, dir_idx, step_idx):
 
 def generate_moves(match):
     topmovecnt = 0
+    mediummovecnt = 0
     color = match.next_color()
     moves = []
     top_moves = []
@@ -104,6 +105,7 @@ def generate_moves(match):
                             escapes = calc_helper.does_attacked_flee(match, gmove)
                             if(attack or support or escapes):
                                 mid_moves.append(gmove)
+                                mediummovecnt += 1
                             else:
                                 low_moves.append(gmove)
 
@@ -113,7 +115,7 @@ def generate_moves(match):
     moves.extend(top_moves)
     moves.extend(mid_moves)
     moves.extend(low_moves)
-    return moves, topmovecnt
+    return moves, topmovecnt, mediummovecnt
 
 
 class immanuelsThread(threading.Thread):
@@ -187,14 +189,14 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
-    gmoves, topmovecnt = generate_moves(match)
+    gmoves, topmovecnt, mediummovecnt = generate_moves(match)
 
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
     elif(depth <= maxdepth + 3):
-        maxcnt = max(20, topmovecnt)
+        maxcnt = min(12, (topmovecnt + mediummovecnt))
     else:
-        maxcnt = max(4, topmovecnt)
+        maxcnt = min(6, (topmovecnt + mediummovecnt))
 
     for gmove in gmoves[:maxcnt]:
         move = match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -258,14 +260,14 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
-    gmoves, topmovecnt = generate_moves(match)
+    gmoves, topmovecnt, mediummovecnt = generate_moves(match)
 
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
     elif(depth <= maxdepth + 3):
-        maxcnt = max(20, topmovecnt)
+        maxcnt = min(12, (topmovecnt + mediummovecnt))
     else:
-        maxcnt = max(4, topmovecnt)
+        maxcnt = min(6, (topmovecnt + mediummovecnt))
 
     for gmove in gmoves[:maxcnt]:
         move = match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
