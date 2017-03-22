@@ -168,6 +168,35 @@ def does_support_attacked(match, srcx, srcy):
     return False
 
 
+def score_supports_of_attacked(match, srcx, srcy):
+    score = 0
+
+    pawn = match.readfield(srcx, srcy)
+
+    if(pawn != Match.PIECES['wPw'] and pawn != Match.PIECES['bPw']):
+        return score
+
+    color = Match.color_of_piece(pawn)
+
+    if(color == Match.COLORS['white']):
+        STEPS = WPW_STEPS
+    else:
+        STEPS = BPW_STEPS
+
+    for i in range(2):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+                continue
+            if( color == Match.color_of_piece(piece) ):
+                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)):
+                    score += Match.SCORES[piece]
+
+    return score
+
+
 def pw_dir(srcx, srcy, dstx, dsty, piece):
     DIRS = rules.DIRS
     step_x = dstx - srcx
