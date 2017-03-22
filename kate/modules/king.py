@@ -138,6 +138,30 @@ def does_support_attacked(match, srcx, srcy):
     return False
 
 
+def score_supports_of_attacked(match, srcx, srcy):
+    score = 0
+
+    king = match.readfield(srcx, srcy)
+
+    if(king != Match.PIECES['wKg'] and king != Match.PIECES['bKg']):
+        return score
+
+    color = Match.color_of_piece(king)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if(piece == Match.PIECES['blk']):
+                continue
+            if( color == Match.color_of_piece(piece) ):
+                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)):
+                    score += Match.SCORES[piece]
+
+    return score 
+
+
 def kg_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS
     step_x = dstx - srcx
