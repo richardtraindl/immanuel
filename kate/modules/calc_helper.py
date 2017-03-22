@@ -2,6 +2,7 @@ from kate.models import Match, Move
 from kate.modules import rules, pawn, debug, helper
 
 
+"""
 def analyse(match):
     analyses = []
     qu_analyses = []
@@ -42,6 +43,7 @@ def analyse(match):
     analyses.extend(kn_analyses)
     analyses.extend(pw_manalyses)
     return analyses
+"""
 
 
 def is_capture(match, move):
@@ -90,10 +92,13 @@ def does_attacked_flee(match, move):
     return False
 
 
+"""
 def is_king_attacked(match, move):
     return rules.is_king_attacked(match, move.srcx, move.srcy)
+"""
 
 
+"""
 def pieces_attacked(match, color):
     if(color == Match.COLORS['white']):
         opp_color = Match.COLORS['black']
@@ -110,13 +115,14 @@ def pieces_attacked(match, color):
                 continue
 
     return False
+"""
 
 
 def evaluate_contacts(match):
-    supported_whites = 0
-    attacked_whites = 0
-    supported_blacks = 0
-    attacked_blacks = 0
+    supporter = 0
+    attacked = 0
+    attackedcnt = 0
+
     color = match.next_color()
 
     for y in range(0, 8, 1):
@@ -124,16 +130,12 @@ def evaluate_contacts(match):
             piece = match.readfield(x, y)
             if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
                 continue
-            elif(Match.color_of_piece(piece) == Match.COLORS['white']):
-                supported_whites += rules.count_attacks(match, x, y)
-                attacked_whites += rules.score_attacks(match, x, y)
-                # attacked_whites += rules.count_attacks(match, x, y, Match.COLORS['black'])
-            else:
-                supported_blacks += rules.count_attacks(match, x, y)
-                attacked_blacks += rules.score_attacks(match, x, y)
-                #attacked_blacks += rules.count_attacks(match, x, y, Match.COLORS['white'])
 
-    return 0 # (supported_whites - attacked_whites) - (supported_blacks - attacked_blacks)
+            supporter += rules.score_supports_of_attacked(match, srcx, srcy)
+            attacked += rules.score_attacks(match, x, y)
+            attackedcnt += rules.count_attacks(match, x, y)
+
+    return ((supporter * -1) + attacked + attackedcnt)
 
 
 def evaluate_piece_moves(match, srcx, srcy):
@@ -219,11 +221,11 @@ def evaluate_position(match):
     contacts = evaluate_contacts(match)
 
     if(match.count < 24):
-        developments = evaluate_developments(match)
         movecnt = evaluate_movecnt(match)
+        developments = evaluate_developments(match)
     else:
-        developments = 0
         movecnt = 0
+        developments = 0
 
     # print("contacts: " + str(contacts))
     # print("movecnts: " + str(movecnt))
