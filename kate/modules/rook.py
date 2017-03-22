@@ -134,7 +134,7 @@ def score_supports_of_attacked(match, srcx, srcy):
     if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['wQu'] and rook != Match.PIECES['bRk'] and rook != Match.PIECES['bQu']):
         return score
 
-    color = Match.color_of_piece(bishop)
+    color = Match.color_of_piece(rook)
 
     for i in range(4):
         stepx = STEPS[i][0]
