@@ -132,6 +132,31 @@ def does_support_attacked(match, srcx, srcy):
     return False
 
 
+def score_supports_of_attacked(match, srcx, srcy):
+    score = 0
+
+    knight = match.readfield(srcx, srcy)
+
+    if(knight != Match.PIECES['wKn'] and knight != Match.PIECES['bKn']):
+        return score
+
+    color = Match.color_of_piece(knight)
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
+        if(x1 != rules.UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+                continue
+            if( color == Match.color_of_piece(piece) ):
+                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)):
+                    score += Match.SCORES[piece]
+
+    return score 
+
+
 def kn_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS
     step_x = dstx - srcx
