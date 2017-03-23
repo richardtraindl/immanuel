@@ -131,7 +131,7 @@ def evaluate_contacts(match):
             if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
                 continue
 
-            supporter += rules.score_supports_of_attacked(match, srcx, srcy)
+            supporter += rules.score_supports_of_attacked(match, x, y)
             attacked += rules.score_attacks(match, x, y)
             attackedcnt += rules.count_attacks(match, x, y)
 
