@@ -276,7 +276,29 @@ class Match(models.Model):
         self.move_list.append(move)
         return move
 
-    def undo_move(self, calc):
+ def undo_move(self, calc):
+        if(calc == False):
+            move = Move.objects.filter(match_id=self.id).order_by("count").last()
+            if(move == None):
+                return None
+        else:
+            if(len(self.move_list) > 0):
+                move = self.move_list.pop()
+            else:
+                return None
+
+        if(move.move_type == move.TYPES['standard']):
+            return generic.undo_move(match, move)
+        elif(move.move_type == move.TYPES['short_castling']):
+            return king.undo_short_castling(match, move)
+        elif(move.move_type == move.TYPES['long_castling']):
+            return king.undo_long_castling(match, move)
+        elif(move.move_type == move.TYPES['promotion']):
+            return pawn.undo_promotion(match, move)
+        else:
+            return undo_en_passant(match, move)
+
+    def undo_move_ori(self, calc):
         if(calc == False):
             move = Move.objects.filter(match_id=self.id).order_by("count").last()
             if(move == None):
