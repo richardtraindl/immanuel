@@ -1,5 +1,5 @@
 from kate.models import Match, Move
-from kate.modules import rules
+from kate.modules import rules, generic
 
 
 WHITE_1N_X = 0
@@ -360,7 +360,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
 
             return move
         else:
-            return None
+            return generic.do_move(match, move, srcpiece, dstpiece)
 
 
 def undo_promotion(match, move):
