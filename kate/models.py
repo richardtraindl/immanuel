@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
-from kate.modules import helper
+from kate.modules import helper, king, pawn, generic
 import threading
 
 
@@ -153,6 +153,21 @@ class Match(models.Model):
         self.bRk_h8_first_movecnt = 0
 
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
+        self.count += 1
+
+        move = Move(self.id, self.count, Move.TYPES['standard'], srcx, srcy, dstx, dsty, None, None, Match.PIECES['blk'], prom_piece, self.fifty_moves_count)
+
+        srcpiece = self.readfield(srcx, srcy)
+        dstpiece = self.readfield(dstx, dsty)
+
+        if(srcpiece == Match.PIECES['wPw'] or srcpiece == Match.PIECES['bPw']):
+            return pawn.do_move(match, move, srcpiece, dstpiece)
+        elif(srcpiece == Match.PIECES['wKg'] or srcpiece == Match.PIECES['bKg']):
+            return king.do_move(match, move, srcpiece, dstpiece)
+        else:
+            return generic.do_move(match, move, srcpiece, dstpiece)
+
+    def do_move_ori(self, srcx, srcy, dstx, dsty, prom_piece):
         self.count += 1
         move = Move()
         move.match_id = self.id
