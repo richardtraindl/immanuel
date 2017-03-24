@@ -363,6 +363,30 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
             return None
 
 
+def undo_promotion(match, move):
+    if(move.dsty == 7):
+        piece = Match.PIECES['wPw']
+    else:
+        piece = Match.PIECES['bPw']
+
+    match.writefield(move.srcx, move.srcy, piece)
+    match.writefield(move.dstx, move.dsty, move.captured_piece)
+    match.score += (Match.SCORES[move.prom_piece] - Match.SCORES[piece])
+    match.score -= Match.SCORES[move.captured_piece]
+
+    return move
+
+
+def undo_en_passant(match, move):
+    piece = match.readfield(move.dstx, move.dsty)
+    match.writefield(move.srcx, move.srcy, piece)
+    match.writefield(move.dstx, move.dsty, Match.PIECES['blk'])
+    match.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
+    match.score -= Match.SCORES[move.captured_piece]
+
+    return move
+
+
 # OLD
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):
     DIRS = rules.DIRS
