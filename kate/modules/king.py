@@ -1,5 +1,5 @@
 from kate.models import Match
-from kate.modules import rules
+from kate.modules import rules, generic
 
 
 STEP_1N_X = 0
@@ -334,7 +334,7 @@ def do_move(match, move, srcpiece, dstpiece)
 
         return move
     else:
-        return None
+        return generic.do_move(match, move, srcpiece, dstpiece)
 
 
 def undo_short_castling(match, move):
