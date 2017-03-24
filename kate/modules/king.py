@@ -283,3 +283,49 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
 
     return True
 
+def do_move(match, move, srcpiece, dstpiece)
+    if(move.srcx - move.dstx == -2):
+        move.move_type = Move.TYPES['short_castling']
+        move.captured_piece = dstpiece
+        
+        match.writefield(move.srcx, move.srcy, self.PIECES['blk'])
+        match.writefield(move.dstx, move.dsty, srcpiece)
+        rook = match.readfield(move.srcx + 3, move.srcy)
+        match.writefield(move.srcx + 3, move.srcy, Match.PIECES['blk'])
+        match.writefield(move.dstx - 1, move.dsty, rook)
+        match.fifty_moves_count += 1
+        if(srcpiece == Match.PIECES['wKg']):
+            match.wKg_x = move.dstx
+            match.wKg_y = move.dsty
+            match.wKg_first_movecnt = match.count
+        else:
+            match.bKg_x = move.dstx
+            match.bKg_y = move.dsty
+            match.bKg_first_movecnt = match.count
+        match.move_list.append(move)
+        return move
+    elif(srcx - dstx == 2):
+        move.move_type = Move.TYPES['long_castling']
+        move.captured_piece = dstpiece
+
+        match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+        match.writefield(move.dstx, move.dsty, srcpiece)
+        rook = match.readfield(move.srcx - 4, move.srcy)
+        match.writefield(move.srcx - 4, move.srcy, Match.PIECES['blk'])
+        match.writefield(move.dstx + 1, move.dsty, rook)
+        match.fifty_moves_count += 1
+        if(srcpiece == Match.PIECES['wKg']):
+            match.wKg_x = move.dstx
+            match.wKg_y = move.dsty
+            match.wKg_first_movecnt = self.count
+        else:
+            match.bKg_x = move.dstx
+            match.bKg_y = move.dsty
+            match.bKg_first_movecnt = self.count
+        match.move_list.append(move)
+        return move
+    else:
+        return None
+
+
+        
