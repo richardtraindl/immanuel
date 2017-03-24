@@ -34,30 +34,33 @@ def generic.do_move(match, move, srcpiece, dstpiece):
 
 
 def generic.undo_move(match, move):
+    match.count -= 1
+    match.fifty_moves_count = move.fifty_moves_count
+
     piece = self.readfield(move.dstx, move.dsty)
-    self.writefield(move.srcx, move.srcy, piece)
-    self.writefield(move.dstx, move.dsty, move.captured_piece)
-    self.score -= self.SCORES[move.captured_piece]
+    match.writefield(move.srcx, move.srcy, piece)
+    match.writefield(move.dstx, move.dsty, move.captured_piece)
+    match.score -= Match.SCORES[move.captured_piece]
     if(piece == Match.PIECES['wKg']):
-        self.wKg_x = move.srcx
-        self.wKg_y = move.srcy
-        if(self.wKg_first_movecnt == self.count + 1):
-            self.wKg_first_movecnt = 0
+        match.wKg_x = move.srcx
+        match.wKg_y = move.srcy
+        if(match.wKg_first_movecnt == match.count + 1):
+            match.wKg_first_movecnt = 0
     elif(piece == Match.PIECES['bKg']):
-        self.bKg_x = move.srcx
-        self.bKg_y = move.srcy
-        if(self.bKg_first_movecnt == self.count + 1):
-            self.bKg_first_movecnt = 0
+        match.bKg_x = move.srcx
+        match.bKg_y = move.srcy
+        if(match.bKg_first_movecnt == match.count + 1):
+            match.bKg_first_movecnt = 0
     elif(piece == Match.PIECES['wRk']):
-        if(self.wRk_a1_first_movecnt == self.count + 1):
-            self.wRk_a1_first_movecnt = 0
-        elif(self.wRk_h1_first_movecnt == self.count + 1):
-            self.wRk_h1_first_movecnt = 0
+        if(match.wRk_a1_first_movecnt == match.count + 1):
+            match.wRk_a1_first_movecnt = 0
+        elif(match.wRk_h1_first_movecnt == match.count + 1):
+            match.wRk_h1_first_movecnt = 0
     elif(piece == Match.PIECES['bRk']):
-        if(self.bRk_a8_first_movecnt == self.count + 1):
-            self.bRk_a8_first_movecnt = 0
-        elif(self.bRk_h8_first_movecnt == self.count + 1):
-            self.bRk_h8_first_movecnt = 0
+        if(match.bRk_a8_first_movecnt == match.count + 1):
+            match.bRk_a8_first_movecnt = 0
+        elif(match.bRk_h8_first_movecnt == match.count + 1):
+            match.bRk_h8_first_movecnt = 0
 
     return move
 
