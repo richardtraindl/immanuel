@@ -298,11 +298,13 @@ def do_move(match, move, srcpiece, dstpiece)
         if(srcpiece == Match.PIECES['wKg']):
             match.wKg_x = move.dstx
             match.wKg_y = move.dsty
-            match.wKg_first_movecnt = match.count
+            if(match.wKg_first_movecnt == 0):
+                match.wKg_first_movecnt = match.count
         else:
             match.bKg_x = move.dstx
             match.bKg_y = move.dsty
-            match.bKg_first_movecnt = match.count
+            if(match.bKg_first_movecnt == 0):
+                match.bKg_first_movecnt = match.count
         match.move_list.append(move)
 
         return move
@@ -319,11 +321,13 @@ def do_move(match, move, srcpiece, dstpiece)
         if(srcpiece == Match.PIECES['wKg']):
             match.wKg_x = move.dstx
             match.wKg_y = move.dsty
-            match.wKg_first_movecnt = match.count
+            if(match.wKg_first_movecnt == 0):
+                match.wKg_first_movecnt = match.count
         else:
             match.bKg_x = move.dstx
             match.bKg_y = move.dsty
-            match.bKg_first_movecnt = match.count
+            if(match.bKg_first_movecnt == 0):
+                match.bKg_first_movecnt = match.count
         match.move_list.append(move)
 
         return move
