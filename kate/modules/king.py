@@ -283,6 +283,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
 
     return True
 
+
 def do_move(match, move, srcpiece, dstpiece)
     if(move.srcx - move.dstx == -2):
         move.move_type = Move.TYPES['short_castling']
@@ -303,6 +304,7 @@ def do_move(match, move, srcpiece, dstpiece)
             match.bKg_y = move.dsty
             match.bKg_first_movecnt = match.count
         match.move_list.append(move)
+
         return move
     elif(srcx - dstx == 2):
         move.move_type = Move.TYPES['long_castling']
@@ -317,15 +319,14 @@ def do_move(match, move, srcpiece, dstpiece)
         if(srcpiece == Match.PIECES['wKg']):
             match.wKg_x = move.dstx
             match.wKg_y = move.dsty
-            match.wKg_first_movecnt = self.count
+            match.wKg_first_movecnt = match.count
         else:
             match.bKg_x = move.dstx
             match.bKg_y = move.dsty
-            match.bKg_first_movecnt = self.count
+            match.bKg_first_movecnt = match.count
         match.move_list.append(move)
+
         return move
     else:
         return None
 
-
-        
