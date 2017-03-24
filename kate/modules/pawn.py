@@ -329,6 +329,38 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
     return True
 
 
+    pawn.do_move(match, move, srcpiece, dstpiece):
+        if(move.prom_piece != Match.PIECES['blk']):
+            move.move_type = Move.TYPES['promotion']
+            move.captured_piece = dstpiece
+
+            match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+            match.writefield(move.dstx, move.dsty, move.prom_piece)
+            match.fifty_moves_count = 0
+
+            match.score -= (Match.SCORES[move.prom_piece] - Match.SCORES[srcpiece])
+            match.score += Match.SCORES[dstpiece]
+            match.move_list.append(move)
+            return move
+        elif(dstpiece == Match.PIECES['blk'] and move.srcx != move.dstx):
+            move.move_type = Move.TYPES['en_passant']
+            move.e_p_fieldx = move.dstx
+            move.e_p_fieldy = move.srcy
+
+            match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+            match.writefield(move.dstx, move.dsty, srcpiece)
+            match.fifty_moves_count = 0
+
+            pawn = self.readfield(move.e_p_fieldx, move.e_p_fieldy)
+            match.writefield(move.e_p_fieldx, move.e_p_fieldy, Match.PIECES['blk'])
+            move.captured_piece = pawn
+            match.score += Match.SCORES[pawn]
+            match.move_list.append(move)
+            return move
+        else:
+            return None
+
+
 # OLD
 def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):
     DIRS = rules.DIRS
