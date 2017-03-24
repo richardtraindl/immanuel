@@ -369,6 +369,8 @@ def undo_promotion(match, move):
     else:
         piece = Match.PIECES['bPw']
 
+    match.count -= 1
+    match.fifty_moves_count = move.fifty_moves_count
     match.writefield(move.srcx, move.srcy, piece)
     match.writefield(move.dstx, move.dsty, move.captured_piece)
     match.score += (Match.SCORES[move.prom_piece] - Match.SCORES[piece])
@@ -378,6 +380,8 @@ def undo_promotion(match, move):
 
 
 def undo_en_passant(match, move):
+    match.count -= 1
+    match.fifty_moves_count = move.fifty_moves_count
     piece = match.readfield(move.dstx, move.dsty)
     match.writefield(move.srcx, move.srcy, piece)
     match.writefield(move.dstx, move.dsty, Match.PIECES['blk'])
