@@ -338,6 +338,9 @@ def do_move(match, move, srcpiece, dstpiece)
 
 
 def undo_short_castling(match, move):
+    match.count -= 1
+    match.fifty_moves_count = move.fifty_moves_count
+
     piece = match.readfield(move.dstx, move.dsty)
     rook = match.readfield(move.dstx - 1, move.dsty)
     match.writefield(move.srcx, move.srcy, piece)
@@ -359,6 +362,9 @@ def undo_short_castling(match, move):
 
 
 def undo_long_castling(match, move):
+    match.count -= 1
+    match.fifty_moves_count = move.fifty_moves_count
+
     piece = match.readfield(move.dstx, move.dsty)
     rook = match.readfield(move.dstx + 1, move.dsty)
     match.writefield(move.srcx, move.srcy, piece)
