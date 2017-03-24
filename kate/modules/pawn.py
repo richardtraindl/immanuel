@@ -334,6 +334,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
             move.move_type = Move.TYPES['promotion']
             move.captured_piece = dstpiece
 
+            match.count += 1 
             match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
             match.writefield(move.dstx, move.dsty, move.prom_piece)
             match.fifty_moves_count = 0
@@ -349,6 +350,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
             pawn = match.readfield(move.e_p_fieldx, move.e_p_fieldy)
             move.captured_piece = pawn
 
+            match.count += 1 
             match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
             match.writefield(move.dstx, move.dsty, srcpiece)
             match.fifty_moves_count = 0
