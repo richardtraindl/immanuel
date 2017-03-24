@@ -6,6 +6,7 @@ def generic.do_move(match, move, srcpiece, dstpiece):
     move.move_type = Move.TYPES['standard']
     move.captured_piece = dstpiece
 
+    match.count += 1            
     match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
     match.writefield(move.dstx, move.dsty, srcpiece)
     if(dstpiece != Match.PIECES['blk']):
