@@ -289,6 +289,7 @@ def do_move(match, move, srcpiece, dstpiece)
         move.move_type = Move.TYPES['short_castling']
         move.captured_piece = dstpiece
         
+        match.count += 1   
         match.writefield(move.srcx, move.srcy, self.PIECES['blk'])
         match.writefield(move.dstx, move.dsty, srcpiece)
         rook = match.readfield(move.srcx + 3, move.srcy)
@@ -312,6 +313,7 @@ def do_move(match, move, srcpiece, dstpiece)
         move.move_type = Move.TYPES['long_castling']
         move.captured_piece = dstpiece
 
+        match.count += 1   
         match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
         match.writefield(move.dstx, move.dsty, srcpiece)
         rook = match.readfield(move.srcx - 4, move.srcy)
