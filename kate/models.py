@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
-from kate.modules import helper, king, pawn, generic
+from kate.modules import helper
 import threading
+
 
 
 class Match(models.Model):
@@ -105,18 +106,14 @@ class Match(models.Model):
     _immanuels_thread_lock = threading.Lock()
     _immanuels_threads_list = []
 
+
     def __init__(self, *args, **kwargs):
         super(Match, self).__init__(*args, **kwargs)
         self.move_list = []
 
-    def writefield(self, x, y, value):
-        self.board[y][x] = value
-
-    def readfield(self, x, y):
-        return self.board[y][x]
 
     def setboardbase(self):
-        self.board = [ [0  for x in range(8)] for x in range(8) ]
+        self.board = [ [0 for x in range(8)] for x in range(8) ]
         self.board[0][0] = self.PIECES['wRk']
         self.board[0][1] = self.PIECES['wKn']
         self.board[0][2] = self.PIECES['wBp']
@@ -152,249 +149,21 @@ class Match(models.Model):
         self.bRk_a8_first_movecnt = 0
         self.bRk_h8_first_movecnt = 0
 
-    def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
-        move = Move(self.id, self.count+1, Move.TYPES['standard'], srcx, srcy, dstx, dsty, None, None, Match.PIECES['blk'], prom_piece, self.fifty_moves_count)
 
-        srcpiece = self.readfield(srcx, srcy)
-        dstpiece = self.readfield(dstx, dsty)
+    def writefield(self, x, y, value):
+        self.board[y][x] = value
 
-        if(srcpiece == Match.PIECES['wPw'] or srcpiece == Match.PIECES['bPw']):
-            return pawn.do_move(match, move, srcpiece, dstpiece)
-        elif(srcpiece == Match.PIECES['wKg'] or srcpiece == Match.PIECES['bKg']):
-            return king.do_move(match, move, srcpiece, dstpiece)
-        else:
-            return generic.do_move(match, move, srcpiece, dstpiece)
 
-    def do_move_ori(self, srcx, srcy, dstx, dsty, prom_piece):
-        self.count += 1
-        move = Move()
-        move.match_id = self.id
-        move.count = self.count
-        move.srcx = srcx
-        move.srcy = srcy
-        move.dstx = dstx
-        move.dsty = dsty
-        move.fifty_moves_count = self.fifty_moves_count        
-        srcpiece = self.readfield(srcx, srcy)
-        dstpiece = self.readfield(dstx, dsty)
-        if(srcpiece == Match.PIECES['wPw'] or srcpiece == Match.PIECES['bPw']):
-            if(prom_piece != Match.PIECES['blk']):
-                self.writefield(srcx, srcy, Match.PIECES['blk']) 
-                self.writefield(dstx, dsty, prom_piece)
-                self.fifty_moves_count = 0
-                move.move_type = Move.TYPES['promotion']
-                move.captured_piece = dstpiece
-                move.prom_piece = prom_piece
-                self.score -= (Match.SCORES[prom_piece] - Match.SCORES[srcpiece])
-                self.score += Match.SCORES[dstpiece]
-                self.move_list.append(move)
-                return move
-            elif(dstpiece == Match.PIECES['blk'] and srcx != dstx):
-                self.writefield(srcx, srcy, Match.PIECES['blk'])
-                self.writefield(dstx, dsty, srcpiece)
-                self.fifty_moves_count = 0
-                move.move_type = Move.TYPES['en_passant']
-                move.e_p_fieldx = dstx
-                move.e_p_fieldy = srcy
-                pawn = self.readfield(move.e_p_fieldx, move.e_p_fieldy)
-                self.writefield(move.e_p_fieldx, move.e_p_fieldy, Match.PIECES['blk'])
-                move.captured_piece = pawn
-                self.score += Match.SCORES[pawn]
-                self.move_list.append(move)
-                return move 
-        elif(srcpiece == Match.PIECES['wKg'] or srcpiece == Match.PIECES['bKg']):
-            if(srcx - dstx == -2):
-                self.writefield(srcx, srcy, self.PIECES['blk'])
-                self.writefield(dstx, dsty, srcpiece)
-                rook = self.readfield(srcx + 3, srcy)
-                self.writefield(srcx + 3, srcy, Match.PIECES['blk'])
-                self.writefield(dstx - 1, dsty, rook)
-                self.fifty_moves_count += 1
-                if(srcpiece == Match.PIECES['wKg']):
-                    self.wKg_x = dstx
-                    self.wKg_y = dsty
-                    self.wKg_first_movecnt = self.count
-                else:
-                    self.bKg_x = dstx
-                    self.bKg_y = dsty
-                    self.bKg_first_movecnt = self.count
+    def readfield(self, x, y):
+        return self.board[y][x]
 
-                move.move_type = Move.TYPES['short_castling']
-                move.captured_piece = dstpiece
-                self.move_list.append(move)
-                return move
-            elif(srcx - dstx == 2):
-                self.writefield(srcx, srcy, Match.PIECES['blk'])
-                self.writefield(dstx, dsty, srcpiece)
-                rook = self.readfield(srcx - 4, srcy)
-                self.writefield(srcx - 4, srcy, Match.PIECES['blk'])
-                self.writefield(dstx + 1, dsty, rook)
-                self.fifty_moves_count += 1
-                if(srcpiece == Match.PIECES['wKg']):
-                    self.wKg_x = dstx
-                    self.wKg_y = dsty
-                    self.wKg_first_movecnt = self.count
-                else:
-                    self.bKg_x = dstx
-                    self.bKg_y = dsty
-                    self.bKg_first_movecnt = self.count
-
-                move.move_type = Move.TYPES['long_castling']
-                move.captured_piece = dstpiece
-                self.move_list.append(move)
-                return move
-        self.writefield(srcx, srcy, Match.PIECES['blk'])
-        self.writefield(dstx, dsty, srcpiece)
-        if(dstpiece != Match.PIECES['blk']):
-            self.fifty_moves_count = 0
-        else:
-            self.fifty_moves_count += 1
-        if(srcpiece == Match.PIECES['wKg']):
-            self.wKg_x = dstx
-            self.wKg_y = dsty
-            if(self.wKg_first_movecnt == 0):
-                self.wKg_first_movecnt = self.count
-        elif(srcpiece == Match.PIECES['bKg']):
-            self.bKg_x = dstx
-            self.bKg_y = dsty
-            if(self.bKg_first_movecnt == 0):
-                self.bKg_first_movecnt = self.count
-        if(srcpiece == Match.PIECES['wRk']):
-            if(srcx == 0 and srcy == 0 and self.wRk_a1_first_movecnt == 0):
-                self.wRk_a1_first_movecnt = self.count
-            elif(srcx == 7 and srcy == 0 and self.wRk_h1_first_movecnt == 0):
-                self.wRk_h1_first_movecnt = self.count
-        elif(srcpiece == Match.PIECES['bRk']):
-            if(srcx == 0 and srcy == 7 and self.bRk_a8_first_movecnt == 0):
-                self.bRk_a8_first_movecnt = self.count
-            elif(srcx == 7 and srcy == 7 and self.bRk_h8_first_movecnt == 0):
-                self.bRk_h8_first_movecnt = self.count
-        move.fifty_moves_count = self.fifty_moves_count
-        move.move_type = Move.TYPES['standard']
-        move.captured_piece = dstpiece
-        self.score += Match.SCORES[dstpiece]
-        self.move_list.append(move)
-        return move
-
- def undo_move(self, calc):
-        if(calc == False):
-            move = Move.objects.filter(match_id=self.id).order_by("count").last()
-            if(move == None):
-                return None
-        else:
-            if(len(self.move_list) > 0):
-                move = self.move_list.pop()
-            else:
-                return None
-
-        if(move.move_type == move.TYPES['standard']):
-            return generic.undo_move(match, move)
-        elif(move.move_type == move.TYPES['short_castling']):
-            return king.undo_short_castling(match, move)
-        elif(move.move_type == move.TYPES['long_castling']):
-            return king.undo_long_castling(match, move)
-        elif(move.move_type == move.TYPES['promotion']):
-            return pawn.undo_promotion(match, move)
-        else:
-            return undo_en_passant(match, move)
-
-    def undo_move_ori(self, calc):
-        if(calc == False):
-            move = Move.objects.filter(match_id=self.id).order_by("count").last()
-            if(move == None):
-                return None
-        else:
-            if(len(self.move_list) > 0):
-                move = self.move_list.pop()
-            else:
-                return None
-        self.count -= 1
-        self.fifty_moves_count = move.fifty_moves_count
-        if(move.move_type == move.TYPES['standard']):
-            piece = self.readfield(move.dstx, move.dsty)
-            self.writefield(move.srcx, move.srcy, piece)
-            self.writefield(move.dstx, move.dsty, move.captured_piece)
-            self.score -= self.SCORES[move.captured_piece]
-            if(piece == Match.PIECES['wKg']):
-                self.wKg_x = move.srcx
-                self.wKg_y = move.srcy
-                if(self.wKg_first_movecnt == self.count + 1):
-                    self.wKg_first_movecnt = 0
-            elif(piece == Match.PIECES['bKg']):
-                self.bKg_x = move.srcx
-                self.bKg_y = move.srcy
-                if(self.bKg_first_movecnt == self.count + 1):
-                    self.bKg_first_movecnt = 0
-            elif(piece == Match.PIECES['wRk']):
-                if(self.wRk_a1_first_movecnt == self.count + 1):
-                    self.wRk_a1_first_movecnt = 0
-                elif(self.wRk_h1_first_movecnt == self.count + 1):
-                    self.wRk_h1_first_movecnt = 0
-            elif(piece == Match.PIECES['bRk']):
-                if(self.bRk_a8_first_movecnt == self.count + 1):
-                    self.bRk_a8_first_movecnt = 0
-                elif(self.bRk_h8_first_movecnt == self.count + 1):
-                    self.bRk_h8_first_movecnt = 0
-            return move
-        elif(move.move_type == move.TYPES['short_castling']):
-            piece = self.readfield(move.dstx, move.dsty)
-            rook = self.readfield(move.dstx - 1, move.dsty)
-            self.writefield(move.srcx, move.srcy, piece)
-            self.writefield(move.dstx, move.dsty, self.PIECES['blk'])
-            self.writefield(move.dstx - 1, move.dsty, self.PIECES['blk'])
-            self.writefield(move.dstx + 1, move.dsty, rook)
-            if(piece == Match.PIECES['wKg']):
-                self.wKg_x = move.srcx
-                self.wKg_y = move.srcy
-                self.wKg_first_movecnt = 0
-                self.wRk_h1_first_movecnt = 0
-            else:
-                self.bKg_x = move.srcx
-                self.bKg_y = move.srcy
-                self.bKg_first_movecnt = 0
-                self.bRk_h8_first_movecnt = 0
-            return move
-        elif(move.move_type == move.TYPES['long_castling']):
-            piece = self.readfield(move.dstx, move.dsty)
-            rook = self.readfield(move.dstx + 1, move.dsty)
-            self.writefield(move.srcx, move.srcy, piece)
-            self.writefield(move.dstx, move.dsty, self.PIECES['blk'])
-            self.writefield(move.dstx + 1, move.dsty, self.PIECES['blk'])
-            self.writefield(move.dstx - 2, move.dsty, rook)
-            if(piece == Match.PIECES['wKg']):
-                self.wKg_x = move.srcx
-                self.wKg_y = move.srcy
-                self.wKg_first_movecnt = 0
-                self.wRk_a1_first_movecnt = 0
-            else:
-                self.bKg_x = move.srcx
-                self.bKg_y = move.srcy
-                self.bKg_first_movecnt = 0
-                self.bRk_a8_first_movecnt = 0
-            return move
-        elif(move.move_type == move.TYPES['promotion']):
-            if(move.dsty == 7):
-                piece = self.PIECES['wPw']
-            else:
-                piece = self.PIECES['bPw']
-            self.writefield(move.srcx, move.srcy, piece)
-            self.writefield(move.dstx, move.dsty, move.captured_piece)
-            self.score += (self.SCORES[move.prom_piece] - self.SCORES[piece])
-            self.score -= self.SCORES[move.captured_piece]
-            return move
-        else:
-            piece = self.readfield(move.dstx, move.dsty)
-            self.writefield(move.srcx, move.srcy, piece)
-            self.writefield(move.dstx, move.dsty, self.PIECES['blk'])
-            self.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
-            self.score -= self.SCORES[move.captured_piece]
-            return move
 
     def next_color(self):
         if(self.count % 2 == 0 ):
-            return Match.COLORS['white']
+            return self.COLORS['white']
         else:
-            return Match.COLORS['black']
+            return self.COLORS['black']
+
 
     def next_color_human(self):
         if(self.count % 2 == 0 ):
@@ -402,30 +171,35 @@ class Match(models.Model):
         else:
             return self.black_player_human
 
+
     def is_immanuel(self):
         return (self.white_player_human == False or self.black_player_human == False)
+
 
     def is_last_move_capture(self):
         if(len(self.move_list) > 0):
             move = self.move_list[-1]
-            if(move.captured_piece != Match.PIECES['blk']):
+            if(move.captured_piece != self.PIECES['blk']):
                 return True
 
         return False
+
 
     def is_last_move_promotion(self):
         if(len(self.move_list) > 0):
             move = self.move_list[-1]
-            if(move.prom_piece != Match.PIECES['blk']):
+            if(move.prom_piece != self.PIECES['blk']):
                 return True
 
         return False
+
 
     def read_move_list(self, idx):
         if(len(self.move_list) > 0):
             return self.move_list[idx]
         else:
             return None
+
 
     @staticmethod
     def color_of_piece(piece):
@@ -436,11 +210,13 @@ class Match(models.Model):
         else:
             return Match.COLORS['undefined']
 
+
     @staticmethod
     def koord_to_index(koord):
         x = ord(koord[0]) - ord('a')
         y = ord(koord[1]) - ord('1')
         return x,y
+
 
     @staticmethod
     def index_to_koord(x, y):
@@ -449,6 +225,7 @@ class Match(models.Model):
         koord = str(col + row)
         return koord
 
+
     @classmethod
     def remove_outdated_threads(cls, match):
         with cls._immanuels_thread_lock:
@@ -456,11 +233,13 @@ class Match(models.Model):
                 if(item.match.id == match.id or item.is_alive() == False):
                     cls._immanuels_threads_list.remove(item)
                     item.join()
-    
+
+
     @classmethod
     def add_thread(cls, thread):
         with cls._immanuels_thread_lock:
             cls._immanuels_threads_list.append(thread)
+
 
     @classmethod
     def get_active_thread(cls, match):
@@ -469,6 +248,7 @@ class Match(models.Model):
                 if(item.match.id == match.id and item.is_alive()):
                     return item
         return None
+
 
     @classmethod
     def does_thread_exist(cls, thread):
@@ -479,6 +259,7 @@ class Match(models.Model):
             return False
 
 
+
 class Move(models.Model):
     TYPES = {
         'standard' : 1,
@@ -486,6 +267,7 @@ class Move(models.Model):
         'long_castling' : 3,
         'promotion' : 4,
         'en_passant' : 5 }
+
     match = models.ForeignKey(Match, on_delete=models.CASCADE, null=False)
     count = models.PositiveSmallIntegerField(null=False)
     move_type = models.PositiveSmallIntegerField(null=False, default=TYPES['standard'])
@@ -499,22 +281,28 @@ class Move(models.Model):
     prom_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
     fifty_moves_count = models.SmallIntegerField(null=False)
 
+
+    def __init__(self, *args, **kwargs):
+        super(Move, self).__init__(*args, **kwargs)
+
+
     class Meta:
         unique_together = (("match", "count"),)
 
+
     def format_move(self):
-        if(self.move_type == self.TYPES['standard']):
+        if(self.move_type == Move.TYPES['standard']):
             if(self.captured_piece == 0):
                 hyphen = "-"
             else:
                 hyphen = "x"
             fmtmove = Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty)
             return fmtmove
-        elif(self.move_type == self.TYPES['short_castling']):
+        elif(self.move_type == Move.TYPES['short_castling']):
             return "0-0"
-        elif(self.move_type == self.TYPES['long_castling']):
+        elif(self.move_type == Move.TYPES['long_castling']):
             return "0-0-0"
-        elif(self.move_type == self.TYPES['promotion']):
+        elif(self.move_type == Move.TYPES['promotion']):
             if(self.captured_piece == 0):
                 hyphen = "-"
             else:
@@ -525,10 +313,13 @@ class Move(models.Model):
             fmtmove= Match.index_to_koord(self.srcx, self.srcy) + "x" + Match.index_to_koord(self.dstx, self.dsty) + " e.p."
             return fmtmove
 
+
+
 class Comment(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=500)
+
 
 
 class OpeningMove(models.Model):
@@ -536,6 +327,7 @@ class OpeningMove(models.Model):
     movecnt = models.PositiveSmallIntegerField(null=False)
     src = models.CharField(max_length=2, blank=False)
     dst = models.CharField(max_length=2, blank=False)
+
 
     class Meta:
         unique_together = (("previous", "movecnt", "src", "dst"),)

@@ -1,4 +1,4 @@
-from kate.models import Match, Move, OpeningMove
+from kate.models import OpeningMove, Match, Move
 from kate.modules import rules, calc
 import random, copy
 

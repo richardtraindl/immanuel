@@ -1,8 +1,7 @@
 from kate.models import Match, Move
-from kate.modules import rules 
-            
-            
-def generic.do_move(match, move, srcpiece, dstpiece):
+
+
+def do_move(match, move, srcpiece, dstpiece):
     move.move_type = Move.TYPES['standard']
     move.captured_piece = dstpiece
 
@@ -33,11 +32,11 @@ def generic.do_move(match, move, srcpiece, dstpiece):
     return move
 
 
-def generic.undo_move(match, move):
+def undo_move(match, move):
     match.count -= 1
     match.fifty_moves_count = move.fifty_moves_count
 
-    piece = self.readfield(move.dstx, move.dsty)
+    piece = match.readfield(move.dstx, move.dsty)
     match.writefield(move.srcx, move.srcy, piece)
     match.writefield(move.dstx, move.dsty, move.captured_piece)
     match.score -= Match.SCORES[move.captured_piece]
@@ -63,6 +62,4 @@ def generic.undo_move(match, move):
             match.bRk_h8_first_movecnt = 0
 
     return move
-
-
 

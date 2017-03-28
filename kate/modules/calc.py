@@ -1,5 +1,5 @@
 from kate.models import Match, Move
-from kate.modules import helper, rules, pawn, rook, bishop, knight, queen, king, openings, calc_helper, debug
+from kate.modules import helper, rules, pawn, rook, bishop, knight, queen, king, kate, openings, calc_helper, debug
 import random, threading, copy, time 
 
 
@@ -140,19 +140,19 @@ class immanuelsThread(threading.Thread):
             self.match.move_list.append(move)
 
         if(self.match.level == Match.LEVEL['low']):
-            maxdepth = 1
-        elif(self.match.level == Match.LEVEL['medium']):
             maxdepth = 2
-        elif(self.match.level == Match.LEVEL['high']):
+        elif(self.match.level == Match.LEVEL['medium']):
             maxdepth = 3
+        elif(self.match.level == Match.LEVEL['high']):
+            maxdepth = 4
         else:
-            maxdepth = 4 # professional
+            maxdepth = 5 # professional
 
         gmove = calc_move(self.match, maxdepth)
         if(gmove != None):
             curr_match = Match.objects.get(id=self.match.id)
             if(curr_match.count == self.match.count and Match.does_thread_exist(self)):
-                move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+                move = kate.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
                 move.save()
                 self.match.save()
                 print("move saved")
@@ -193,13 +193,13 @@ def calc_max(match, maxdepth, depth, alpha, beta):
 
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
-    elif(depth <= maxdepth + 3):
-        maxcnt = min(12, (topmovecnt + mediummovecnt))
+    elif(depth <= maxdepth + 2):
+        maxcnt = min(16, (topmovecnt + mediummovecnt))
     else:
-        maxcnt = min(6, (topmovecnt + mediummovecnt))
+        maxcnt = min(8, (topmovecnt + mediummovecnt))
 
     for gmove in gmoves[:maxcnt]:
-        move = match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
         if(depth == 1):
             msg = "\nmatch.id:" + str(match.id) + " calculate "
@@ -211,14 +211,14 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                 if(thread and score):
                     thread.populate_candiate(candidate)
 
-        if(depth <= maxdepth or kg_attacked or (topmovecnt > 0 and depth <= 6)):
+        if(depth <= maxdepth or kg_attacked or (topmovecnt > 0 and depth <= 5)):
             score = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
         else:
             score = match.score + calc_helper.evaluate_position(match)
 
         score, candidate = rate(color, gmove, score, candidate, maxscore)
 
-        match.undo_move(True)
+        kate.undo_move(match, True)
 
         if(score > maxscore):
             maxscore = score
@@ -228,9 +228,9 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     if(len(gmoves) == 0):
         status = rules.game_status(match)
         if(status == Match.STATUS['winner_black']):
-            score = Match.SCORES[Match.PIECES['wKg']]
+            score = Match.SCORES[Match.PIECES['wKg']] - depth
         elif(status == Match.STATUS['winner_white']):
-            score = Match.SCORES[Match.PIECES['bKg']]
+            score = Match.SCORES[Match.PIECES['bKg']] + depth
         elif(status == Match.STATUS['draw']):
             score = Match.SCORES[Match.PIECES['blk']]
         else:
@@ -264,13 +264,13 @@ def calc_min(match, maxdepth, depth, alpha, beta):
 
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
-    elif(depth <= maxdepth + 3):
-        maxcnt = min(12, (topmovecnt + mediummovecnt))
+    elif(depth <= maxdepth + 2):
+        maxcnt = min(16, (topmovecnt + mediummovecnt))
     else:
-        maxcnt = min(6, (topmovecnt + mediummovecnt))
+        maxcnt = min(8, (topmovecnt + mediummovecnt))
 
     for gmove in gmoves[:maxcnt]:
-        move = match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        move = kate.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
         if(depth == 1):
             msg = "\nmatch.id:" + str(match.id) + " calculate "
@@ -282,14 +282,14 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                 if(thread and score):
                     thread.populate_candiate(candidate)
 
-        if(depth <= maxdepth or kg_attacked or (topmovecnt > 0 and depth <= 6)):
+        if(depth <= maxdepth or kg_attacked or (topmovecnt > 0 and depth <= 5)):
             score = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
         else:
             score = match.score + calc_helper.evaluate_position(match)
 
         score, candidate = rate(color, gmove, score, candidate, minscore)
 
-        match.undo_move(True)
+        kate.undo_move(match, True)
 
         if(score < minscore):
             minscore = score
@@ -299,9 +299,9 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     if(len(gmoves) == 0):
         status = rules.game_status(match)
         if(status == Match.STATUS['winner_black']):
-            score = Match.SCORES[Match.PIECES['wKg']]
+            score = Match.SCORES[Match.PIECES['wKg']] - depth
         elif(status == Match.STATUS['winner_white']):
-            score = Match.SCORES[Match.PIECES['bKg']]
+            score = Match.SCORES[Match.PIECES['bKg']] + depth
         elif(status == Match.STATUS['draw']):
             score = Match.SCORES[Match.PIECES['blk']]
         else:

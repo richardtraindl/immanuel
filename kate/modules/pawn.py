@@ -329,38 +329,38 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
     return True
 
 
-    pawn.do_move(match, move, srcpiece, dstpiece):
-        if(move.prom_piece != Match.PIECES['blk']):
-            move.move_type = Move.TYPES['promotion']
-            move.captured_piece = dstpiece
+def do_move(match, move, srcpiece, dstpiece):
+    if(move.prom_piece != Match.PIECES['blk']):
+        move.move_type = Move.TYPES['promotion']
+        move.captured_piece = dstpiece
 
-            match.count += 1 
-            match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
-            match.writefield(move.dstx, move.dsty, move.prom_piece)
-            match.fifty_moves_count = 0
-            match.score -= (Match.SCORES[move.prom_piece] - Match.SCORES[srcpiece])
-            match.score += Match.SCORES[dstpiece]
-            match.move_list.append(move)
+        match.count += 1 
+        match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+        match.writefield(move.dstx, move.dsty, move.prom_piece)
+        match.fifty_moves_count = 0
+        match.score -= (Match.SCORES[move.prom_piece] - Match.SCORES[srcpiece])
+        match.score += Match.SCORES[dstpiece]
+        match.move_list.append(move)
 
-            return move
-        elif(dstpiece == Match.PIECES['blk'] and move.srcx != move.dstx):
-            move.move_type = Move.TYPES['en_passant']
-            move.e_p_fieldx = move.dstx
-            move.e_p_fieldy = move.srcy
-            pawn = match.readfield(move.e_p_fieldx, move.e_p_fieldy)
-            move.captured_piece = pawn
+        return move
+    elif(dstpiece == Match.PIECES['blk'] and move.srcx != move.dstx):
+        move.move_type = Move.TYPES['en_passant']
+        move.e_p_fieldx = move.dstx
+        move.e_p_fieldy = move.srcy
+        pawn = match.readfield(move.e_p_fieldx, move.e_p_fieldy)
+        move.captured_piece = pawn
 
-            match.count += 1 
-            match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
-            match.writefield(move.dstx, move.dsty, srcpiece)
-            match.fifty_moves_count = 0
-            match.writefield(move.e_p_fieldx, move.e_p_fieldy, Match.PIECES['blk'])
-            match.score += Match.SCORES[pawn]
-            match.move_list.append(move)
+        match.count += 1 
+        match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+        match.writefield(move.dstx, move.dsty, srcpiece)
+        match.fifty_moves_count = 0
+        match.writefield(move.e_p_fieldx, move.e_p_fieldy, Match.PIECES['blk'])
+        match.score += Match.SCORES[pawn]
+        match.move_list.append(move)
 
-            return move
-        else:
-            return generic.do_move(match, move, srcpiece, dstpiece)
+        return move
+    else:
+        return generic.do_move(match, move, srcpiece, dstpiece)
 
 
 def undo_promotion(match, move):
@@ -389,53 +389,3 @@ def undo_en_passant(match, move):
     match.score -= Match.SCORES[move.captured_piece]
 
     return move
-
-
-# OLD
-def is_move_ok(match, srcx, srcy, dstx, dsty, piece, prom_piece):
-    DIRS = rules.DIRS
-    direction = pw_dir(srcx, srcy, dstx, dsty, piece)
-    if(direction == DIRS['undefined']):
-        return False
-
-    pin_dir = rules.pin_dir(match, srcx, srcy)
-
-    if(direction == DIRS['north'] or direction == DIRS['south'] or direction == DIRS['2north'] 
-        or direction == DIRS['2south']):
-        if(pin_dir != DIRS['north'] and pin_dir != DIRS['south'] and pin_dir != DIRS['undefined']):
-            return False
-    elif(direction == DIRS['north-west'] or direction == DIRS['south-east']):
-        if(pin_dir != DIRS['north-west'] and pin_dir != DIRS['south-east'] and pin_dir != DIRS['undefined']):
-            return False
-    elif(direction == DIRS['north-east'] or direction == DIRS['south-west']):
-        if(pin_dir != DIRS['north-east'] and pin_dir != DIRS['south-west'] and pin_dir != DIRS['undefined']):
-            return False
-
-    dstpiece = match.readfield(dstx, dsty)
-    dstcolor = Match.color_of_piece(dstpiece)
-    if(direction == DIRS['north'] or direction == DIRS['south']):
-        if(dstpiece != Match.PIECES['blk']):
-            return False
-    elif(direction == DIRS['2north']):
-        midpiece = match.readfield(dstx, srcy + 1)
-        if(midpiece != Match.PIECES['blk'] or dstpiece != Match.PIECES['blk']):
-            return False
-    elif(direction == DIRS['2south']):
-        midpiece = match.readfield(dstx, srcy - 1)
-        if(midpiece != Match.PIECES['blk'] or dstpiece != Match.PIECES['blk']):
-            return False
-    if(direction == DIRS['north-west'] or direction == DIRS['north-east']):
-        if(dstcolor != Match.COLORS['black']):
-            return is_white_ep_move_ok(match, srcx, srcy, dstx, dsty)
-    elif(direction == DIRS['south-east'] or direction == DIRS['south-west']):
-        if(dstcolor != Match.COLORS['white']):
-            return is_black_ep_move_ok(match, srcx, srcy, dstx, dsty)
-
-    if(piece == Match.PIECES['wPw'] and dsty == 7 and not (prom_piece == Match.PIECES['wQu'] or
-       prom_piece == Match.PIECES['wRk'] or prom_piece == Match.PIECES['wBp'] or prom_piece == Match.PIECES['wKn'])):
-        return False
-    elif(piece == Match.PIECES['bPw'] and dsty == 0 and not (prom_piece == Match.PIECES['bQu'] or 
-         prom_piece == Match.PIECES['bRk'] or prom_piece == Match.PIECES['bBp'] or prom_piece == Match.PIECES['bKn'])):
-        return False
-
-    return True

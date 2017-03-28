@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from kate.models import Match, Move, Comment
-from kate.modules import helper, rules, calc
+from kate.modules import helper, rules, calc, kate
 
 
 def calc_move_for_immanuel(match):
@@ -170,7 +170,7 @@ def do_move(request, matchid):
                 flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
                 status = rules.game_status(match)
                 if(flag == True and status == Match.STATUS['open']):
-                    move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
+                    move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
                     move.save()
                     match.save()
                     calc_move_for_immanuel(match)
@@ -216,7 +216,7 @@ def do_move(request, matchid):
 def undo_move(request, matchid, switch=None):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
-    move = match.undo_move(False)
+    move = kate.undo_move(match, False)
     if(move != None):
         move.delete()
         match.save()

@@ -1,5 +1,5 @@
 from kate.models import Match
-from kate.modules import rook, bishop
+from kate.modules import rules, rook, bishop
 
 
 blank = Match.PIECES['blk']

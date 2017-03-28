@@ -1,4 +1,4 @@
-from kate.models import Match
+from kate.models import Match, Move
 from kate.modules import rules, generic
 
 
@@ -284,13 +284,13 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
     return True
 
 
-def do_move(match, move, srcpiece, dstpiece)
+def do_move(match, move, srcpiece, dstpiece):
     if(move.srcx - move.dstx == -2):
         move.move_type = Move.TYPES['short_castling']
         move.captured_piece = dstpiece
         
         match.count += 1   
-        match.writefield(move.srcx, move.srcy, self.PIECES['blk'])
+        match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
         match.writefield(move.dstx, move.dsty, srcpiece)
         rook = match.readfield(move.srcx + 3, move.srcy)
         match.writefield(move.srcx + 3, move.srcy, Match.PIECES['blk'])
@@ -309,7 +309,7 @@ def do_move(match, move, srcpiece, dstpiece)
         match.move_list.append(move)
 
         return move
-    elif(srcx - dstx == 2):
+    elif(move.srcx - move.dstx == 2):
         move.move_type = Move.TYPES['long_castling']
         move.captured_piece = dstpiece
 
@@ -383,4 +383,3 @@ def undo_long_castling(match, move):
         match.bRk_a8_first_movecnt = 0
 
     return move
-
