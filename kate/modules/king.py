@@ -285,10 +285,10 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
 
 
 def do_move(match, move, srcpiece, dstpiece):
-    if(move.srcx - move.dstx == -2):
+    if(move.dstx - move.srcx == 2):
         move.move_type = Move.TYPES['short_castling']
         move.captured_piece = dstpiece
-        
+
         match.count += 1   
         match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
         match.writefield(move.dstx, move.dsty, srcpiece)
@@ -309,7 +309,7 @@ def do_move(match, move, srcpiece, dstpiece):
         match.move_list.append(move)
 
         return move
-    elif(move.srcx - move.dstx == 2):
+    elif(move.dstx - move.srcx == -2):
         move.move_type = Move.TYPES['long_castling']
         move.captured_piece = dstpiece
 

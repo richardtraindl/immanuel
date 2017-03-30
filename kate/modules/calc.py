@@ -200,7 +200,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-
+            
         if(depth == 1):
             msg = "\nmatch.id:" + str(match.id) + " calculate "
             prnt_move(msg, gmove)

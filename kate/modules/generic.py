@@ -15,7 +15,17 @@ def do_move(match, move, srcpiece, dstpiece):
         match.fifty_moves_count += 1
         move.fifty_moves_count = match.fifty_moves_count
 
-    if(srcpiece == Match.PIECES['wRk']):
+    if(srcpiece == Match.PIECES['wKg']):
+        match.wKg_x = move.dstx
+        match.wKg_y = move.dsty
+        if(match.wKg_first_movecnt == 0):
+            match.wKg_first_movecnt = match.count
+    elif(srcpiece == Match.PIECES['bKg']):
+        match.bKg_x = move.dstx
+        match.bKg_y = move.dsty
+        if(match.bKg_first_movecnt == 0):
+            match.bKg_first_movecnt = match.count
+    elif(srcpiece == Match.PIECES['wRk']):
         if(move.srcx == 0 and move.srcy == 0 and match.wRk_a1_first_movecnt == 0):
             match.wRk_a1_first_movecnt = match.count
         elif(move.srcx == 7 and move.srcy == 0 and match.wRk_h1_first_movecnt == 0):
