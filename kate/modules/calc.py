@@ -193,10 +193,11 @@ def calc_max(match, maxdepth, depth, alpha, beta):
 
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
-    elif(depth <= maxdepth + 2):
-        maxcnt = min(16, (topmovecnt + mediummovecnt))
+    # elif(depth <= maxdepth + 2):
     else:
-        maxcnt = min(8, (topmovecnt + mediummovecnt))
+        maxcnt = max(16, (topmovecnt + mediummovecnt))
+    #else:
+    #    maxcnt = min(8, (topmovecnt + mediummovecnt))
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -205,7 +206,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             msg = "\nmatch.id:" + str(match.id) + " calculate "
             prnt_move(msg, gmove)
             if(candidate):
-                prnt_move(" CANDIDATE ", candidate)
+                prnt_move("     CANDIDATE ", candidate)
                 print(" score: " + str(score) + " / " + str(maxscore))
                 thread = Match.get_active_thread(match)
                 if(thread and score):

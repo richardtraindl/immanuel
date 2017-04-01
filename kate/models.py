@@ -67,6 +67,22 @@ class Match(models.Model):
         PIECES['bQu'] : 950
     }
 
+    CONTACT_SCORES = {
+        PIECES['blk'] : 0,
+        PIECES['wKg'] : -20,
+        PIECES['wPw'] : -1,
+        PIECES['wRk'] : -5,
+        PIECES['wKn'] : -4,
+        PIECES['wBp'] : -4,
+        PIECES['wQu'] : -10,
+        PIECES['bKg'] : 20,
+        PIECES['bPw'] : 1,
+        PIECES['bRk'] : 5,
+        PIECES['bKn'] : 4,
+        PIECES['bBp'] : 4,
+        PIECES['bQu'] : 10
+    }
+
     STATUS = {
         'open' : 1,
         'draw' : 2,

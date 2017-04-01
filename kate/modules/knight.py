@@ -105,7 +105,7 @@ def score_attacks(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
-                score += Match.SCORES[piece]
+                score += Match.CONTACT_SCORES[piece]
 
     return score
 
@@ -152,7 +152,7 @@ def score_supports_of_attacked(match, srcx, srcy):
                 continue
             if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)):
-                    score += Match.SCORES[piece]
+                    score += Match.CONTACT_SCORES[piece]
 
     return score 
 

@@ -240,7 +240,7 @@ def score_attacks(match, srcx, srcy):
 
     score += pawn.score_attacks(match, srcx, srcy)
 
-    return score // 100
+    return score
 
 
 def score_supports_of_attacked(match, srcx, srcy):
@@ -256,7 +256,7 @@ def score_supports_of_attacked(match, srcx, srcy):
 
     score += pawn.score_supports_of_attacked(match, srcx, srcy)
 
-    return score // 100
+    return score
 
 
 def is_king_attacked(match, x1, y1):

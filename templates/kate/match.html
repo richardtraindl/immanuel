@@ -7,10 +7,20 @@
 {% block header %}
     <div class="grid">
         <div class="row_12_of_12">
-            <h1><a href="{% url 'kate:match' match.id switch %}">Game</a> <span style="font-size: 10px;">2017-03-30</span></h1>
-            <h2>{{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }} , &nbsp; 
+            <div class="grid">
+                <div class="row_8_of_12">
+                    <h1><a href="{% url 'kate:match' match.id switch %}">Game</a></h1>
+                </div>
+                <div class="row_4_of_12">
+                    <p style="text-align: right; font-size: 9px;">build at 2017-04-01</p>
+                </div>
+            </div>
+
+            <h2>
+                {{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }} , &nbsp; 
                 Created on: &nbsp; {{ match.begin|fmtdate }} ,&nbsp;
-                Level: &nbsp; {{ match.level|matchlevel }}</h2>
+                Level: &nbsp; {{ match.level|matchlevel }}
+            </h2>
         </div>
     </div>
 {% endblock %}
