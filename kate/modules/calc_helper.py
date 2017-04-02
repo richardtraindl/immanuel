@@ -121,7 +121,6 @@ def pieces_attacked(match, color):
 def evaluate_contacts(match):
     supporter = 0
     attacked = 0
-    attackedcnt = 0
 
     color = match.next_color()
 
@@ -133,9 +132,8 @@ def evaluate_contacts(match):
 
             supporter += rules.score_supports_of_attacked(match, x, y)
             attacked += rules.score_attacks(match, x, y)
-            attackedcnt += rules.count_attacks(match, x, y)
 
-    return ((supporter * -1) + attacked + attackedcnt)
+    return (supporter + attacked)
 
 
 def evaluate_piece_moves(match, srcx, srcy):

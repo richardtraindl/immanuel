@@ -140,11 +140,11 @@ class immanuelsThread(threading.Thread):
             self.match.move_list.append(move)
 
         if(self.match.level == Match.LEVEL['low']):
-            maxdepth = 2
+            maxdepth = 1
         elif(self.match.level == Match.LEVEL['medium']):
-            maxdepth = 3
+            maxdepth = 2
         elif(self.match.level == Match.LEVEL['high']):
-            maxdepth = 4
+            maxdepth = 3
         else:
             maxdepth = 5 # professional
 
@@ -185,19 +185,18 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     maxscore = -200000
 
     if(match.next_color() == Match.COLORS['white']):
-        kg_attacked = rules.is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
+        kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.wKg_x, match.wKg_y)
     else:
-        kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
+        kg_attacked = rules.is_field_attacked(match, Match.COLORS['black'], match.bKg_x, match.bKg_y)
 
     gmoves, topmovecnt, mediummovecnt = generate_moves(match)
 
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
-    # elif(depth <= maxdepth + 2):
+    elif(depth <= maxdepth + 2):
+        maxcnt = min(16, (topmovecnt + mediummovecnt + 1))
     else:
-        maxcnt = max(16, (topmovecnt + mediummovecnt))
-    #else:
-    #    maxcnt = min(8, (topmovecnt + mediummovecnt))
+        maxcnt = min(8, (topmovecnt + mediummovecnt + 1))
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -212,7 +211,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                 if(thread and score):
                     thread.populate_candiate(candidate)
 
-        if(depth <= maxdepth or kg_attacked or (topmovecnt > 0 and depth <= 5)):
+        if(depth <= 5):
             score = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
         else:
             score = match.score + calc_helper.evaluate_position(match)
@@ -224,6 +223,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
         if(score > maxscore):
             maxscore = score
             if(maxscore >= beta):
+                # return maxscore, candidate
                 break
 
     if(len(gmoves) == 0):
@@ -257,18 +257,18 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     minscore = 200000
 
     if(match.next_color() == Match.COLORS['white']):
-        kg_attacked = rules.is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
+        kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.wKg_x, match.wKg_y)
     else:
-        kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
+        kg_attacked = rules.is_field_attacked(match, Match.COLORS['black'], match.bKg_x, match.bKg_y)
 
     gmoves, topmovecnt, mediummovecnt = generate_moves(match)
 
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
     elif(depth <= maxdepth + 2):
-        maxcnt = min(16, (topmovecnt + mediummovecnt))
+        maxcnt = min(16, (topmovecnt + mediummovecnt + 1))
     else:
-        maxcnt = min(8, (topmovecnt + mediummovecnt))
+        maxcnt = min(8, (topmovecnt + mediummovecnt + 1))
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -283,7 +283,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                 if(thread and score):
                     thread.populate_candiate(candidate)
 
-        if(depth <= maxdepth or kg_attacked or (topmovecnt > 0 and depth <= 5)):
+        if(depth <= 5):
             score = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
         else:
             score = match.score + calc_helper.evaluate_position(match)
@@ -295,6 +295,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
         if(score < minscore):
             minscore = score
             if(minscore <= alpha):
+                # return minscore, candidate
                 break
 
     if(len(gmoves) == 0):
