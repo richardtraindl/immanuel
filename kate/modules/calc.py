@@ -194,7 +194,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
     elif(depth <= maxdepth + 2):
-        maxcnt = min(16, (topmovecnt + mediummovecnt + 1))
+        maxcnt = max(8, (topmovecnt + mediummovecnt))
     else:
         maxcnt = min(8, (topmovecnt + mediummovecnt + 1))
 
@@ -266,7 +266,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     if(depth <= maxdepth or kg_attacked):
         maxcnt = 160
     elif(depth <= maxdepth + 2):
-        maxcnt = min(16, (topmovecnt + mediummovecnt + 1))
+        maxcnt = max(8, (topmovecnt + mediummovecnt))
     else:
         maxcnt = min(8, (topmovecnt + mediummovecnt + 1))
 
