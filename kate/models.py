@@ -108,14 +108,14 @@ class Match(models.Model):
     elapsed_time_black = models.IntegerField(null=False, default=0)
     level = models.SmallIntegerField(null=False, default=1)
     # board = ArrayField(ArrayField(models.PositiveSmallIntegerField(null=False, blank=False, default=PIECES['blk']), size=8), size=8)
-    rank1 = models.CharField(max_length=16, blank=False, default='0304050601050403')
-    rank2 = models.CharField(max_length=16, blank=False, default='0202020202020202')
-    rank3 = models.CharField(max_length=16, blank=False, default='0000000000000000')
-    rank4 = models.CharField(max_length=16, blank=False, default='0000000000000000')
-    rank5 = models.CharField(max_length=16, blank=False, default='0000000000000000')
-    rank6 = models.CharField(max_length=16, blank=False, default='0000000000000000')
-    rank7 = models.CharField(max_length=16, blank=False, default='1010101010101010')
-    rank8 = models.CharField(max_length=16, blank=False, default='1112131409131211')
+    rank1 = models.CharField(max_length=32, blank=False, default='wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;')
+    rank2 = models.CharField(max_length=32, blank=False, default='wPw;wPw;wPw;wPw;wPw;wPw;wPw;wPw;')
+    rank3 = models.CharField(max_length=32, blank=False, default='blk;blk;blk;blk;blk;blk;blk;blk;')
+    rank4 = models.CharField(max_length=32, blank=False, default='blk;blk;blk;blk;blk;blk;blk;blk;')
+    rank5 = models.CharField(max_length=32, blank=False, default='blk;blk;blk;blk;blk;blk;blk;blk;')
+    rank6 = models.CharField(max_length=32, blank=False, default='blk;blk;blk;blk;blk;blk;blk;blk;')
+    rank7 = models.CharField(max_length=32, blank=False, default='bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;')
+    rank8 = models.CharField(max_length=32, blank=False, default='bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;')
     fifty_moves_count = models.SmallIntegerField(null=False, default=0)
     wKg_x = models.SmallIntegerField(null=False, default=0)
     wKg_y = models.SmallIntegerField(null=False, default=0)
@@ -146,14 +146,14 @@ class Match(models.Model):
 
 
     def setboardbase(self):
-        self.rank1 = '0304050601050403;'
-        self.rank2 = '0202020202020202'
-        self.rank3 = '0000000000000000'
-        self.rank4 = '0000000000000000'
-        self.rank5 = '0000000000000000'
-        self.rank6 = '0000000000000000'
-        self.rank7 = '1010101010101010;'
-        self.rank8 = '1112131409131211'
+        self.rank1 = 'wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;'
+        self.rank2 = 'wPw;wPw;wPw;wPw;wPw;wPw;wPw;wPw;'
+        self.rank3 = 'blk;blk;blk;blk;blk;blk;blk;blk;'
+        self.rank4 = 'blk;blk;blk;blk;blk;blk;blk;blk;'
+        self.rank5 = 'blk;blk;blk;blk;blk;blk;blk;blk;'
+        self.rank6 = 'blk;blk;blk;blk;blk;blk;blk;blk;'
+        self.rank7 = 'bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;'
+        self.rank8 = 'bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;'
         self.fifty_moves_count = 0
         self.wKg_x = 4
         self.wKg_y = 0
@@ -206,13 +206,15 @@ class Match(models.Model):
 
     def writefield(self, x, y, value):
         rank = self.board[y]
-        rank[x*2] = value
+        idx = x*4
+        str_value = reverse_lookup(Match.PIECES, value)
+        rank[:idx] + str_value + rank[idx + 3:]
 
 
     def readfield(self, x, y):
         rank = self.board[y]
-        idx = x*2        
-        return int(rank[idx:idx+2])
+        idx = x*4
+        return Match.PIECES[rank[idx:idx+3]]
 
 
     def writefield_old(self, x, y, value):
