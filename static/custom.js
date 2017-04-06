@@ -1,3 +1,5 @@
+
+
     function performMove(){
         $('#board td').click(function(){
             if( $(this).hasClass("marked") ){
@@ -39,8 +41,46 @@
                             return;
                         }
                     }
-                    $("#move").submit()
+                    $("#move").submit();
                 }
             }
         });
+    }
+    
+    
+    function drag() {
+        $('.draggable').draggable({
+          start: function() {
+            $(this).css("background: rgba(0,0,255,0.5");
+            $('#move-src').val($(this).attr("id"));
+          }
+        });
+    }
+
+    // Dropzone erstellen
+    function drop() {
+        $('.droppable').droppable({
+          drop: function() { 
+              $('#move-dst').val($(this).attr("id")); 
+
+              var src = $('#move-src').val();
+              var dst = $('#move-dst').val();
+              if(src === dst){
+                return;
+              }else{
+                $("#move").submit(); 
+              }
+          }
+        });
+    }
+
+    // Positionieren wenn erfolgreich gedroppt
+    function positioning( event, ui ) {
+        position = $(this).position();        
+        ui.draggable.animate({
+          opacity: 1,
+          top: position.top,
+          left: position.left
+          }, 200
+        );
     }

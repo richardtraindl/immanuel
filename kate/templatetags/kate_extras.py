@@ -46,7 +46,7 @@ def chesscnt(count):
 
 @register.filter(name='matchlevel')
 def matchlevel(level):
-    return helper.reverse_lookup(Match.LEVEL, level)
+    return helper.reverse_lookup(Match.LEVELS, level)
 
 @register.filter(name='booltoint')
 def booltoint(value):

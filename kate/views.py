@@ -107,7 +107,7 @@ def create(request):
             match.black_player_human = False
 
         levellist = request.POST.getlist('level')
-        match.level = Match.LEVEL[levellist[0]]
+        match.level = Match.LEVELS[levellist[0]]
 
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.setboardbase()
@@ -140,7 +140,7 @@ def update(request, matchid, switch=0):
             match.black_player_human = False
 
         levellist = request.POST.getlist('level')
-        match.level = Match.LEVEL[levellist[0]]
+        match.level = Match.LEVELS[levellist[0]]
 
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.save()
@@ -264,9 +264,9 @@ def html_board(match, switch, movesrc, movedst):
         htmldata += "<tr><td class='board-label'>" + str(row[0][1])[1] + "</td>"
         for col in row:
             if(col[1] == movesrc or col[1] == movedst):
-                htmldata += "<td id='" + str(col[1]) + "' class='hint' value='" + str(col[0]) + "'>"
+                htmldata += "<td id='" + str(col[1]) + "' class='hint draggable droppable' value='" + str(col[0]) + "'>"
             else:
-                htmldata += "<td id='" + str(col[1]) + "' value='" + str(col[0]) + "'>"
+                htmldata += "<td id='" + str(col[1]) + "' class='draggable droppable' value='" + str(col[0]) + "'>"
 
             if(col[0] == 0):
                 htmldata += "&nbsp;"

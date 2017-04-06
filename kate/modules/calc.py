@@ -32,6 +32,7 @@ def read_steps(steps, dir_idx, step_idx):
 def generate_moves(match):
     topmovecnt = 0
     mediummovecnt = 0
+    lowmovecnt = 0
     color = match.next_color()
     moves = []
     top_moves = []
@@ -108,13 +109,25 @@ def generate_moves(match):
                                 mediummovecnt += 1
                             else:
                                 low_moves.append(gmove)
+                                lowmovecnt += 1
 
                     elif(errmsg != rules.ERROR_CODES['king-error']):
                         break
 
+    if(match.next_color() == Match.COLORS['white']):
+        kg_attacked = rules.is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
+    else:
+        kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
+
+    if(kg_attacked):
+        topmovecnt += (mediummovecnt + lowmovecnt)
+        mediummovecnt = 0
+        lowmovecnt = 0
+
     moves.extend(top_moves)
     moves.extend(mid_moves)
     moves.extend(low_moves)
+
     return moves, topmovecnt, mediummovecnt
 
 
@@ -139,14 +152,14 @@ class immanuelsThread(threading.Thread):
         if(move != None):
             self.match.move_list.append(move)
 
-        if(self.match.level == Match.LEVEL['low']):
-            maxdepth = 1
-        elif(self.match.level == Match.LEVEL['medium']):
-            maxdepth = 2
-        elif(self.match.level == Match.LEVEL['high']):
+        if(self.match.level == Match.LEVELS['low']):
             maxdepth = 3
+        elif(self.match.level == Match.LEVELS['medium']):
+            maxdepth = 4
+        elif(self.match.level == Match.LEVELS['high']):
+            maxdepth = 5
         else:
-            maxdepth = 5 # professional
+            maxdepth = 7 # professional
 
         gmove = calc_move(self.match, maxdepth)
         if(gmove != None):
@@ -178,25 +191,29 @@ def rate(color, gmove, gmovescore, candidate, candidatescore):
         return gmovescore, gmove
 
 
+def maxcount(match, depth):
+    if(match.level == Match.LEVELS['low']):
+        level_count = [60, 16, 8]
+    elif(match.level == Match.LEVELS['medium']):
+        level_count = [60, 60, 16]
+    else:
+        level_count = [60, 60, 60]
+
+    if(depth <= 3):
+        return level_count[depth-1]
+    else:
+        return 4
+
+
 def calc_max(match, maxdepth, depth, alpha, beta):
     color = match.next_color()
     candidate = None
     score = None
     maxscore = -200000
 
-    if(match.next_color() == Match.COLORS['white']):
-        kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.wKg_x, match.wKg_y)
-    else:
-        kg_attacked = rules.is_field_attacked(match, Match.COLORS['black'], match.bKg_x, match.bKg_y)
-
     gmoves, topmovecnt, mediummovecnt = generate_moves(match)
 
-    if(depth <= maxdepth or kg_attacked):
-        maxcnt = 160
-    elif(depth <= maxdepth + 2):
-        maxcnt = max(8, (topmovecnt + mediummovecnt))
-    else:
-        maxcnt = min(8, (topmovecnt + mediummovecnt + 1))
+    maxcnt = max(topmovecnt, maxcount(match, depth))
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -211,7 +228,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                 if(thread and score):
                     thread.populate_candiate(candidate)
 
-        if(depth <= 5):
+        if( depth <= maxdepth or (topmovecnt > 0 and depth <= (maxdepth + 2)) ):
             score = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
         else:
             score = match.score + calc_helper.evaluate_position(match)
@@ -223,8 +240,8 @@ def calc_max(match, maxdepth, depth, alpha, beta):
         if(score > maxscore):
             maxscore = score
             if(maxscore >= beta):
-                # return maxscore, candidate
-                break
+                return maxscore, candidate
+                # break
 
     if(len(gmoves) == 0):
         status = rules.game_status(match)
@@ -256,19 +273,9 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     score = None
     minscore = 200000
 
-    if(match.next_color() == Match.COLORS['white']):
-        kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.wKg_x, match.wKg_y)
-    else:
-        kg_attacked = rules.is_field_attacked(match, Match.COLORS['black'], match.bKg_x, match.bKg_y)
-
     gmoves, topmovecnt, mediummovecnt = generate_moves(match)
 
-    if(depth <= maxdepth or kg_attacked):
-        maxcnt = 160
-    elif(depth <= maxdepth + 2):
-        maxcnt = max(8, (topmovecnt + mediummovecnt))
-    else:
-        maxcnt = min(8, (topmovecnt + mediummovecnt + 1))
+    maxcnt = max(topmovecnt, maxcount(match, depth))
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -283,7 +290,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                 if(thread and score):
                     thread.populate_candiate(candidate)
 
-        if(depth <= 5):
+        if( depth <= maxdepth or (topmovecnt > 0 and depth <= (maxdepth + 2)) ):
             score = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
         else:
             score = match.score + calc_helper.evaluate_position(match)
@@ -295,8 +302,8 @@ def calc_min(match, maxdepth, depth, alpha, beta):
         if(score < minscore):
             minscore = score
             if(minscore <= alpha):
-                # return minscore, candidate
-                break
+                return minscore, candidate
+                # break
 
     if(len(gmoves) == 0):
         status = rules.game_status(match)

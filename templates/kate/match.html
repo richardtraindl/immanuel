@@ -86,9 +86,9 @@
                         <td class="board-label">{{ row.0.1|cut }}</td>
                     {% for col in row %}
                         {% if col.1 == movesrc or col.1 == movedst %}
-                            <td id="{{ col.1 }}" class="hint" value="{{ col.0 }}">
+                            <td id="{{ col.1 }}" class="hint draggable droppable" value="{{ col.0 }}">
                         {% else %}
-                            <td id="{{ col.1 }}" value="{{ col.0 }}">
+                            <td id="{{ col.1 }}" class="draggable droppable" value="{{ col.0 }}">
                         {% endif %}
                         {% if col.0 == 0 %}
                             &nbsp;
@@ -246,6 +246,10 @@
                 });
             }, 11000);
         {% endif %}
+
+            $( drag );
+
+            $( drop );
 
         });
     </script>

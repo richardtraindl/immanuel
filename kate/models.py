@@ -1,5 +1,5 @@
 from django.db import models
-# from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 from kate.modules import helper
 import threading
@@ -67,7 +67,7 @@ class Match(models.Model):
         PIECES['bQu'] : 950
     }
 
-    CONTACT_SCORES = {
+    ATTACKED_SCORES = {
         PIECES['blk'] : 0,
         PIECES['wKg'] : -20,
         PIECES['wPw'] : -1,
@@ -83,6 +83,22 @@ class Match(models.Model):
         PIECES['bQu'] : 10
     }
 
+    SUPPORTED_SCORES = {
+        PIECES['blk'] : 0,
+        PIECES['wKg'] : 20,
+        PIECES['wPw'] : 1,
+        PIECES['wRk'] : 5,
+        PIECES['wKn'] : 4,
+        PIECES['wBp'] : 4,
+        PIECES['wQu'] : 10,
+        PIECES['bKg'] : -20,
+        PIECES['bPw'] : -1,
+        PIECES['bRk'] : -5,
+        PIECES['bKn'] : -4,
+        PIECES['bBp'] : -4,
+        PIECES['bQu'] : -10
+    }
+
     STATUS = {
         'open' : 1,
         'draw' : 2,
@@ -90,7 +106,7 @@ class Match(models.Model):
         'winner_black' : 4,
         'cancelled' : 5 }
 
-    LEVEL = {
+    LEVELS = {
         'low' : 1,
         'medium' : 2,
         'high' : 3,
@@ -107,15 +123,7 @@ class Match(models.Model):
     black_player_human = models.BooleanField(null=False, default=True)
     elapsed_time_black = models.IntegerField(null=False, default=0)
     level = models.SmallIntegerField(null=False, default=1)
-    # board = ArrayField(ArrayField(models.PositiveSmallIntegerField(null=False, blank=False, default=PIECES['blk']), size=8), size=8)
-    rank1 = models.CharField(max_length=32, blank=False, default='wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;')
-    rank2 = models.CharField(max_length=32, blank=False, default='wPw;wPw;wPw;wPw;wPw;wPw;wPw;wPw;')
-    rank3 = models.CharField(max_length=32, blank=False, default='blk;blk;blk;blk;blk;blk;blk;blk;')
-    rank4 = models.CharField(max_length=32, blank=False, default='blk;blk;blk;blk;blk;blk;blk;blk;')
-    rank5 = models.CharField(max_length=32, blank=False, default='blk;blk;blk;blk;blk;blk;blk;blk;')
-    rank6 = models.CharField(max_length=32, blank=False, default='blk;blk;blk;blk;blk;blk;blk;blk;')
-    rank7 = models.CharField(max_length=32, blank=False, default='bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;')
-    rank8 = models.CharField(max_length=32, blank=False, default='bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;')
+    board = ArrayField(ArrayField(models.PositiveSmallIntegerField(null=False, blank=False, default=PIECES['blk']), size=8), size=8)
     fifty_moves_count = models.SmallIntegerField(null=False, default=0)
     wKg_x = models.SmallIntegerField(null=False, default=0)
     wKg_y = models.SmallIntegerField(null=False, default=0)
@@ -133,40 +141,10 @@ class Match(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Match, self).__init__(*args, **kwargs)
-        self.board = []
-        self.board.append(self.rank1)
-        self.board.append(self.rank2)
-        self.board.append(self.rank3)
-        self.board.append(self.rank4)
-        self.board.append(self.rank5)
-        self.board.append(self.rank6)
-        self.board.append(self.rank7)
-        self.board.append(self.rank8)        
         self.move_list = []
 
 
     def setboardbase(self):
-        self.rank1 = 'wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;'
-        self.rank2 = 'wPw;wPw;wPw;wPw;wPw;wPw;wPw;wPw;'
-        self.rank3 = 'blk;blk;blk;blk;blk;blk;blk;blk;'
-        self.rank4 = 'blk;blk;blk;blk;blk;blk;blk;blk;'
-        self.rank5 = 'blk;blk;blk;blk;blk;blk;blk;blk;'
-        self.rank6 = 'blk;blk;blk;blk;blk;blk;blk;blk;'
-        self.rank7 = 'bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;'
-        self.rank8 = 'bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;'
-        self.fifty_moves_count = 0
-        self.wKg_x = 4
-        self.wKg_y = 0
-        self.bKg_x = 4
-        self.bKg_y = 7
-        self.wKg_first_movecnt = 0
-        self.bKg_first_movecnt = 0
-        self.wRk_a1_first_movecnt = 0
-        self.wRk_h1_first_movecnt = 0
-        self.bRk_a8_first_movecnt = 0
-        self.bRk_h8_first_movecnt = 0
-
-    def setboardbase_old(self):
         self.board = [ [0 for x in range(8)] for x in range(8) ]
         self.board[0][0] = self.PIECES['wRk']
         self.board[0][1] = self.PIECES['wKn']
@@ -205,24 +183,12 @@ class Match(models.Model):
 
 
     def writefield(self, x, y, value):
-        rank = self.board[y]
-        idx = x*4
-        str_value = reverse_lookup(Match.PIECES, value)
-        rank[:idx] + str_value + rank[idx + 3:]
-
-
-    def readfield(self, x, y):
-        rank = self.board[y]
-        idx = x*4
-        return Match.PIECES[rank[idx:idx+3]]
-
-
-    def writefield_old(self, x, y, value):
         self.board[y][x] = value
 
 
-    def readfield_old(self, x, y):
+    def readfield(self, x, y):
         return self.board[y][x]
+
 
     def next_color(self):
         if(self.count % 2 == 0 ):
