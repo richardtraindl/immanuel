@@ -45,7 +45,7 @@ def index(request):
     return render(request, 'kate/index.html', { 'matches': matches } )
 
 
-def match(request, matchid=None, switch=0):
+def match(request, matchid=None, switch=0, msg=None):
     context = RequestContext(request)
     if(matchid == None):
         match = Match(white_player=None, black_player=None)
@@ -75,7 +75,18 @@ def match(request, matchid=None, switch=0):
             moves.append(qmove)
 
     comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:3]
-    fmtmsg = "<p class='ok'></p>"
+    
+    if(msg == None):
+        fmtmsg = "<p class='ok'></p>"
+    elif(int(msg) == 0):
+        fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[int(msg)] + "</p>"
+    elif(int(msg) == 100):
+        fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
+    elif(int(msg) == 101):
+        fmtmsg = "<p class='error'>Farbe ist nicht am Zug.</p>"
+    else:
+        fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[int(msg)] + "</p>"
+
     if(int(switch) == 0):
         rangeobj = range(8)
     else:
@@ -174,15 +185,16 @@ def do_move(request, matchid):
                     move.save()
                     match.save()
                     calc_move_for_immanuel(match)
-                    fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[msg] + "</p>"
-                else:
-                    fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[msg] + "</p>"
             else:
-                fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
+                msg = 100
+                # fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
         else:
-            fmtmsg = "<p class='error'>Farbe ist nicht am Zug.</p>"
+            msg = 101
+            # fmtmsg = "<p class='error'>Farbe ist nicht am Zug.</p>"
 
-        fmtboard = fill_fmtboard(match, int(switch))
+        return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
+        
+        """fmtboard = fill_fmtboard(match, int(switch))
 
         moves = []
         currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
@@ -208,7 +220,8 @@ def do_move(request, matchid):
 
         candidate = ""
 
-        return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'candidate': candidate } )
+        # return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'candidate': candidate } )
+        return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } ) """
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
 

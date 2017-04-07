@@ -199,16 +199,16 @@ def evaluate_movecnt(match):
 
 def evaluate_developments(match):
     if(match.wKg_y == 0 and match.wKg_x == 6 and match.readfield(match.wKg_x-1, match.wKg_y+1) == Match.PIECES['wPw'] and match.readfield(match.wKg_x,  match.wKg_y+1) == Match.PIECES['wPw']):
-        developed_whites = 20
+        developed_whites = 2
     elif(match.wKg_y == 0 and match.wKg_x == 2 and match.readfield(match.wKg_x, match.wKg_y+1) == Match.PIECES['wPw'] and match.readfield(match.wKg_x-1, match.wKg_y+1) == Match.PIECES['wPw'] and match.readfield(match.wKg_x-2, match.wKg_y+1) == Match.PIECES['wPw']):
-        developed_whites = 20
+        developed_whites = 2
     else:
         developed_whites = 0
 
     if(match.bKg_y == 7 and match.bKg_x == 6 and match.readfield(match.bKg_x-1, match.bKg_y-1) == Match.PIECES['bPw'] and match.readfield(match.bKg_x, match.bKg_y-1) == Match.PIECES['bPw']):
-        developed_blacks = -20
+        developed_blacks = -2
     elif(match.bKg_y == 7 and match.bKg_x == 2 and match.readfield(match.bKg_x, match.bKg_y-1) == Match.PIECES['bPw'] and match.readfield(match.bKg_x-1, match.bKg_y-1) == Match.PIECES['bPw'] and match.readfield(match.bKg_x-2, match.bKg_y-1) == Match.PIECES['bPw']):
-        developed_blacks = -20
+        developed_blacks = -2
     else:
         developed_blacks = 0
 
@@ -216,19 +216,11 @@ def evaluate_developments(match):
 
 
 def evaluate_position(match):
-    contacts = evaluate_contacts(match)
-
     if(match.count < 24):
-        movecnt = evaluate_movecnt(match)
-        developments = evaluate_developments(match)
+        value = evaluate_movecnt(match)
+        value += evaluate_developments(match)
     else:
-        movecnt = 0
-        developments = 0
+        value = evaluate_contacts(match)
 
-    # print("contacts: " + str(contacts))
-    # print("movecnts: " + str(movecnt))
-    # print("developments: " + str(developments))
-    # print("****************************")
-
-    return (movecnt + contacts + developments)
+    return value
 

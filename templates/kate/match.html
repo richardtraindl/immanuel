@@ -7,15 +7,7 @@
 {% block header %}
     <div class="grid">
         <div class="row_12_of_12">
-            <div class="grid">
-                <div class="row_8_of_12">
-                    <h1><a href="{% url 'kate:match' match.id switch %}">Game</a></h1>
-                </div>
-                <div class="row_4_of_12">
-                    <p style="text-align: right; font-size: 9px;">build at 2017-04-02</p>
-                </div>
-            </div>
-
+            <h1><a href="{% url 'kate:match' match.id switch %}">Game</a></h1>
             <h2>
                 {{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }} , &nbsp; 
                 Created on: &nbsp; {{ match.begin|fmtdate }} ,&nbsp;
@@ -149,6 +141,7 @@
                         </td>
 
                         <td>
+                            <input type="hidden" name="next" value="{{ request.path }}">
                             <input type="submit" value="ziehen" />
                             &nbsp;
                         </td>
@@ -211,7 +204,7 @@
                 var piece;
                 piece = $(this).attr("value");
                 $('#prom-piece').val(piece);
-                $("#move").submit()
+                $("#move").submit();
             });
 
             setInterval(function(){

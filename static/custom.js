@@ -66,6 +66,8 @@
               var src = $('#move-src').val();
               var dst = $('#move-dst').val();
               if(src === dst){
+                $('#move-src').val("");
+                $('#move-dst').val("");
                 return;
               }else{
                 $("#move").submit(); 
