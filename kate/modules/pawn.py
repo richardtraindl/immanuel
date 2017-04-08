@@ -192,7 +192,7 @@ def score_supports_of_attacked(match, srcx, srcy):
                 continue
             if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)):
-                    score -= Match.SUPPORTED_SCORES[piece]
+                    score += Match.SUPPORTED_SCORES[piece]
 
     return score
 
