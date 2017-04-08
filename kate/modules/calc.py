@@ -231,7 +231,9 @@ def calc_max(match, maxdepth, depth, alpha, beta):
         if( depth <= maxdepth or (topmovecnt > 0 and depth <= (maxdepth + 2)) ):
             score = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
         else:
-            score = match.score + calc_helper.evaluate_position(match)
+            score = match.score
+
+        score += calc_helper.evaluate_position(match)
 
         score, candidate = rate(color, gmove, score, candidate, maxscore)
 
@@ -293,7 +295,9 @@ def calc_min(match, maxdepth, depth, alpha, beta):
         if( depth <= maxdepth or (topmovecnt > 0 and depth <= (maxdepth + 2)) ):
             score = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
         else:
-            score = match.score + calc_helper.evaluate_position(match)
+            score = match.score
+
+        score += calc_helper.evaluate_position(match)
 
         score, candidate = rate(color, gmove, score, candidate, minscore)
 
