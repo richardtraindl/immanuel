@@ -81,8 +81,10 @@ def match(request, matchid=None, switch=0, msg=None):
     elif(int(msg) == 0):
         fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[int(msg)] + "</p>"
     elif(int(msg) == 100):
+        fmtmsg = "<p class='error'>" + helper.reverse_lookup(Match.STATUS, status) + "</p>"
+    elif(int(msg) == 110):
         fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
-    elif(int(msg) == 101):
+    elif(int(msg) == 111):
         fmtmsg = "<p class='error'>Farbe ist nicht am Zug.</p>"
     else:
         fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[int(msg)] + "</p>"
@@ -186,42 +188,15 @@ def do_move(request, matchid):
                     match.save()
                     calc_move_for_immanuel(match)
             else:
-                msg = 100
-                # fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
+                msg = 110 # Zug-Format ist ungültig
         else:
-            msg = 101
-            # fmtmsg = "<p class='error'>Farbe ist nicht am Zug.</p>"
-
-        return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
-        
-        """fmtboard = fill_fmtboard(match, int(switch))
-
-        moves = []
-        currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
-        if(currmove != None):
-            if(currmove.count % 2 == 0):
-                limit = 22
-            else:
-                limit = 21
-            qmoves = Move.objects.filter(match_id=match.id).order_by("-count")[:limit]
-            for qmove in reversed(qmoves):
-                moves.append(qmove)
-
-        comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:3]
+            msg = 111 # Farbe ist nicht am Zug
 
         status = rules.game_status(match)
         if(status != Match.STATUS['open']):
-            fmtmsg = "<p class='error'>" + helper.reverse_lookup(Match.STATUS, status) + "</p>"
+            msg = 100
 
-        if(int(switch) == 0):
-            rangeobj = range(8)
-        else:
-            rangeobj = range(7, -1, -1)
-
-        candidate = ""
-
-        # return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'candidate': candidate } )
-        return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } ) """
+        return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
 

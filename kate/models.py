@@ -67,6 +67,22 @@ class Match(models.Model):
         PIECES['bQu'] : 950
     }
 
+    REVERSED_SCORES = {
+        PIECES['blk'] : PIECES['blk'],
+        PIECES['wKg'] : PIECES['bKg'],
+        PIECES['wPw'] : PIECES['bPw'],
+        PIECES['wRk'] : PIECES['bRk'] ,
+        PIECES['wKn'] : PIECES['bKn'],
+        PIECES['wBp'] : PIECES['bBp'],
+        PIECES['wQu'] : PIECES['bQu'],
+        PIECES['bKg'] : PIECES['wKg'],
+        PIECES['bPw'] : PIECES['wPw'],
+        PIECES['bRk'] : PIECES['wRk'],
+        PIECES['bKn'] : PIECES['wKn'],
+        PIECES['bBp'] : PIECES['wBp'],
+        PIECES['bQu'] : PIECES['wQu']
+    }
+
     ATTACKED_SCORES = {
         PIECES['blk'] : 0,
         PIECES['wKg'] : -20,

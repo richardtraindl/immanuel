@@ -1,5 +1,28 @@
 
 
+    function showPromotion(){
+        var fieldid = $('#move-src').val();
+        var piece = $('#' + fieldid).attr("value");
+        if( piece == '2' ){
+            var row = $('#move-dst').val();
+            if( row.charAt(1) == '8' ){
+                $('#white-pieces').removeClass("invisible");
+                $('#prom-piece').removeAttr("readonly");
+                return true;
+            }
+        }
+        else if( piece == '10' ){
+            var row = $('#move-dst').val();
+            if( row.charAt(1) == '1' ){
+                $('#black-pieces').removeClass("invisible");
+                $('#prom-piece').removeAttr("readonly");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function performMove(){
         $('#board td').click(function(){
             if( $(this).hasClass("marked") ){
@@ -23,25 +46,9 @@
                 }
                 else{
                     $('#move-dst').val($(this).attr("id"));
-                    var fieldid = $('#move-src').val();
-                    var piece = $('#' + fieldid).attr("value");
-                    if( piece == '2' ){
-                        var row = $('#move-dst').val();
-                        if( row.charAt(1) == '8' ){
-                            $('#white-pieces').removeClass("invisible");
-                            $('#prom-piece').removeAttr("readonly");
-                            return;
-                        }
+                    if(showPromotion() == false){
+                        $("#move").submit();
                     }
-                    else if( piece == '10' ){
-                        var row = $('#move-dst').val();
-                        if( row.charAt(1) == '1' ){
-                            $('#black-pieces').removeClass("invisible");
-                            $('#prom-piece').removeAttr("readonly");
-                            return;
-                        }
-                    }
-                    $("#move").submit();
                 }
             }
         });
@@ -50,39 +57,29 @@
     
     function drag() {
         $('.draggable').draggable({
-          start: function() {
-            $(this).css("background: rgba(0,0,255,0.5");
-            $('#move-src').val($(this).attr("id"));
+          start: function( event, ui ){
+            var src = $(this).parent().attr("id");
+            $('#move-src').val( src );
+            $('#move-dst').val("");
           }
         });
     }
 
-    // Dropzone erstellen
     function drop() {
         $('.droppable').droppable({
-          drop: function() { 
-              $('#move-dst').val($(this).attr("id")); 
+          drop: function( event, ui ) { 
+              var dst1 = $(this).attr("id");
+              $('#move-dst').val( dst1 );
 
-              var src = $('#move-src').val();
-              var dst = $('#move-dst').val();
-              if(src === dst){
+              var src1 = $('#move-src').val();
+              if( src1.trim() == dst1.trim() ){
                 $('#move-src').val("");
                 $('#move-dst').val("");
-                return;
               }else{
-                $("#move").submit(); 
+                if(showPromotion() == false){
+                    $("#move").submit(); 
+                }
               }
           }
         });
-    }
-
-    // Positionieren wenn erfolgreich gedroppt
-    function positioning( event, ui ) {
-        position = $(this).position();        
-        ui.draggable.animate({
-          opacity: 1,
-          top: position.top,
-          left: position.left
-          }, 200
-        );
     }

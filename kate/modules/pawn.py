@@ -137,6 +137,8 @@ def score_attacks(match, srcx, srcy):
             piece = match.readfield(x1, y1)
             if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
                 score += Match.ATTACKED_SCORES[piece]
+                if(Match.SCORES[pawn] <= Match.REVERSED_SCORES[piece]):
+                    score += (Match.ATTACKED_SCORES[piece] // 2)
 
     return score
 

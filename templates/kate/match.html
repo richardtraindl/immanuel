@@ -78,14 +78,14 @@
                         <td class="board-label">{{ row.0.1|cut }}</td>
                     {% for col in row %}
                         {% if col.1 == movesrc or col.1 == movedst %}
-                            <td id="{{ col.1 }}" class="hint draggable droppable" value="{{ col.0 }}">
+                            <td id="{{ col.1 }}" class="hint droppable" value="{{ col.0 }}">
                         {% else %}
-                            <td id="{{ col.1 }}" class="draggable droppable" value="{{ col.0 }}">
+                            <td id="{{ col.1 }}" class="droppable" value="{{ col.0 }}">
                         {% endif %}
                         {% if col.0 == 0 %}
-                            &nbsp;
+                            <div>&nbsp;</div>
                         {% else %}
-                            <img src="{% static col.0|imgsrc %}">
+                            <div class="draggable"><img src="{% static col.0|imgsrc %}"></div>
                         {% endif %}
                         </td>
                     {% endfor %}
@@ -199,6 +199,8 @@
     <script>
         $(document).ready(function() {
             performMove();
+            drag();
+            drop();
 
             $('#promotion td').click(function(){
                 var piece;
@@ -220,6 +222,8 @@
                             $('#minutes').html(arr[1]);
                             $('#candidate').html("<p>&nbsp</p>");
                             performMove();
+                            drag();
+                            drop();
                         }
                         if(arr[2].length > 0){
                             $('#candidate').html(arr[2]);
@@ -228,7 +232,7 @@
                 });
             }, 12000);
 
-        {% if match.is_immanuel == False %}
+          {% if match.is_immanuel == False %}
             setInterval(function() {
                 var matchid;
                 matchid = $('#addcomment').attr("matchid");
@@ -238,12 +242,7 @@
                     }
                 });
             }, 11000);
-        {% endif %}
-
-            $( drag );
-
-            $( drop );
-
+          {% endif %}
         });
     </script>
 {% endblock %}
