@@ -81,11 +81,10 @@ def match(request, matchid=None, switch=0, msg=None):
     elif(int(msg) == 0):
         fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[int(msg)] + "</p>"
     elif(int(msg) == 100):
+        status = rules.game_status(match)
         fmtmsg = "<p class='error'>" + helper.reverse_lookup(Match.STATUS, status) + "</p>"
     elif(int(msg) == 110):
         fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
-    elif(int(msg) == 111):
-        fmtmsg = "<p class='error'>Farbe ist nicht am Zug.</p>"
     else:
         fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[int(msg)] + "</p>"
 
@@ -175,26 +174,21 @@ def do_move(request, matchid):
         movedst = request.POST['move_dst']
         prompiece = request.POST['prom_piece']
         switch = request.POST['switch']
-        if(match.next_color_human()):
-            if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
-                srcx,srcy = Match.koord_to_index(movesrc)
-                dstx,dsty = Match.koord_to_index(movedst)
-                prom_piece = match.PIECES[prompiece]
-                flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
-                status = rules.game_status(match)
-                if(flag == True and status == Match.STATUS['open']):
-                    move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
-                    move.save()
-                    match.save()
-                    calc_move_for_immanuel(match)
-            else:
-                msg = 110 # Zug-Format ist ungültig
-        else:
-            msg = 111 # Farbe ist nicht am Zug
-
         status = rules.game_status(match)
         if(status != Match.STATUS['open']):
             msg = 100
+        if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
+            srcx,srcy = Match.koord_to_index(movesrc)
+            dstx,dsty = Match.koord_to_index(movedst)
+            prom_piece = match.PIECES[prompiece]
+            flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
+            if(flag == True and status == Match.STATUS['open']):
+                move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
+                move.save()
+                match.save()
+                calc_move_for_immanuel(match)
+        else:
+            msg = 110 # Zug-Format ist ungültig
 
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
@@ -239,8 +233,8 @@ def fetch_comments(request):
 
 def html_board(match, switch, movesrc, movedst):
     fmtboard = fill_fmtboard(match, switch)
-    htmldata = "<table id='board' matchid='" + str(match.id) + "' movecnt='" + str(match.count) + "'>"
-    htmldata += "<tr id='board-letters1'><td>&nbsp;</td>"
+    htmldata = "<table id=\"board\" matchid=\"" + str(match.id) + "\" movecnt=\"" + str(match.count) + "\">"
+    htmldata += "<tr id=\"board-letters1\"><td>&nbsp;</td>"
     if(switch == 0):
         for i in range(8):
             htmldata += "<td>" + chr(i + ord('A')) + "</td>"
@@ -249,21 +243,21 @@ def html_board(match, switch, movesrc, movedst):
             htmldata += "<td>" + chr(ord('H') - i) + "</td>"
     htmldata += "<td>&nbsp;</td></tr>"
     for row in fmtboard:
-        htmldata += "<tr><td class='board-label'>" + str(row[0][1])[1] + "</td>"
+        htmldata += "<tr><td class=\"board-label\">" + str(row[0][1])[1] + "</td>"
         for col in row:
             if(col[1] == movesrc or col[1] == movedst):
-                htmldata += "<td id='" + str(col[1]) + "' class='hint draggable droppable' value='" + str(col[0]) + "'>"
+                htmldata += "<td id=\"" + str(col[1]) + "\" class=\"hint droppable\"  value=\"" + str(col[0]) + "\">"
             else:
-                htmldata += "<td id='" + str(col[1]) + "' class='draggable droppable' value='" + str(col[0]) + "'>"
+                htmldata += "<td id=\"" + str(col[1]) + "\" class=\"droppable\" value=\"" + str(col[0]) + "\">"
 
             if(col[0] == 0):
                 htmldata += "&nbsp;"
             else:
                 piece = helper.reverse_lookup(Match.PIECES, col[0])
-                htmldata += "<img src='" + "/static/img/" + piece + ".png'>"
+                htmldata += "<img class=\"draggable\" " + " src=\"/static/img/" + piece + ".png\">"
             htmldata += "</td>"
-        htmldata += "<td class='board-label'>" + str(row[0][1])[1] + "</td></tr>"
-    htmldata += "<tr id='board-letters2'><td>&nbsp;</td>"
+        htmldata += "<td class=\"board-label\">" + str(row[0][1])[1] + "</td></tr>"
+    htmldata += "<tr id=\"board-letters2\"><td>&nbsp;</td>"
     if(switch == 0):
         for i in range(8):
             htmldata += "<td>" + chr(i + ord('A')) + "</td>"
@@ -278,11 +272,11 @@ def html_moves(match):
     htmlmoves = "<table>"
     htmlmoves += "<tr><td>&nbsp;</td>"
     if(match.white_player_human == False):
-        htmlmoves += "<td><span class='fbold'>" + match.white_player + "</span></td>"
+        htmlmoves += "<td><span class=\"fbold\">" + match.white_player + "</span></td>"
     else:
         htmlmoves += "<td>" + match.white_player + "</td>"
     if(match.black_player_human == False):
-        htmlmoves += "<td><span class='fbold'>" + match.black_player + "</span></td>"
+        htmlmoves += "<td><span class=\"fbold\">" + match.black_player + "</span></td>"
     else:
         htmlmoves += "<td>" + match.black_player + "</td></tr>"
     

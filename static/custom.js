@@ -60,7 +60,6 @@
           start: function( event, ui ){
             var src = $(this).parent().attr("id");
             $('#move-src').val( src );
-            $('#move-dst').val("");
           }
         });
     }

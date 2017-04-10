@@ -85,7 +85,7 @@
                         {% if col.0 == 0 %}
                             <div>&nbsp;</div>
                         {% else %}
-                            <div class="draggable"><img src="{% static col.0|imgsrc %}"></div>
+                            <img class="draggable" src="{% static col.0|imgsrc %}">
                         {% endif %}
                         </td>
                     {% endfor %}
@@ -206,7 +206,7 @@
                 var piece;
                 piece = $(this).attr("value");
                 $('#prom-piece').val(piece);
-                $("#move").submit();
+                $('#move').submit();
             });
 
             setInterval(function(){
