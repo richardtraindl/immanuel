@@ -177,7 +177,7 @@ def do_move(request, matchid):
         status = rules.game_status(match)
         if(status != Match.STATUS['open']):
             msg = 100
-        if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
+        elif(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
             srcx,srcy = Match.koord_to_index(movesrc)
             dstx,dsty = Match.koord_to_index(movedst)
             prom_piece = match.PIECES[prompiece]
@@ -186,7 +186,11 @@ def do_move(request, matchid):
                 move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
                 move.save()
                 match.save()
-                calc_move_for_immanuel(match)
+                status = rules.game_status(match)
+                if(status != Match.STATUS['open']):
+                    msg = 100
+                else:
+                    calc_move_for_immanuel(match)
         else:
             msg = 110 # Zug-Format ist ungültig
 

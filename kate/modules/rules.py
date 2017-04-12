@@ -309,20 +309,17 @@ def is_move_available(match):
 
 
 def game_status(match):
-    if(match.next_color() == Match.COLORS['white']):
-        flag = is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
-    else:
-        flag = is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
-
     if(is_move_available(match)):
         return Match.STATUS['open']
-    elif(flag):
-        if(match.next_color() == Match.COLORS['white']):
-            return Match.STATUS['winner_black']
-        else:
-            return Match.STATUS['winner_white']
     else:
-        return Match.STATUS['draw']
+        if(match.next_color() == Match.COLORS['white']):
+            if(is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)):
+                return Match.STATUS['winner_black']
+        else:
+            if(is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)):
+                return Match.STATUS['winner_white']
+
+    return Match.STATUS['draw']
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
