@@ -173,42 +173,52 @@ def is_field_attacked(match, color, srcx, srcy):
     return False
 
 
-def does_attack(match, srcx, srcy):
-    if( rook.does_attack(match, srcx, srcy) ):
-        return True
+def does_attack(match, srcx, srcy, dstx, dsty):
+    flag, priority = rook.does_attack(match, srcx, srcy, dstx, dsty)
+    if(flag):
+        return True, priority
 
-    if( bishop.does_attack(match, srcx, srcy) ):
-        return True
+    flag, priority = bishop.does_attack(match, srcx, srcy, dstx, dsty)
+    if(flag):
+        return True, priority
 
-    if( knight.does_attack(match, srcx, srcy) ):
-        return True
+    flag, priority = knight.does_attack(match, srcx, srcy, dstx, dsty)
+    if(flag):
+        return True, priority
 
-    if( king.does_attack(match, srcx, srcy) ):
-        return True
+    flag, priority = king.does_attack(match, srcx, srcy, dstx, dsty)
+    if(flag ):
+        return True, priority
 
-    if( pawn.does_attack(match, srcx, srcy) ):
-        return True
+    flag, priority = pawn.does_attack(match, srcx, srcy, dstx, dsty)
+    if(flag):
+        return True, priority
 
-    return False
+    return False, 0
 
 
-def does_support_attacked(match, srcx, srcy):
-    if( rook.does_support_attacked(match, srcx, srcy) ):
-        return True
+def does_support_attacked(match, srcx, srcy, dstx, dsty):
+    flag, priority = rook.does_support_attacked(match, srcx, srcy, dstx, dsty)
+    if(flag):
+        return True, priority
 
-    if( bishop.does_support_attacked(match, srcx, srcy) ):
-        return True
+    flag, priority = bishop.does_support_attacked(match, srcx, srcy, dstx, dsty)
+    if(flag):
+        return True, priority
 
-    if( knight.does_support_attacked(match, srcx, srcy) ):
-        return True
+    flag, priority = knight.does_support_attacked(match, srcx, srcy, dstx, dsty)
+    if(flag):
+        return True, priority
 
-    if( king.does_support_attacked(match, srcx, srcy) ):
-        return True
+    flag, priority = king.does_support_attacked(match, srcx, srcy, dstx, dsty)
+    if(flag):
+        return True, priority
 
-    if( pawn.does_support_attacked(match, srcx, srcy) ):
-        return True
+    flag, priority = pawn.does_support_attacked(match, srcx, srcy, dstx, dsty)
+    if(flag):
+        return True, priority
 
-    return False
+    return False, 0
 
 
 def count_attacks(match, srcx, srcy):

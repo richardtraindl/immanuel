@@ -76,11 +76,11 @@ def is_castling(match, move):
 
 
 def does_attack(match, move):
-    return rules.does_attack(match, move.dstx, move.dsty)
+    return rules.does_attack(match, move.srcx, move.srcy, move.dstx, move.dsty)
 
 
 def does_support_attacked(match, move):
-    return rules.does_support_attacked(match, move.dstx, move.dsty)
+    return rules.does_support_attacked(match, move.srcx, move.srcy, move.dstx, move.dsty)
 
 
 def does_attacked_flee(match, move):
@@ -88,6 +88,15 @@ def does_attacked_flee(match, move):
     
     if( rules.is_field_attacked(match, opp_color, move.srcx, move.srcy) ):
         return True
+
+    return False
+
+
+def is_endgame_move(match, move):
+    if(match.count > 60):
+        piece = match.readfield(move.srcx, move.srcy)
+        if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+            return True
 
     return False
 
@@ -216,7 +225,7 @@ def evaluate_developments(match):
 
 
 def evaluate_position(match):
-    if(match.count < 24):
+    if(match.count < 30):
         value = evaluate_movecnt(match)
         value += evaluate_developments(match)
     else:

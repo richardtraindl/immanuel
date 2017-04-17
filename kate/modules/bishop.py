@@ -34,24 +34,30 @@ def is_field_attacked(match, color, fieldx, fieldy):
     return False
 
 
-def does_attack(match, srcx, srcy):
+def does_attack(match, srcx, srcy, dstx, dsty):
     bishop = match.readfield(srcx, srcy)
 
     if(bishop != Match.PIECES['wBp'] and bishop != Match.PIECES['wQu'] and bishop != Match.PIECES['bBp'] and bishop != Match.PIECES['bQu']):
-        return False
+        return False, 0
 
     color = Match.color_of_piece(bishop)
+    opp_color = Match.REVERSED_COLORS[color]
 
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
+        x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
-            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
-                return True
+            if(Match.color_of_piece(piece) == opp_color):
+                if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
+                    return True, 0 # priority
+                elif(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+                    return True, 2 # priority
+                else:
+                    return True, 1 # priority
 
-    return False
+    return False, 0
 
 
 def count_attacks(match, srcx, srcy):
@@ -63,6 +69,7 @@ def count_attacks(match, srcx, srcy):
             return count
 
     color = Match.color_of_piece(bishop)
+    opp_color = Match.REVERSED_COLORS[color]
 
     if(color == Match.COLORS['white']):
         counter = 1
@@ -75,7 +82,7 @@ def count_attacks(match, srcx, srcy):
         x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
-            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+            if(Match.color_of_piece(piece) == opp_color):
                 count += counter
 
     return count
@@ -90,6 +97,7 @@ def score_attacks(match, srcx, srcy):
         return score
 
     color = Match.color_of_piece(bishop)
+    opp_color = Match.REVERSED_COLORS[color]
 
     for i in range(4):
         stepx = STEPS[i][0]
@@ -97,7 +105,7 @@ def score_attacks(match, srcx, srcy):
         x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
-            if( Match.REVERSED_COLORS[color] == Match.color_of_piece(piece) ):
+            if(Match.color_of_piece(piece) == opp_color):
                 score += Match.ATTACKED_SCORES[piece]
                 if(Match.SCORES[bishop] <= Match.REVERSED_SCORES[piece]):
                     score += (Match.ATTACKED_SCORES[piece] // 2)
@@ -105,27 +113,31 @@ def score_attacks(match, srcx, srcy):
     return score
 
 
-def does_support_attacked(match, srcx, srcy):
+def does_support_attacked(match, srcx, srcy, dstx, dsty):
     bishop = match.readfield(srcx, srcy)
 
     if(bishop != Match.PIECES['wBp'] and bishop != Match.PIECES['wQu'] and bishop != Match.PIECES['bBp'] and bishop != Match.PIECES['bQu']):
-        return False
+        return False, 0
 
     color = Match.color_of_piece(bishop)
+    opp_color = Match.REVERSED_COLORS[color]
 
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
+        x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
                 continue
             if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)):
-                    return True
+                if(rules.is_field_attacked(match, opp_color, x1, y1)):
+                    if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
+                        return True, 0 # priority
+                    else:
+                        return True, 1 # priority
 
-    return False
+    return False, 0
 
 
 def score_supports_of_attacked(match, srcx, srcy):
@@ -137,6 +149,7 @@ def score_supports_of_attacked(match, srcx, srcy):
         return score
 
     color = Match.color_of_piece(bishop)
+    opp_color = Match.REVERSED_COLORS[color]
 
     for i in range(4):
         stepx = STEPS[i][0]
@@ -147,7 +160,7 @@ def score_supports_of_attacked(match, srcx, srcy):
             if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
                 continue
             if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)):
+                if(rules.is_field_attacked(match, opp_color, x1, y1)):
                     score += Match.SUPPORTED_SCORES[piece]
 
     return score 

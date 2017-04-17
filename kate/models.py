@@ -35,6 +35,22 @@ class Match(models.Model):
         'bQu' : 14 
     }
 
+    PIECES_COLOR = {
+        'blk' : COLORS['undefined'],
+        'wKg' : COLORS['white'],
+        'wPw' : COLORS['white'],
+        'wRk' : COLORS['white'],
+        'wKn' : COLORS['white'],
+        'wBp' : COLORS['white'],
+        'wQu' : COLORS['white'],
+        'bKg' : COLORS['black'],
+        'bPw' : COLORS['black'],
+        'bRk' : COLORS['black'],
+        'bKn' : COLORS['black'],
+        'bBp' : COLORS['black'],
+        'bQu' : COLORS['black']
+    }
+
     EXPORT_PIECES = {
         0 : '0',
         1 : '1',
@@ -56,14 +72,14 @@ class Match(models.Model):
         PIECES['wKg'] : -20000,
         PIECES['wPw'] : -100,
         PIECES['wRk'] : -500,
-        PIECES['wKn'] : -330,
-        PIECES['wBp'] : -350,
+        PIECES['wKn'] : -336,
+        PIECES['wBp'] : -340,
         PIECES['wQu'] : -950,
         PIECES['bKg'] : 20000,
         PIECES['bPw'] : 100,
         PIECES['bRk'] : 500,
-        PIECES['bKn'] : 330,
-        PIECES['bBp'] : 350,
+        PIECES['bKn'] : 336,
+        PIECES['bBp'] : 340,
         PIECES['bQu'] : 950
     }
 
@@ -85,34 +101,34 @@ class Match(models.Model):
 
     ATTACKED_SCORES = {
         PIECES['blk'] : 0,
-        PIECES['wKg'] : -20,
+        PIECES['wKg'] : -10,
         PIECES['wPw'] : -1,
         PIECES['wRk'] : -5,
         PIECES['wKn'] : -4,
         PIECES['wBp'] : -4,
-        PIECES['wQu'] : -10,
-        PIECES['bKg'] : 20,
+        PIECES['wQu'] : -7,
+        PIECES['bKg'] : 10,
         PIECES['bPw'] : 1,
         PIECES['bRk'] : 5,
         PIECES['bKn'] : 4,
         PIECES['bBp'] : 4,
-        PIECES['bQu'] : 10
+        PIECES['bQu'] : 7
     }
 
     SUPPORTED_SCORES = {
         PIECES['blk'] : 0,
-        PIECES['wKg'] : 20,
+        PIECES['wKg'] : 10,
         PIECES['wPw'] : 1,
         PIECES['wRk'] : 5,
         PIECES['wKn'] : 4,
         PIECES['wBp'] : 4,
-        PIECES['wQu'] : 10,
-        PIECES['bKg'] : -20,
+        PIECES['wQu'] : 7,
+        PIECES['bKg'] : -10,
         PIECES['bPw'] : -1,
         PIECES['bRk'] : -5,
         PIECES['bKn'] : -4,
         PIECES['bBp'] : -4,
-        PIECES['bQu'] : -10
+        PIECES['bQu'] : -7
     }
 
     STATUS = {
@@ -125,8 +141,7 @@ class Match(models.Model):
     LEVELS = {
         'low' : 1,
         'medium' : 2,
-        'high' : 3,
-        'professional' : 4 }
+        'high' : 3 }
 
     status = models.PositiveSmallIntegerField(null=False, default=STATUS['open'])
     count = models.SmallIntegerField(null=False, default=0)
@@ -251,12 +266,14 @@ class Match(models.Model):
 
     @staticmethod
     def color_of_piece(piece):
-        if(piece >= Match.PIECES['wKg'] and piece <= Match.PIECES['wQu']):
+        str_piece = helper.reverse_lookup(Match.PIECES, piece)
+        return Match.PIECES_COLOR[str_piece]
+        """if(piece >= Match.PIECES['wKg'] and piece <= Match.PIECES['wQu']):
             return Match.COLORS['white']
         elif(piece >= Match.PIECES['bKg'] and piece <= Match.PIECES['bQu']):
             return Match.COLORS['black']
         else:
-            return Match.COLORS['undefined']
+            return Match.COLORS['undefined']"""
 
 
     @staticmethod

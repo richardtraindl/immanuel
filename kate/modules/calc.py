@@ -29,15 +29,59 @@ def read_steps(steps, dir_idx, step_idx):
     return stepx, stepy, prom_piece
 
 
+def sort_move(match, gmove, l0_moves, l1_moves, l2_moves, l3_moves, l4_moves):
+    if( calc_helper.is_capture(match, gmove) ):
+        l0_moves.append(gmove)
+        return
+    
+    if( calc_helper.is_promotion(match, gmove) ):
+        l0_moves.append(gmove)
+        return
+    
+    if( calc_helper.is_castling(match, gmove) ):
+        l0_moves.append(gmove)
+        return
+
+    attack, priority = calc_helper.does_attack(match, gmove)
+    if(attack):
+        if(priority == 2):
+            l0_moves.append(gmove)
+        elif(priority == 1):
+            l1_moves.append(gmove)
+        else:
+            l2_moves.append(gmove)
+        return
+
+    support, priority = calc_helper.does_support_attacked(match, gmove)
+    if(support):
+        if(priority == 2):
+            l0_moves.append(gmove)
+        elif(priority == 1):
+            l1_moves.append(gmove)
+        else:
+            l2_moves.append(gmove)
+        return
+
+    if( calc_helper.does_attacked_flee(match, gmove) ):
+        l3_moves.append(gmove)
+        return
+
+    if( calc_helper.is_endgame_move(match, gmove) ):
+        l2_moves.append(gmove)
+        return
+
+    l4_moves.append(gmove)
+
+
 def generate_moves(match):
     topmovecnt = 0
-    mediummovecnt = 0
-    lowmovecnt = 0
     color = match.next_color()
     moves = []
-    top_moves = []
-    mid_moves = []
-    low_moves = []
+    l0_moves = []
+    l1_moves = []
+    l2_moves = []
+    l3_moves = []
+    l4_moves = []
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -94,22 +138,7 @@ def generate_moves(match):
                     flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
-                        capture = calc_helper.is_capture(match, gmove)
-                        promotion = calc_helper.is_promotion(match, gmove)
-                        castling = calc_helper.is_castling(match, gmove)
-                        if(capture or promotion or castling):
-                            top_moves.append(gmove)
-                            topmovecnt += 1
-                        else:
-                            attack = calc_helper.does_attack(match, gmove)
-                            support = calc_helper.does_support_attacked(match, gmove)
-                            escapes = calc_helper.does_attacked_flee(match, gmove)
-                            if(attack or support or escapes):
-                                mid_moves.append(gmove)
-                                mediummovecnt += 1
-                            else:
-                                low_moves.append(gmove)
-                                lowmovecnt += 1
+                        sort_move(match, gmove, l0_moves, l1_moves, l2_moves, l3_moves, l4_moves)
 
                     elif(errmsg != rules.ERROR_CODES['king-error']):
                         break
@@ -119,16 +148,41 @@ def generate_moves(match):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
+    moves.extend(l0_moves)
+    moves.extend(l1_moves)
+    moves.extend(l2_moves)
+    moves.extend(l3_moves)
+    moves.extend(l4_moves)
+
     if(kg_attacked):
-        topmovecnt += (mediummovecnt + lowmovecnt)
-        mediummovecnt = 0
-        lowmovecnt = 0
+        topmovecnt = len(moves)
+    else:
+        topmovecnt = (len(l0_moves) + len(l1_moves) + len(l2_moves))
 
-    moves.extend(top_moves)
-    moves.extend(mid_moves)
-    moves.extend(low_moves)
+    """print("l0_moves:")
+    for gm in l0_moves:
+        prnt_move("; ", gm)
+    print("-------------")
+    print("l1_moves:")
+    for gm in l1_moves:
+        prnt_move("; ", gm)
+    print("-------------")
+    print("l2_moves:")
+    for gm in l2_moves:
+        prnt_move("; ", gm)
+    print("-------------")
+    print("l3_moves:")
+    for gm in l3_moves:
+        prnt_move("; ", gm)
+    print("-------------")
+    print("l4_moves:")
+    for gm in l4_moves:
+        prnt_move("; ", gm)
+    print("-------------")
+    
+    time.sleep(60) """
 
-    return moves, topmovecnt, mediummovecnt
+    return moves, topmovecnt
 
 
 class immanuelsThread(threading.Thread):
@@ -153,13 +207,11 @@ class immanuelsThread(threading.Thread):
             self.match.move_list.append(move)
 
         if(self.match.level == Match.LEVELS['low']):
-            maxdepth = 3
+            maxdepth = 6
         elif(self.match.level == Match.LEVELS['medium']):
-            maxdepth = 4
-        elif(self.match.level == Match.LEVELS['high']):
-            maxdepth = 5
+            maxdepth = 8
         else:
-            maxdepth = 7 # professional
+            maxdepth = 10 # Match.LEVELS['high']
 
         gmove = calc_move(self.match, maxdepth)
         if(gmove != None):
@@ -191,18 +243,24 @@ def rate(color, gmove, gmovescore, candidate, candidatescore):
         return gmovescore, gmove
 
 
-def maxcount(match, depth):
-    if(match.level == Match.LEVELS['low']):
-        level_count = [60, 16, 8]
-    elif(match.level == Match.LEVELS['medium']):
-        level_count = [60, 60, 16]
-    else:
-        level_count = [60, 60, 60]
+def select_maxcnt(match, depth, topmovecnt):
+    if(depth > 10):
+        return 0
 
-    if(depth <= 3):
-        return level_count[depth-1]
+    if(match.level == Match.LEVELS['low']):
+        level_count = [16, 16, 16, 16, 16, 8, 4, 4, 2, 2]
+        if(depth > 3):
+            return level_count[depth-1]
+    elif(match.level == Match.LEVELS['medium']):
+        level_count = [200, 16, 16, 16, 16, 8, 4, 4, 2, 2]
+        if(depth > 6):
+            return level_count[depth-1]
     else:
-        return 4
+        level_count = [200, 200, 16, 16, 16, 8, 4, 4, 2, 2]
+        if(depth > 6):
+            return level_count[depth-1]
+    
+    return max(topmovecnt, level_count[depth-1])
 
 
 def calc_max(match, maxdepth, depth, alpha, beta):
@@ -210,30 +268,33 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     candidate = None
     score = None
     maxscore = -200000
+    count = 0
 
-    gmoves, topmovecnt, mediummovecnt = generate_moves(match)
+    gmoves, topmovecnt = generate_moves(match)
 
-    maxcnt = max(topmovecnt, maxcount(match, depth))
+    maxcnt = select_maxcnt(match, depth, topmovecnt)
+
+    if(maxcnt == 0):
+        return match.score, None
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
             
         if(depth == 1):
-            msg = "\nmatch.id:" + str(match.id) + " calculate "
+            count += 1
+            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
             if(candidate):
-                prnt_move("     CANDIDATE ", candidate)
-                print(" score: " + str(score) + " / " + str(maxscore))
+                prnt_move(" *** CANDIDATE: ", candidate)
+                print(" --- score: " + str(score) + " / " + str(maxscore))
                 thread = Match.get_active_thread(match)
                 if(thread and score):
                     thread.populate_candiate(candidate)
 
-        if( depth <= maxdepth or (topmovecnt > 0 and depth <= (maxdepth + 2)) ):
+        if(depth <= maxdepth): #  or (depth <= 10 and topmovecnt > 0)
             score = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
         else:
-            score = match.score
-
-        score += calc_helper.evaluate_position(match)
+            score = match.score + calc_helper.evaluate_position(match)
 
         score, candidate = rate(color, gmove, score, candidate, maxscore)
 
@@ -275,9 +336,12 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     score = None
     minscore = 200000
 
-    gmoves, topmovecnt, mediummovecnt = generate_moves(match)
+    gmoves, topmovecnt = generate_moves(match)
 
-    maxcnt = max(topmovecnt, maxcount(match, depth))
+    maxcnt = select_maxcnt(match, depth, topmovecnt)
+
+    if(maxcnt == 0):
+        return match.score, None
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -292,12 +356,10 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                 if(thread and score):
                     thread.populate_candiate(candidate)
 
-        if( depth <= maxdepth or (topmovecnt > 0 and depth <= (maxdepth + 2)) ):
+        if(depth <= maxdepth): #  or (depth <= 10 and topmovecnt > 0) 
             score = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
         else:
-            score = match.score
-
-        score += calc_helper.evaluate_position(match)
+            score = match.score + calc_helper.evaluate_position(match)
 
         score, candidate = rate(color, gmove, score, candidate, minscore)
 
@@ -334,6 +396,8 @@ def calc_min(match, maxdepth, depth, alpha, beta):
 
 
 def calc_move(match, maxdepth):
+    start = time.time()
+    
     gmove = openings.retrieve_move(match)
 
     if(gmove):
@@ -349,6 +413,9 @@ def calc_move(match, maxdepth):
         print("")
     else:
         print("no results found!!!" + str(score))
+
+    end = time.time()
+    print( (end - start) // 60 )
     return gmove
 
 
