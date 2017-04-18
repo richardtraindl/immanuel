@@ -323,9 +323,13 @@ def fetch_match(request):
 
         thread = Match.get_active_thread(match)
         if(thread and not thread.candidate_srcx):
-            data += "§<p>thread found with matchid: " + str(thread.match.id) + "</p>"
+            data += "§<p>current search: "
+            data += Match.index_to_koord(thread.search_srcx, thread.search_srcy) + "-" + Match.index_to_koord(thread.search_dstx, thread.search_dsty)
+            data += "<br>thread found with matchid: " + str(thread.match.id) + "</p>"
         elif(thread and thread.candidate_srcx):
-            data += "§<p>move candidate: "
+            data += "§<p>current search: " 
+            data += Match.index_to_koord(thread.search_srcx, thread.search_srcy) + "-" + Match.index_to_koord(thread.search_dstx, thread.search_dsty)
+            data += "<br>move candidate: "
             data += Match.index_to_koord(thread.candidate_srcx, thread.candidate_srcy) + "-" + Match.index_to_koord(thread.candidate_dstx, thread.candidate_dsty)
             data += "</p>"
         else:
