@@ -248,19 +248,25 @@ def select_maxcnt(match, depth, topmovecnt):
         return 0
 
     if(match.level == Match.LEVELS['low']):
-        level_count = [200, 16, 16, 8, 8, 8, 4, 4, 2, 2]
         if(depth > 3):
-            return level_count[depth-1]
+            return 16
+        else:
+            level_count = [200, 16, 16]
+            return max(topmovecnt, level_count[depth-1])
     elif(match.level == Match.LEVELS['medium']):
-        level_count = [200, 16, 16, 16, 16, 8, 4, 4, 2, 2]
         if(depth > 6):
-            return level_count[depth-1]
+            return 8
+        else:
+            level_count = [200, 32, 16, 16, 16, 8]
+            return max(topmovecnt, level_count[depth-1])
     else:
-        level_count = [200, 200, 16, 16, 16, 8, 4, 4, 2, 2]
         if(depth > 6):
-            return level_count[depth-1]
+            return 8
+        else:
+            level_count = [200, 200, 32, 16, 16, 8]
+            return max(topmovecnt, level_count[depth-1])
     
-    return max(topmovecnt, level_count[depth-1])
+    return 0
 
 
 def calc_max(match, maxdepth, depth, alpha, beta):
