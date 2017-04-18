@@ -190,6 +190,11 @@ class immanuelsThread(threading.Thread):
         threading.Thread.__init__(self)
         self.name = name
         self.match = copy.deepcopy(match)
+        self.search_srcx = None
+        self.search_srcy = None
+        self.search_dstx = None
+        self.search_dsty = None
+        self.search_prom_piece = None
         self.candidate_srcx = None
         self.candidate_srcy = None
         self.candidate_dstx = None
@@ -232,6 +237,14 @@ class immanuelsThread(threading.Thread):
             self.candidate_dstx = gmove.dstx
             self.candidate_dsty = gmove.dsty
             self.candidate_prom_piece = gmove.prom_piece
+
+    def populate_search(self, gmove):
+        if(gmove):
+            self.search_srcx = gmove.srcx
+            self.search_srcy = gmove.srcy
+            self.search_dstx = gmove.dstx
+            self.search_dsty = gmove.dsty
+            self.search_prom_piece = gmove.prom_piece
 
 
 def rate(color, gmove, gmovescore, candidate, candidatescore):
@@ -290,11 +303,13 @@ def calc_max(match, maxdepth, depth, alpha, beta):
             count += 1
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
-            if(candidate):
-                prnt_move(" *** CANDIDATE: ", candidate)
-                print(" --- score: " + str(score) + " / " + str(maxscore))
-                thread = Match.get_active_thread(match)
-                if(thread and score):
+
+            thread = Match.get_active_thread(match)
+            if(thread):
+                thread.populate_search(self, gmove):
+                if(candidate and score):
+                    prnt_move(" *** CANDIDATE: ", candidate)
+                    print(" --- score: " + str(score) + " / " + str(maxscore))
                     thread.populate_candiate(candidate)
 
         if(depth <= maxdepth): #  or (depth <= 10 and topmovecnt > 0)
@@ -355,11 +370,13 @@ def calc_min(match, maxdepth, depth, alpha, beta):
         if(depth == 1):
             msg = "\nmatch.id:" + str(match.id) + " calculate "
             prnt_move(msg, gmove)
-            if(candidate):
-                prnt_move(" CANDIDATE ", candidate)
-                print(" score: " + str(score) + " / " + str(minscore))
-                thread = Match.get_active_thread(match)
-                if(thread and score):
+
+            thread = Match.get_active_thread(match)
+            if(thread):
+                thread.populate_search(self, gmove):
+                if(candidate and score):
+                    prnt_move(" *** CANDIDATE: ", candidate)
+                    print(" --- score: " + str(score) + " / " + str(maxscore))
                     thread.populate_candiate(candidate)
 
         if(depth <= maxdepth): #  or (depth <= 10 and topmovecnt > 0) 
