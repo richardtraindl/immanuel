@@ -306,7 +306,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
 
             thread = Match.get_active_thread(match)
             if(thread):
-                thread.populate_search(gmove):
+                thread.populate_search(gmove)
                 if(candidate and score):
                     prnt_move(" *** CANDIDATE: ", candidate)
                     print(" --- score: " + str(score) + " / " + str(maxscore))
@@ -373,7 +373,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
 
             thread = Match.get_active_thread(match)
             if(thread):
-                thread.populate_search(gmove):
+                thread.populate_search(gmove)
                 if(candidate and score):
                     prnt_move(" *** CANDIDATE: ", candidate)
                     print(" --- score: " + str(score) + " / " + str(maxscore))
