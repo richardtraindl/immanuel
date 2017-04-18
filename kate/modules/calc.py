@@ -207,9 +207,9 @@ class immanuelsThread(threading.Thread):
             self.match.move_list.append(move)
 
         if(self.match.level == Match.LEVELS['low']):
-            maxdepth = 6
+            maxdepth = 5
         elif(self.match.level == Match.LEVELS['medium']):
-            maxdepth = 8
+            maxdepth = 7
         else:
             maxdepth = 10 # Match.LEVELS['high']
 
