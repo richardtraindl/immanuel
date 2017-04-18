@@ -322,11 +322,11 @@ def fetch_match(request):
             data = html_board(match, int(switchflag), movesrc, movedst) + "§" + html_moves(match)
 
         thread = Match.get_active_thread(match)
-        if(thread and not thread.candidate_srcx):
+        if(thread and thread.search_srcx and not thread.candidate_srcx):
             data += "§<p>current search: "
             data += Match.index_to_koord(thread.search_srcx, thread.search_srcy) + "-" + Match.index_to_koord(thread.search_dstx, thread.search_dsty)
             data += "<br>thread found with matchid: " + str(thread.match.id) + "</p>"
-        elif(thread and thread.candidate_srcx):
+        elif(thread and thread.search_srcx and thread.candidate_srcx):
             data += "§<p>current search: " 
             data += Match.index_to_koord(thread.search_srcx, thread.search_srcy) + "-" + Match.index_to_koord(thread.search_dstx, thread.search_dsty)
             data += "<br>move candidate: "
