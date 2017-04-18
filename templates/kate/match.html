@@ -217,7 +217,7 @@
                 switchflag = $('#switch').attr("value");
                 $.get('/kate/fetchmatch', { matchid: matchid, movecnt: movecnt, switchflag: switchflag }, function(data){
                     if(data.length > 0){
-                        var arr = data.split('ยง');
+                        var arr = data.split('§');
                         if(arr[0].length > 0){
                             $('#board-wrapper').html(arr[0]);
                             $('#minutes').html(arr[1]);
