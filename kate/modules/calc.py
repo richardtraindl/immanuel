@@ -207,7 +207,7 @@ class immanuelsThread(threading.Thread):
             self.match.move_list.append(move)
 
         if(self.match.level == Match.LEVELS['low']):
-            maxdepth = 6
+            maxdepth = 5
         elif(self.match.level == Match.LEVELS['medium']):
             maxdepth = 8
         else:
@@ -249,7 +249,7 @@ def select_maxcnt(match, depth, topmovecnt):
 
     if(match.level == Match.LEVELS['low']):
         if(depth > 3):
-            return min(topmovecnt + 1, 8)
+            return min(topmovecnt + 1, 12)
         else:
             level_count = [200, 16, 16]
             return max(topmovecnt, level_count[depth-1])
@@ -261,7 +261,7 @@ def select_maxcnt(match, depth, topmovecnt):
             return max(topmovecnt, level_count[depth-1])
     else:
         if(depth > 6):
-            return min(topmovecnt + 1, 16)
+            return min(topmovecnt + 1, 12)
         else:
             level_count = [200, 200, 32, 16, 16, 8]
             return max(topmovecnt, level_count[depth-1])
