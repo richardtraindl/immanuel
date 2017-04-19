@@ -257,23 +257,20 @@ def rate(color, gmove, gmovescore, candidate, candidatescore):
 
 
 def select_maxcnt(match, depth, topmovecnt):
-    if(depth > 10):
-        return 0
-
     if(match.level == Match.LEVELS['low']):
-        level_count = [16, 16, 8, 8, 4]
+        level_count = [16, 16, 8, 8, 4, 0, 0, 0, 0, 0]
         if(depth > 3):
             return min(topmovecnt + 1, level_count[depth-1])
         else:
             return max(topmovecnt, level_count[depth-1])
     elif(match.level == Match.LEVELS['medium']):
-        level_count = [200, 16, 8, 8, 4, 2, 2]
+        level_count = [200, 16, 8, 8, 4, 2, 2, 0, 0, 0]
         if(depth > 5):
             return min(topmovecnt + 1, level_count[depth-1])
         else:
             return max(topmovecnt, level_count[depth-1])
     else:
-        level_count = [200, 200, 8, 8, 4, 2, 2, 2, 2]
+        level_count = [200, 200, 8, 8, 4, 2, 2, 2, 2, 0]
         if(depth > 7):
             return min(topmovecnt + 1, level_count[depth-1])
         else:
