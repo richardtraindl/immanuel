@@ -320,7 +320,7 @@ def calc_max(match, maxdepth, depth, alpha, beta):
 
         if(score > maxscore):
             maxscore = score
-            if(maxscore >= beta):
+            if(maxscore > beta):
                 return maxscore, candidate
                 # break
 
@@ -387,7 +387,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
 
         if(score < minscore):
             minscore = score
-            if(minscore <= alpha):
+            if(minscore < alpha):
                 return minscore, candidate
                 # break
 

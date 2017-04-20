@@ -4,28 +4,32 @@ from kate.modules import pawn, rook, knight, bishop, queen, king
 
 ERROR_CODES = {
     'none' : 0,
-    'general-error' : 1,
-    'wrong-color' : 2,
-    'out-of-bounds' : 3,
-    'pawn-error' : 4,
-    'rook-error' : 5,
-    'knight-error' : 6,
-    'bishop-error' : 7,
-    'queen-error' : 8,
-    'king-error' : 9,
+    'format-error' : 10,
+    'out-of-bounds' : 11,
+    'wrong-status' : 20,
+    'wrong-color' : 21,
+    'pawn-error' : 30,
+    'rook-error' : 31,
+    'knight-error' : 32,
+    'bishop-error' : 33,
+    'queen-error' : 34,
+    'king-error' : 35,
+    'general-error' : 100
 }
 
 ERROR_MSGS = {
-    ERROR_CODES['none'] : "Zug ist OK.",
-    ERROR_CODES['general-error'] : "Allgemeiner Fehler",
-    ERROR_CODES['wrong-color'] : "Farbe ist nicht am Zug",
-    ERROR_CODES['out-of-bounds'] : "Falsches Feld",
-    ERROR_CODES['pawn-error'] : "Bauernzug Fehler",
-    ERROR_CODES['rook-error'] : "Turmzug Fehler",
-    ERROR_CODES['knight-error'] : "Springerzug Fehler",
-    ERROR_CODES['bishop-error'] : "Läuferzug Fehler",
-    ERROR_CODES['queen-error'] : "Damenzug Fehler",
-    ERROR_CODES['king-error'] : "Königzug Fehler",
+    ERROR_CODES['none'] : "move okay",
+    ERROR_CODES['format-error'] : "format wrror",
+    ERROR_CODES['out-of-bounds'] : "wrong square",
+    ERROR_CODES['wrong-status'] : "wrong status",
+    ERROR_CODES['wrong-color'] : "wrong color",
+    ERROR_CODES['pawn-error'] : "pawn error",
+    ERROR_CODES['rook-error'] : "rook error",
+    ERROR_CODES['knight-error'] : "knight error",
+    ERROR_CODES['bishop-error'] : "bishop error",
+    ERROR_CODES['queen-error'] : "queen error",
+    ERROR_CODES['king-error'] : "king error",
+    ERROR_CODES['general-error'] : "general error",
 }
 
 

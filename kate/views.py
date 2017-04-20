@@ -80,11 +80,6 @@ def match(request, matchid=None, switch=0, msg=None):
         fmtmsg = "<p class='ok'></p>"
     elif(int(msg) == 0):
         fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[int(msg)] + "</p>"
-    elif(int(msg) == 100):
-        status = rules.game_status(match)
-        fmtmsg = "<p class='error'>" + helper.reverse_lookup(Match.STATUS, status) + "</p>"
-    elif(int(msg) == 110):
-        fmtmsg = "<p class='error'>Zug-Format ist ungültig.</p>"
     else:
         fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[int(msg)] + "</p>"
 
@@ -173,7 +168,7 @@ def do_move(request, matchid):
         switch = request.POST['switch']        
         status = rules.game_status(match)
         if(status != Match.STATUS['open']):
-            msg = 100
+            msg = rules.ERROR_CODES['wrong-status']
             return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
         if(match.next_color_human() == False):
             msg= rules.ERROR_CODES['wrong-color']
@@ -186,13 +181,13 @@ def do_move(request, matchid):
             dstx,dsty = Match.koord_to_index(movedst)
             prom_piece = match.PIECES[prompiece]
             flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
-            if(flag == True and status == Match.STATUS['open']):
+            if(flag == True):
                 move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
                 move.save()
                 match.save()
                 calc_move_for_immanuel(match)
         else:
-            msg = 110 # Zug-Format ist ungültig
+            msg = rules.ERROR_CODES['format-error']
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
