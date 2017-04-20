@@ -172,8 +172,11 @@ def do_move(request, matchid):
         match = get_object_or_404(Match, pk=matchid)
         switch = request.POST['switch']        
         status = rules.game_status(match)
-        if(status != Match.STATUS['open'] or match.next_color_human() == False):
+        if(status != Match.STATUS['open']):
             msg = 100
+            return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
+        if(match.next_color_human() == False):
+            msg= rules.ERROR_CODES['wrong-color']
             return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
