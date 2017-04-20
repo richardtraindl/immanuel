@@ -220,15 +220,19 @@
                         var arr = data.split('§');
                         if(arr[0].length > 0){
                             $('#board-wrapper').html(arr[0]);
+                        }
+                        if(arr[1].length > 0){
                             $('#minutes').html(arr[1]);
-                            $('#candidate').html("<p>&nbsp</p>");
-                            performMove();
-                            drag();
-                            drop();
                         }
                         if(arr[2].length > 0){
                             $('#candidate').html(arr[2]);
                         }
+                        else{
+                            $('#candidate').html("<p>&nbsp</p>");
+                        }
+                        performMove();
+                        drag();
+                        drop();
                     }
                 });
             }, 20000);
