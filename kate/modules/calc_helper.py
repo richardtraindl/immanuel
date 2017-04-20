@@ -208,16 +208,16 @@ def evaluate_movecnt(match):
 
 def evaluate_developments(match):
     if(match.wKg_y == 0 and match.wKg_x == 6 and match.readfield(match.wKg_x-1, match.wKg_y+1) == Match.PIECES['wPw'] and match.readfield(match.wKg_x,  match.wKg_y+1) == Match.PIECES['wPw']):
-        developed_whites = 2
+        developed_whites = 6
     elif(match.wKg_y == 0 and match.wKg_x == 2 and match.readfield(match.wKg_x, match.wKg_y+1) == Match.PIECES['wPw'] and match.readfield(match.wKg_x-1, match.wKg_y+1) == Match.PIECES['wPw'] and match.readfield(match.wKg_x-2, match.wKg_y+1) == Match.PIECES['wPw']):
-        developed_whites = 2
+        developed_whites = 6
     else:
         developed_whites = 0
 
     if(match.bKg_y == 7 and match.bKg_x == 6 and match.readfield(match.bKg_x-1, match.bKg_y-1) == Match.PIECES['bPw'] and match.readfield(match.bKg_x, match.bKg_y-1) == Match.PIECES['bPw']):
-        developed_blacks = -2
+        developed_blacks = -6
     elif(match.bKg_y == 7 and match.bKg_x == 2 and match.readfield(match.bKg_x, match.bKg_y-1) == Match.PIECES['bPw'] and match.readfield(match.bKg_x-1, match.bKg_y-1) == Match.PIECES['bPw'] and match.readfield(match.bKg_x-2, match.bKg_y-1) == Match.PIECES['bPw']):
-        developed_blacks = -2
+        developed_blacks = -6
     else:
         developed_blacks = 0
 
