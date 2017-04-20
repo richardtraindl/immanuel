@@ -170,14 +170,15 @@ def do_move(request, matchid):
     context = RequestContext(request)
     if request.method == 'POST':
         match = get_object_or_404(Match, pk=matchid)
+        switch = request.POST['switch']        
+        status = rules.game_status(match)
+        if(status != Match.STATUS['open'] or match.next_color_human() == False):
+            msg = 100
+            return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
-        prompiece = request.POST['prom_piece']
-        switch = request.POST['switch']
-        status = rules.game_status(match)
-        if(status != Match.STATUS['open']):
-            msg = 100
-        elif(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
+        prompiece = request.POST['prom_piece']        
+        if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
             srcx,srcy = Match.koord_to_index(movesrc)
             dstx,dsty = Match.koord_to_index(movedst)
             prom_piece = match.PIECES[prompiece]
@@ -186,14 +187,9 @@ def do_move(request, matchid):
                 move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
                 move.save()
                 match.save()
-                status = rules.game_status(match)
-                if(status != Match.STATUS['open']):
-                    msg = 100
-                else:
-                    calc_move_for_immanuel(match)
+                calc_move_for_immanuel(match)
         else:
             msg = 110 # Zug-Format ist ungültig
-
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
