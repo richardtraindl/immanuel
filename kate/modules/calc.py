@@ -253,29 +253,24 @@ def select_maxcnt(match, depth, topmovecnts):
     topmovecnt = topmovecnts[0] + topmovecnts[1] + topmovecnts[2]
 
     if(match.level == Match.LEVELS['low']):
-        level_count = [200, 32, 16, 8, 4, 0, 0, 0, 0, 0]
-        if(depth < 5):
-            return max(topmovecnt, level_count[depth-1])
-        elif(depth < 7):
-            return min( (topmovecnts[0] + topmovecnts[1]), level_count[depth-1] )
-        else:
-            return min(topmovecnts[0], level_count[depth-1])
+        counts = [200, 32, 16, 8, 4, 0, 0, 0, 0, 0]
+        lowdepth = 3
+        middepth = 5
     elif(match.level == Match.LEVELS['medium']):
-        level_count = [200, 32, 16, 8, 4, 2, 2, 0, 0, 0]
-        if(depth < 6):
-            return max(topmovecnt, level_count[depth-1])
-        elif(depth < 8):
-            return min( (topmovecnts[0] + topmovecnts[1]), level_count[depth-1] )
-        else:
-            return min(topmovecnts[0], level_count[depth-1])
+        counts = [200, 32, 16, 8, 4, 2, 2, 0, 0, 0]
+        lowdepth = 4
+        middepth = 6
     else:
-        level_count = [200, 200, 32, 16, 8, 4, 2, 2, 2, 0]
-        if(depth < 7):
-            return max(topmovecnt, level_count[depth-1])
-        elif(depth < 9):
-            return min( (topmovecnts[0] + topmovecnts[1]), level_count[depth-1] )
-        else:
-            return min(topmovecnts[0], level_count[depth-1])            
+        counts = [200, 200, 32, 16, 8, 4, 2, 2, 2, 0]
+        lowdepth = 5
+        middepth = 7
+
+    if(depth <= lowdepth):
+        return max(topmovecnt, counts[depth-1])
+    elif(depth <= middepth):
+        return min(topmovecnt, counts[depth-1] )
+    else:
+        return min(topmovecnts[0], counts[depth-1])
 
     return 0
 
