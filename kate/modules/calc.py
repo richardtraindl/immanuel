@@ -155,9 +155,9 @@ def generate_moves(match):
     moves.extend(l4_moves)
 
     if(kg_attacked):
-        topmovecnt = len(moves)
+        topmovecnts = [len(moves), 0, 0]
     else:
-        topmovecnt = (len(l0_moves) + len(l1_moves) + len(l2_moves))
+        topmovecnts = [len(l0_moves), len(l1_moves), len(l2_moves)]
 
     """print("l0_moves:")
     for gm in l0_moves:
@@ -182,7 +182,7 @@ def generate_moves(match):
     
     time.sleep(60) """
 
-    return moves, topmovecnt
+    return moves, topmovecnts
 
 
 class immanuelsThread(threading.Thread):
@@ -211,14 +211,7 @@ class immanuelsThread(threading.Thread):
         if(move != None):
             self.match.move_list.append(move)
 
-        if(self.match.level == Match.LEVELS['low']):
-            maxdepth = 4
-        elif(self.match.level == Match.LEVELS['medium']):
-            maxdepth = 6
-        else:
-            maxdepth = 8 # Match.LEVELS['high']
-
-        gmove = calc_move(self.match, maxdepth)
+        gmove = calc_move(self.match)
         if(gmove != None):
             curr_match = Match.objects.get(id=self.match.id)
             if(curr_match.count == self.match.count and Match.does_thread_exist(self)):
@@ -256,39 +249,41 @@ def rate(color, gmove, gmovescore, candidate, candidatescore):
         return gmovescore, gmove
 
 
-def select_maxcnt(match, depth, topmovecnt):
+def select_maxcnt(match, depth, topmovecnts):
+    topmovecnt = topmovecnts[0] + topmovecnts[1] + topmovecnts[2]
+
     if(match.level == Match.LEVELS['low']):
         level_count = [200, 32, 16, 8, 4, 0, 0, 0, 0, 0]
-        if(depth > 3):
-            return min(topmovecnt + 1, level_count[depth-1])
+        if(depth > 4):
+            return min(topmovecnts[0] + 1, level_count[depth-1])
         else:
             return max(topmovecnt, level_count[depth-1])
     elif(match.level == Match.LEVELS['medium']):
         level_count = [200, 32, 16, 8, 4, 2, 2, 0, 0, 0]
-        if(depth > 5):
-            return min(topmovecnt + 1, level_count[depth-1])
+        if(depth > 6):
+            return min(topmovecnts[0] + 1, level_count[depth-1])
         else:
             return max(topmovecnt, level_count[depth-1])
     else:
         level_count = [200, 200, 32, 16, 8, 4, 2, 2, 2, 0]
-        if(depth > 7):
-            return min(topmovecnt + 1, level_count[depth-1])
+        if(depth > 8):
+            return min(topmovecnts[0] + 1, level_count[depth-1])
         else:
             return max(topmovecnt, level_count[depth-1])
 
     return 0
 
 
-def calc_max(match, maxdepth, depth, alpha, beta):
+def calc_max(match, depth, alpha, beta):
     color = match.next_color()
     candidate = None
     score = None
     maxscore = -200000
     count = 0
 
-    gmoves, topmovecnt = generate_moves(match)
+    gmoves, topmovecnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, topmovecnt)
+    maxcnt = select_maxcnt(match, depth, topmovecnts)
 
     if(maxcnt == 0):
         return match.score, None
@@ -309,8 +304,8 @@ def calc_max(match, maxdepth, depth, alpha, beta):
                     print(" --- score: " + str(score) + " / " + str(maxscore))
                     thread.populate_candiate(candidate)
 
-        if(depth <= maxdepth): #  or (depth <= 10 and topmovecnt > 0)
-            score = calc_min(match, maxdepth, depth + 1, maxscore, beta)[0]
+        if(depth < 10):
+            score = calc_min(match, depth + 1, maxscore, beta)[0]
         else:
             score = match.score + calc_helper.evaluate_position(match)
 
@@ -348,15 +343,15 @@ def calc_max(match, maxdepth, depth, alpha, beta):
     return maxscore, candidate
 
 
-def calc_min(match, maxdepth, depth, alpha, beta):
+def calc_min(match, depth, alpha, beta):
     color = match.next_color()
     candidate = None
     score = None
     minscore = 200000
 
-    gmoves, topmovecnt = generate_moves(match)
+    gmoves, topmovecnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, topmovecnt)
+    maxcnt = select_maxcnt(match, depth, topmovecnts)
 
     if(maxcnt == 0):
         return match.score, None
@@ -376,8 +371,8 @@ def calc_min(match, maxdepth, depth, alpha, beta):
                     print(" --- score: " + str(score) + " / " + str(maxscore))
                     thread.populate_candiate(candidate)
 
-        if(depth <= maxdepth): #  or (depth <= 10 and topmovecnt > 0) 
-            score = calc_max(match, maxdepth, depth + 1, alpha, minscore)[0]
+        if(depth < 10):
+            score = calc_max(match, depth + 1, alpha, minscore)[0]
         else:
             score = match.score + calc_helper.evaluate_position(match)
 
@@ -415,7 +410,7 @@ def calc_min(match, maxdepth, depth, alpha, beta):
     return minscore, candidate
 
 
-def calc_move(match, maxdepth):
+def calc_move(match):
     start = time.time()
     
     gmove = openings.retrieve_move(match)
@@ -423,9 +418,9 @@ def calc_move(match, maxdepth):
     if(gmove):
         score = match.score
     elif(match.next_color() == Match.COLORS['white']):
-        score, gmove = calc_max(match, maxdepth, 1, -200000, 200000)
+        score, gmove = calc_max(match, 1, -200000, 200000)
     else:
-        score, gmove = calc_min(match, maxdepth, 1, -200000, 200000)
+        score, gmove = calc_min(match, 1, -200000, 200000)
 
     if(gmove != None):
         msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
