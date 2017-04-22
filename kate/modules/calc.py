@@ -241,9 +241,9 @@ class immanuelsThread(threading.Thread):
 
 
 def rate(color, gmove, gmovescore, candidate, candidatescore):
-    if(color == Match.COLORS["white"] and gmovescore < candidatescore):
+    if(color == Match.COLORS["white"] and candidatescore > gmovescore):
         return candidatescore, candidate
-    elif(color == Match.COLORS["black"] and gmovescore > candidatescore):
+    elif(color == Match.COLORS["black"] and candidatescore < gmovescore):
         return candidatescore, candidate
     else:
         return gmovescore, gmove
@@ -253,26 +253,24 @@ def select_maxcnt(match, depth, topmovecnts):
     topmovecnt = topmovecnts[0] + topmovecnts[1] + topmovecnts[2]
 
     if(match.level == Match.LEVELS['low']):
-        counts = [200, 32, 16, 8, 4, 0, 0, 0, 0, 0]
+        counts = [200, 16, 16, 8, 4, 2, 2, 0, 0, 0]
         lowdepth = 3
         middepth = 5
     elif(match.level == Match.LEVELS['medium']):
-        counts = [200, 32, 16, 8, 4, 2, 2, 0, 0, 0]
+        counts = [200, 16, 16, 8, 8, 4, 2, 2, 0, 0]
         lowdepth = 4
         middepth = 6
     else:
-        counts = [200, 200, 32, 16, 8, 4, 2, 2, 2, 0]
+        counts = [200, 200, 32, 16, 8, 8, 4, 2, 2, 0]
         lowdepth = 5
         middepth = 7
 
     if(depth <= lowdepth):
         return max(topmovecnt, counts[depth-1])
     elif(depth <= middepth):
-        return min(topmovecnt, counts[depth-1] )
+        return min(topmovecnt, counts[depth-1])
     else:
         return min(topmovecnts[0], counts[depth-1])
-
-    return 0
 
 
 def calc_max(match, depth, alpha, beta):
@@ -287,7 +285,7 @@ def calc_max(match, depth, alpha, beta):
     maxcnt = select_maxcnt(match, depth, topmovecnts)
 
     if(maxcnt == 0):
-        return match.score, None
+        return match.score + calc_helper.evaluate_position(match), None
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -297,20 +295,19 @@ def calc_max(match, depth, alpha, beta):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
 
+        score = calc_min(match, depth + 1, maxscore, beta)[0]
+        # score = match.score + calc_helper.evaluate_position(match)
+
+        score, candidate = rate(color, gmove, score, candidate, maxscore)
+
+        if(depth == 1):
             thread = Match.get_active_thread(match)
             if(thread):
                 thread.populate_search(gmove)
-                if(candidate and score):
-                    prnt_move(" *** CANDIDATE: ", candidate)
-                    print(" --- score: " + str(score) + " / " + str(maxscore))
+                if(candidate):
                     thread.populate_candiate(candidate)
-
-        if(depth < 10):
-            score = calc_min(match, depth + 1, maxscore, beta)[0]
-        else:
-            score = match.score + calc_helper.evaluate_position(match)
-
-        score, candidate = rate(color, gmove, score, candidate, maxscore)
+                    prnt_move(" *** CANDIDATE: ", candidate)
+                    print(" --- score: " + str(score) + " / maxscore: " + str(maxscore))
 
         kate.undo_move(match, True)
 
@@ -332,12 +329,16 @@ def calc_max(match, depth, alpha, beta):
             score = match.score
 
         if(depth == 1):
-            msg = "\nmatch.id:" + str(match.id) + " CANDIDATE "
-            prnt_move(msg, candidate)
-            print(" score: " + str(score))
+            msg = "\nmatch.id: " + str(match.id) + "   count: None" + "   calculate: "
+            prnt_move(msg, gmove)
+
             thread = Match.get_active_thread(match)
             if(thread):
-                thread.populate_candiate(candidate)
+                thread.populate_search(gmove)
+                if(candidate):
+                    thread.populate_candiate(candidate)
+                    prnt_move(" *** CANDIDATE: ", candidate)
+                    print(" --- score: " + str(score) + " / maxscore: " + str(maxscore))
 
         return score, candidate
 
@@ -355,31 +356,31 @@ def calc_min(match, depth, alpha, beta):
     maxcnt = select_maxcnt(match, depth, topmovecnts)
 
     if(maxcnt == 0):
-        return match.score, None
+        return match.score + calc_helper.evaluate_position(match), None
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
         if(depth == 1):
-            msg = "\nmatch.id:" + str(match.id) + " calculate "
+            count += 1
+            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
 
-            thread = Match.get_active_thread(match)
-            if(thread):
-                thread.populate_search(gmove)
-                if(candidate and score):
-                    prnt_move(" *** CANDIDATE: ", candidate)
-                    print(" --- score: " + str(score) + " / " + str(maxscore))
-                    thread.populate_candiate(candidate)
-
-        if(depth < 10):
-            score = calc_max(match, depth + 1, alpha, minscore)[0]
-        else:
-            score = match.score + calc_helper.evaluate_position(match)
+        score = calc_max(match, depth + 1, alpha, minscore)[0]
+        # score = match.score + calc_helper.evaluate_position(match)
 
         score, candidate = rate(color, gmove, score, candidate, minscore)
 
         kate.undo_move(match, True)
+
+        if(depth == 1):
+            thread = Match.get_active_thread(match)
+            if(thread):
+                thread.populate_search(gmove)
+                if(candidate):
+                    thread.populate_candiate(candidate)
+                    prnt_move(" *** CANDIDATE: ", candidate)
+                    print(" --- score: " + str(score) + " / minscore: " + str(minscore))
 
         if(score < minscore):
             minscore = score
@@ -399,12 +400,16 @@ def calc_min(match, depth, alpha, beta):
             score = match.score
 
         if(depth == 1):
-            msg = "\nmatch.id:" + str(match.id) + " CANDIDATE "
-            prnt_move(msg, candidate)
-            print(" score: " + str(score))
+            msg = "\nmatch.id: " + str(match.id) + "   count: None" + "   calculate: "
+            prnt_move(msg, gmove)
+
             thread = Match.get_active_thread(match)
             if(thread):
-                thread.populate_candiate(candidate)
+                thread.populate_search(gmove)
+                if(candidate):
+                    thread.populate_candiate(candidate)
+                    prnt_move(" *** CANDIDATE: ", candidate)
+                    print(" --- score: " + str(score) + " / minscore: " + str(minscore))
 
         return score, candidate
 
