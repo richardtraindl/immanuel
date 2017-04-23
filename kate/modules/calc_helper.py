@@ -214,12 +214,12 @@ def evaluate_movecnt(match):
 
 def evaluate_developments(match):
     if(match.wKg_first_movecnt > 0 and (match.wRk_a1_first_movecnt > 0 or match.wRk_h1_first_movecnt > 0) ):
-        developed_whites = 6
+        developed_whites = 20
     else:
         developed_whites = 0
 
     if(match.bKg_first_movecnt > 0 and (match.bRk_a8_first_movecnt > 0 or match.bRk_h8_first_movecnt > 0) ):
-        developed_blacks = -6
+        developed_blacks = 20
     else:
         developed_blacks = 0
 
