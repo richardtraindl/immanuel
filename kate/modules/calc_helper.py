@@ -76,7 +76,13 @@ def is_castling(match, move):
 
 
 def does_attack(match, move):
-    return rules.does_attack(match, move.srcx, move.srcy, move.dstx, move.dsty)
+    flag, priority = rules.does_attack(match, move.srcx, move.srcy, move.dstx, move.dsty)
+    if(flag):
+        count = rules.count_attacks(match, move.srcx, move.srcy, move.dstx, move.dsty)
+        if(count >= 2):
+            return flag, 2
+
+    return flag, priority
 
 
 def does_support_attacked(match, move):

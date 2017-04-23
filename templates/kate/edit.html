@@ -67,6 +67,11 @@
                         </td>
                         <td colspan=2>
                             <select name="level" size="1">
+                            {% if match.level == 0 %}
+                                <option selected>blitz</option>
+                            {% else %} 
+                                <option>blitz</option>
+                            {% endif %}
                             {% if match.level == 1 %}
                                 <option selected>low</option>
                             {% else %}  

@@ -93,7 +93,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
     return False, 0
 
 
-def count_attacks(match, srcx, srcy):
+def count_attacks(match, srcx, srcy, dstx, dsty):
     count = 0
 
     pawn = match.readfield(srcx, srcy)
@@ -106,18 +106,16 @@ def count_attacks(match, srcx, srcy):
 
     if(color == Match.COLORS['white']):
         STEPS = WPW_STEPS
-        counter = 1
     else:
         STEPS = BPW_STEPS
-        counter = -1
 
     for i in range(2):
-        x1 = srcx + STEPS[i][0]
-        y1 = srcy + STEPS[i][1]
+        x1 = dstx + STEPS[i][0]
+        y1 = dsty + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                count += counter
+                count += 1
 
     return count
 

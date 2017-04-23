@@ -139,6 +139,7 @@ class Match(models.Model):
         'cancelled' : 5 }
 
     LEVELS = {
+        'blitz' : 0,
         'low' : 1,
         'medium' : 2,
         'high' : 3 }
