@@ -29,59 +29,66 @@ def read_steps(steps, dir_idx, step_idx):
     return stepx, stepy, prom_piece
 
 
-def sort_move(match, gmove, l0_moves, l1_moves, l2_moves, l3_moves, l4_moves):
+def sort_move(match, gmove, piece_moves):
+    prio1 = 1
+    prio2 = 2
+    prio3 = 3
+    prio4 = 4
+    
     if( calc_helper.is_capture(match, gmove) ):
-        l0_moves.append(gmove)
+        piece_moves.append([prio1, gmove])
         return
     
     if( calc_helper.is_promotion(match, gmove) ):
-        l0_moves.append(gmove)
+        piece_moves.append([prio1, gmove])
         return
     
     if( calc_helper.is_castling(match, gmove) ):
-        l0_moves.append(gmove)
+        piece_moves.append([prio1, gmove])
         return
 
     attack, priority = calc_helper.does_attack(match, gmove)
     if(attack):
         if(priority == 2):
-            l0_moves.append(gmove)
+            piece_moves.append([prio1, gmove])
         elif(priority == 1):
-            l1_moves.append(gmove)
+            piece_moves.append([prio2, gmove])
         else:
-            l2_moves.append(gmove)
+            piece_moves.append([prio3, gmove])
         return
 
     support, priority = calc_helper.does_support_attacked(match, gmove)
     if(support):
         if(priority == 2):
-            l0_moves.append(gmove)
+            piece_moves.append([prio1, gmove])
         elif(priority == 1):
-            l1_moves.append(gmove)
+            piece_moves.append([prio2, gmove])
         else:
-            l2_moves.append(gmove)
+            piece_moves.append([prio3, gmove])
         return
 
     if( calc_helper.does_attacked_flee(match, gmove) ):
-        l3_moves.append(gmove)
+        piece_moves.append([prio3, gmove])
         return
 
     if( calc_helper.is_endgame_move(match, gmove) ):
-        l2_moves.append(gmove)
+        piece_moves.append([prio3, gmove])
         return
 
-    l4_moves.append(gmove)
+    piece_moves.append([prio4, gmove])
 
 
 def generate_moves(match):
-    topmovecnt = 0
     color = match.next_color()
     moves = []
-    l0_moves = []
-    l1_moves = []
-    l2_moves = []
-    l3_moves = []
-    l4_moves = []
+    prio_moves = []
+    piece_moves = None
+    pw_moves = []
+    kn_moves = []
+    bp_moves = []
+    rk_moves = []
+    qu_moves = []
+    kg_moves = []
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -92,6 +99,7 @@ def generate_moves(match):
                 dir_idx = 0
                 step_idx = 0
                 if(piece == Match.PIECES['wPw']):
+                    piece_moves = pw_moves
                     if(y < 6):
                         steps = pawn.GEN_WSTEPS
                         max_dir = 4
@@ -101,6 +109,7 @@ def generate_moves(match):
                         max_dir = 3
                         max_step = 4
                 elif(piece == Match.PIECES['bPw']):
+                    piece_moves = pw_moves
                     if(y > 1):
                         steps = pawn.GEN_BSTEPS
                         max_dir = 4
@@ -110,22 +119,27 @@ def generate_moves(match):
                         max_dir = 3
                         max_step = 4
                 elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
+                    piece_moves = rk_moves
                     steps = rook.GEN_STEPS
                     max_dir = 4
                     max_step = 7
                 elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
+                    piece_moves = bp_moves
                     steps = bishop.GEN_STEPS
                     max_dir = 4
                     max_step = 7
                 elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
+                    piece_moves = kn_moves
                     steps = knight.GEN_STEPS
                     max_dir = 8
                     max_step = 1
                 elif(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
+                    piece_moves = qu_moves
                     steps = queen.GEN_STEPS
                     max_dir = 8
                     max_step = 7
                 else:
+                    piece_moves = kg_moves
                     steps = king.GEN_STEPS
                     max_dir = 10
                     max_step = 1
@@ -138,7 +152,7 @@ def generate_moves(match):
                     flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
-                        sort_move(match, gmove, l0_moves, l1_moves, l2_moves, l3_moves, l4_moves)
+                        sort_move(match, gmove, piece_moves)
 
                     elif(errmsg != rules.ERROR_CODES['king-error']):
                         break
@@ -148,41 +162,27 @@ def generate_moves(match):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
-    moves.extend(l0_moves)
-    moves.extend(l1_moves)
-    moves.extend(l2_moves)
-    moves.extend(l3_moves)
-    moves.extend(l4_moves)
+        
+    qu_moves.sort()
+    prio_moves.extend(qu_moves[:8])
+    prio_moves.extend(kg_moves)
+    prio_moves.extend(rk_moves)
+    prio_moves.extend(bp_moves)
+    prio_moves.extend(kn_moves)
+    prio_moves.extend(pw_moves)
+    prio_moves.sort()
+    prio_moves.extend(qu_moves[8:])
+
+    topmovecnt = 0
+    for pmove in prio_moves:
+        moves.append(pmove[1])
+        if(pmove[0] <= 2):
+            topmovecnt += 1
 
     if(kg_attacked):
-        topmovecnts = [len(moves), 0, 0]
-    else:
-        topmovecnts = [len(l0_moves), len(l1_moves), len(l2_moves)]
+        topmovecnt = len(moves)
 
-    """print("l0_moves:")
-    for gm in l0_moves:
-        prnt_move("; ", gm)
-    print("-------------")
-    print("l1_moves:")
-    for gm in l1_moves:
-        prnt_move("; ", gm)
-    print("-------------")
-    print("l2_moves:")
-    for gm in l2_moves:
-        prnt_move("; ", gm)
-    print("-------------")
-    print("l3_moves:")
-    for gm in l3_moves:
-        prnt_move("; ", gm)
-    print("-------------")
-    print("l4_moves:")
-    for gm in l4_moves:
-        prnt_move("; ", gm)
-    print("-------------")
-    
-    time.sleep(60) """
-
-    return moves, topmovecnts
+    return moves, topmovecnt
 
 
 class immanuelsThread(threading.Thread):
@@ -249,9 +249,8 @@ def rate(color, gmove, gmovescore, candidate, candidatescore):
         return gmovescore, gmove
 
 
-def select_maxcnt(match, depth, topmovecnts):
+def select_maxcnt(match, depth, topmovecnt):
     counts = [200, 200, 32, 16, 8, 8, 8, 4, 4, 0]
-    topmovecnt = topmovecnts[0] + topmovecnts[1] + topmovecnts[2]
     midlimit = 2
 
     if(match.level == Match.LEVELS['blitz']):
@@ -273,7 +272,7 @@ def select_maxcnt(match, depth, topmovecnts):
     elif(depth <= (lowlimit + midlimit)):
         return min(topmovecnt, counts[(cntoffs + depth - 1)])
     else:
-        return min(topmovecnts[0], counts[(cntoffs + depth - 1)])
+        return min(topmovecnt, counts[(cntoffs + depth - 1)])
 
 
 def calc_max(match, depth, alpha, beta):
@@ -283,9 +282,9 @@ def calc_max(match, depth, alpha, beta):
     maxscore = -200000
     count = 0
 
-    gmoves, topmovecnts = generate_moves(match)
+    gmoves, topmovecnt = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, topmovecnts)
+    maxcnt = select_maxcnt(match, depth, topmovecnt)
 
     if(maxcnt == 0):
         return match.score + calc_helper.evaluate_position(match), None
@@ -354,9 +353,9 @@ def calc_min(match, depth, alpha, beta):
     score = None
     minscore = 200000
 
-    gmoves, topmovecnts = generate_moves(match)
+    gmoves, topmovecnt = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, topmovecnts)
+    maxcnt = select_maxcnt(match, depth, topmovecnt)
 
     if(maxcnt == 0):
         return match.score + calc_helper.evaluate_position(match), None
