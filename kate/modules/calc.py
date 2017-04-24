@@ -256,7 +256,7 @@ def select_maxcnt(match, depth, topmovecnt):
     if(match.level == Match.LEVELS['blitz']):
         lowlimit = 2
         midlimit = 1
-        cntoffs = 3
+        cntoffs = 4
     elif(match.level == Match.LEVELS['low']):
         lowlimit = 3
         cntoffs = 2
