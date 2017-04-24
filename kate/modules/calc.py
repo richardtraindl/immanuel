@@ -252,23 +252,25 @@ def rate(color, gmove, gmovescore, candidate, candidatescore):
 def select_maxcnt(match, depth, topmovecnts):
     counts = [200, 200, 32, 16, 8, 8, 8, 4, 4, 0]
     topmovecnt = topmovecnts[0] + topmovecnts[1] + topmovecnts[2]
+    midlimit = 2
 
     if(match.level == Match.LEVELS['blitz']):
-        depthlimit = 2
+        lowlimit = 2
+        midlimit = 1
         cntoffs = 3
     elif(match.level == Match.LEVELS['low']):
-        depthlimit = 3
+        lowlimit = 3
         cntoffs = 2
     elif(match.level == Match.LEVELS['medium']):
-        depthlimit = 4
+        lowlimit = 4
         cntoffs = 1
     else:
-        depthlimit = 5
+        lowlimit = 5
         cntoffs = 0
 
-    if(depth <= depthlimit):
+    if(depth <= lowlimit):
         return max(topmovecnt, counts[(cntoffs + depth - 1)])
-    elif(depth <= (depthlimit + 2)):
+    elif(depth <= (lowlimit + midlimit)):
         return min(topmovecnt, counts[(cntoffs + depth - 1)])
     else:
         return min(topmovecnts[0], counts[(cntoffs + depth - 1)])
