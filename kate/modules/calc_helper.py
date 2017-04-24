@@ -219,7 +219,7 @@ def evaluate_developments(match):
         developed_whites = 0
 
     if(match.bKg_first_movecnt > 0 and (match.bRk_a8_first_movecnt > 0 or match.bRk_h8_first_movecnt > 0) ):
-        developed_blacks = 20
+        developed_blacks = -20
     else:
         developed_blacks = 0
 
@@ -227,11 +227,11 @@ def evaluate_developments(match):
 
 
 def evaluate_position(match):
+    value = evaluate_contacts(match)
+
     if(match.count < 30):
-        value = evaluate_movecnt(match)
+        value += evaluate_movecnt(match)
         value += evaluate_developments(match)
-    else:
-        value = evaluate_contacts(match)
 
     return value
 

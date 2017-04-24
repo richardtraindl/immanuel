@@ -1,6 +1,7 @@
 from kate.models import Match, Move
 from kate.modules import helper, rules, pawn, rook, bishop, knight, queen, king, kate, openings, calc_helper, debug
 import random, threading, copy, time 
+from operator import itemgetter
 
 
 def prnt_move(msg, move):
@@ -162,16 +163,15 @@ def generate_moves(match):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
-        
-    qu_moves.sort()
-    prio_moves.extend(qu_moves[:8])
+    qu_moves.sort(key=itemgetter(0))
+    prio_moves.extend(qu_moves[:6])
     prio_moves.extend(kg_moves)
     prio_moves.extend(rk_moves)
     prio_moves.extend(bp_moves)
     prio_moves.extend(kn_moves)
     prio_moves.extend(pw_moves)
-    prio_moves.sort()
-    prio_moves.extend(qu_moves[8:])
+    prio_moves.sort(key=itemgetter(0))
+    prio_moves.extend(qu_moves[6:])
 
     topmovecnt = 0
     for pmove in prio_moves:
