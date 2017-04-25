@@ -240,34 +240,28 @@ def rate(color, gmove, gmovescore, candidate, candidatescore):
 
 
 def select_maxcnt(match, depth, topmovecnt):
-    counts = [200, 200, 32, 16, 8, 8, 8, 4, 4, 0]
-
     if(match.level == Match.LEVELS['blitz']):
-        lowlimit = 2
-        midlimit = 1
         if(match.count < 30):
-            cntoffs = 5
-        else:        
-            cntoffs = 4
-    elif(match.level == Match.LEVELS['low']):
-        lowlimit = 3
-        midlimit = 2
-        cntoffs = 2
-    elif(match.level == Match.LEVELS['medium']):
-        lowlimit = 4
-        midlimit = 2
-        cntoffs = 1
+            counts = [16, 8, 8, 0, 0, 0, 0, 0, 0, 0]
+            limit = 2
+        else:
+            counts = [16, 16, 8, 8, 0, 0, 0, 0, 0, 0]
+            limit = 2
     else:
-        lowlimit = 5
-        midlimit = 2
-        cntoffs = 0
+        if(match.level == Match.LEVELS['low']):
+            counts = [32, 16, 8, 8, 8, 4, 4, 0, 0, 0]
+            limit = 3
+        elif(match.level == Match.LEVELS['medium']):
+            counts = [200, 32, 16, 8, 8, 8, 4, 4, 0, 0]
+            limit = 4
+        else:
+            counts = [200, 200, 32, 16, 8, 8, 8, 4, 4, 0]
+            limit = 5
 
-    if(depth <= lowlimit):
-        return max(topmovecnt, counts[(cntoffs + depth - 1)])
-    elif(depth <= (lowlimit + midlimit)):
-        return min(topmovecnt, counts[(cntoffs + depth - 1)])
-    else:
-        return min(topmovecnt, counts[(cntoffs + depth - 1)])
+        if(depth <= limit):
+            return max(topmovecnt, counts[(depth - 1)])
+        else:
+            return min(topmovecnt, counts[(depth - 1)])
 
 
 def calc_max(match, depth, alpha, beta):
