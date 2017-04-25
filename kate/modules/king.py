@@ -208,11 +208,16 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
         if(field != Match.PIECES['blk']):
             return False
 
+    if(rules.is_inbounds((dstx + 1), dsty)):
+        rook = match.readfield((dstx + 1), dsty)
+    else:
+        return False
+
     if(color == Match.COLORS['white']):
-        if(match.wKg_first_movecnt != 0 or match.wRk_h1_first_movecnt != 0):
+        if(match.wKg_first_movecnt != 0 or match.wRk_h1_first_movecnt != 0 or rook =! Match.PIECES['wRk']):
             return False
     else:
-        if(match.bKg_first_movecnt != 0 or match.bRk_h8_first_movecnt != 0):
+        if(match.bKg_first_movecnt != 0 or match.bRk_h8_first_movecnt != 0 or rook =! Match.PIECES['bRk']):
             return False            
 
     king = match.readfield(srcx, srcy)
@@ -239,11 +244,16 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
         if(field != Match.PIECES['blk']):
             return False
 
+    if(rules.is_inbounds((dstx - 2), dsty)):
+        rook = match.readfield((dstx - 2), dsty)
+    else:
+        return False
+
     if(color == Match.COLORS['white']):
-        if(match.wKg_first_movecnt != 0 or match.wRk_a1_first_movecnt != 0):
+        if(match.wKg_first_movecnt != 0 or match.wRk_a1_first_movecnt != 0 or rook =! Match.PIECES['wRk']):
             return False
     else:
-        if(match.bKg_first_movecnt != 0 or match.bRk_a8_first_movecnt != 0):
+        if(match.bKg_first_movecnt != 0 or match.bRk_a8_first_movecnt != 0 or rook =! Match.PIECES['bRk']):
             return False
 
     king = match.readfield(srcx, srcy)
