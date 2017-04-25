@@ -258,10 +258,10 @@ def select_maxcnt(match, depth, topmovecnt):
             counts = [200, 200, 32, 16, 8, 8, 8, 4, 4, 0]
             limit = 5
 
-        if(depth <= limit):
-            return max(topmovecnt, counts[(depth - 1)])
-        else:
-            return min(topmovecnt, counts[(depth - 1)])
+    if(depth <= limit):
+        return max(topmovecnt, counts[(depth - 1)])
+    else:
+        return min(topmovecnt, counts[(depth - 1)])
 
 
 def calc_max(match, depth, alpha, beta):
