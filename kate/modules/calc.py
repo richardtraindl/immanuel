@@ -50,26 +50,16 @@ def sort_move(match, gmove, piece_moves):
 
     attack, priority = calc_helper.does_attack(match, gmove)
     if(attack):
-        if(priority == 2):
-            piece_moves.append([prio1, gmove])
-        elif(priority == 1):
-            piece_moves.append([prio2, gmove])
-        else:
-            piece_moves.append([prio3, gmove])
+        piece_moves.append([priority, gmove])
         return
 
     support, priority = calc_helper.does_support_attacked(match, gmove)
     if(support):
-        if(priority == 2):
-            piece_moves.append([prio1, gmove])
-        elif(priority == 1):
-            piece_moves.append([prio2, gmove])
-        else:
-            piece_moves.append([prio3, gmove])
+        piece_moves.append([priority, gmove])
         return
 
     if( calc_helper.does_attacked_flee(match, gmove) ):
-        piece_moves.append([prio3, gmove])
+        piece_moves.append([prio2, gmove])
         return
 
     if( calc_helper.is_endgame_move(match, gmove) ):
