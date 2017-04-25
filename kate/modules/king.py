@@ -66,9 +66,9 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
                 if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
-                    return True, 0 # priority
+                    return True, 3 # priority
                 else:
-                    return True, 1 # priority
+                    return True, 2 # priority
 
     return False, 0
 
@@ -136,9 +136,9 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
             if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_attacked(match, opp_color, x1, y1)):
                     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
-                        return True, 0 # priority
+                        return True, 3 # priority
                     else:
-                        return True, 1 # priority
+                        return True, 2 # priority
 
     return False, 0
 
