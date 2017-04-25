@@ -9,9 +9,20 @@ def prnt_move(msg, move):
         print("no move.....")
     else:
         print(msg + 
-            Match.index_to_koord(move.srcx, move.srcy) + " " +
-            Match.index_to_koord(move.dstx, move.dsty) + " " +
-            helper.reverse_lookup(Match.PIECES, move.prom_piece), end="")
+            Match.index_to_koord(move.srcx, move.srcy) + "-" +
+            Match.index_to_koord(move.dstx, move.dsty), end=" * ")
+        if(move.prom_piece != Match.PIECES['blk']):
+            print(helper.reverse_lookup(Match.PIECES, move.prom_piece), end="")
+
+
+def prnt_candidates(msg, candidates):
+    if(candidates[0] == None):
+        print("no move.....")
+    else:
+        print(msg, end=" ")
+        candmsg = ""
+        for cand in candidates[:3]:
+            prnt_move(candmsg, cand)
 
 
 class GenMove(object):
@@ -235,21 +246,24 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
         return candidatescore
     else:
         candidates[0] = gmove
-        idx = 1
-        for cand in search_candidates[:5]:
-            if(cand):
-                candidates[idx] = cand
-                idx += 1
+
+        if(search_candidates):
+            idx = 1
+            for cand in search_candidates[:5]:
+                if(cand):
+                    candidates[idx] = cand
+                    idx += 1
+
         return gmovescore
 
 
 def select_maxcnt(match, depth, topmovecnt):
     if(match.level == Match.LEVELS['blitz']):
         if(match.count < 30):
-            counts = [16, 16, 16, 0, 0, 0, 0, 0, 0, 0]
+            counts = [16, 16, 16, 4, 4, 0, 0, 0, 0, 0]
             limit = 2
         else:
-            counts = [16, 16, 8, 8, 0, 0, 0, 0, 0, 0]
+            counts = [16, 16, 8, 8, 4, 0, 0, 0, 0, 0]
             limit = 2
     else:
         if(match.level == Match.LEVELS['low']):
@@ -271,6 +285,7 @@ def select_maxcnt(match, depth, topmovecnt):
 def calc_max(match, depth, alpha, beta):
     color = match.next_color()
     candidates = [None] * 10
+    search_candidates = [None] * 10
     score = None
     maxscore = -200000
     count = 0
@@ -280,29 +295,27 @@ def calc_max(match, depth, alpha, beta):
     maxcnt = select_maxcnt(match, depth, topmovecnt)
 
     if(maxcnt == 0):
-        return match.score + calc_helper.evaluate_position(match), max_candidates
+        return match.score + calc_helper.evaluate_position(match), candidates
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-            
-        if(depth == 1):
-            count += 1
-            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, gmove)
 
         score, search_candidates = calc_min(match, depth + 1, maxscore, beta)
-        # score = match.score + calc_helper.evaluate_position(match)
 
-        score = rate(color, gmove, score, candidate, maxscore, search_candidates)
+        score = rate(color, gmove, score, candidates, maxscore, search_candidates)
 
         if(depth == 1):
+            count += 1
+
             thread = Match.get_active_thread(match)
             if(thread):
                 thread.populate_search(gmove)
                 if(candidates[0]):
                     thread.populate_candiate(candidates[0])
-                    prnt_move(" *** CANDIDATE: ", candidates[0])
-                    print(" --- score: " + str(score) + " / maxscore: " + str(maxscore))
+
+                    msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
+                    prnt_candidates(msg, candidates)
+                    print(" score: " + str(score) + " / maxscore: " + str(maxscore))
 
         kate.undo_move(match, True)
 
@@ -310,7 +323,6 @@ def calc_max(match, depth, alpha, beta):
             maxscore = score
             if(maxscore > beta):
                 return maxscore, candidates
-                # break
 
     if(len(gmoves) == 0):
         status = rules.game_status(match)
@@ -324,16 +336,7 @@ def calc_max(match, depth, alpha, beta):
             score = match.score
 
         if(depth == 1):
-            msg = "\nmatch.id: " + str(match.id) + "   count: None" + "   calculate: "
-            prnt_move(msg, gmove)
-
-            thread = Match.get_active_thread(match)
-            if(thread):
-                thread.populate_search(gmove)
-                if(candidates[0]):
-                    thread.populate_candiate(candidates[0])
-                    prnt_move(" *** CANDIDATE: ", candidates[0])
-                    print(" --- score: " + str(score) + " / maxscore: " + str(maxscore))
+            print("\nmatch.id: " + str(match.id) + "   count: None" + "   calculate: " + str(score))
 
         return score, candidates
 
@@ -343,6 +346,7 @@ def calc_max(match, depth, alpha, beta):
 def calc_min(match, depth, alpha, beta):
     color = match.next_color()
     candidates = [None] * 10
+    search_candidates = [None] * 10
     score = None
     minscore = 200000
     count = 0
@@ -352,37 +356,34 @@ def calc_min(match, depth, alpha, beta):
     maxcnt = select_maxcnt(match, depth, topmovecnt)
 
     if(maxcnt == 0):
-        return match.score + calc_helper.evaluate_position(match), None
+        return match.score + calc_helper.evaluate_position(match), candidates
 
     for gmove in gmoves[:maxcnt]:
         move = kate.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-        if(depth == 1):
-            count += 1
-            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, gmove)
-
         score, search_candidates = calc_max(match, depth + 1, alpha, minscore)
-        # score = match.score + calc_helper.evaluate_position(match)
 
         score = rate(color, gmove, score, candidates, minscore, search_candidates)
 
         kate.undo_move(match, True)
 
         if(depth == 1):
+            count += 1
+
             thread = Match.get_active_thread(match)
             if(thread):
                 thread.populate_search(gmove)
                 if(candidates[0]):
                     thread.populate_candiate(candidates[0])
-                    prnt_move(" *** CANDIDATE: ", candidates[0])
-                    print(" --- score: " + str(score) + " / minscore: " + str(minscore))
+
+                    msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
+                    prnt_candidates(msg, candidates)
+                    print(" score: " + str(score) + " / minscore: " + str(minscore))
 
         if(score < minscore):
             minscore = score
             if(minscore < alpha):
                 return minscore, candidates
-                # break
 
     if(len(gmoves) == 0):
         status = rules.game_status(match)
@@ -396,188 +397,33 @@ def calc_min(match, depth, alpha, beta):
             score = match.score
 
         if(depth == 1):
-            msg = "\nmatch.id: " + str(match.id) + "   count: None" + "   calculate: "
-            prnt_move(msg, gmove)
-
-            thread = Match.get_active_thread(match)
-            if(thread):
-                thread.populate_search(gmove)
-                if(candidates[0]):
-                    thread.populate_candiate(candidates[0])
-                    prnt_move(" *** CANDIDATE: ", candidates[0])
-                    print(" --- score: " + str(score) + " / minscore: " + str(minscore))
+            print("\nmatch.id: " + str(match.id) + "   count: None" + "   calculate: " + str(score))
 
         return score, candidates
 
     return minscore, candidates
 
 
-def calc_max_ALT(match, depth, alpha, beta):
-    color = match.next_color()
-    candidate = None
-    score = None
-    maxscore = -200000
-    count = 0
-
-    gmoves, topmovecnt = generate_moves(match)
-
-    maxcnt = select_maxcnt(match, depth, topmovecnt)
-
-    if(maxcnt == 0):
-        return match.score + calc_helper.evaluate_position(match), None
-
-    for gmove in gmoves[:maxcnt]:
-        move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-            
-        if(depth == 1):
-            count += 1
-            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, gmove)
-
-        score = calc_min(match, depth + 1, maxscore, beta)[0]
-        # score = match.score + calc_helper.evaluate_position(match)
-
-        score, candidate = rate(color, gmove, score, candidate, maxscore)
-
-        if(depth == 1):
-            thread = Match.get_active_thread(match)
-            if(thread):
-                thread.populate_search(gmove)
-                if(candidate):
-                    thread.populate_candiate(candidate)
-                    prnt_move(" *** CANDIDATE: ", candidate)
-                    print(" --- score: " + str(score) + " / maxscore: " + str(maxscore))
-
-        kate.undo_move(match, True)
-
-        if(score > maxscore):
-            maxscore = score
-            if(maxscore > beta):
-                return maxscore, candidate
-                # break
-
-    if(len(gmoves) == 0):
-        status = rules.game_status(match)
-        if(status == Match.STATUS['winner_black']):
-            score = Match.SCORES[Match.PIECES['wKg']] - depth
-        elif(status == Match.STATUS['winner_white']):
-            score = Match.SCORES[Match.PIECES['bKg']] + depth
-        elif(status == Match.STATUS['draw']):
-            score = Match.SCORES[Match.PIECES['blk']]
-        else:
-            score = match.score
-
-        if(depth == 1):
-            msg = "\nmatch.id: " + str(match.id) + "   count: None" + "   calculate: "
-            prnt_move(msg, gmove)
-
-            thread = Match.get_active_thread(match)
-            if(thread):
-                thread.populate_search(gmove)
-                if(candidate):
-                    thread.populate_candiate(candidate)
-                    prnt_move(" *** CANDIDATE: ", candidate)
-                    print(" --- score: " + str(score) + " / maxscore: " + str(maxscore))
-
-        return score, candidate
-
-    return maxscore, candidate
-
-
-def calc_min_ALT(match, depth, alpha, beta):
-    color = match.next_color()
-    candidate = None
-    score = None
-    minscore = 200000
-    count = 0
-
-    gmoves, topmovecnt = generate_moves(match)
-
-    maxcnt = select_maxcnt(match, depth, topmovecnt)
-
-    if(maxcnt == 0):
-        return match.score + calc_helper.evaluate_position(match), None
-
-    for gmove in gmoves[:maxcnt]:
-        move = kate.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-
-        if(depth == 1):
-            count += 1
-            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, gmove)
-
-        score = calc_max(match, depth + 1, alpha, minscore)[0]
-        # score = match.score + calc_helper.evaluate_position(match)
-
-        score, candidate = rate(color, gmove, score, candidate, minscore)
-
-        kate.undo_move(match, True)
-
-        if(depth == 1):
-            thread = Match.get_active_thread(match)
-            if(thread):
-                thread.populate_search(gmove)
-                if(candidate):
-                    thread.populate_candiate(candidate)
-                    prnt_move(" *** CANDIDATE: ", candidate)
-                    print(" --- score: " + str(score) + " / minscore: " + str(minscore))
-
-        if(score < minscore):
-            minscore = score
-            if(minscore < alpha):
-                return minscore, candidate
-                # break
-
-    if(len(gmoves) == 0):
-        status = rules.game_status(match)
-        if(status == Match.STATUS['winner_black']):
-            score = Match.SCORES[Match.PIECES['wKg']] - depth
-        elif(status == Match.STATUS['winner_white']):
-            score = Match.SCORES[Match.PIECES['bKg']] + depth
-        elif(status == Match.STATUS['draw']):
-            score = Match.SCORES[Match.PIECES['blk']]
-        else:
-            score = match.score
-
-        if(depth == 1):
-            msg = "\nmatch.id: " + str(match.id) + "   count: None" + "   calculate: "
-            prnt_move(msg, gmove)
-
-            thread = Match.get_active_thread(match)
-            if(thread):
-                thread.populate_search(gmove)
-                if(candidate):
-                    thread.populate_candiate(candidate)
-                    prnt_move(" *** CANDIDATE: ", candidate)
-                    print(" --- score: " + str(score) + " / minscore: " + str(minscore))
-
-        return score, candidate
-
-    return minscore, candidate
-
-
 def calc_move(match):
+    candidates = [None] * 10
+
     start = time.time()
     
-    gmove = openings.retrieve_move(match)
+    candidates[0] = openings.retrieve_move(match)
 
-    if(gmove):
+    if(candidates[0]):
         score = match.score
     elif(match.next_color() == Match.COLORS['white']):
-        score, gmove = calc_max(match, 1, -200000, 200000)
+        score, candidates = calc_max(match, 1, -200000, 200000)
     else:
-        score, gmove = calc_min(match, 1, -200000, 200000)
+        score, candidates = calc_min(match, 1, -200000, 200000)
 
-    if(gmove != None):
-        msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
-        prnt_move(msg, gmove)
-        print("")
-    else:
-        print("no results found!!!" + str(score))
+    msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
+    prnt_candidates(msg, candidates)
 
     end = time.time()
     print( (end - start) / 60 )
-    return gmove
+    return candidates[0]
 
 
 def thread_do_move(match):
