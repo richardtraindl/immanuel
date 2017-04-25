@@ -80,7 +80,7 @@ def does_attack(match, move):
     if(flag):
         count = rules.count_attacks(match, move.srcx, move.srcy, move.dstx, move.dsty)
         if(count >= 2):
-            return flag, 2
+            return flag, 1
 
     return flag, priority
 
