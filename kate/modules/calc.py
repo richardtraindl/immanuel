@@ -341,6 +341,7 @@ def calc_min(match, depth, alpha, beta):
     candidate = None
     score = None
     minscore = 200000
+    count = 0
 
     gmoves, topmovecnt = generate_moves(match)
 
