@@ -232,14 +232,14 @@ class immanuelsThread(threading.Thread):
 
 def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates):
     if( (color == Match.COLORS["white"] and candidatescore > gmovescore) or (color == Match.COLORS["black"] and candidatescore < gmovescore) ):
+        return candidatescore
+    else:
+        candidates[0] = gmove
         idx = 1
         for cand in search_candidates[:5]:
             if(cand):
                 candidates[idx] = cand
                 idx += 1
-
-        return candidatescore
-    else:
         return gmovescore
 
 
