@@ -127,6 +127,8 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
         x1 = dstx + STEPS[i][0]
         y1 = dsty + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
+            if(x1 == srcx and y1 == srcy):
+                continue
             piece = match.readfield(x1, y1)
             if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
                 continue
@@ -152,7 +154,7 @@ def score_supports_of_attacked(match, srcx, srcy):
     color = Match.color_of_piece(knight)
     opp_color = Match.REVERSED_COLORS[color]
 
-    for i in range(4):
+    for i in range(8):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
