@@ -152,7 +152,7 @@
         </div>
 
         <div class="row_4_of_12">
-            <div>
+            <div id="score">
                 <p>Score: &nbsp; {{ match.score }}</p>
             </div>
 
@@ -225,10 +225,10 @@
                             $('#minutes').html(arr[1]);
                         }
                         if(arr[2].length > 0){
-                            $('#candidate').html(arr[2]);
+                            $('#score').html(arr[2]);
                         }
-                        else{
-                            $('#candidate').html("<p>&nbsp</p>");
+                        if(arr[3].length > 0){
+                            $('#candidate').html(arr[3]);
                         }
                         performMove();
                         drag();
