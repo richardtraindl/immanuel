@@ -263,8 +263,8 @@ def select_maxcnt(match, depth, topmovecnt):
             counts = [16, 16, 16, 8, 4, 2, 0, 0, 0, 0]
             limit = 2
         else:
-            counts = [16, 16, 8, 4, 2, 0, 0, 0, 0, 0]
-            limit = 2
+            counts = [16, 16, 8, 2, 2, 0, 0, 0, 0, 0]
+            limit = 1
     else:
         if(match.level == Match.LEVELS['low']):
             counts = [32, 16, 8, 8, 8, 4, 4, 0, 0, 0]
