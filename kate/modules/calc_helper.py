@@ -93,9 +93,13 @@ def does_attacked_flee(match, move):
     opp_color = Match.REVERSED_COLORS[match.next_color()]
     
     if( rules.is_field_attacked(match, opp_color, move.srcx, move.srcy) ):
-        return True
+        piece = match.readfield(move.srcx, move.srcy)
+        if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
+            return True, 2
+        else:
+            return True, 1
 
-    return False
+    return False, 0
 
 
 def is_endgame_move(match, move):
