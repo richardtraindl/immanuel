@@ -192,16 +192,8 @@ class immanuelsThread(threading.Thread):
         threading.Thread.__init__(self)
         self.name = name
         self.match = copy.deepcopy(match)
-        self.search_srcx = None
-        self.search_srcy = None
-        self.search_dstx = None
-        self.search_dsty = None
-        self.search_prom_piece = None
-        self.candidate_srcx = None
-        self.candidate_srcy = None
-        self.candidate_dstx = None
-        self.candidate_dsty = None
-        self.candidate_prom_piece = None
+        self.search = [None]
+        self.candidates = [None] * 10
 
         Match.remove_outdated_threads(match)
         Match.add_thread(self)
@@ -225,21 +217,19 @@ class immanuelsThread(threading.Thread):
                 print("thread outdated - move dropped")
         return gmove
 
-    def populate_candiate(self, gmove):
-        if(gmove):
-            self.candidate_srcx = gmove.srcx
-            self.candidate_srcy = gmove.srcy
-            self.candidate_dstx = gmove.dstx
-            self.candidate_dsty = gmove.dsty
-            self.candidate_prom_piece = gmove.prom_piece
+    def populate_candiates(self, candiates):
+        if(candiates[0]):
+            idx = 0
+            for cand in candiates:
+                if(cand):
+                    self.candidates[idx] = cand
+                    idx += 1
+                else:
+                    break
 
     def populate_search(self, gmove):
         if(gmove):
-            self.search_srcx = gmove.srcx
-            self.search_srcy = gmove.srcy
-            self.search_dstx = gmove.dstx
-            self.search_dsty = gmove.dsty
-            self.search_prom_piece = gmove.prom_piece
+            self.search = gmove
 
 
 def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates):
@@ -311,12 +301,10 @@ def calc_max(match, depth, alpha, beta):
             thread = Match.get_active_thread(match)
             if(thread):
                 thread.populate_search(gmove)
-                if(candidates[0]):
-                    thread.populate_candiate(candidates[0])
-
-                    msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-                    prnt_candidates(msg, candidates)
-                    print(" score: " + str(score) + " / maxscore: " + str(maxscore))
+                thread.populate_candiates(candidates)
+                msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
+                prnt_candidates(msg, candidates)
+                print(" score: " + str(score) + " / maxscore: " + str(maxscore))
 
         kate.undo_move(match, True)
 
@@ -374,12 +362,10 @@ def calc_min(match, depth, alpha, beta):
             thread = Match.get_active_thread(match)
             if(thread):
                 thread.populate_search(gmove)
-                if(candidates[0]):
-                    thread.populate_candiate(candidates[0])
-
-                    msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-                    prnt_candidates(msg, candidates)
-                    print(" score: " + str(score) + " / minscore: " + str(minscore))
+                thread.populate_candiates(candidates)
+                msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
+                prnt_candidates(msg, candidates)
+                print(" score: " + str(score) + " / minscore: " + str(minscore))
 
         if(score < minscore):
             minscore = score
