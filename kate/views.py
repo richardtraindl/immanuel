@@ -168,7 +168,14 @@ def do_move(request, matchid):
         switch = request.POST['switch']        
         status = rules.game_status(match)
         if(status != Match.STATUS['open']):
-            msg = rules.ERROR_CODES['wrong-status']
+            if(status == Match.STATUS['draw']):
+                msg = rules.ERROR_CODES['draw']
+            elif(status == Match.STATUS['winner_white']):
+                msg = rules.ERROR_CODES['winner_white']
+            elif(status == Match.STATUS['winner_black']):
+                msg = rules.ERROR_CODES['winner_black']
+            else:
+                msg = rules.ERROR_CODES['cancelled']
             return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
         if(match.next_color_human() == False):
             msg= rules.ERROR_CODES['wrong-color']
@@ -320,11 +327,12 @@ def fetch_match(request):
         thread = Match.get_active_thread(match)
         if(thread and thread.search and thread.candidates[0]):
             gmove = thread.search
-            candidate = thread.candidates[0]
             data += "§<p>current search: " 
             data += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
-            data += "<br>move candidate: "
-            data += Match.index_to_koord(candidate.srcx, candidate.srcy) + "-" + Match.index_to_koord(candidate.dstx, candidate.dsty)
+
+            data += "<br>move candidates: <br>"
+            for cand in thread.candidates[:3]:
+                data += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
             data += "</p>"
         else:
             data += "§"

@@ -10,7 +10,7 @@ def prnt_move(msg, move):
     else:
         print(msg + 
             Match.index_to_koord(move.srcx, move.srcy) + "-" +
-            Match.index_to_koord(move.dstx, move.dsty), end=" * ")
+            Match.index_to_koord(move.dstx, move.dsty), end="")
         if(move.prom_piece != Match.PIECES['blk']):
             print(helper.reverse_lookup(Match.PIECES, move.prom_piece), end="")
 
@@ -20,9 +20,10 @@ def prnt_candidates(msg, candidates):
         print("no move.....")
     else:
         print(msg, end=" ")
-        candmsg = ""
+        candmsg = "["
         for cand in candidates[:3]:
             prnt_move(candmsg, cand)
+            print("] ", end="")
 
 
 class GenMove(object):

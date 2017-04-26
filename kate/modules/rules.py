@@ -4,10 +4,13 @@ from kate.modules import pawn, rook, knight, bishop, queen, king
 
 ERROR_CODES = {
     'none' : 0,
+    'draw' : 1,
+    'winner_white' : 2,
+    'winner_black' : 3,
+    'cancelled' : 4,
     'format-error' : 10,
     'out-of-bounds' : 11,
-    'wrong-status' : 20,
-    'wrong-color' : 21,
+    'wrong-color' : 20,
     'pawn-error' : 30,
     'rook-error' : 31,
     'knight-error' : 32,
@@ -19,9 +22,12 @@ ERROR_CODES = {
 
 ERROR_MSGS = {
     ERROR_CODES['none'] : "move okay",
+    ERROR_CODES['draw'] : "draw",
+    ERROR_CODES['winner_white'] : "winner_white",
+    ERROR_CODES['winner_black'] : "winner_black",
+    ERROR_CODES['cancelled'] : " match is cancelled",
     ERROR_CODES['format-error'] : "format wrror",
     ERROR_CODES['out-of-bounds'] : "wrong square",
-    ERROR_CODES['wrong-status'] : "wrong status",
     ERROR_CODES['wrong-color'] : "wrong color",
     ERROR_CODES['pawn-error'] : "pawn error",
     ERROR_CODES['rook-error'] : "rook error",
