@@ -159,6 +159,8 @@ def score_supports_of_attacked(match, srcx, srcy):
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
         if(x1 != rules.UNDEF_X):
+            if(x1 == srcx and y1 == srcy):
+                continue
             piece = match.readfield(x1, y1)
             if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
                 continue
