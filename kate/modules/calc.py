@@ -69,8 +69,9 @@ def sort_move(match, gmove, piece_moves):
         piece_moves.append([priority, gmove])
         return
 
-    if( calc_helper.does_attacked_flee(match, gmove) ):
-        piece_moves.append([prio2, gmove])
+    flee, priority = calc_helper.does_attacked_flee(match, gmove)
+    if(flee):
+        piece_moves.append([priority, gmove])
         return
 
     if( calc_helper.is_endgame_move(match, gmove) ):
