@@ -130,6 +130,8 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
         x1 = dstx + STEPS[i][0]
         y1 = dsty + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
+            if(x1 == srcx and y1 == srcy):
+                continue
             piece = match.readfield(x1, y1)
             if(piece == Match.PIECES['blk']):
                 continue
@@ -159,6 +161,8 @@ def score_supports_of_attacked(match, srcx, srcy):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
+            if(x1 == srcx and y1 == srcy):
+                continue
             piece = match.readfield(x1, y1)
             if(piece == Match.PIECES['blk']):
                 continue
