@@ -316,7 +316,7 @@ def fetch_match(request):
             data = html_board(match, int(switchflag), movesrc, movedst) + "§" + html_moves(match)
 
         thread = Match.get_active_thread(match)
-        if(thread and thread.search and thread.candidates):
+        if(thread and thread.search and thread.candidates[0]):
             gmove = thread.search
             candidate = thread.candidates[0]
             data += "§<p>current search: " 
