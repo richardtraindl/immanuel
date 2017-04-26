@@ -304,16 +304,18 @@ def fetch_match(request):
     switchflag = request.GET['switchflag']
     match = Match.objects.get(id=matchid)
     if(match == None):
-        data = "§§"
+        data = "§§§"
     else:
         lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
         if(lastmove != None):
             movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
             movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
         if(int(movecnt) == match.count):
-            data = "§"
+            data = "§§"
         else:
-            data = html_board(match, int(switchflag), movesrc, movedst) + "§" + html_moves(match)
+            data = html_board(match, int(switchflag), movesrc, movedst)
+            data += "§" + html_moves(match)
+            data += "§<p>Score: &nbsp;" + str(match.score) + "</p>"
 
         thread = Match.get_active_thread(match)
         if(thread and thread.search and thread.candidates[0]):
