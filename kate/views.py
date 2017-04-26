@@ -316,15 +316,13 @@ def fetch_match(request):
             data = html_board(match, int(switchflag), movesrc, movedst) + "§" + html_moves(match)
 
         thread = Match.get_active_thread(match)
-        if(thread and thread.search_srcx and not thread.candidate_srcx):
-            data += "§<p>current search: "
-            data += Match.index_to_koord(thread.search_srcx, thread.search_srcy) + "-" + Match.index_to_koord(thread.search_dstx, thread.search_dsty)
-            data += "<br>thread found with matchid: " + str(thread.match.id) + "</p>"
-        elif(thread and thread.search_srcx and thread.candidate_srcx):
+        if(thread and thread.search and thread.candidates):
+            gmove = thread.search
+            candidate = thread.candidates[0]
             data += "§<p>current search: " 
-            data += Match.index_to_koord(thread.search_srcx, thread.search_srcy) + "-" + Match.index_to_koord(thread.search_dstx, thread.search_dsty)
+            data += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
             data += "<br>move candidate: "
-            data += Match.index_to_koord(thread.candidate_srcx, thread.candidate_srcy) + "-" + Match.index_to_koord(thread.candidate_dstx, thread.candidate_dsty)
+            data += Match.index_to_koord(candidate.srcx, candidate.srcy) + "-" + Match.index_to_koord(candidate.dstx, candidate.dsty)
             data += "</p>"
         else:
             data += "§"
