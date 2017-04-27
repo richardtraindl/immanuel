@@ -169,13 +169,13 @@ def do_move(request, matchid):
         status = rules.game_status(match)
         if(status != Match.STATUS['open']):
             if(status == Match.STATUS['draw']):
-                msg = rules.ERROR_CODES['draw']
+                msg = rules.RETURN_CODES['draw']
             elif(status == Match.STATUS['winner_white']):
-                msg = rules.ERROR_CODES['winner_white']
+                msg = rules.RETURN_CODES['winner_white']
             elif(status == Match.STATUS['winner_black']):
-                msg = rules.ERROR_CODES['winner_black']
+                msg = rules.RETURN_CODES['winner_black']
             else:
-                msg = rules.ERROR_CODES['cancelled']
+                msg = rules.RETURN_CODES['match-cancelled']
             return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
         if(match.next_color_human() == False):
             msg= rules.ERROR_CODES['wrong-color']
