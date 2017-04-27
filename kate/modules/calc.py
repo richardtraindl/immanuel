@@ -158,7 +158,7 @@ def generate_moves(match):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         sort_move(match, gmove, piece_moves)
 
-                    elif(errmsg != rules.ERROR_CODES['king-error']):
+                    elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
 
     if(match.next_color() == Match.COLORS['white']):
