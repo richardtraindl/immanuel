@@ -79,9 +79,9 @@ def match(request, matchid=None, switch=0, msg=None):
     if(msg == None):
         fmtmsg = "<p class='ok'></p>"
     elif(int(msg) == 0):
-        fmtmsg = "<p class='ok'>" + rules.ERROR_MSGS[int(msg)] + "</p>"
+        fmtmsg = "<p class='ok'>" + rules.RETURN_MSGS[int(msg)] + "</p>"
     else:
-        fmtmsg = "<p class='error'>" + rules.ERROR_MSGS[int(msg)] + "</p>"
+        fmtmsg = "<p class='error'>" + rules.RETURN_MSGS[int(msg)] + "</p>"
 
     if(int(switch) == 0):
         rangeobj = range(8)
@@ -178,7 +178,7 @@ def do_move(request, matchid):
                 msg = rules.RETURN_CODES['match-cancelled']
             return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
         if(match.next_color_human() == False):
-            msg= rules.ERROR_CODES['wrong-color']
+            msg= rules.RETURN_CODES['wrong-color']
             return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
@@ -194,7 +194,7 @@ def do_move(request, matchid):
                 match.save()
                 calc_move_for_immanuel(match)
         else:
-            msg = rules.ERROR_CODES['format-error']
+            msg = rules.RETURN_CODES['format-error']
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
