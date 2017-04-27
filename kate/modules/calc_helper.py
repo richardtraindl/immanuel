@@ -191,7 +191,7 @@ def evaluate_piece_moves(match, srcx, srcy):
             flag,errcode = rules.is_move_valid(match, srcx, srcy, dstx, dsty, Match.PIECES['blk'])
             if(flag):
                 movecnt += value
-            elif(errcode == rules.ERROR_CODES['out-of-bounds']):
+            elif(errcode == rules.RETURN_CODES['out-of-bounds']):
                 break
 
     return (movecnt)
