@@ -2,40 +2,40 @@ from kate.models import Match
 from kate.modules import pawn, rook, knight, bishop, queen, king
 
 
-ERROR_CODES = {
-    'none' : 0,
-    'draw' : 1,
-    'winner_white' : 2,
-    'winner_black' : 3,
-    'cancelled' : 4,
-    'format-error' : 10,
-    'out-of-bounds' : 11,
-    'wrong-color' : 20,
-    'pawn-error' : 30,
-    'rook-error' : 31,
-    'knight-error' : 32,
-    'bishop-error' : 33,
-    'queen-error' : 34,
-    'king-error' : 35,
-    'general-error' : 100
+RETURN_CODES = {
+    'ok' : 0,
+    'draw' : 10,
+    'winner_white' : 11,
+    'winner_black' : 12,
+    'status-cancelled' : 13,
+    'wrong-color' : 14,
+    'pawn-error' : 20,
+    'rook-error' : 21,
+    'knight-error' : 22,
+    'bishop-error' : 23,
+    'queen-error' : 24,
+    'king-error' : 25,
+    'format-error' : 30,
+    'out-of-bounds' : 31,
+    'general-error' : 40,
 }
 
-ERROR_MSGS = {
-    ERROR_CODES['none'] : "move okay",
-    ERROR_CODES['draw'] : "draw",
-    ERROR_CODES['winner_white'] : "winner_white",
-    ERROR_CODES['winner_black'] : "winner_black",
-    ERROR_CODES['cancelled'] : " match is cancelled",
-    ERROR_CODES['format-error'] : "format wrror",
-    ERROR_CODES['out-of-bounds'] : "wrong square",
-    ERROR_CODES['wrong-color'] : "wrong color",
-    ERROR_CODES['pawn-error'] : "pawn error",
-    ERROR_CODES['rook-error'] : "rook error",
-    ERROR_CODES['knight-error'] : "knight error",
-    ERROR_CODES['bishop-error'] : "bishop error",
-    ERROR_CODES['queen-error'] : "queen error",
-    ERROR_CODES['king-error'] : "king error",
-    ERROR_CODES['general-error'] : "general error",
+RETURN_MSGS = {
+    RETURN_CODES['ok'] : "move okay",
+    RETURN_CODES['draw'] : "draw",
+    RETURN_CODES['winner_white'] : "winner_white",
+    RETURN_CODES['winner_black'] : "winner_black",
+    RETURN_CODES['status-cancelled'] : " match is cancelled",
+    RETURN_CODES['wrong-color'] : "wrong color",
+    RETURN_CODES['pawn-error'] : "pawn error",
+    RETURN_CODES['rook-error'] : "rook error",
+    RETURN_CODES['knight-error'] : "knight error",
+    RETURN_CODES['bishop-error'] : "bishop error",
+    RETURN_CODES['queen-error'] : "queen error",
+    RETURN_CODES['king-error'] : "king error",
+    RETURN_CODES['format-error'] : "format wrror",
+    RETURN_CODES['out-of-bounds'] : "wrong square",
+    RETURN_CODES['general-error'] : "general error",
 }
 
 
@@ -347,46 +347,46 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
     #print(" counts " + str(match.bKg_first_movecnt) + " " + str(match.bRk_h8_first_movecnt)  + " " + str(match.bRk_a8_first_movecnt))
     #print("-------------------------------------------")
     if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
-        return False, ERROR_CODES['out-of-bounds']
+        return False, RETURN_CODES['out-of-bounds']
 
     piece = match.readfield(srcx, srcy)
 
     if(match.next_color() != Match.color_of_piece(piece)):
-        return False, ERROR_CODES['wrong-color']
+        return False, RETURN_CODES['wrong-color']
 
     if(piece != Match.PIECES['wKg'] and piece != Match.PIECES['bKg']):
         if(is_king_after_move_attacked(match, srcx, srcy, dstx, dsty)):
-            return False, ERROR_CODES['king-error']
+            return False, RETURN_CODES['king-error']
 
     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
         if(pawn.is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece)):
-            return True, ERROR_CODES['none']
+            return True, RETURN_CODES['ok']
         else:
-            return False, ERROR_CODES['pawn-error']
+            return False, RETURN_CODES['pawn-error']
     elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
         if(rook.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
-            return True, ERROR_CODES['none']
+            return True, RETURN_CODES['ok']
         else:
-            return False, ERROR_CODES['rook-error']
+            return False, RETURN_CODES['rook-error']
     elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
         if(knight.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
-            return True, ERROR_CODES['none']
+            return True, RETURN_CODES['ok']
         else:
-            return False, ERROR_CODES['knight-error']
+            return False, RETURN_CODES['knight-error']
     elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
         if(bishop.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
-            return True, ERROR_CODES['none']
+            return True, RETURN_CODES['ok']
         else:
-            return False, ERROR_CODES['bishop-error']
+            return False, RETURN_CODES['bishop-error']
     elif(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
         if(queen.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
-            return True, ERROR_CODES['none']
+            return True, RETURN_CODES['ok']
         else:
-            return False, ERROR_CODES['queen-error']
+            return False, RETURN_CODES['queen-error']
     elif(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
         if(king.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
-            return True, ERROR_CODES['none']
+            return True, RETURN_CODES['ok']
         else:
-            return False, ERROR_CODES['king-error']
+            return False, RETURN_CODES['king-error']
     else:
-        return False, ERROR_CODES['general-error']
+        return False, RETURN_CODES['general-error']
