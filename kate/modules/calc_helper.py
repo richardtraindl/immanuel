@@ -89,9 +89,9 @@ def does_attacked_flee(match, move):
     if( rules.is_field_attacked(match, opp_color, move.srcx, move.srcy) ):
         piece = match.readfield(move.srcx, move.srcy)
         if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
-            return True, 2
+            return True, 3
         else:
-            return True, 1
+            return True, 2
 
     return False, 0
 
