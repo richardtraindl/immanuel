@@ -46,6 +46,7 @@ def is_field_attacked(match, color, fieldx, fieldy):
 
 
 def does_attack(match, srcx, srcy, dstx, dsty):
+    priority = 5
     knight = match.readfield(srcx, srcy)
 
     if(knight != Match.PIECES['wKn'] and knight != Match.PIECES['bKn']):
@@ -61,13 +62,16 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
                 if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
-                    return True, 3 # priority
+                    priority = min(priority, 3)
                 elif(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
-                    return True, 1 # priority
+                    priority = min(priority, 1)
                 else:
-                    return True, 2 # priority
+                    priority = min(priority, 2)
 
-    return False, 0
+    if(priority == 5):
+        return False, 0
+    else:
+        return True, priority
 
 
 def count_attacks(match, srcx, srcy, dstx, dsty):
@@ -115,6 +119,7 @@ def score_attacks(match, srcx, srcy):
 
 
 def does_support_attacked(match, srcx, srcy, dstx, dsty):
+    priority = 5
     knight = match.readfield(srcx, srcy)
 
     if(knight != Match.PIECES['wKn'] and knight != Match.PIECES['bKn']):
@@ -135,11 +140,14 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
             if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_attacked(match, opp_color, x1, y1)):
                     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
-                        return True, 3 # priority
+                        priority = min(priority, 3)
                     else:
-                        return True, 2 # priority
+                        priority = min(priority, 2)
 
-    return False, 0
+    if(priority == 5):
+        return False, 0
+    else:
+        return True, priority
 
 
 
