@@ -166,15 +166,14 @@ def generate_moves(match):
     else:
         kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
-    qu_moves.sort(key=itemgetter(0))
-    prio_moves.extend(qu_moves[:4])
     prio_moves.extend(kg_moves)
     prio_moves.extend(rk_moves)
     prio_moves.extend(bp_moves)
     prio_moves.extend(kn_moves)
     prio_moves.extend(pw_moves)
+    prio_moves.extend(qu_moves)
     prio_moves.sort(key=itemgetter(0))
-    prio_moves.extend(qu_moves[4:])
+    
 
     topmovecnt = 0
     for pmove in prio_moves:
