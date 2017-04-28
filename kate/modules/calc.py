@@ -94,7 +94,7 @@ def generate_moves(match):
     rk_moves = []
     qu_moves = []
     kg_moves = []
-    priocnts = [0] * 4
+    priorities = [0] * 4
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -159,7 +159,14 @@ def generate_moves(match):
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         priority = sort_move(match, gmove, piece_moves)
-                        priocnts[priority-1] += 1
+                        if(priority == 0):
+                            priorities[0] += 1
+                        elif(priority == 1):
+                            priorities[1] += 1
+                        if(priority == 2):
+                            priorities[2] += 1
+                        else:
+                            priorities[3] += 1
 
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
@@ -176,13 +183,16 @@ def generate_moves(match):
     prio_moves.extend(pw_moves)
     prio_moves.extend(qu_moves)
     prio_moves.sort(key=itemgetter(0))
+    
+    for pmove in prio_moves:
+        moves.append(pmove[1])
 
     if(kg_attacked):
-        priocnts[0]= len(moves)
-        priocnts[1]= 0
-        priocnts[2]= 0
-        priocnts[3]= 0
-    return moves, priocnts
+        priorities[0]= len(moves)
+        priorities[1]= 0
+        priorities[2]= 0
+        priorities[3]= 0
+    return moves, priorities
 
 
 class immanuelsThread(threading.Thread):
@@ -246,29 +256,29 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
         return gmovescore
 
 
-def select_maxcnt(match, depth, priocnts):
+def select_maxcnt(match, depth, priorities):
     if(match.level == Match.LEVELS['blitz']):
-        counts = [16, 16, 16, 8, 4, 2, 0, 0, 0, 0]
+        counts = [16, 16, 16, 16, 8, 4, 0, 0, 0, 0]
         if(match.count < 60):
             limit = 1
         else:
             limit = 2
     elif(match.level == Match.LEVELS['low']):
-        counts = [32, 16, 16, 16, 8, 4, 2, 0, 0, 0]
+        counts = [32, 16, 16, 16, 8, 4, 4, 0, 0, 0]
         limit = 2
     elif(match.level == Match.LEVELS['medium']):
-        counts = [200, 32, 16, 16, 16, 8, 4, 2, 0, 0]
+        counts = [200, 32, 16, 16, 16, 8, 4, 4, 0, 0]
         limit = 3
     else:
-        counts = [200, 200, 32, 16, 16, 16, 8, 4, 2, 0]
+        counts = [200, 200, 32, 16, 16, 16, 8, 4, 4, 0]
         limit = 4
 
     if(depth <= limit):
-        return max((priocnts[0] + priocnts[1] + priocnts[2]), counts[(depth - 1)])
+        return max((priorities[0] + priorities[1] + priorities[2]), counts[(depth - 1)])
     elif(depth <= limit + 2):
-        return max((priocnts[0] + priocnts[1]), counts[(depth - 1)])
+        return max((priorities[0] + priorities[1]), counts[(depth - 1)])
     else:
-        return min((priocnts[0] + priocnts[1]), counts[(depth - 1)])
+        return min((priorities[0] + priorities[1]), counts[(depth - 1)])
 
 
 def calc_max(match, depth, alpha, beta):
@@ -279,9 +289,9 @@ def calc_max(match, depth, alpha, beta):
     maxscore = -200000
     count = 0
 
-    gmoves, priocnts = generate_moves(match)
+    gmoves, priorities = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, priocnts)
+    maxcnt = select_maxcnt(match, depth, priorities)
 
     if(maxcnt == 0):
         return match.score + calc_helper.evaluate_position(match), candidates
@@ -300,9 +310,12 @@ def calc_max(match, depth, alpha, beta):
             if(thread):
                 thread.populate_search(gmove)
                 thread.populate_candiates(candidates)
-                msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-                prnt_candidates(msg, candidates)
-                print(" score: " + str(score) + " / maxscore: " + str(maxscore))
+
+            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
+            prnt_move(msg, gmove)
+            msg = "    CANDIDATES: "
+            prnt_candidates(msg, candidates)
+            print(" score: " + str(score) + " / maxscore: " + str(maxscore))
 
         kate.undo_move(match, True)
 
@@ -338,9 +351,9 @@ def calc_min(match, depth, alpha, beta):
     minscore = 200000
     count = 0
 
-    gmoves, priocnts = generate_moves(match)
+    gmoves, priorities = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, priocnts)
+    maxcnt = select_maxcnt(match, depth, priorities)
 
     if(maxcnt == 0):
         return match.score + calc_helper.evaluate_position(match), candidates
@@ -361,9 +374,12 @@ def calc_min(match, depth, alpha, beta):
             if(thread):
                 thread.populate_search(gmove)
                 thread.populate_candiates(candidates)
-                msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-                prnt_candidates(msg, candidates)
-                print(" score: " + str(score) + " / minscore: " + str(minscore))
+
+            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
+            prnt_move(msg, gmove)
+            msg = "    CANDIDATES: "
+            prnt_candidates(msg, candidates)
+            print(" score: " + str(score) + " / minscore: " + str(minscore))
 
         if(score < minscore):
             minscore = score
