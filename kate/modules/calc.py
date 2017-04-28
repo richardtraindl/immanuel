@@ -246,7 +246,7 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
         return gmovescore
 
 
-def select_maxcnt(match, depth, topmovecnt):
+def select_maxcnt(match, depth, priocnts):
     if(match.level == Match.LEVELS['blitz']):
         counts = [16, 16, 16, 8, 4, 2, 0, 0, 0, 0]
         if(match.count < 60):
@@ -264,9 +264,11 @@ def select_maxcnt(match, depth, topmovecnt):
         limit = 4
 
     if(depth <= limit):
-        return max(topmovecnt, counts[(depth - 1)])
+        return max((priocnts[0] + priocnts[1] + priocnts[2]), counts[(depth - 1)])
+    elif(depth <= limit + 2):
+        return max((priocnts[0] + priocnts[1]), counts[(depth - 1)])
     else:
-        return min(topmovecnt, counts[(depth - 1)])
+        return min((priocnts[0] + priocnts[1]), counts[(depth - 1)])
 
 
 def calc_max(match, depth, alpha, beta):
@@ -277,9 +279,9 @@ def calc_max(match, depth, alpha, beta):
     maxscore = -200000
     count = 0
 
-    gmoves, topmovecnt = generate_moves(match)
+    gmoves, priocnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, topmovecnt)
+    maxcnt = select_maxcnt(match, depth, priocnts)
 
     if(maxcnt == 0):
         return match.score + calc_helper.evaluate_position(match), candidates
@@ -336,9 +338,9 @@ def calc_min(match, depth, alpha, beta):
     minscore = 200000
     count = 0
 
-    gmoves, topmovecnt = generate_moves(match)
+    gmoves, priocnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, topmovecnt)
+    maxcnt = select_maxcnt(match, depth, priocnts)
 
     if(maxcnt == 0):
         return match.score + calc_helper.evaluate_position(match), candidates
