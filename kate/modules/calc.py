@@ -50,36 +50,37 @@ def sort_move(match, gmove, piece_moves):
     
     if( calc_helper.is_capture(match, gmove) ):
         piece_moves.append([prio1, gmove])
-        return
+        return prio1
     
     if( calc_helper.is_promotion(match, gmove) ):
         piece_moves.append([prio1, gmove])
-        return
+        return prio1
     
     if( calc_helper.is_castling(match, gmove) ):
         piece_moves.append([prio1, gmove])
-        return
+        return prio1
 
     attack, priority = calc_helper.does_attack(match, gmove)
     if(attack):
         piece_moves.append([priority, gmove])
-        return
+        return priority
 
     support, priority = calc_helper.does_support_attacked(match, gmove)
     if(support):
         piece_moves.append([priority, gmove])
-        return
+        return priority
 
     flee, priority = calc_helper.does_attacked_flee(match, gmove)
     if(flee):
         piece_moves.append([priority, gmove])
-        return
+        return priority
 
     if( calc_helper.is_endgame_move(match, gmove) ):
         piece_moves.append([prio3, gmove])
-        return
+        return prio3
 
     piece_moves.append([prio4, gmove])
+    return prio4
 
 
 def generate_moves(match):
@@ -93,6 +94,7 @@ def generate_moves(match):
     rk_moves = []
     qu_moves = []
     kg_moves = []
+    priocnts = [0] * 4
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -156,7 +158,8 @@ def generate_moves(match):
                     flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
-                        sort_move(match, gmove, piece_moves)
+                        priority = sort_move(match, gmove, piece_moves)
+                        priocnts[priority-1] += 1
 
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
@@ -173,18 +176,13 @@ def generate_moves(match):
     prio_moves.extend(pw_moves)
     prio_moves.extend(qu_moves)
     prio_moves.sort(key=itemgetter(0))
-    
-
-    topmovecnt = 0
-    for pmove in prio_moves:
-        moves.append(pmove[1])
-        if(pmove[0] <= 2):
-            topmovecnt += 1
 
     if(kg_attacked):
-        topmovecnt = len(moves)
-
-    return moves, topmovecnt
+        priocnts[0]= len(moves)
+        priocnts[1]= 0
+        priocnts[2]= 0
+        priocnts[3]= 0
+    return moves, priocnts
 
 
 class immanuelsThread(threading.Thread):
