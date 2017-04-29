@@ -47,6 +47,7 @@ def sort_move(match, gmove, piece_moves):
     prio2 = 2
     prio3 = 3
     prio4 = 4
+    priority = 5
     
     if( calc_helper.is_capture(match, gmove) ):
         piece_moves.append([prio1, gmove])
@@ -60,27 +61,33 @@ def sort_move(match, gmove, piece_moves):
         piece_moves.append([prio1, gmove])
         return prio1
 
-    attack, priority = calc_helper.does_attack(match, gmove)
+    attack, prio = calc_helper.does_attack(match, gmove)
     if(attack):
-        piece_moves.append([priority, gmove])
-        return priority
+        priority = min(priority, prio)
+        if(priority == prio1):
+            piece_moves.append([priority, gmove])
+            return priority
 
-    support, priority = calc_helper.does_support_attacked(match, gmove)
+    support, prio = calc_helper.does_support_attacked(match, gmove)
     if(support):
-        piece_moves.append([priority, gmove])
-        return priority
+        priority = min(priority, prio)
+        if(priority == prio1):
+            piece_moves.append([priority, gmove])
+            return priority
 
-    flee, priority = calc_helper.does_attacked_flee(match, gmove)
+    flee, prio = calc_helper.does_attacked_flee(match, gmove)
     if(flee):
-        piece_moves.append([priority, gmove])
-        return priority
+        priority = min(priority, prio)
+        if(priority == prio1):
+            piece_moves.append([priority, gmove])
+            return priority
 
     if( calc_helper.is_endgame_move(match, gmove) ):
-        piece_moves.append([prio3, gmove])
-        return prio3
+        priority = min(priority, prio3)
 
-    piece_moves.append([prio4, gmove])
-    return prio4
+    priority = min(priority, prio4)
+    piece_moves.append([priority, gmove])
+    return priority
 
 
 def generate_moves(match):
