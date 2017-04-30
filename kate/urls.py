@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^(?P<matchid>[0-9]+)/(?P<switch>[0-1])/match/$', views.match, name='match'),
     url(r'^(?P<matchid>[0-9]+)/(?P<switch>[0-1])/(?P<msg>[0-9]+)/match/$', views.match, name='match'),
     url(r'^(?P<matchid>[0-9]+)/domove/$', views.do_move, name='domove'),
+    url(r'^(?P<matchid>[0-9]+)/(?P<switch>[0-1])/forcemove/$', views.force_move, name='forcemove'),
     url(r'^(?P<matchid>[0-9]+)/(?P<switch>[0-1])/undomove/$', views.undo_move, name='undomove'),
     url(r'^new/$', views.new, name='new'),
     url(r'^create/$', views.create, name='create'),

@@ -36,6 +36,7 @@ def is_field_attacked(match, color, fieldx, fieldy):
 
 def does_attack(match, srcx, srcy, dstx, dsty):
     priority = 5
+
     rook = match.readfield(srcx, srcy)
 
     if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['wQu'] and rook != Match.PIECES['bRk'] and rook != Match.PIECES['bQu']):
@@ -54,7 +55,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                 if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
                     priority = min(priority, 3)
                 elif(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
-                    priority = min(priority, 1)
+                    return True, 1 # priority
                 else:
                     priority = min(priority, 2)
 
@@ -112,6 +113,7 @@ def score_attacks(match, srcx, srcy):
 
 def does_support_attacked(match, srcx, srcy, dstx, dsty):
     priority = 5
+
     rook = match.readfield(srcx, srcy)
 
     if(rook != Match.PIECES['wRk'] and rook != Match.PIECES['wQu'] and rook != Match.PIECES['bRk'] and rook != Match.PIECES['bQu']):
@@ -135,7 +137,7 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
                         priority = min(priority, 3)
                     else:
-                        priority = min(priority, 2)
+                        return True, 2 # priority
 
     if(priority == 5):
         return False, 0

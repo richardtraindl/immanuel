@@ -97,12 +97,15 @@ def does_attacked_flee(match, move):
 
 
 def is_endgame_move(match, move):
-    if(match.count > 60):
-        piece = match.readfield(move.srcx, move.srcy)
-        if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
-            return True
+    if(match.count > 40):
+        if(pawn.is_running(match, move)):
+            return True, 1
+        else:
+            piece = match.readfield(move.srcx, move.srcy)
+            if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+                return True, 3
 
-    return False
+    return False, 0
 
 
 """
@@ -224,12 +227,34 @@ def evaluate_developments(match):
     return developed_whites + developed_blacks
 
 
+def evaluate_endgame(match):
+    running = 0
+
+    for y in range(0, 8, 1):
+        for x in range(0, 8, 1):
+            piece = match.readfield(x, y)
+            if(piece == Match.PIECES['wPw']):
+                if(pawn.is_running):
+                    running += Match.REVERSED_SCORES[piece] // 2
+                    if(y >= 4):
+                        running += Match.REVERSED_SCORES[piece]
+            elif(piece == Match.PIECES['bPw']):
+                if(pawn.is_running):
+                    running += Match.REVERSED_SCORES[piece] // 2
+                    if(y <= 3):
+                        running += Match.REVERSED_SCORES[piece]
+
+    return running
+
+
 def evaluate_position(match):
     value = evaluate_contacts(match)
 
     if(match.count < 30):
         value += evaluate_movecnt(match)
         value += evaluate_developments(match)
+    else:
+        value += evaluate_endgame(match)
 
     return value
 

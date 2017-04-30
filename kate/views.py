@@ -200,6 +200,22 @@ def do_move(request, matchid):
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
 
 
+def force_move(request, matchid, switch=None):
+    context = RequestContext(request)
+    match = Match.objects.get(id=matchid)
+    thread = Match.get_active_thread(match)
+    if(thread and thread.running and thread.candidates[0]):
+        thread.running = False
+        gmove = thread.candidates[0]
+        msg = "move forced"
+        move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        move.save()
+        match.save()
+        return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
+    else:
+        return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
+
+
 def undo_move(request, matchid, switch=None):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)

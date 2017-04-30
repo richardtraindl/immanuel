@@ -65,6 +65,7 @@ def is_field_attacked(match, color, fieldx, fieldy):
 
 def does_attack(match, srcx, srcy, dstx, dsty):
     priority = 5
+
     pawn = match.readfield(srcx, srcy)
 
     if(pawn != Match.PIECES['wPw'] and pawn != Match.PIECES['bPw']):
@@ -87,7 +88,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                 if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
                     priority = min(priority, 3)
                 elif(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
-                    priority = min(priority, 1)
+                    return True, 1 # priority
                 else:
                     priority = min(priority, 2)
 
@@ -153,6 +154,7 @@ def score_attacks(match, srcx, srcy):
 
 def does_support_attacked(match, srcx, srcy, dstx, dsty):
     priority = 5
+
     pawn = match.readfield(srcx, srcy)
 
     if(pawn != Match.PIECES['wPw'] and pawn != Match.PIECES['bPw']):
@@ -178,7 +180,7 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
                         priority = min(priority, 3)
                     else:
-                        priority = min(priority, 2) 
+                        return True, 2 # priority
               
     if(priority == 5):
         return False, 0
@@ -214,6 +216,34 @@ def score_supports_of_attacked(match, srcx, srcy):
                     score += Match.SUPPORTED_SCORES[piece]
 
     return score
+
+
+def is_running(match, move):
+    piece = match.readfield(move.srcx, move.srcy)
+    if(piece == Match.PIECES['wPw']):
+        stepx = 0
+        stepy = 1
+        opp_pawn = Match.PIECES['bPw']
+    elif(piece == Match.PIECES['bPw']):
+        stepx = 0
+        stepy = -1
+        opp_pawn = Match.PIECES['wPw']
+    else:
+        return False
+
+    STARTS = [0, 1, -1]
+    for i in range(3):
+        x1 = move.dstx + STARTS[i]
+        y1 = move.dsty
+        while( x1 != rules.UNDEF_X and rules.is_inbounds(x1, y1) ):
+            x1, y1 = rules.search(match, x1, y1, stepx , stepy)
+            if(x1 != rules.UNDEF_X):
+                piece = match.readfield(x1, y1)
+                if(piece == opp_pawn):
+                    return False
+
+    return True
+
 
 
 def pw_dir(srcx, srcy, dstx, dsty, piece):

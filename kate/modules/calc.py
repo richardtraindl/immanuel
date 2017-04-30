@@ -21,7 +21,7 @@ def prnt_candidates(msg, candidates):
     else:
         print(msg, end=" ")
         candmsg = "["
-        for cand in candidates[:3]:
+        for cand in candidates[:9]:
             prnt_move(candmsg, cand)
             print("] ", end="")
 
@@ -82,8 +82,12 @@ def sort_move(match, gmove, piece_moves):
             piece_moves.append([priority, gmove])
             return priority
 
-    if( calc_helper.is_endgame_move(match, gmove) ):
-        priority = min(priority, prio3)
+    endgame, prio = calc_helper.is_endgame_move(match, gmove)
+    if(endgame):
+        priority = min(priority, prio)
+        if(priority == prio1):
+            piece_moves.append([priority, gmove])
+            return priority
 
     priority = min(priority, prio4)
     piece_moves.append([priority, gmove])
@@ -206,6 +210,7 @@ class immanuelsThread(threading.Thread):
     def __init__(self, name, match):
         threading.Thread.__init__(self)
         self.name = name
+        self.running = True
         self.match = copy.deepcopy(match)
         self.search = [None]
         self.candidates = [None] * 10
@@ -221,7 +226,7 @@ class immanuelsThread(threading.Thread):
             self.match.move_list.append(move)
 
         gmove = calc_move(self.match)
-        if(gmove != None):
+        if(self.running and gmove != None):
             curr_match = Match.objects.get(id=self.match.id)
             if(curr_match.count == self.match.count and Match.does_thread_exist(self)):
                 move = kate.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -248,14 +253,14 @@ class immanuelsThread(threading.Thread):
 
 
 def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates):
-    if( (color == Match.COLORS["white"] and candidatescore > gmovescore) or (color == Match.COLORS["black"] and candidatescore < gmovescore) ):
+    if( (color == Match.COLORS["white"] and candidatescore >= gmovescore) or (color == Match.COLORS["black"] and candidatescore <= gmovescore) ):
         return candidatescore
     else:
         candidates[0] = gmove
 
         if(search_candidates):
             idx = 1
-            for cand in search_candidates[:5]:
+            for cand in search_candidates[:9]:
                 if(cand):
                     candidates[idx] = cand
                     idx += 1
@@ -266,10 +271,7 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
 def select_maxcnt(match, depth, priorities):
     if(match.level == Match.LEVELS['blitz']):
         counts = [16, 16, 16, 16, 8, 4, 0, 0, 0, 0]
-        if(match.count < 60):
-            limit = 1
-        else:
-            limit = 2
+        limit = 2
     elif(match.level == Match.LEVELS['low']):
         counts = [32, 16, 16, 16, 8, 4, 4, 0, 0, 0]
         limit = 2
@@ -283,9 +285,11 @@ def select_maxcnt(match, depth, priorities):
     if(depth <= limit):
         return max((priorities[0] + priorities[1] + priorities[2]), counts[(depth - 1)])
     elif(depth <= limit + 2):
-        return max((priorities[0] + priorities[1]), counts[(depth - 1)])
-    else:
+        return min((priorities[0] + priorities[1] + priorities[2]), counts[(depth - 1)])
+    elif(depth <= limit + 4):
         return min((priorities[0] + priorities[1]), counts[(depth - 1)])
+    else:
+        return min((priorities[0]), counts[(depth - 1)])
 
 
 def calc_max(match, depth, alpha, beta):

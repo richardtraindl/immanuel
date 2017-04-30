@@ -13,7 +13,7 @@
                 Created on: &nbsp; {{ match.begin|fmtdate }} ,&nbsp;
                 Level: &nbsp; {{ match.level|matchlevel }}
             </h2>
-            <p style="font-size: 12px;">2017.04.28-4</p>
+            <p style="font-size: 12px;">2017.04.29-2</p>
         </div>
     </div>
 {% endblock %}
@@ -27,9 +27,8 @@
                 <a href="{% url 'kate:undomove' match.id switch %}" onclick="return confirm('Withdraw last move?')">WITHDRAW MOVE</a> |
                 <a href="{% url 'kate:edit' match.id switch %}">EDIT GAME</a> |
                 <a href="{% url 'kate:new' %}">NEW GAME</a> |
-                <a href="{% url 'kate:index' %}">LOAD GAME</a>
-                
-
+                <a href="{% url 'kate:index' %}">LOAD GAME</a> |
+                <a href="{% url 'kate:forcemove' match.id switch %}">FORCE MOVE</a>
             </h2>
         </div>
     </div>
