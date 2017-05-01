@@ -107,7 +107,10 @@ def score_attacks(match, srcx, srcy):
                 piece = match.readfield(x1, y1)
                 if(Match.color_of_piece(piece) == opp_color):
                     score += Match.ATTACKED_SCORES[piece]
-
+                    pin_dir = rules.pin_dir(match, x1, y1)
+                    rkdir = rk_dir(srcx, srcy, x1, y1)
+                    if(pin_dir == rkdir):
+                        score += Match.ATTACKED_SCORES[piece] // 2
     return score
 
 
