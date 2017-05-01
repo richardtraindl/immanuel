@@ -108,8 +108,8 @@ def score_attacks(match, srcx, srcy):
             if(Match.color_of_piece(piece) == opp_color):
                 score += Match.ATTACKED_SCORES[piece]
                 pin_dir = rules.pin_dir(match, x1, y1)
-                bpdir = bp_dir(srcx, srcy, x1, y1)
-                if(pin_dir == rkdir):
+                direction = bp_dir(srcx, srcy, x1, y1)
+                if(pin_dir == direction):
                     score += Match.ATTACKED_SCORES[piece] // 2
 
     return score
