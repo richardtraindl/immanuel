@@ -36,6 +36,7 @@ def fill_fmtboard(match, switch):
             fmtboard[idx1][idx2][1] = field
             idx2 += 1
         idx1 += 1
+
     return fmtboard
 
 
@@ -121,6 +122,7 @@ def create(request):
             match.save()
             calc_move_for_immanuel(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
+
     return render(request, 'kate/new.html', { 'white_player': match.white_player, 'white_player_human': match.white_player_human, 'black_player': match.black_player, 'black_player_human': match.black_player_human } )
 
 
@@ -153,6 +155,7 @@ def update(request, matchid, switch=0):
             match.save()
             calc_move_for_immanuel(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch,)))
+
     return render(request, 'kate/edit.html', { 'match': match, 'switch': switch } )
 
 
@@ -180,6 +183,7 @@ def do_move(request, matchid):
         if(match.next_color_human() == False):
             msg= rules.RETURN_CODES['wrong-color']
             return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
+
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
         prompiece = request.POST['prom_piece']        
@@ -195,6 +199,7 @@ def do_move(request, matchid):
                 calc_move_for_immanuel(match)
         else:
             msg = rules.RETURN_CODES['format-error']
+
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
@@ -203,11 +208,12 @@ def do_move(request, matchid):
 def force_move(request, matchid, switch=None):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
+
     thread = Match.get_active_thread(match)
     if(thread and thread.running and thread.candidates[0]):
         thread.running = False
         gmove = thread.candidates[0]
-        msg = "move forced"
+        msg = rules.RETURN_CODES['ok']
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
         move.save()
         match.save()
@@ -219,11 +225,23 @@ def force_move(request, matchid, switch=None):
 def undo_move(request, matchid, switch=None):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
+
+    thread = Match.get_active_thread(match)
+    if(thread):
+        thread.running = False
     move = kate.undo_move(match, False)
+
     if(move != None):
         move.delete()
         match.save()
-        calc_move_for_immanuel(match)
+
+    return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
+
+
+def resume(request, matchid, switch=None):
+    context = RequestContext(request)
+    match = Match.objects.get(id=matchid)
+    calc_move_for_immanuel(match)
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
 
 

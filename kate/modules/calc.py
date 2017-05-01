@@ -48,11 +48,14 @@ def sort_move(match, gmove, piece_moves):
     prio3 = 3
     prio4 = 4
     priority = 5
-    
-    if( calc_helper.is_capture(match, gmove) ):
-        piece_moves.append([prio1, gmove])
-        return prio1
-    
+
+    capture, prio = calc_helper.is_capture(match, gmove)
+    if(capture):
+        priority = min(priority, prio)
+        if(priority == prio1):
+            piece_moves.append([priority, gmove])
+            return priority
+
     if( calc_helper.is_promotion(match, gmove) ):
         piece_moves.append([prio1, gmove])
         return prio1
@@ -183,9 +186,9 @@ def generate_moves(match):
                         break
 
     if(match.next_color() == Match.COLORS['white']):
-        kg_attacked = rules.is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
+        kg_attacked = rules.is_field_touched(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
     else:
-        kg_attacked = rules.is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
+        kg_attacked = rules.is_field_touched(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
 
     prio_moves.extend(kg_moves)
     prio_moves.extend(rk_moves)
@@ -215,9 +218,10 @@ class immanuelsThread(threading.Thread):
         self.search = [None]
         self.candidates = [None] * 10
 
-        Match.remove_outdated_threads(match)
+        Match.remove_threads(match)
         Match.add_thread(self)
         print("match.id: " + str(match.id))
+
 
     def run(self):
         print("Starting " + str(self.name))
@@ -226,16 +230,16 @@ class immanuelsThread(threading.Thread):
             self.match.move_list.append(move)
 
         gmove = calc_move(self.match)
-        if(self.running and gmove != None):
-            curr_match = Match.objects.get(id=self.match.id)
-            if(curr_match.count == self.match.count and Match.does_thread_exist(self)):
-                move = kate.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-                move.save()
-                self.match.save()
-                print("move saved")
-            else:
-                print("thread outdated - move dropped")
+        if(gmove and Match.does_thread_exist(self) and self.running):
+            move = kate.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+            move.save()
+            self.match.save()
+            print("move saved")
+        else:
+            print("thread outdated - move dropped")
+
         return gmove
+
 
     def populate_candiates(self, candiates):
         if(candiates[0]):
@@ -246,6 +250,7 @@ class immanuelsThread(threading.Thread):
                     idx += 1
                 else:
                     break
+
 
     def populate_search(self, gmove):
         if(gmove):
@@ -271,25 +276,25 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
 def select_maxcnt(match, depth, priorities):
     if(match.level == Match.LEVELS['blitz']):
         counts = [16, 16, 16, 16, 8, 4, 4, 4, 4, 0]
-        limit = 2
+        limit = 1
     elif(match.level == Match.LEVELS['low']):
-        counts = [32, 16, 16, 16, 8, 4, 4, 4, 4, 0]
+        counts = [16, 16, 16, 16, 16, 4, 4, 4, 4, 0]
         limit = 2
     elif(match.level == Match.LEVELS['medium']):
-        counts = [200, 32, 16, 16, 16, 8, 4, 4, 4, 0]
+        counts = [32, 16, 16, 16, 16, 8, 4, 4, 4, 0]
         limit = 3
     else:
-        counts = [200, 200, 32, 16, 16, 16, 8, 4, 4, 0]
+        counts = [200, 32, 16, 16, 16, 16, 8, 4, 4, 0]
         limit = 4
 
-    if(depth <= limit):
-        return max((priorities[0] + priorities[1] + priorities[2]), counts[(depth - 1)])
-    elif(depth <= limit + 2):
-        return min((priorities[0] + priorities[1] + priorities[2]), counts[(depth - 1)])
-    elif(depth <= limit + 4):
-        return min((priorities[0] + priorities[1]), counts[(depth - 1)])
+    if(depth >= 10):
+        return 0
+    elif(depth <= limit):
+        return max( (priorities[0] + priorities[1] + priorities[2]), counts[(depth - 1)] )
+    elif(depth <= limit + 3):
+        return min( (priorities[0] + priorities[1] + priorities[2]), counts[(depth - 1)] )
     else:
-        return min((priorities[0]), counts[(depth - 1)])
+        return priorities[0]
 
 
 def calc_max(match, depth, alpha, beta):
@@ -441,5 +446,4 @@ def calc_move(match):
 def thread_do_move(match):
     thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
     thread.start()
-
 

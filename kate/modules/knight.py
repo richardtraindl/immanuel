@@ -32,7 +32,7 @@ GEN_STEPS = [ [[1, 2, blank]],
               [[-1, 2, blank]] ]
 
 
-def is_field_attacked(match, color, fieldx, fieldy):
+def is_field_touched(match, color, fieldx, fieldy):
     for i in range(8):
         x1 = fieldx + STEPS[i][0]
         y1 = fieldy + STEPS[i][1]
@@ -140,7 +140,7 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
             if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
                 continue
             if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_attacked(match, opp_color, x1, y1)):
+                if(rules.is_field_touched(match, opp_color, x1, y1)):
                     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
                         priority = min(priority, 3)
                     else:
@@ -175,7 +175,7 @@ def score_supports_of_attacked(match, srcx, srcy):
             if(piece == Match.PIECES['blk'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
                 continue
             if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_attacked(match, opp_color, x1, y1)):
+                if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += Match.SUPPORTED_SCORES[piece]
 
     return score 

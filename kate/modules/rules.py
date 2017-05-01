@@ -8,7 +8,7 @@ RETURN_CODES = {
     'winner_white' : 11,
     'winner_black' : 12,
     'match-cancelled' : 13,
-    'wrong-color' : 14,
+    'wrong-color' : 14,    
     'pawn-error' : 20,
     'rook-error' : 21,
     'knight-error' : 22,
@@ -23,8 +23,8 @@ RETURN_CODES = {
 RETURN_MSGS = {
     RETURN_CODES['ok'] : "move okay",
     RETURN_CODES['draw'] : "draw",
-    RETURN_CODES['winner_white'] : "winner_white",
-    RETURN_CODES['winner_black'] : "winner_black",
+    RETURN_CODES['winner_white'] : "winner white",
+    RETURN_CODES['winner_black'] : "winner black",
     RETURN_CODES['match-cancelled'] : " match is cancelled",
     RETURN_CODES['wrong-color'] : "wrong color",
     RETURN_CODES['pawn-error'] : "pawn error",
@@ -164,20 +164,20 @@ def pin_dir(match, scrx, srcy):
     return DIRS['undefined']
 
 
-def is_field_attacked(match, color, srcx, srcy):
-    if(rook.is_field_attacked(match, color, srcx, srcy)):
+def is_field_touched(match, color, srcx, srcy):
+    if(rook.is_field_touched(match, color, srcx, srcy)):
         return True
 
-    if(bishop.is_field_attacked(match, color, srcx, srcy)):
+    if(bishop.is_field_touched(match, color, srcx, srcy)):
         return True
 
-    if(knight.is_field_attacked(match, color, srcx, srcy)):
+    if(knight.is_field_touched(match, color, srcx, srcy)):
         return True
 
-    if(king.is_field_attacked(match, color, srcx, srcy)):
+    if(king.is_field_touched(match, color, srcx, srcy)):
         return True
 
-    if(pawn.is_field_attacked(match, color, srcx, srcy)):
+    if(pawn.is_field_touched(match, color, srcx, srcy)):
         return True
 
     return False
@@ -287,7 +287,7 @@ def is_king_attacked(match, x1, y1):
 
     color = Match.color_of_piece(king)
 
-    return is_field_attacked(match, Match.REVERSED_COLORS[color], x1, y1)
+    return is_field_touched(match, Match.REVERSED_COLORS[color], x1, y1)
 
 
 def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
@@ -299,9 +299,9 @@ def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
     color = Match.color_of_piece(piece)
 
     if(color == Match.COLORS['white']):
-        flag = is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
+        flag = is_field_touched(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
     else:
-        flag = is_field_attacked(match,  Match.COLORS['white'], match.bKg_x, match.bKg_y)
+        flag = is_field_touched(match,  Match.COLORS['white'], match.bKg_x, match.bKg_y)
         
     match.writefield(dstx, dsty, dstpiece)
     match.writefield(srcx, srcy, piece)
@@ -333,10 +333,10 @@ def game_status(match):
         return Match.STATUS['open']
     else:
         if(match.next_color() == Match.COLORS['white']):
-            if(is_field_attacked(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)):
+            if(is_field_touched(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)):
                 return Match.STATUS['winner_black']
         else:
-            if(is_field_attacked(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)):
+            if(is_field_touched(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)):
                 return Match.STATUS['winner_white']
 
     return Match.STATUS['draw']

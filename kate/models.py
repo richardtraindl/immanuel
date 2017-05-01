@@ -36,19 +36,19 @@ class Match(models.Model):
     }
 
     PIECES_COLOR = {
-        'blk' : COLORS['undefined'],
-        'wKg' : COLORS['white'],
-        'wPw' : COLORS['white'],
-        'wRk' : COLORS['white'],
-        'wKn' : COLORS['white'],
-        'wBp' : COLORS['white'],
-        'wQu' : COLORS['white'],
-        'bKg' : COLORS['black'],
-        'bPw' : COLORS['black'],
-        'bRk' : COLORS['black'],
-        'bKn' : COLORS['black'],
-        'bBp' : COLORS['black'],
-        'bQu' : COLORS['black']
+        PIECES['blk'] : COLORS['undefined'],
+        PIECES['wKg'] : COLORS['white'],
+        PIECES['wPw'] : COLORS['white'],
+        PIECES['wRk'] : COLORS['white'],
+        PIECES['wKn'] : COLORS['white'],
+        PIECES['wBp'] : COLORS['white'],
+        PIECES['wQu'] : COLORS['white'],
+        PIECES['bKg'] : COLORS['black'],
+        PIECES['bPw'] : COLORS['black'],
+        PIECES['bRk'] : COLORS['black'],
+        PIECES['bKn'] : COLORS['black'],
+        PIECES['bBp'] : COLORS['black'],
+        PIECES['bQu'] : COLORS['black']
     }
 
     EXPORT_PIECES = {
@@ -267,15 +267,12 @@ class Match(models.Model):
 
     @staticmethod
     def color_of_piece(piece):
-        str_piece = helper.reverse_lookup(Match.PIECES, piece)
-        return Match.PIECES_COLOR[str_piece]
-        """if(piece >= Match.PIECES['wKg'] and piece <= Match.PIECES['wQu']):
-            return Match.COLORS['white']
-        elif(piece >= Match.PIECES['bKg'] and piece <= Match.PIECES['bQu']):
-            return Match.COLORS['black']
-        else:
-            return Match.COLORS['undefined']"""
+        return Match.PIECES_COLOR[piece]
 
+    @staticmethod
+    def oppcolor_of_piece(piece):
+        color = Match.PIECES_COLOR[piece]
+        return Match.REVERSED_COLORS[color]
 
     @staticmethod
     def koord_to_index(koord):
@@ -293,10 +290,10 @@ class Match(models.Model):
 
 
     @classmethod
-    def remove_outdated_threads(cls, match):
+    def remove_threads(cls, match):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
-                if(item.match.id == match.id or item.is_alive() == False):
+                if(item.match.id == match.id and item.is_alive() == False):
                     cls._immanuels_threads_list.remove(item)
                     item.join()
 

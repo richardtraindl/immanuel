@@ -38,7 +38,7 @@ GEN_STEPS = [ [[0, 1, blank]],
               [[-2, 0, blank]] ]
 
 
-def is_field_attacked(match, color, fieldx, fieldy):
+def is_field_touched(match, color, fieldx, fieldy):
     for i in range(8):
         x1 = fieldx + STEPS[i][0]
         y1 = fieldy + STEPS[i][1]
@@ -143,7 +143,7 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
             if(piece == Match.PIECES['blk']):
                 continue
             if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_attacked(match, opp_color, x1, y1)):
+                if(rules.is_field_touched(match, opp_color, x1, y1)):
                     if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
                         priority = min(priority, 3)
                     else:
@@ -176,7 +176,7 @@ def score_supports_of_attacked(match, srcx, srcy):
             if(piece == Match.PIECES['blk']):
                 continue
             if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_attacked(match, opp_color, x1, y1)):
+                if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += Match.SUPPORTED_SCORES[piece]
 
     return score 
@@ -237,7 +237,7 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     match.writefield(srcx, srcy, Match.PIECES['blk'])
     for i in range(3):
         castlingx = srcx + i
-        attacked = rules.is_field_attacked(match, opp_color, castlingx, srcy)
+        attacked = rules.is_field_touched(match, opp_color, castlingx, srcy)
         if(attacked == True):            
             match.writefield(srcx, srcy, king)
             return False
@@ -273,7 +273,7 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     match.writefield(srcx, srcy, Match.PIECES['blk'])
     for i in range(0, -3, -1):
         castlingx = srcx + i
-        attacked = rules.is_field_attacked(match, opp_color, castlingx, srcy)
+        attacked = rules.is_field_touched(match, opp_color, castlingx, srcy)
         if(attacked == True):
             match.writefield(srcx, srcy, king)
             return False
@@ -301,7 +301,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
     captured = match.readfield(dstx, dsty)
     match.writefield(srcx, srcy, Match.PIECES['blk'])
     match.writefield(dstx, dsty, king)
-    attacked = rules.is_field_attacked(match, opp_color, dstx, dsty)
+    attacked = rules.is_field_touched(match, opp_color, dstx, dsty)
     match.writefield(srcx, srcy, king)
     match.writefield(dstx, dsty, captured)
     if(attacked == True):

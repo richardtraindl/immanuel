@@ -19,22 +19,22 @@ def analyse(match):
             piece = match.readfield(x1, y1)
             if(color == Match.color_of_piece(piece)):
                 if(piece == Match.PIECES['wPw'] or Match.PIECES['bPw']):
-                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         pw_analyses.append("pw")
                 elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
-                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         rk_analyses.append("rk")
                 elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
-                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         bp_analyses.append("bp")
                 elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
-                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         kn_analyses.append("kn")
                 elif(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
-                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         qu_analyses.append("qu")
                 else:
-                    if( rules.is_field_attacked(match, opp_color, x1, y1) ):
+                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         analyses.append("kg")
 
     analyses.extend(qu_analyses)
@@ -49,14 +49,28 @@ def analyse(match):
 def is_capture(match, move):
     dstpiece = match.readfield(move.dstx, move.dsty)
     if(dstpiece != Match.PIECES['blk']):
-        return True
+        piece = match.readfield(move.srcx, move.srcy)
+        match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+        if(rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty)):
+            match.writefield(move.srcx, move.srcy, piece)
+            return True, 2 # priority
+        else:
+            match.writefield(move.srcx, move.srcy, piece)
+            return True, 1 # priority
     else:
         piece = match.readfield(move.srcx, move.srcy)
         if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
             if(move.srcx != move.dstx and dstpiece == Match.PIECES['blk']):
-                return True
+                piece = match.readfield(move.srcx, move.srcy)
+                match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+                if( rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty) ):
+                    match.writefield(move.srcx, move.srcy, piece)
+                    return True, 2 # priority
+                else:
+                    match.writefield(move.srcx, move.srcy, piece)
+                    return True, 1 # priority
 
-    return False
+    return False, 0  # priority
 
 
 def is_promotion(match, move):
@@ -86,12 +100,8 @@ def does_support_attacked(match, move):
 def does_attacked_flee(match, move):
     opp_color = Match.REVERSED_COLORS[match.next_color()]
     
-    if( rules.is_field_attacked(match, opp_color, move.srcx, move.srcy) ):
-        piece = match.readfield(move.srcx, move.srcy)
-        if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
-            return True, 3
-        else:
-            return True, 2
+    if( rules.is_field_touched(match, opp_color, move.srcx, move.srcy) ):
+        return True, 2
 
     return False, 0
 
@@ -125,7 +135,7 @@ def pieces_attacked(match, color):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
             if(Match.color_of_piece(piece) == opp_color):
-                if(rules.is_field_attacked(match, opp_color, x, y)):
+                if(rules.is_field_touched(match, opp_color, x, y)):
                     return True
             else:
                 continue
