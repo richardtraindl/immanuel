@@ -68,7 +68,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
                 pin_dir = rules.pin_dir(match, x1, y1)
-                direction = bp_dir(srcx, srcy, x1, y1)
+                direction = kg_dir(srcx, srcy, x1, y1)
                 if(pin_dir == direction):
                     return True, 1 # priority
                 else:

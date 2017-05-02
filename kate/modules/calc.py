@@ -15,14 +15,13 @@ def prnt_move(msg, move):
             print(helper.reverse_lookup(Match.PIECES, move.prom_piece), end="")
 
 
-def prnt_candidates(msg, candidates):
-    if(candidates[0] == None):
+def prnt_moves(msg, moves):
+    if(moves[0] == None):
         print("no move.....")
     else:
         print(msg, end=" ")
-        candmsg = "["
-        for cand in candidates[:9]:
-            prnt_move(candmsg, cand)
+        for move in moves[:9]:
+            prnt_move("[", move)
             print("] ", end="")
 
 
@@ -292,7 +291,7 @@ def select_maxcnt(match, depth, priorities):
     elif(depth <= limit):
         return max( (priorities[0] + priorities[1] + priorities[2]), counts[depth-1] )
     elif(depth <= limit + 3):
-        return min( (priorities[0] + priorities[1] + priorities[2]), counts[depth-1] )
+        return (priorities[0] + priorities[1] + priorities[2])
     else:
         return priorities[0]
 
@@ -327,10 +326,15 @@ def calc_max(match, depth, alpha, beta):
                 thread.populate_search(gmove)
                 thread.populate_candiates(candidates)
 
+            print("------------------------------------------------------------")
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
-            msg = "    CANDIDATES: "
-            prnt_candidates(msg, candidates)
+
+            msg = "\nCURR SEARCH: "
+            prnt_moves(msg, search_candidates)
+
+            msg = "\nCANDIDATES: "
+            prnt_moves(msg, candidates)
             print(" score: " + str(score) + " / maxscore: " + str(maxscore))
 
         kate.undo_move(match, True)
@@ -391,10 +395,15 @@ def calc_min(match, depth, alpha, beta):
                 thread.populate_search(gmove)
                 thread.populate_candiates(candidates)
 
+            print("------------------------------------------------------------")
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
+
+            msg = "\nCURR SEARCH: "
+            prnt_moves(msg, search_candidates)
+
             msg = "    CANDIDATES: "
-            prnt_candidates(msg, candidates)
+            prnt_moves(msg, candidates)
             print(" score: " + str(score) + " / minscore: " + str(minscore))
 
         if(score < minscore):
@@ -436,7 +445,7 @@ def calc_move(match):
         score, candidates = calc_min(match, 1, -200000, 200000)
 
     msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
-    prnt_candidates(msg, candidates)
+    prnt_moves(msg, candidates)
 
     end = time.time()
     print( (end - start) / 60 )

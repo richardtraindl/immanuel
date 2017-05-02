@@ -56,7 +56,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                     return True, 1 # priority
                 else:                  
                     pin_dir = rules.pin_dir(match, x1, y1)
-                    direction = bp_dir(srcx, srcy, x1, y1)
+                    direction = rk_dir(srcx, srcy, x1, y1)
                     if(pin_dir == direction):
                         return True, 1 # priority
                     else:
