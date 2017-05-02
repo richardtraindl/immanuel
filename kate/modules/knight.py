@@ -62,12 +62,18 @@ def does_attack(match, srcx, srcy, dstx, dsty):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
-                    priority = min(priority, 3)
-                elif(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+                if(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
                     return True, 1 # priority
-                else:
-                    priority = min(priority, 2)
+                else:                  
+                    pin_dir = rules.pin_dir(match, x1, y1)
+                    direction = bp_dir(srcx, srcy, x1, y1)
+                    if(pin_dir == direction):
+                        return True, 1 # priority
+                    else:
+                        if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
+                            priority = min(priority, 3)
+                        else:
+                            priority = min(priority, 2)
 
     if(priority == 5):
         return False, 0
