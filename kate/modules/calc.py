@@ -294,7 +294,7 @@ def select_maxcnt(match, depth, priorities):
     elif(depth <= limit + 3):
         return min( (priorities[0] + priorities[1] + priorities[2]), counts[depth-1] )
     else:
-        return priorities[0] + priorities[1]
+        return priorities[0]
 
 
 def calc_max(match, depth, alpha, beta):
