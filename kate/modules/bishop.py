@@ -110,7 +110,10 @@ def score_attacks(match, srcx, srcy):
                 pin_dir = rules.pin_dir(match, x1, y1)
                 direction = bp_dir(srcx, srcy, x1, y1)
                 if(pin_dir == direction):
-                    score += Match.ATTACKED_SCORES[piece] // 2
+                    if(piece == Match.PIECES['wbp'] or piece == Match.PIECES['bbp'] or piece == Match.PIECES['wqu'] or piece == Match.PIECES['bqu']):
+                        score += Match.ATTACKED_SCORES[piece] // 4
+                    else:
+                        score += Match.ATTACKED_SCORES[piece] // 2     
 
     return score
 
