@@ -236,16 +236,16 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
 
 def select_maxcnt(match, depth, priorities):
     if(match.level == Match.LEVELS['blitz']):
-        counts = [16, 16, 16, 16, 8, 8, 8, 8, 4, 0]
+        counts = [16, 16, 16, 8, 8, 4, 4, 4, 4, 0]
         limit = 1
     elif(match.level == Match.LEVELS['low']):
-        counts = [32, 16, 16, 16, 8, 8, 8, 8, 4, 0]
+        counts = [24, 16, 16, 8, 8, 4, 4, 4, 4, 0]
         limit = 2
     elif(match.level == Match.LEVELS['medium']):
-        counts = [200, 32, 16, 16, 16, 8, 8, 8, 4, 0]
+        counts = [32, 16, 16, 8, 8, 8, 4, 4, 4, 0]
         limit = 3
     else:
-        counts = [200, 200, 32, 16, 16, 8, 8, 8, 4, 0]
+        counts = [200, 200, 32, 16, 8, 8, 4, 4, 4, 0]
         limit = 4
 
     if(depth >= 10):
@@ -253,9 +253,9 @@ def select_maxcnt(match, depth, priorities):
     elif(depth <= limit):
         return max( (priorities[0] + priorities[1] + priorities[2]), counts[depth-1] )
     elif(depth <= limit + 3):
-        return (priorities[0] + priorities[1] + priorities[2])
+        return min( (priorities[0] + priorities[1] + priorities[2]), counts[depth-1] )
     else:
-        return priorities[0]
+        return min( priorities[0], counts[depth-1] )
 
 
 def calc_max(match, depth, alpha, beta):
@@ -272,7 +272,7 @@ def calc_max(match, depth, alpha, beta):
 
     if(maxcnt == 0):
         return match.score + calc_helper.evaluate_position(match), candidates
-
+        
     for pmove in prio_moves[:maxcnt]:
         gmove = pmove[1]
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
