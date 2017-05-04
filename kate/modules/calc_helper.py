@@ -118,13 +118,13 @@ def does_attacked_flee(match, move):
 
 
 def is_endgame_move(match, move):
-    if(match.count > 40):
+    if(match.count > 60):
         if(pawn.is_running(match, move)):
             return True, 1
         else:
             piece = match.readfield(move.srcx, move.srcy)
             if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
-                return True, 3
+                return True, 2
 
     return False, 0
 
