@@ -89,7 +89,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                     return True, 1 # priority
                 else:
                     pin_dir = rules.pin_dir(match, x1, y1)
-                    if(pin_dir == rules.DIRS['undefined']):
+                    if(pin_dir != rules.DIRS['undefined']):
                         return True, 1 # priority
                     else:
                         priority = min(priority, 2)
