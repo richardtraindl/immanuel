@@ -52,7 +52,7 @@ def is_capture(match, move):
     dstpiece = match.readfield(move.dstx, move.dsty)
 
     if(dstpiece != Match.PIECES['blk']):
-        pin_dir = rules.pin_dir(match, (move.dstx, (move.dsty)
+        pin_dir = rules.pin_dir(match, move.dstx, move.dsty)
         if(pin_dir != rules.DIRS['undefined']):
             return True, 1 # priority
 
@@ -69,7 +69,7 @@ def is_capture(match, move):
     else:
         if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
             if(move.srcx != move.dstx and dstpiece == Match.PIECES['blk']):
-                pin_dir = rules.pin_dir(match, (move.dstx, (move.dsty)
+                pin_dir = rules.pin_dir(match, move.dstx, move.dsty)
                 if(pin_dir != rules.DIRS['undefined']):
                     return True, 1 # priority
 
