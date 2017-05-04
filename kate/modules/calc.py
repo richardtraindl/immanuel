@@ -248,19 +248,19 @@ def select_maxcnt(match, depth, priorities):
     if(match.level == Match.LEVELS['blitz']):
         counts = [16, 8, 8, 4, 4, 2]
         limit = 1
-        midlimit = MAXCNT - 3
+        midlimit = min(3, MAXCNT)
     elif(match.level == Match.LEVELS['low']):
         counts = [16, 16, 8, 8, 4, 4]
         limit = 2
-        midlimit = MAXCNT - 2
+        midlimit = min(4, MAXCNT)
     elif(match.level == Match.LEVELS['medium']):
         counts = [32, 16, 16, 8, 8, 4]
         limit = 3
-        midlimit = MAXCNT - 1
+        midlimit = min(5, MAXCNT)
     else:
         counts = [200, 16, 16, 8, 8, 8]
         limit = 4
-        midlimit = MAXCNT
+        midlimit = min(6, MAXCNT)
 
     if(depth > 10):
         return 0
@@ -269,7 +269,7 @@ def select_maxcnt(match, depth, priorities):
     elif(depth <= midlimit):
         return min( (priorities[0] + priorities[1] + priorities[2]), counts[depth-1] )
     else:
-        return priorities[0]
+        return  min( priorities[0], 2)
 
 
 def calc_max(match, depth, alpha, beta):
