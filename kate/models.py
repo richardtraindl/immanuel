@@ -51,6 +51,22 @@ class Match(models.Model):
         PIECES['bQu'] : COLORS['black']
     }
 
+    PIECES_RANK = {
+        PIECES['blk'] : 0,
+        PIECES['wPw'] : 1,
+        PIECES['bPw'] : 1,
+        PIECES['wKn'] : 2,
+        PIECES['bKn'] : 2,
+        PIECES['wBp'] : 2,
+        PIECES['bBp'] : 2,
+        PIECES['wRk'] : 4,
+        PIECES['bRk'] : 4,
+        PIECES['wQu'] : 5,
+        PIECES['bQu'] : 5,
+        PIECES['wKg'] : 6,
+        PIECES['bKg'] : 6
+    }
+
     EXPORT_PIECES = {
         0 : '0',
         1 : '1',
