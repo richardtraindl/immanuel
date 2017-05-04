@@ -47,21 +47,32 @@ def analyse(match):
 
 
 def is_capture(match, move):
+    piece = match.readfield(move.srcx, move.srcy)
+
     dstpiece = match.readfield(move.dstx, move.dsty)
+
     if(dstpiece != Match.PIECES['blk']):
-        piece = match.readfield(move.srcx, move.srcy)
+        pin_dir = rules.pin_dir(match, (move.dstx, (move.dsty)
+        if(pin_dir != rules.DIRS['undefined']):
+            return True, 1 # priority
+
         match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
         if(rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty)):
             match.writefield(move.srcx, move.srcy, piece)
-            return True, 2 # priority
+            if(Match.PIECES_RANK[piece] <= Match.PIECES_RANK[dstpiece]):
+                return True, 2 # priority
+            else:
+                return True, 3 # priority
         else:
             match.writefield(move.srcx, move.srcy, piece)
             return True, 1 # priority
     else:
-        piece = match.readfield(move.srcx, move.srcy)
         if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']):
             if(move.srcx != move.dstx and dstpiece == Match.PIECES['blk']):
-                piece = match.readfield(move.srcx, move.srcy)
+                pin_dir = rules.pin_dir(match, (move.dstx, (move.dsty)
+                if(pin_dir != rules.DIRS['undefined']):
+                    return True, 1 # priority
+
                 match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
                 if( rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty) ):
                     match.writefield(move.srcx, move.srcy, piece)
