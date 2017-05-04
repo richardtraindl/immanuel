@@ -244,9 +244,9 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
 
 def select_maxcnt(match, depth, priorities):
     if(match.level == Match.LEVELS['blitz']):
-        counts = [16, 16, 8, 4, 4, 4, 0, 0, 0, 0]
+        counts = [16, 8, 8, 4, 4, 2, 2, 2, 2, 2]
         limit = 1
-        midlimit = 3
+        midlimit = 4
     elif(match.level == Match.LEVELS['low']):
         counts = [16, 16, 16, 8, 8, 4, 2, 0, 0, 0]
         limit = 2
@@ -260,7 +260,9 @@ def select_maxcnt(match, depth, priorities):
         limit = 4
         midlimit = 6
 
-    if(depth <= limit):
+    if(depth > 10):
+        return 0
+    elif(depth <= limit):
         return max( (priorities[0] + priorities[1] + priorities[2]), counts[depth-1] )
     elif(depth <= midlimit):
         return min( (priorities[0] + priorities[1] + priorities[2]), counts[depth-1] )
