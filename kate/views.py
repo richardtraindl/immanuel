@@ -93,10 +93,12 @@ def match(request, matchid=None, switch=0, msg=None):
     thread = Match.get_active_thread(match)
     if(thread and thread.running):
         immanuel[0] = True
-        if(thread.candidates[0]):
+        immanuel[1] = ""
+        immanuel[2] = ""
+        if(thread.search):
             gmove = thread.search
-            immanuel[1] = Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
-            immanuel[2] = ""
+            immanuel[1] += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+        if(thread.candidates[0]):
             for cand in thread.candidates[:3]:
                 immanuel[2] += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
     else:
