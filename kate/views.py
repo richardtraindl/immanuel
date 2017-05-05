@@ -95,10 +95,17 @@ def match(request, matchid=None, switch=0, msg=None):
         if(thread.search):
             gmove = thread.search
             immanuel += "search: " + Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+        else:
+            immanuel = "no search found"
+
         if(thread.candidates[0]):
             immanuel += "candidates: "
             for cand in thread.candidates[:3]:
                 immanuel += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
+        else:
+            immanuel = "no candidates found"
+    else:
+        immanuel = "no thread found"
 
     return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'immanuel': immanuel } )
 
