@@ -89,7 +89,20 @@ def match(request, matchid=None, switch=0, msg=None):
     else:
         rangeobj = range(7, -1, -1)
 
-    return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj } )
+    immanuel = [None] * 3
+    thread = Match.get_active_thread(match)
+    if(thread and thread.running):
+        immanuel[0] = True
+        if(thread.candidates[0]):
+            gmove = thread.search
+            immanuel[1] = Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+            immanuel[2] = ""
+            for cand in thread.candidates[:3]:
+                immanuel[2] += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
+    else:
+        immanuel[0] = False
+
+    return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'immanuel': immanuel } )
 
 
 def new(request):
@@ -205,7 +218,7 @@ def do_move(request, matchid):
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
 
 
-def force_move(request, matchid, switch=None):
+def force_move(request, matchid, switch=0):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
 
@@ -222,7 +235,7 @@ def force_move(request, matchid, switch=None):
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
 
 
-def undo_move(request, matchid, switch=None):
+def undo_move(request, matchid, switch=0):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
 
@@ -238,7 +251,7 @@ def undo_move(request, matchid, switch=None):
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
 
 
-def resume(request, matchid, switch=None):
+def resume(request, matchid, switch=0):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
     calc_move_for_immanuel(match)
