@@ -54,17 +54,16 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             if(Match.color_of_piece(piece) == opp_color):
                 if(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
                     return True, 1 # priority
-                else:                  
-                    pin_dir = rules.pin_dir(match, x1, y1)
-                    if(pin_dir != rules.DIRS['undefined']):
-                        return True, 1 # priority
-                    else:
-                        if(Match.PIECES_RANK[bishop] <= Match.PIECES_RANK[piece]):
+                else:    
+                    if(rules.is_field_touched(match, opp_color, x1, y1)):                      
+                        if(Match.PIECES_RANK[piece]) >= Match.PIECES_RANK[bishop]):
                             priority = min(priority, 2)
                         else:
                             priority = min(priority, 3)
-
-    if(priority == 5):
+                    else:
+                        priority = min(priority, 2)
+                            
+     f(priority == 5):
         return False, 0
     else:
         return True, priority
