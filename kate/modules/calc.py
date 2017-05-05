@@ -54,11 +54,13 @@ def rank_move(match, gmove):
         if(priority == prio1):
             return priority
 
-    if( calc_helper.is_promotion(match, gmove) ):
-        return prio1
+    promotion, priority = calc_helper.is_promotion(match, gmove) 
+    if(promotion):
+        return priority
     
-    if( calc_helper.is_castling(match, gmove) ):
-        return prio1
+    castling, priority = calc_helper.is_castling(match, gmove)
+    if(castling):
+        return priority
 
     attack, prio = calc_helper.does_attack(match, gmove)
     if(attack):
