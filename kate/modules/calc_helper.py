@@ -52,7 +52,8 @@ def is_capture(match, move):
     dstpiece = match.readfield(move.dstx, move.dsty)
 
     if(dstpiece != Match.PIECES['blk']):
-        pin_dir = rules.pin_dir(match, move.dstx, move.dsty)
+        return True, 1 # priority
+        """pin_dir = rules.pin_dir(match, move.dstx, move.dsty)
         if(pin_dir != rules.DIRS['undefined']):
             return True, 1 # priority
 
@@ -66,12 +67,11 @@ def is_capture(match, move):
                 return True, 2 # priority
         else:
             match.writefield(move.srcx, move.srcy, piece)
-            return True, 1 # priority
+            return True, 1 # priority"""
+    elif( (piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']) and move.srcx != move.dstx ):
+        return True, 1 # priority
     else:
-        if( (piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']) and move.srcx != move.dstx ):
-            return True, 1 # priority
-
-    return False, 0  # priority
+        return False, 0  # priority
 
 
 def is_promotion(match, move):
@@ -103,20 +103,22 @@ def does_attacked_flee(match, move):
     
     if( rules.is_field_touched(match, opp_color, move.srcx, move.srcy) ):
         return True, 2 # priority
-
-    return False, 0 # priority
+    else:
+        return False, 0 # priority
 
 
 def is_endgame_move(match, move):
     if(match.count > 60):
         if(pawn.is_running(match, move)):
-            return True, 1 # priority
+            return True, 2 # priority
         else:
             piece = match.readfield(move.srcx, move.srcy)
             if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
-                return True, 2 # priority
-
-    return False, 0 # priority
+                return True, 3 # priority
+            else:
+                return False, 0 # priority
+    else:
+        return False, 0 # priority
 
 
 """

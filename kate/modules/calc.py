@@ -190,7 +190,7 @@ class immanuelsThread(threading.Thread):
         self.name = name
         self.running = True
         self.match = copy.deepcopy(match)
-        self.search = [None]
+        self.search = None
         self.candidates = [None] * 10
 
         Match.remove_threads(match)
@@ -250,7 +250,7 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
 
 def select_maxcnt(match, depth, priorities):
     if(match.level == Match.LEVELS['blitz']):
-        maxdepth = 4
+        maxdepth = 6
         counts = [16, 8]
         limit = 2
         midlimit = 4
@@ -314,6 +314,7 @@ def calc_max(match, depth, alpha, beta):
             print("\n------------------------------------------------------------")
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
+            print(" " + str(pmove[1]) + " " + str(pmove[2]), end="")
 
             msg = "\nCURR SEARCH: "
             prnt_moves(msg, search_candidates)
@@ -384,6 +385,7 @@ def calc_min(match, depth, alpha, beta):
             print("\n------------------------------------------------------------")
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
+            print(" " + str(pmove[1]) + " " + str(pmove[2]), end="")
 
             msg = "\nCURR SEARCH: "
             prnt_moves(msg, search_candidates)

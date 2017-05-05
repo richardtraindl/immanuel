@@ -69,12 +69,12 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             if(Match.color_of_piece(piece) == opp_color):
                 pin_dir = rules.pin_dir(match, x1, y1)
                 if(pin_dir != rules.DIRS['undefined']):
-                    return True, 1 # priority
+                    return True, 2 # priority
                 else:
                     if(rules.is_field_touched(match, opp_color, x1, y1)):
-                        priority = min(priority, 2)
+                        priority = min(priority, 3)
                     else:
-                        return True, 1 # priority
+                        return True, 2 # priority
 
     if(priority == 5):
         return False, 0
@@ -150,9 +150,9 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
-                        return True, 1 # priority
+                        return True, 2 # priority
                     else:
-                        priority = min(priority, 2)
+                        priority = min(priority, 3)
 
     if(priority == 5):
         return False, 0
