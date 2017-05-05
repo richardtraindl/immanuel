@@ -158,12 +158,7 @@
 
         {% if match.is_immanuel %}
             <div id="candidate">
-                {% if immanuel[0] == False %}
-                    <p>&nbsp;</p>
-                {% else %}
-                    <p>search: {{ immanuel[1] }} </p>
-                    <p>candidates: {{ immanuel[2] }} </p>
-                {% endif %}
+                <p>&nbsp; {{ immanuel }} </p>
             </div>
         {% endif %}
 
