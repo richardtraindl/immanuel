@@ -58,7 +58,7 @@ def is_capture(match, move):
 
         match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
         if(rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty)):
-             if(Match.PIECES_RANK[dstpiece] >= Match.PIECES_RANK[piece]):
+            if(Match.PIECES_RANK[dstpiece] >= Match.PIECES_RANK[piece]):
                 match.writefield(move.srcx, move.srcy, piece)
                 return True, 1 # priority
             else:
