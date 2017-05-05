@@ -69,10 +69,13 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                     if(pin_dir != rules.DIRS['undefined']):
                         return True, 1 # priority
                     else:
-                        if(Match.PIECES_RANK[knight] <= Match.PIECES_RANK[piece]):
-                            priority = min(priority, 2)
+                        if(rules.is_field_touched(match, opp_color, x1, y1)):
+                            if(Match.PIECES_RANK[piece]) >= Match.PIECES_RANK[knight]):
+                                priority = min(priority, 2)
+                            else:
+                                priority = min(priority, 3)
                         else:
-                            priority = min(priority, 3)
+                            priority = min(priority, 2)
 
     if(priority == 5):
         return False, 0
