@@ -74,7 +74,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                     if(rules.is_field_touched(match, opp_color, x1, y1)):
                         priority = min(priority, 2)
                     else:
-                        priority = min(priority, 1)
+                        return True, 1 # priority
 
     if(priority == 5):
         return False, 0
