@@ -67,7 +67,14 @@ def does_attack(match, srcx, srcy, dstx, dsty):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                return True, 1 # priority
+                pin_dir = rules.pin_dir(match, x1, y1)
+                if(pin_dir != rules.DIRS['undefined']):
+                    return True, 1 # priority
+                else:
+                    if(rules.is_field_touched(match, opp_color, x1, y1)):
+                        priority = min(priority, 2)
+                    else:
+                        priority = min(priority, 1)
 
     if(priority == 5):
         return False, 0
