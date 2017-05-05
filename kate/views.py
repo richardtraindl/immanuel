@@ -89,20 +89,16 @@ def match(request, matchid=None, switch=0, msg=None):
     else:
         rangeobj = range(7, -1, -1)
 
-    immanuel = [None] * 3
+    immanuel = ""
     thread = Match.get_active_thread(match)
     if(thread and thread.running):
-        immanuel[0] = True
-        immanuel[1] = ""
-        immanuel[2] = ""
         if(thread.search):
             gmove = thread.search
-            immanuel[1] += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+            immanuel += "search: " + Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
         if(thread.candidates[0]):
+            immanuel += "candidates: "
             for cand in thread.candidates[:3]:
-                immanuel[2] += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
-    else:
-        immanuel[0] = False
+                immanuel += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
 
     return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'immanuel': immanuel } )
 
