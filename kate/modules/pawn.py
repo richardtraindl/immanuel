@@ -97,7 +97,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
     if(priority == 5):
         return False, 0
     else:
-        return True, priority
+        return True, priority 
 
 
 def count_attacks(match, srcx, srcy, dstx, dsty):
