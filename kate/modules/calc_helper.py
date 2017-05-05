@@ -76,18 +76,18 @@ def is_capture(match, move):
 
 def is_promotion(match, move):
     if(move.prom_piece == Match.PIECES['blk']):
-        return False
+        return False, 0 # priority
     else:
-        return True
+        return True, 1 # priority
 
 
 def is_castling(match, move):
     piece = match.readfield(move.srcx, move.srcy)
     if(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
         if(move.srcx - move.dstx == 2 or move.srcx - move.dstx == -2):
-            return True
+            return True, 1 # priority
 
-    return False
+    return False, 0 # priority
 
 
 def does_attack(match, move):
@@ -102,21 +102,21 @@ def does_attacked_flee(match, move):
     opp_color = Match.REVERSED_COLORS[match.next_color()]
     
     if( rules.is_field_touched(match, opp_color, move.srcx, move.srcy) ):
-        return True, 2
+        return True, 2 # priority
 
-    return False, 0
+    return False, 0 # priority
 
 
 def is_endgame_move(match, move):
     if(match.count > 60):
         if(pawn.is_running(match, move)):
-            return True, 1
+            return True, 1 # priority
         else:
             piece = match.readfield(move.srcx, move.srcy)
             if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
-                return True, 2
+                return True, 2 # priority
 
-    return False, 0
+    return False, 0 # priority
 
 
 """
