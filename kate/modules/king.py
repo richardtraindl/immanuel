@@ -256,7 +256,7 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
 
     opp_color = Match.REVERSED_COLORS[color]
 
-    for i in range(1, 3, 1):
+    for i in range(1, 4, 1):
         fieldx = srcx - i
         field = match.readfield(fieldx, srcy)
         if(field != Match.PIECES['blk']):
