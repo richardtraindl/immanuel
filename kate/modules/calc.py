@@ -292,7 +292,7 @@ def calc_max(match, depth, alpha, beta):
 
     maxcnt = select_maxcnt(match, depth, priorities)
 
-    if(maxcnt == 0):
+    if(maxcnt == 0 and len(prio_moves) > 0):
         return match.score + calc_helper.evaluate_position(match), candidates
         
     for pmove in prio_moves[:maxcnt]:
@@ -361,7 +361,7 @@ def calc_min(match, depth, alpha, beta):
 
     maxcnt = select_maxcnt(match, depth, priorities)
 
-    if(maxcnt == 0):
+    if(maxcnt == 0 and len(prio_moves) > 0):
         return match.score + calc_helper.evaluate_position(match), candidates
 
     for pmove in prio_moves[:maxcnt]:
