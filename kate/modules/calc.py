@@ -21,8 +21,9 @@ def prnt_moves(msg, moves):
     else:
         print(msg, end=" ")
         for move in moves[:9]:
-            prnt_move("[", move)
-            print("] ", end="")
+            if(move):
+                prnt_move("[", move)
+                print("] ", end="")
 
 
 class GenMove(object):
@@ -238,46 +239,42 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
     else:
         candidates[0] = gmove
 
-        if(search_candidates):
+        if(search_candidates[0]):
             idx = 1
             for cand in search_candidates[:9]:
                 if(cand):
                     candidates[idx] = cand
                     idx += 1
+                else:
+                    break
 
         return gmovescore
 
 
 def select_maxcnt(match, depth, priorities):
     if(match.level == Match.LEVELS['blitz']):
-        maxdepth = 6
-        counts = [16, 8]
+        maxdepth = 7
+        counts = [8, 6]
         limit = 2
-        midlimit = 4
     elif(match.level == Match.LEVELS['low']):
-        maxdepth = 8
-        counts = [16, 8]
+        maxdepth = 7
+        counts = [12, 6]
         limit = 2
-        midlimit = 4
     elif(match.level == Match.LEVELS['medium']):
-        maxdepth = 9
-        counts = [32, 16]
-        limit = 3
-        midlimit = 5
+        maxdepth = 8
+        counts = [16, 6]
+        limit = 2
     else:
         maxdepth = 10
         counts = [200, 16]
-        limit = 4
-        midlimit = 6
+        limit = 2
 
     if(depth > maxdepth or (priorities[0] + priorities[1] + priorities[2] + priorities[3]) == 0):
         return 0
     elif(depth <= limit):
-        return max( (priorities[0] + priorities[1] + priorities[2]), counts[0] )
-    elif(depth <= midlimit):
-        return max( (priorities[0] + priorities[1]), counts[1] )
+        return min( (priorities[0] + priorities[1] + priorities[2] + priorities[3]), counts[0] )
     else:
-        return  priorities[0]
+        return min( (priorities[0] + priorities[1] + priorities[2] + priorities[3]), counts[1] )
 
 
 def calc_max(match, depth, alpha, beta):
@@ -311,7 +308,7 @@ def calc_max(match, depth, alpha, beta):
                 thread.populate_search(gmove)
                 thread.populate_candiates(candidates)
 
-            print("\n------------------------------------------------------------")
+            print("\n____________________________________________________________")
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
             print(" p:" + str(pmove[1]) + " r:" + str(pmove[2]), end="")
@@ -319,9 +316,10 @@ def calc_max(match, depth, alpha, beta):
             msg = "\nCURR SEARCH: "
             prnt_moves(msg, search_candidates)
 
-            msg = "\nCANDIDATES: "
+            msg = "\nCANDIDATES:  "
             prnt_moves(msg, candidates)
             print(" score: " + str(score) + " / maxscore: " + str(maxscore))
+            print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         kate.undo_move(match, True)
 
@@ -329,23 +327,6 @@ def calc_max(match, depth, alpha, beta):
             maxscore = score
             if(maxscore > beta):
                 return maxscore, candidates
-
-    if(len(prio_moves) == 0):
-        print("NEVER")
-        status = rules.game_status(match)
-        if(status == Match.STATUS['winner_black']):
-            score = Match.SCORES[Match.PIECES['wKg']]
-        elif(status == Match.STATUS['winner_white']):
-            score = Match.SCORES[Match.PIECES['bKg']]
-        elif(status == Match.STATUS['draw']):
-            score = Match.SCORES[Match.PIECES['blk']]
-        else:
-            score = match.score
-
-        if(depth == 1):
-            print("\nmatch.id: " + str(match.id) + "   count: None" + "   calculate: " + str(score))
-
-        return score, candidates
 
     return maxscore, candidates
 
@@ -383,7 +364,7 @@ def calc_min(match, depth, alpha, beta):
                 thread.populate_search(gmove)
                 thread.populate_candiates(candidates)
 
-            print("\n------------------------------------------------------------")
+            print("\n____________________________________________________________")
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
             print(" p:" + str(pmove[1]) + " r:" + str(pmove[2]), end="")
@@ -391,31 +372,15 @@ def calc_min(match, depth, alpha, beta):
             msg = "\nCURR SEARCH: "
             prnt_moves(msg, search_candidates)
 
-            msg = "    CANDIDATES: "
+            msg = "    CANDIDATES:  "
             prnt_moves(msg, candidates)
             print(" score: " + str(score) + " / minscore: " + str(minscore))
+            print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         if(score < minscore):
             minscore = score
             if(minscore < alpha):
                 return minscore, candidates
-
-    if(len(prio_moves) == 0):
-        print("NEVER")
-        status = rules.game_status(match)
-        if(status == Match.STATUS['winner_black']):
-            score = Match.SCORES[Match.PIECES['wKg']]
-        elif(status == Match.STATUS['winner_white']):
-            score = Match.SCORES[Match.PIECES['bKg']]
-        elif(status == Match.STATUS['draw']):
-            score = Match.SCORES[Match.PIECES['blk']]
-        else:
-            score = match.score
-
-        if(depth == 1):
-            print("\nmatch.id: " + str(match.id) + "   count: None" + "   calculate: " + str(score))
-
-        return score, candidates
 
     return minscore, candidates
 

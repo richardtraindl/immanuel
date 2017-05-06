@@ -272,13 +272,13 @@ def evaluate_position(match, movecnt):
     else:  
         value = match.score
 
-        value += evaluate_contacts(match)
+        # value += evaluate_contacts(match)
 
-        if(match.count < 30):
-            value += evaluate_movecnt(match)
-            value += evaluate_developments(match)
-        else:
-            value += evaluate_endgame(match)
+        # if(match.count < 30):
+            # value += evaluate_movecnt(match)
+            # value += evaluate_developments(match)
+        # else:
+        #    value += evaluate_endgame(match)
 
         return value
 
