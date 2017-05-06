@@ -333,9 +333,9 @@ def calc_max(match, depth, alpha, beta):
     if(len(prio_moves) == 0):
         status = rules.game_status(match)
         if(status == Match.STATUS['winner_black']):
-            score = Match.SCORES[Match.PIECES['wKg']] - depth
+            score = Match.SCORES[Match.PIECES['wKg']]
         elif(status == Match.STATUS['winner_white']):
-            score = Match.SCORES[Match.PIECES['bKg']] + depth
+            score = Match.SCORES[Match.PIECES['bKg']]
         elif(status == Match.STATUS['draw']):
             score = Match.SCORES[Match.PIECES['blk']]
         else:
@@ -402,9 +402,9 @@ def calc_min(match, depth, alpha, beta):
     if(len(prio_moves) == 0):
         status = rules.game_status(match)
         if(status == Match.STATUS['winner_black']):
-            score = Match.SCORES[Match.PIECES['wKg']] - depth
+            score = Match.SCORES[Match.PIECES['wKg']]
         elif(status == Match.STATUS['winner_white']):
-            score = Match.SCORES[Match.PIECES['bKg']] + depth
+            score = Match.SCORES[Match.PIECES['bKg']]
         elif(status == Match.STATUS['draw']):
             score = Match.SCORES[Match.PIECES['blk']]
         else:
