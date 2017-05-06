@@ -271,7 +271,7 @@ def evaluate_position(match, movecnt):
             return Match.SCORES[Match.PIECES['blk']]
     else:  
         value = match.score
-
+        
         value += evaluate_contacts(match)
 
         if(match.count < 30):
