@@ -264,13 +264,15 @@ def evaluate_position(match, movecnt):
     if(movecnt == 0):
         status = rules.game_status(match)
         if(status == Match.STATUS['winner_black']):
-            return Match.SCORES[Match.PIECES['wKg']]
+            return ( Match.SCORES[Match.PIECES['wKg']] + match.count )
         elif(status == Match.STATUS['winner_white']):
-            return Match.SCORES[Match.PIECES['bKg']]
+            return ( Match.SCORES[Match.PIECES['bKg']] - match.count )
         else:   # Match.STATUS['draw']):
             return Match.SCORES[Match.PIECES['blk']]
-    else:    
-        value = evaluate_contacts(match)
+    else:  
+        value = match.score
+
+        value += evaluate_contacts(match)
 
         if(match.count < 30):
             value += evaluate_movecnt(match)

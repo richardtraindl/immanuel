@@ -101,7 +101,8 @@ def match(request, matchid=None, switch=0, msg=None):
         if(thread.candidates[0]):
             immanuel += "candidates: "
             for cand in thread.candidates[:3]:
-                immanuel += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
+                if(cand):
+                    immanuel += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
         else:
             immanuel = "no candidates found"
     else:
@@ -384,7 +385,8 @@ def fetch_match(request):
 
             data += "<br>move candidates: <br>"
             for cand in thread.candidates[:3]:
-                data += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
+                if(cand):
+                    data += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
             data += "</p>"
         else:
             data += "§"
