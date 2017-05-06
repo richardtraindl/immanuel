@@ -247,6 +247,8 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
                     idx += 1
                 else:
                     break
+        else:
+            candidates[1] = None
 
         return gmovescore
 
