@@ -260,14 +260,24 @@ def evaluate_endgame(match):
     return running
 
 
-def evaluate_position(match):
-    value = evaluate_contacts(match)
+def evaluate_position(match, movecnt):    
+    if(movecnt == 0):
+        status = rules.game_status(match)
+        if(status == Match.STATUS['winner_black']):
+            return Match.SCORES[Match.PIECES['wKg']]
+        elif(status == Match.STATUS['winner_white']):
+            return Match.SCORES[Match.PIECES['bKg']]
+        else:   # Match.STATUS['draw']):
+            return Match.SCORES[Match.PIECES['blk']]
+    else:    
+        value = evaluate_contacts(match)
 
-    if(match.count < 30):
-        value += evaluate_movecnt(match)
-        value += evaluate_developments(match)
-    else:
-        value += evaluate_endgame(match)
+        if(match.count < 30):
+            value += evaluate_movecnt(match)
+            value += evaluate_developments(match)
+        else:
+            value += evaluate_endgame(match)
 
-    return value
+        return value
+
 
