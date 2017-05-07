@@ -52,11 +52,6 @@ def is_capture(match, move):
     dstpiece = match.readfield(move.dstx, move.dsty)
 
     if(dstpiece != Match.PIECES['blk']):
-        return True, 1 # priority
-        """pin_dir = rules.pin_dir(match, move.dstx, move.dsty)
-        if(pin_dir != rules.DIRS['undefined']):
-            return True, 1 # priority
-
         match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
         if(rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty)):
             if(Match.PIECES_RANK[dstpiece] >= Match.PIECES_RANK[piece]):
