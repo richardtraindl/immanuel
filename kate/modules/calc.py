@@ -1,6 +1,6 @@
 from kate.models import Match, Move
 from kate.modules import helper, rules, pawn, rook, bishop, knight, queen, king, kate, openings, calc_helper, debug
-import random, threading, copy, time, humanfriendly
+import random, threading, copy, time, datetime
 from operator import itemgetter
 
 
@@ -405,7 +405,7 @@ def calc_move(match):
     prnt_moves(msg, candidates)
 
     end = time.time()
-    print(humanfriendly.format_timespan(end - start))
+    print( str(datetime.timedelta(end - start)) )
     return candidates[0]
 
 
