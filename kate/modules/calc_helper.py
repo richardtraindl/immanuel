@@ -94,10 +94,20 @@ def does_support_attacked(match, move):
 
 
 def does_attacked_flee(match, move):
-    opp_color = Match.REVERSED_COLORS[match.next_color()]
+    piece = match.readfield(move.srcx, move.srcy)
     
-    if( rules.is_field_touched(match, opp_color, move.srcx, move.srcy) ):
-        return True, 2 # priority
+    color = Match.color_of_piece(piece)
+    opp_color = Match.REVERSED_COLORS[color]
+
+    touched, opp_piece = rules.is_field_touched_ext(match, opp_color, move.srcx, move.srcy)
+    if(touched):
+        if(Match.PIECES_RANK[opp_piece] < Match.PIECES_RANK[piece]):
+            return True, 1 # priority
+        else:
+            if(rules.is_field_touched(match, color, move.srcx, move.srcy)):
+                return True, 3 # priority
+            else:
+                return True, 2 # priority
     else:
         return False, 0 # priority
 

@@ -45,6 +45,19 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
+def is_field_touched_ext(match, color, fieldx, fieldy):
+    for i in range(8):
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKn']) or
+                (color == Match.COLORS['black'] and piece == Match.PIECES['bKn']) ):
+                return True, piece
+
+    return False, Match.PIECES['blk']
+
+
 def does_attack(match, srcx, srcy, dstx, dsty):
     priority = 5
 

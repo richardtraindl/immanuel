@@ -34,6 +34,26 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
+def is_field_touched_ext(match, color, fieldx, fieldy):
+    piece = Match.PIECES['blk']
+    
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
+            newpiece = match.readfield(x1, y1)
+            if( (color == Match.COLORS['white'] and (newpiece == Match.PIECES['wQu'] or newpiece == Match.PIECES['wRk'])) or
+                (color == Match.COLORS['black'] and (newpiece == Match.PIECES['bQu'] or newpiece == Match.PIECES['bRk'])) ):
+                if(Match.PIECES_RANK[newpiece] < Match.PIECES_RANK[piece]):
+                    piece = newpiece
+
+    if(piece == Match.PIECES['blk']):
+        return False, Match.PIECES['blk']
+    else:
+        return True, piece
+
+
 def does_attack(match, srcx, srcy, dstx, dsty):
     priority = 5
 

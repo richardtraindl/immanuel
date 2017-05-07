@@ -184,11 +184,11 @@ def is_field_touched(match, color, srcx, srcy):
 
 
 def is_field_touched_ext(match, color, srcx, srcy):
-    touched, piece = rook.is_field_touched_ext(match, color, srcx, srcy)
+    touched, piece = king.is_field_touched_ext(match, color, srcx, srcy)
     if(touched):
         return touched, piece
 
-    touched, piece = bishop.is_field_touched_ext(match, color, srcx, srcy)
+    touched, piece = pawn.is_field_touched_ext(match, color, srcx, srcy)
     if(touched):
         return touched, piece
 
@@ -196,11 +196,11 @@ def is_field_touched_ext(match, color, srcx, srcy):
     if(touched):
         return touched, piece
 
-    touched, piece = king.is_field_touched_ext(match, color, srcx, srcy)
+    touched, piece = bishop.is_field_touched_ext(match, color, srcx, srcy)
     if(touched):
         return touched, piece
 
-    touched, piece = pawn.is_field_touched_ext(match, color, srcx, srcy)
+    touched, piece = rook.is_field_touched_ext(match, color, srcx, srcy)
     if(touched):
         return touched, piece
 
