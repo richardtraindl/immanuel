@@ -87,9 +87,9 @@ def retrieve_move(match):
             print("------------ opening move found! --------------")
             return gmove
         else:
-            print("############ 1: No opening move found! ###############")
+            print("############ No opening move found! ###############")
             return None
     else:
-        print("############ 2: No opening move found! ###############")
+        print("############ No opening move found! ###############")
         return None
 

@@ -336,8 +336,9 @@ def html_moves(match):
     if(match.black_player_human == False):
         htmlmoves += "<td><span class=\"fbold\">" + match.black_player + "</span></td>"
     else:
-        htmlmoves += "<td>" + match.black_player + "</td></tr>"
-    
+        htmlmoves += "<td>" + match.black_player + "</td>"
+    htmlmoves += "</tr>"
+
     currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
     if(currmove != None):
         if(currmove.count % 2 == 0):
