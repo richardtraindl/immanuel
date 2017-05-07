@@ -183,6 +183,30 @@ def is_field_touched(match, color, srcx, srcy):
     return False
 
 
+def is_field_touched_ext(match, color, srcx, srcy):
+    touched, piece = rook.is_field_touched_ext(match, color, srcx, srcy)
+    if(touched):
+        return touched, piece
+
+    touched, piece = bishop.is_field_touched_ext(match, color, srcx, srcy)
+    if(touched):
+        return touched, piece
+
+    touched, piece = knight.is_field_touched_ext(match, color, srcx, srcy)
+    if(touched):
+        return touched, piece
+
+    touched, piece = king.is_field_touched_ext(match, color, srcx, srcy)
+    if(touched):
+        return touched, piece
+
+    touched, piece = pawn.is_field_touched_ext(match, color, srcx, srcy)
+    if(touched):
+        return touched, piece
+
+    return False, Match.PIECES['blk']
+
+
 def does_attack(match, srcx, srcy, dstx, dsty):
     flag, priority = rook.does_attack(match, srcx, srcy, dstx, dsty)
     if(flag):
