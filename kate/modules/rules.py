@@ -184,27 +184,29 @@ def is_field_touched(match, color, srcx, srcy):
 
 
 def is_field_touched_ext(match, color, srcx, srcy):
-    touched, piece = king.is_field_touched_ext(match, color, srcx, srcy)
-    if(touched):
-        return touched, piece
+    fields = []
 
-    touched, piece = pawn.is_field_touched_ext(match, color, srcx, srcy)
+    touched, newfields = rook.is_field_touched_ext(match, color, srcx, srcy)
     if(touched):
-        return touched, piece
+        fields.extend(newfields)
 
-    touched, piece = knight.is_field_touched_ext(match, color, srcx, srcy)
+    touched, newfields = bishop.is_field_touched_ext(match, color, srcx, srcy)
     if(touched):
-        return touched, piece
-
-    touched, piece = bishop.is_field_touched_ext(match, color, srcx, srcy)
+        fields.extend(newfields)
+        
+    touched, newfields = knight.is_field_touched_ext(match, color, srcx, srcy)
     if(touched):
-        return touched, piece
+        fields.extend(newfields)
 
-    touched, piece = rook.is_field_touched_ext(match, color, srcx, srcy)
+    touched, newfields = king.is_field_touched_ext(match, color, srcx, srcy)
     if(touched):
-        return touched, piece
+        fields.extend(newfields)
 
-    return False, Match.PIECES['blk']
+    touched, newfields = pawn.is_field_touched_ext(match, color, srcx, srcy)
+    if(touched):
+        fields.extend(newfields)
+        
+    return False, fields
 
 
 def does_attack(match, srcx, srcy, dstx, dsty):
