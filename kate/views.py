@@ -95,7 +95,7 @@ def match(request, matchid=None, switch=0, msg=None):
             gmove = thread.search
             search = "current search: " + Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
         else:
-            search = "current search: ---"
+            search = "current search:"
 
         if(thread.candidates[0]):
             candidates = "candidates: "
@@ -103,10 +103,10 @@ def match(request, matchid=None, switch=0, msg=None):
                 if(cand):
                     candidates += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
         else:
-            candidates = "candidates: ---"
+            candidates = "candidates:"
     else:
-        search = "current search: ---"
-        candidates = "candidates: ---"
+        search = "current search:"
+        candidates = "candidates:"
 
     return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'search': search, 'candidates': candidates } )
 
