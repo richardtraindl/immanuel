@@ -94,7 +94,7 @@ def match(request, matchid=None, switch=0, msg=None):
         if(thread.searchcnt and thread.search):
             cnt = thread.searchcnt
             gmove = thread.search
-            search = "current search: " + str(cnt) + ": " + Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+            search = "current search: " + str(cnt) + ". " + Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
         else:
             search = "current search:"
 
@@ -386,7 +386,7 @@ def fetch_match(request):
         if(thread and thread.searchcnt and thread.search and thread.candidates[0]):
             cnt = thread.searchcnt
             gmove = thread.search
-            data += "§<p>current search: " + str(cnt) + ": "
+            data += "§<p>current search: " + str(cnt) + ". "
             data += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
             data += "</p>"
 
