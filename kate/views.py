@@ -53,6 +53,7 @@ def index(request):
 
 
 def match(request, matchid=None, switch=0, msg=None):
+    logger.info("test2222222222")
     context = RequestContext(request)
     if(matchid == None):
         match = Match(white_player=None, black_player=None)
