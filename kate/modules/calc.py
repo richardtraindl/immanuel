@@ -213,7 +213,8 @@ class immanuelsThread(threading.Thread):
         if(move != None):
             self.match.move_list.append(move)
 
-        gmove = calc_move(self.match)
+        # gmove = calc_move(self.match)
+        gmove = None
         if(gmove and Match.does_thread_exist(self) and self.running):
             move = kate.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
             move.save()
