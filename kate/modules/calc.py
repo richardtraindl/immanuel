@@ -420,5 +420,5 @@ def calc_move(match):
 
 def thread_do_move(match):
     thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
-    thread.start()
+    # thread.start()
 
