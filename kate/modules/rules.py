@@ -184,29 +184,29 @@ def is_field_touched(match, color, srcx, srcy):
 
 
 def list_field_touches(match, color, srcx, srcy):
-    fields = []
+    touches = []
 
-    newfields = rook.list_field_touches(match, color, srcx, srcy)
-    if(len(newfields) > 0):
-        fields.extend(newfields)
+    newtouches = rook.list_field_touches(match, color, srcx, srcy)
+    if(len(newtouches) > 0):
+        fields.extend(newtouches)
 
-    newfields = bishop.list_field_touches(match, color, srcx, srcy)
-    if(len(newfields) > 0):
-        fields.extend(newfields)
+    newtouches = bishop.list_field_touches(match, color, srcx, srcy)
+    if(len(newtouches) > 0):
+        touches.extend(newtouches)
+
+    newtouches = knight.list_field_touches(match, color, srcx, srcy)
+    if(len(newtouches) > 0):
+        touches.extend(newtouches)
+
+    newtouches = king.list_field_touches(match, color, srcx, srcy)
+    if(len(newtouches) > 0):
+        touches.extend(newtouches)
+
+    newtouches = pawn.list_field_touches(match, color, srcx, srcy)
+    if(len(newtouches) > 0):
+        touches.extend(newtouches)
         
-    newfields = knight.list_field_touches(match, color, srcx, srcy)
-    if(len(newfields) > 0):
-        fields.extend(newfields)
-
-    newfields = king.list_field_touches(match, color, srcx, srcy)
-    if(len(newfields) > 0):
-        fields.extend(newfields)
-
-    newfields = pawn.list_field_touches(match, color, srcx, srcy)
-    if(len(newfields) > 0):
-        fields.extend(newfields)
-        
-    return fields
+    return touches
 
 
 def does_attack(match, srcx, srcy, dstx, dsty):
