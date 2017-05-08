@@ -106,13 +106,16 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
                 if(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
-                    return True, 1 # priority
+                    return True, 2 # priority
                 else:
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
                         priority = min(priority, 2)
                     else:
-                        priority = min(priority, 3)
+                        if(rules.is_field_touched(match, opp_color, dstx, dsty)):
+                            priority = min(priority, 3)
+                        else:
+                            priority = min(priority, 2)
 
     if(priority == 5):
         return False, 0
