@@ -385,7 +385,7 @@ def fetch_match(request):
             data += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
             data += "</p>"
 
-            data += "§<p>candidates:<br>"
+            data += "§<p>candidates: "
             for cand in thread.candidates[:3]:
                 if(cand):
                     data += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
