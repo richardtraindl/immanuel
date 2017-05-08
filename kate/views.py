@@ -260,7 +260,10 @@ def undo_move(request, matchid, switch=0):
 def resume(request, matchid, switch=0):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
-    calc_move_for_immanuel(match)
+    thread = Match.get_active_thread(match)
+    if(thread is None or thread.running == False):
+        calc_move_for_immanuel(match)
+
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
 
 
