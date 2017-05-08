@@ -186,7 +186,7 @@ def is_field_touched(match, color, srcx, srcy):
 def list_field_touches(match, color, srcx, srcy):
     touches = []
 
-    newtouches = rook.list_field_touches(match, color, srcx, srcy)
+    """newtouches = rook.list_field_touches(match, color, srcx, srcy)
     if(len(newtouches) > 0):
         touches.extend(newtouches)
 
@@ -204,7 +204,7 @@ def list_field_touches(match, color, srcx, srcy):
 
     newtouches = pawn.list_field_touches(match, color, srcx, srcy)
     if(len(newtouches) > 0):
-        touches.extend(newtouches)
+        touches.extend(newtouches)"""
 
     return touches
 
