@@ -199,6 +199,7 @@ class immanuelsThread(threading.Thread):
         self.name = name
         self.running = True
         self.match = copy.deepcopy(match)
+        self.searchcnt = None
         self.search = None
         self.candidates = [None] * 10
 
@@ -236,8 +237,9 @@ class immanuelsThread(threading.Thread):
                     break
 
 
-    def populate_search(self, gmove):
+    def populate_search(self, gmove, cnt):
         if(gmove):
+            self.searchcnt = cnt
             self.search = gmove
 
 
@@ -315,7 +317,7 @@ def calc_max(match, depth, alpha, beta):
 
             thread = Match.get_active_thread(match)
             if(thread):
-                thread.populate_search(gmove)
+                thread.populate_search(gmove, count)
                 thread.populate_candiates(candidates)
 
             print("\n____________________________________________________________")
@@ -371,7 +373,7 @@ def calc_min(match, depth, alpha, beta):
 
             thread = Match.get_active_thread(match)
             if(thread):
-                thread.populate_search(gmove)
+                thread.populate_search(gmove, count)
                 thread.populate_candiates(candidates)
 
             print("\n____________________________________________________________")
