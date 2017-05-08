@@ -89,26 +89,26 @@ def match(request, matchid=None, switch=0, msg=None):
     else:
         rangeobj = range(7, -1, -1)
 
-    immanuel = ""
     thread = Match.get_active_thread(match)
     if(thread and thread.running):
         if(thread.search):
             gmove = thread.search
-            immanuel += "current search: " + Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+            curr_search = "current search: " + Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
         else:
-            immanuel = "no search found"
+            curr_search = "no search found"
 
         if(thread.candidates[0]):
-            immanuel += "<br>candidates: "
+            candidates = "candidates: "
             for cand in thread.candidates[:3]:
                 if(cand):
-                    immanuel += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
+                    candidates += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
         else:
-            immanuel = "no candidates found"
+            candidates = "no candidates found"
     else:
-        immanuel = "no thread found"
+        curr_search = "no thread found"
+        candidates = ""
 
-    return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'immanuel': immanuel } )
+    return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'curr_search': curr_search, 'candidates': candidates } )
 
 
 def new(request):
@@ -365,7 +365,7 @@ def fetch_match(request):
     switchflag = request.GET['switchflag']
     match = Match.objects.get(id=matchid)
     if(match == None):
-        data = "§§§"
+        data = "§§§§"
     else:
         lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
         if(lastmove != None):
@@ -383,14 +383,15 @@ def fetch_match(request):
             gmove = thread.search
             data += "§<p>current search: " 
             data += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+            data += "</p>"
 
-            data += "<br>candidates: <br>"
+            data += "§<br>candidates: <br>"
             for cand in thread.candidates[:3]:
                 if(cand):
                     data += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
             data += "</p>"
         else:
-            data += "§"
+            data += "§§"
 
     return HttpResponse(data)
 
