@@ -4,9 +4,15 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from kate.models import Match, Move, Comment
 from kate.modules import helper, rules, calc, kate
+import logging
+
+
+logger = logging.getLogger('ex_logger')
+logger.info("core.views logger")
 
 
 def calc_move_for_immanuel(match):
+    logger.info("test1111111")
     if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
         calc.thread_do_move(match)
 
