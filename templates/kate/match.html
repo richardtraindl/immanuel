@@ -160,8 +160,8 @@
             <div id="search">
                 <p>{{ search }}</p>
             </div>
-            <div id="candidate">
-                <p>{{ candidate }}</p>
+            <div id="candidates">
+                <p>{{ candidates }}</p>
             </div>
         {% endif %}
 
@@ -234,7 +234,7 @@
                             $('#search').html(arr[3]);
                         }
                         if(arr[4].length > 0){
-                            $('#candidate').html(arr[4]);
+                            $('#candidates').html(arr[4]);
                         }
                         performMove();
                         drag();
