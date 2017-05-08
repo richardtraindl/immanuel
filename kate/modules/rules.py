@@ -355,8 +355,7 @@ def is_move_available(match):
 
 
 def game_status(match):
-    return Match.STATUS['open']
-    """if(is_move_available(match)):
+    if(is_move_available(match)):
         return Match.STATUS['open']
     else:
         if(match.next_color() == Match.COLORS['white']):
@@ -366,7 +365,7 @@ def game_status(match):
             if(is_field_touched(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)):
                 return Match.STATUS['winner_white']
 
-    return Match.STATUS['draw']"""
+    return Match.STATUS['draw']
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
