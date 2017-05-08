@@ -172,7 +172,7 @@ def update(request, matchid, switch=0):
 
         if(len(match.white_player) > 0 and len(match.black_player) > 0):
             match.save()
-            calc_move_for_immanuel(match)
+            # calc_move_for_immanuel(match)
             return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch,)))
 
     return render(request, 'kate/edit.html', { 'match': match, 'switch': switch } )
@@ -260,7 +260,7 @@ def undo_move(request, matchid, switch=0):
 def resume(request, matchid, switch=0):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
-    calc_move_for_immanuel(match)
+    # calc_move_for_immanuel(match)
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
 
 
