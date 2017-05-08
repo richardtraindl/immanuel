@@ -238,7 +238,7 @@ class immanuelsThread(threading.Thread):
 
 
     def populate_search(self, gmove, cnt):
-        if(gmove):
+        if(gmove and cnt):
             self.searchcnt = cnt
             self.search = gmove
 
