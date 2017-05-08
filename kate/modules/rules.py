@@ -188,7 +188,7 @@ def list_field_touches(match, color, srcx, srcy):
 
     newtouches = rook.list_field_touches(match, color, srcx, srcy)
     if(len(newtouches) > 0):
-        fields.extend(newtouches)
+        touches.extend(newtouches)
 
     newtouches = bishop.list_field_touches(match, color, srcx, srcy)
     if(len(newtouches) > 0):
