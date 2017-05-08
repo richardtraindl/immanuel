@@ -45,26 +45,6 @@ GEN_BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']],
                     [[-1, -1, Match.PIECES['bQu']], [-1, -1, Match.PIECES['bRk']], [-1, -1, Match.PIECES['bBp']], [-1, -1, Match.PIECES['bKn']]] ]
 
 
-def list_field_touches(match, color, fieldx, fieldy):
-    touches = []
-
-    if(color == Match.COLORS['white']):
-        STEPS = WPW_BACK_STEPS
-    else:
-        STEPS = BPW_BACK_STEPS
-
-    for i in range(2):
-        x1 = fieldx + STEPS[i][0]
-        y1 = fieldy + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-            if( (color == Match.COLORS['white'] and piece == Match.PIECES['wPw']) or
-                (color == Match.COLORS['black'] and piece == Match.PIECES['bPw']) ):
-                touches.append([piece, x1, y1])
-
-    return touches
-
-
 def is_field_touched_ext(match, color, fieldx, fieldy):
     if(color == Match.COLORS['white']):
         STEPS = WPW_BACK_STEPS
@@ -83,6 +63,26 @@ def is_field_touched_ext(match, color, fieldx, fieldy):
     return False, Match.PIECES['blk']
 
 
+def list_field_touches(match, color, fieldx, fieldy):
+    touches = []
+
+    if(color == Match.COLORS['white']):
+        STEPS = WPW_BACK_STEPS
+    else:
+        STEPS = BPW_BACK_STEPS
+
+    for i in range(2):
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( (color == Match.COLORS['white'] and piece == Match.PIECES['wPw']) or
+                (color == Match.COLORS['black'] and piece == Match.PIECES['bPw']) ):
+                touches.append([piece, x1, y1])
+
+    return touches
+ 
+ 
 def does_attack(match, srcx, srcy, dstx, dsty):
     priority = 5
 
