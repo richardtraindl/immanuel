@@ -1,6 +1,6 @@
 from kate.models import Match, Move
 from kate.modules import helper, rules, pawn, rook, bishop, knight, queen, king, kate, openings, calc_helper, debug
-import random, threading, copy, time, sys
+import random, threading, copy, time
 from operator import itemgetter
 
 
@@ -418,9 +418,6 @@ def calc_move(match):
 
 
 def thread_do_move(match):
-    print("hello world")
-    sys.stdout.flush()
-
     thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
     thread.start()
 
