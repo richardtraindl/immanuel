@@ -61,7 +61,7 @@ def list_field_touches(match, color, fieldx, fieldy):
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
                 (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
                 touches.append([piece, x1, y1])
-                break
+                return touches
 
     return touches
 
