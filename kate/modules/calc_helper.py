@@ -99,15 +99,15 @@ def does_attacked_flee(match, move):
     color = Match.color_of_piece(piece)
     opp_color = Match.REVERSED_COLORS[color]
 
-    touched, opp_piece = rules.is_field_touched_ext(match, opp_color, move.srcx, move.srcy)
-    if(touched):
-        if(Match.PIECES_RANK[opp_piece] < Match.PIECES_RANK[piece]):
+    touches = rules.list_field_touches(match, opp_color, move.srcx, move.srcy)
+    if(len(touches) > 0):
+        match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+        newtouches = rules.list_field_touches(match, opp_color, move.dstx, move.dsty)
+        match.writefield(move.srcx, move.srcy, piece)
+        if(len(newtouches) < len(touches)):
             return True, 1 # priority
         else:
-            if(rules.is_field_touched(match, color, move.srcx, move.srcy)):
-                return True, 3 # priority
-            else:
-                return True, 2 # priority
+            return True, 2 # priority
     else:
         return False, 0 # priority
 
