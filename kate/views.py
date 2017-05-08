@@ -8,7 +8,7 @@ from kate.modules import helper, rules, calc, kate
 
 def calc_move_for_immanuel(match):
     if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
-        # calc.thread_do_move(match)
+        calc.thread_do_move(match)
 
 
 def fill_fmtboard(match, switch):
