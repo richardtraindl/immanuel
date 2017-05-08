@@ -34,7 +34,7 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
-def is_field_touched_ext(match, color, fieldx, fieldy):
+def list_field_touches(match, color, fieldx, fieldy):
     touches = []
     
     for i in range(4):
