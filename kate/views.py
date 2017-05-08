@@ -375,6 +375,7 @@ def fetch_match(request):
         if(lastmove != None):
             movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
             movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
+
         if(int(movecnt) == match.count):
             data = "§§"
         else:
@@ -383,18 +384,24 @@ def fetch_match(request):
             data += "§<p>Score: &nbsp;" + str(match.score) + "</p>"
 
         thread = Match.get_active_thread(match)
-        if(thread and thread.searchcnt and thread.search and thread.candidates[0]):
-            cnt = thread.searchcnt
-            gmove = thread.search
-            data += "§<p>current search: " + str(cnt) + ". "
-            data += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
-            data += "</p>"
+        if(thread and thread.running):
+            if(thread.searchcnt and thread.search):
+                cnt = thread.searchcnt
+                gmove = thread.search
+                data += "§<p>current search: " + str(cnt) + ". "
+                data += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+                data += "</p>"
+            else:
+                data += "§"
 
-            data += "§<p>candidates: "
-            for cand in thread.candidates[:3]:
-                if(cand):
-                    data += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
-            data += "</p>"
+            if(thread.candidates[0]):
+                data += "§<p>candidates: "
+                for cand in thread.candidates[:3]:
+                    if(cand):
+                        data += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
+                data += "</p>"
+            else:
+                data += "§"
         else:
             data += "§§"
 
