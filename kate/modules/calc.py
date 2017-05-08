@@ -213,8 +213,7 @@ class immanuelsThread(threading.Thread):
         if(move != None):
             self.match.move_list.append(move)
 
-        # gmove = calc_move(self.match)
-        gmove = None
+        gmove = calc_move(self.match)
         if(gmove and Match.does_thread_exist(self) and self.running):
             move = kate.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
             move.save()
@@ -420,5 +419,5 @@ def calc_move(match):
 
 def thread_do_move(match):
     thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
-    # thread.start()
+    thread.start()
 
