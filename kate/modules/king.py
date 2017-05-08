@@ -50,7 +50,9 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
-def is_field_touched_ext(match, color, fieldx, fieldy):
+def list_field_touches(match, color, fieldx, fieldy):
+    touches = []
+
     for i in range(8):
         x1 = fieldx + STEPS[i][0]
         y1 = fieldy + STEPS[i][1]
@@ -58,9 +60,10 @@ def is_field_touched_ext(match, color, fieldx, fieldy):
             piece = match.readfield(x1, y1)
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['wKg']) or
                 (color == Match.COLORS['black'] and piece == Match.PIECES['bKg']) ):
-                return True, piece
+                touches.append([piece, x1, y1])
+                break
 
-    return False, Match.PIECES['blk']
+    return touches
 
 
 def does_attack(match, srcx, srcy, dstx, dsty):
