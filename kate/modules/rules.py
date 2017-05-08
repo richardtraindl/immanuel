@@ -190,11 +190,11 @@ def list_field_touches(match, color, srcx, srcy):
     if(len(newtouches) > 0):
         touches.extend(newtouches)
 
-    """newtouches = bishop.list_field_touches(match, color, srcx, srcy)
+    newtouches = bishop.list_field_touches(match, color, srcx, srcy)
     if(len(newtouches) > 0):
         touches.extend(newtouches)
 
-    newtouches = knight.list_field_touches(match, color, srcx, srcy)
+    """newtouches = knight.list_field_touches(match, color, srcx, srcy)
     if(len(newtouches) > 0):
         touches.extend(newtouches)
 
