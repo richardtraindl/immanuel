@@ -45,7 +45,9 @@ GEN_BPROM_STEPS = [ [[0, -1, Match.PIECES['bQu']], [0, -1, Match.PIECES['bRk']],
                     [[-1, -1, Match.PIECES['bQu']], [-1, -1, Match.PIECES['bRk']], [-1, -1, Match.PIECES['bBp']], [-1, -1, Match.PIECES['bKn']]] ]
 
 
-def is_field_touched(match, color, fieldx, fieldy):
+def list_field_touches(match, color, fieldx, fieldy):
+    touches = []
+
     if(color == Match.COLORS['white']):
         STEPS = WPW_BACK_STEPS
     else:
@@ -58,9 +60,9 @@ def is_field_touched(match, color, fieldx, fieldy):
             piece = match.readfield(x1, y1)
             if( (color == Match.COLORS['white'] and piece == Match.PIECES['wPw']) or
                 (color == Match.COLORS['black'] and piece == Match.PIECES['bPw']) ):
-                return True
+                touches.append([piece, x1, y1])
 
-    return False
+    return touches
 
 
 def is_field_touched_ext(match, color, fieldx, fieldy):
