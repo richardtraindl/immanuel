@@ -94,7 +94,8 @@ def does_support_attacked(match, move):
 
 
 def does_attacked_flee(match, move):
-    piece = match.readfield(move.srcx, move.srcy)
+    return False, 0 # priority
+    """piece = match.readfield(move.srcx, move.srcy)
     
     color = Match.color_of_piece(piece)
     opp_color = Match.REVERSED_COLORS[color]
@@ -109,7 +110,7 @@ def does_attacked_flee(match, move):
         else:
             return True, 2 # priority
     else:
-        return False, 0 # priority
+        return False, 0 # priority"""
 
 
 def is_endgame_move(match, move):
