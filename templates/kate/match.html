@@ -157,11 +157,11 @@
             </div>
 
         {% if match.is_immanuel %}
-            <div id="candidate">
-                <p>{{ candidate }}</p>
-            </div>
             <div id="search">
                 <p>{{ search }}</p>
+            </div>
+            <div id="candidate">
+                <p>{{ candidate }}</p>
             </div>
         {% endif %}
 
@@ -231,10 +231,10 @@
                             $('#score').html(arr[2]);
                         }
                         if(arr[3].length > 0){
-                            $('#candidate').html(arr[3]);
+                            $('#search').html(arr[3]);
                         }
                         if(arr[4].length > 0){
-                            $('#search').html(arr[3]);
+                            $('#candidate').html(arr[4]);
                         }
                         performMove();
                         drag();
