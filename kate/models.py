@@ -333,10 +333,9 @@ class Match(models.Model):
     def does_thread_exist(cls, thread):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
-                if(item is thread):
+                if(item is thread and item.is_alive()):
                     return True
             return False
-
 
 
 class Move(models.Model):
