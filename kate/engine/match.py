@@ -33,7 +33,7 @@ class Match:
         self.black_player_human = True
         self.elapsed_time_black = 0
         self.level = LEVELS['blitz']
-        self.board = []
+        self.board = [[0 for x in range(8)] for y in range()] 
         self.fifty_moves_count = 0
         self.wKg_x = E1_X
         self.wKg_y = E1_Y
