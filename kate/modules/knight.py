@@ -84,9 +84,9 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                     if(pin_dir != rules.DIRS['undefined']):
                         priority = min(priority, 2)
                     else:
-                        match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+                        match.writefield(srcx, srcy, Match.PIECES['blk'])
                         touched = rules.is_field_touched(match, opp_color, dstx, dsty)
-                        match.writefield(move.srcx, move.srcy, knight)
+                        match.writefield(srcx, srcy, knight)
                         if(touched):
                             priority = min(priority, 3)
                         elif(rules.is_field_touched(match, opp_color, x1, y1)):
