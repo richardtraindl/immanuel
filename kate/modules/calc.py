@@ -326,7 +326,7 @@ def calc_max(match, depth, alpha, beta):
                 thread.populate_search(gmove, count)
                 thread.populate_candiates(candidates)
                 debuginfo = "prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1] + 
-                            " prio3:" + str(priorities[2] + " prio4:" + str(priorities[3])
+                            " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3])
                 thread.populate_debuginfo(debuginfo)
 
             print("\n____________________________________________________________")
@@ -385,7 +385,7 @@ def calc_min(match, depth, alpha, beta):
                 thread.populate_search(gmove, count)
                 thread.populate_candiates(candidates)
                 debuginfo = "prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1] + 
-                            " prio3:" + str(priorities[2] + " prio4:" + str(priorities[3])
+                            " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3])
                 thread.populate_debuginfo(debuginfo)
 
             print("\n____________________________________________________________")
