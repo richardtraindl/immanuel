@@ -239,6 +239,7 @@ def force_move(request, matchid, switch=0):
     if(thread and thread.running and thread.candidates[0]):
         thread.running = False
         gmove = thread.candidates[0]
+        Match.remove_threads(match)
         msg = rules.RETURN_CODES['ok']
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
         move.save()
@@ -254,7 +255,10 @@ def undo_move(request, matchid, switch=0):
 
     thread = Match.get_active_thread(match)
     if(thread):
-        thread.running = False
+        if(thread.running):
+            thread.running = False
+        Match.remove_threads(match)
+
     move = kate.undo_move(match, False)
 
     if(move != None):
@@ -267,8 +271,13 @@ def undo_move(request, matchid, switch=0):
 def resume(request, matchid, switch=0):
     context = RequestContext(request)
     match = Match.objects.get(id=matchid)
+
     thread = Match.get_active_thread(match)
-    if(thread is None or thread.running == False):
+    if(thread):
+        if(thread.running == False):
+            Match.remove_threads(match)
+            calc_move_for_immanuel(match)
+    else:
         calc_move_for_immanuel(match)
 
     return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
