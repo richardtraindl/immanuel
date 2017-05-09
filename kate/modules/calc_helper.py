@@ -56,12 +56,12 @@ def is_capture(match, move):
             return True, 1 # priority
         else:
             match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
-            if(rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty)):
-                match.writefield(move.srcx, move.srcy, piece)
+            touched = rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty)
+            match.writefield(move.srcx, move.srcy, piece)        
+            if(touched):
                 return True, 2 # priority
             else:
-                match.writefield(move.srcx, move.srcy, piece)
-                return True, 1 # priority"""
+                return True, 1 # priority
     elif( (piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']) and move.srcx != move.dstx ):
         return True, 1 # priority
     else:
