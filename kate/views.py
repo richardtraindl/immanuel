@@ -105,11 +105,17 @@ def match(request, matchid=None, switch=0, msg=None):
                     candidates += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
         else:
             candidates = "candidates:"
+            
+        if(thread.debuginfo):
+            debuginfo = thread.debuginfo
+        else:
+            debuginfo = ""
     else:
         search = "current search:"
         candidates = "candidates:"
+        debuginfo = ""
 
-    return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'search': search, 'candidates': candidates } )
+    return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'search': search, 'candidates': candidates, 'debuginfo': debuginfo } )
 
 
 def new(request):
