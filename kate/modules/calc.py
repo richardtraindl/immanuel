@@ -202,6 +202,7 @@ class immanuelsThread(threading.Thread):
         self.searchcnt = None
         self.search = None
         self.candidates = [None] * 10
+        self.debuginfo = None
 
         Match.remove_threads(match)
         Match.add_thread(self)
@@ -243,6 +244,10 @@ class immanuelsThread(threading.Thread):
             self.search = gmove
 
 
+    def populate_debuginfo(self, debuginfo):
+        self.debuginfo = debuginfo
+
+        
 def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates):
     if( (color == Match.COLORS["white"] and candidatescore >= gmovescore) or (color == Match.COLORS["black"] and candidatescore <= gmovescore) ):
         return candidatescore
@@ -319,6 +324,9 @@ def calc_max(match, depth, alpha, beta):
             if(thread):
                 thread.populate_search(gmove, count)
                 thread.populate_candiates(candidates)
+                debuginfo = "prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1] + 
+                            " prio3:" + str(priorities[2] + " prio4:" + str(priorities[3])
+                thread.populate_debuginfo(self, debuginfo)
 
             print("\n____________________________________________________________")
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
@@ -375,6 +383,9 @@ def calc_min(match, depth, alpha, beta):
             if(thread):
                 thread.populate_search(gmove, count)
                 thread.populate_candiates(candidates)
+                debuginfo = "prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1] + 
+                            " prio3:" + str(priorities[2] + " prio4:" + str(priorities[3])
+                thread.populate_debuginfo(self, debuginfo)
 
             print("\n____________________________________________________________")
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
