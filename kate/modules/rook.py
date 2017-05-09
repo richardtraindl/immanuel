@@ -77,7 +77,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                     else:
                         match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
                         touched = rules.is_field_touched(match, opp_color, dstx, dsty)
-                        match.writefield(move.srcx, move.srcy, piece)
+                        match.writefield(move.srcx, move.srcy, rook)
                         if(touched):
                             priority = min(priority, 3)
                         elif(rules.is_field_touched(match, opp_color, x1, y1)):
