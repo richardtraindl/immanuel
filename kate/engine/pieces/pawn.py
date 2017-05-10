@@ -1,4 +1,5 @@
-from kate.engine import match, move, rules, generic, calc_helper
+from kate.engine import rules, calc_helper
+from kate.engine.match import *
 
 
 WHITE_1N_X = 0
@@ -24,28 +25,28 @@ BPW_BACK_STEPS = [ [1, 1], [-1, 1] ]
 WPW_STEPS = [ [1, 1], [-1, 1] ]
 BPW_STEPS = [ [1, -1], [-1, -1] ]
 
-blank = match.PIECES['blk']
+blank = PIECES['blk']
 GEN_WSTEPS = [ [[0, 1, blank]],
                [[0, 2, blank]],
                [[1, 1, blank]], 
                [[-1, 1, blank]] ]
 
-GEN_WPROM_STEPS = [ [[0, 1, match.PIECES['wQu']], [1, 1, match.PIECES['wQu']], [-1, 1, match.PIECES['wQu']], [0, 1, match.PIECES['wRk']]],
-                    [[1, 1, match.PIECES['wRk']], [-1, 1, match.PIECES['wRk']], [0, 1, match.PIECES['wBp']], [1, 1, match.PIECES['wBp']]],
-                    [[-1, 1, match.PIECES['wBp']], [0, 1, match.PIECES['wKn']], [1, 1, match.PIECES['wKn']], [-1, 1, match.PIECES['wKn']]] ]
+GEN_WPROM_STEPS = [ [[0, 1, PIECES['wQu']], [1, 1, PIECES['wQu']], [-1, 1, PIECES['wQu']], [0, 1, PIECES['wRk']]],
+                    [[1, 1, PIECES['wRk']], [-1, 1, PIECES['wRk']], [0, 1, PIECES['wBp']], [1, 1, PIECES['wBp']]],
+                    [[-1, 1, PIECES['wBp']], [0, 1, PIECES['wKn']], [1, 1, PIECES['wKn']], [-1, 1, PIECES['wKn']]] ]
 
 GEN_BSTEPS = [ [[0, -1, blank]],
                [[0, -2, blank]],
                [[-1, -1, blank]], 
                [[1, -1, blank]] ]
 
-GEN_BPROM_STEPS = [ [[0, -1, match.PIECES['bQu']], [0, -1, match.PIECES['bRk']], [0, -1, match.PIECES['bBp']], [0, -1, match.PIECES['bKn']]],
-                    [[1, -1, match.PIECES['bQu']], [1, -1, match.PIECES['bRk']], [1, -1, match.PIECES['bBp']], [1, -1, match.PIECES['bKn']]],
-                    [[-1, -1, match.PIECES['bQu']], [-1, -1, match.PIECES['bRk']], [-1, -1, match.PIECES['bBp']], [-1, -1, match.PIECES['bKn']]] ]
+GEN_BPROM_STEPS = [ [[0, -1, PIECES['bQu']], [0, -1, PIECES['bRk']], [0, -1, PIECES['bBp']], [0, -1, PIECES['bKn']]],
+                    [[1, -1, PIECES['bQu']], [1, -1, PIECES['bRk']], [1, -1, PIECES['bBp']], [1, -1, PIECES['bKn']]],
+                    [[-1, -1, PIECES['bQu']], [-1, -1, PIECES['bRk']], [-1, -1, PIECES['bBp']], [-1, -1, PIECES['bKn']]] ]
 
 
 def is_field_touched(match, color, fieldx, fieldy):
-    if(color == match.COLORS['white']):
+    if(color == COLORS['white']):
         STEPS = WPW_BACK_STEPS
     else:
         STEPS = BPW_BACK_STEPS
@@ -55,8 +56,8 @@ def is_field_touched(match, color, fieldx, fieldy):
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( (color == match.COLORS['white'] and piece == match.PIECES['wPw']) or
-                (color == match.COLORS['black'] and piece == match.PIECES['bPw']) ):
+            if( (color == COLORS['white'] and piece == PIECES['wPw']) or
+                (color == COLORS['black'] and piece == PIECES['bPw']) ):
                 return True
 
     return False
@@ -65,7 +66,7 @@ def is_field_touched(match, color, fieldx, fieldy):
 def list_field_touches(match, color, fieldx, fieldy):
     touches = []
 
-    if(color == match.COLORS['white']):
+    if(color == COLORS['white']):
         STEPS = WPW_BACK_STEPS
     else:
         STEPS = BPW_BACK_STEPS
@@ -75,8 +76,8 @@ def list_field_touches(match, color, fieldx, fieldy):
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( (color == match.COLORS['white'] and piece == match.PIECES['wPw']) or
-                (color == match.COLORS['black'] and piece == match.PIECES['bPw']) ):
+            if( (color == COLORS['white'] and piece == PIECES['wPw']) or
+                (color == COLORS['black'] and piece == PIECES['bPw']) ):
                 touches.append([piece, x1, y1])
 
     return touches
@@ -87,13 +88,13 @@ def does_attack(match, srcx, srcy, dstx, dsty):
 
     pawn = match.readfield(srcx, srcy)
 
-    if(pawn != match.PIECES['wPw'] and pawn != match.PIECES['bPw']):
+    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
         return False, 0
 
-    color = match.color_of_piece(pawn)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(pawn)
+    opp_color = Match.oppcolor_of_piece(pawn)
 
-    if(color == match.COLORS['white']):
+    if(color == COLORS['white']):
         STEPS = WPW_STEPS
     else:
         STEPS = BPW_STEPS
@@ -104,14 +105,14 @@ def does_attack(match, srcx, srcy, dstx, dsty):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
-                if(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     return True, 2 # priority
                 else:
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
                         priority = min(priority, 2)
                     else:
-                        match.writefield(srcx, srcy, match.PIECES['blk'])
+                        match.writefield(srcx, srcy, PIECES['blk'])
                         touched = rules.is_field_touched(match, opp_color, dstx, dsty)
                         match.writefield(srcx, srcy, pawn)
                         if(touched):
@@ -130,13 +131,13 @@ def count_attacks(match, srcx, srcy, dstx, dsty):
 
     pawn = match.readfield(srcx, srcy)
 
-    if(pawn != match.PIECES['wPw'] and pawn != match.PIECES['bPw']):
+    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
         return count
 
-    color = match.color_of_piece(pawn)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(pawn)
+    opp_color = Match.oppcolor_of_piece(pawn)
 
-    if(color == match.COLORS['white']):
+    if(color == COLORS['white']):
         STEPS = WPW_STEPS
     else:
         STEPS = BPW_STEPS
@@ -157,13 +158,13 @@ def score_attacks(match, srcx, srcy):
 
     pawn = match.readfield(srcx, srcy)
 
-    if(pawn != match.PIECES['wPw'] and pawn != match.PIECES['bPw']):
+    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
         return score
 
-    color = match.color_of_piece(pawn)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(pawn)
+    opp_color = Match.oppcolor_of_piece(pawn)
 
-    if(color == match.COLORS['white']):
+    if(color == COLORS['white']):
         STEPS = WPW_STEPS
     else:
         STEPS = BPW_STEPS
@@ -184,13 +185,13 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
 
     pawn = match.readfield(srcx, srcy)
 
-    if(pawn != match.PIECES['wPw'] and pawn != match.PIECES['bPw']):
+    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
         return False, 0
 
-    color = match.color_of_piece(pawn)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(pawn)
+    opp_color = Match.oppcolor_of_piece(pawn)
 
-    if(color == match.COLORS['white']):
+    if(color == COLORS['white']):
         STEPS = WPW_STEPS
     else:
         STEPS = BPW_STEPS
@@ -200,9 +201,9 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
         y1 = dsty + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if(piece == match.PIECES['blk'] or piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+            if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
-            if( color == match.color_of_piece(piece) ):
+            if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     return True, 2 # priority
 
@@ -217,13 +218,13 @@ def score_supports_of_attacked(match, srcx, srcy):
 
     pawn = match.readfield(srcx, srcy)
 
-    if(pawn != match.PIECES['wPw'] and pawn != match.PIECES['bPw']):
+    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
         return score
 
-    color = match.color_of_piece(pawn)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(pawn)
+    opp_color = Match.oppcolor_of_piece(pawn)
 
-    if(color == match.COLORS['white']):
+    if(color == COLORS['white']):
         STEPS = WPW_STEPS
     else:
         STEPS = BPW_STEPS
@@ -233,9 +234,9 @@ def score_supports_of_attacked(match, srcx, srcy):
         y1 = srcy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if(piece == match.PIECES['blk'] or piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+            if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
-            if( color == match.color_of_piece(piece) ):
+            if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += calc_helper.SUPPORTED_SCORES[piece]
 
@@ -244,14 +245,14 @@ def score_supports_of_attacked(match, srcx, srcy):
 
 def is_running(match, move):
     piece = match.readfield(move.srcx, move.srcy)
-    if(piece == match.PIECES['wPw']):
+    if(piece == PIECES['wPw']):
         stepx = 0
         stepy = 1
-        opp_pawn = match.PIECES['bPw']
-    elif(piece == match.PIECES['bPw']):
+        opp_pawn = PIECES['bPw']
+    elif(piece == PIECES['bPw']):
         stepx = 0
         stepy = -1
-        opp_pawn = match.PIECES['wPw']
+        opp_pawn = PIECES['wPw']
     else:
         return False
 
@@ -274,7 +275,7 @@ def pw_dir(srcx, srcy, dstx, dsty, piece):
     DIRS = rules.DIRS
     step_x = dstx - srcx
     step_y = dsty - srcy
-    if(piece == match.PIECES['wPw']):
+    if(piece == PIECES['wPw']):
         if(step_x == WHITE_1N_X and step_y == WHITE_1N_Y):
             return DIRS['north']
         elif(step_x == WHITE_2N_X and step_y == WHITE_2N_Y and srcy == 1):
@@ -310,7 +311,7 @@ def is_white_ep_move_ok(match, srcx, srcy, dstx, dsty):
 
     piece = match.readfield(dstx, dsty)
     opp_piece = match.readfield(move.dstx, move.dsty)
-    if(piece == match.PIECES['blk'] and opp_piece == match.PIECES['bPw'] and 
+    if(piece == PIECES['blk'] and opp_piece == PIECES['bPw'] and 
        srcy == 4 and move.srcx == move.dstx and move.dstx == dstx and 
        move.srcy - 2 == move.dsty):
         return True
@@ -328,7 +329,7 @@ def is_black_ep_move_ok(match, srcx, srcy, dstx, dsty):
 
     piece = match.readfield(dstx, dsty)
     opp_piece = match.readfield(move.dstx, move.dsty)
-    if(piece == match.PIECES['blk'] and opp_piece == match.PIECES['wPw'] and 
+    if(piece == PIECES['blk'] and opp_piece == PIECES['wPw'] and 
        srcy == 3 and move.srcx == move.dstx and move.dstx == dstx and 
        move.srcy + 2 == move.dsty):
         return True
@@ -346,7 +347,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
 
     dstpiece = match.readfield(dstx, dsty)
 
-    if(piece == match.PIECES['wPw']):
+    if(piece == PIECES['wPw']):
         # check pins
         if(direction == DIRS['north'] or direction == DIRS['2north']):
             if(pin_dir != DIRS['north'] and pin_dir != DIRS['south'] and pin_dir != DIRS['undefined']):
@@ -366,11 +367,11 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
             if(midpiece != match.PIECES['blk'] or dstpiece != match.PIECES['blk']):
                 return False
         elif(direction == DIRS['north-west'] or direction == DIRS['north-east']):
-            if(match.color_of_piece(dstpiece) != match.COLORS['black']):
+            if(Match.color_of_piece(dstpiece) != match.COLORS['black']):
                 return is_white_ep_move_ok(match, srcx, srcy, dstx, dsty)
 
         # check promotion
-        if(dsty == 7 and prom_piece != match.PIECES['wQu'] and prom_piece != match.PIECES['wRk'] and prom_piece != match.PIECES['wBp'] and prom_piece != match.PIECES['wKn']):
+        if(dsty == 7 and prom_piece != PIECES['wQu'] and prom_piece != PIECES['wRk'] and prom_piece != PIECES['wBp'] and prom_piece != PIECES['wKn']):
             return False
     else:
         # check pins
@@ -385,30 +386,30 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
                 return False
         
         # check fields
-        if(direction == DIRS['south'] and dstpiece != match.PIECES['blk']):
+        if(direction == DIRS['south'] and dstpiece != PIECES['blk']):
             return False
         elif(direction == DIRS['2south']):
             midpiece = match.readfield(dstx, srcy + BLACK_1S_Y)
-            if(midpiece != match.PIECES['blk'] or dstpiece != match.PIECES['blk']):
+            if(midpiece != PIECES['blk'] or dstpiece != PIECES['blk']):
                 return False
         elif(direction == DIRS['south-east'] or direction == DIRS['south-west']):
-            if(match.color_of_piece(dstpiece) != match.COLORS['white']):
+            if(Match.color_of_piece(dstpiece) != COLORS['white']):
                 return is_black_ep_move_ok(match, srcx, srcy, dstx, dsty)
 
         # check promotion
-        if(dsty == 0 and prom_piece != match.PIECES['bQu'] and prom_piece != match.PIECES['bRk'] and prom_piece != match.PIECES['bBp'] and prom_piece != match.PIECES['bKn']):
+        if(dsty == 0 and prom_piece != PIECES['bQu'] and prom_piece != PIECES['bRk'] and prom_piece != PIECES['bBp'] and prom_piece != PIECES['bKn']):
             return False
 
     return True
 
 
 def do_move(match, move, srcpiece, dstpiece):
-    if(move.prom_piece != match.PIECES['blk']):
+    if(move.prom_piece != PIECES['blk']):
         move.move_type = Move.TYPES['promotion']
         move.captured_piece = dstpiece
 
         match.count += 1 
-        match.writefield(move.srcx, move.srcy, match.PIECES['blk'])
+        match.writefield(move.srcx, move.srcy, PIECES['blk'])
         match.writefield(move.dstx, move.dsty, move.prom_piece)
         match.fifty_moves_count = 0
         match.score -= (calc_helpe.SCORES[move.prom_piece] - calc_helpe.SCORES[srcpiece])
@@ -416,7 +417,7 @@ def do_move(match, move, srcpiece, dstpiece):
         match.move_list.append(move)
 
         return move
-    elif(dstpiece == match.PIECES['blk'] and move.srcx != move.dstx):
+    elif(dstpiece == PIECES['blk'] and move.srcx != move.dstx):
         move.move_type = Move.TYPES['en_passant']
         move.e_p_fieldx = move.dstx
         move.e_p_fieldy = move.srcy
@@ -424,10 +425,10 @@ def do_move(match, move, srcpiece, dstpiece):
         move.captured_piece = pawn
 
         match.count += 1 
-        match.writefield(move.srcx, move.srcy, match.PIECES['blk'])
+        match.writefield(move.srcx, move.srcy, PIECES['blk'])
         match.writefield(move.dstx, move.dsty, srcpiece)
         match.fifty_moves_count = 0
-        match.writefield(move.e_p_fieldx, move.e_p_fieldy, match.PIECES['blk'])
+        match.writefield(move.e_p_fieldx, move.e_p_fieldy, PIECES['blk'])
         match.score += calc_helpe.SCORES[pawn]
         match.move_list.append(move)
 
@@ -438,9 +439,9 @@ def do_move(match, move, srcpiece, dstpiece):
 
 def undo_promotion(match, move):
     if(move.dsty == 7):
-        piece = match.PIECES['wPw']
+        piece = PIECES['wPw']
     else:
-        piece = match.PIECES['bPw']
+        piece = PIECES['bPw']
 
     match.count -= 1
     match.fifty_moves_count = move.fifty_moves_count
@@ -457,8 +458,10 @@ def undo_en_passant(match, move):
     match.fifty_moves_count = move.fifty_moves_count
     piece = match.readfield(move.dstx, move.dsty)
     match.writefield(move.srcx, move.srcy, piece)
-    match.writefield(move.dstx, move.dsty, match.PIECES['blk'])
+    match.writefield(move.dstx, move.dsty, PIECES['blk'])
     match.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
     match.score -= calc_helpe.SCORES[move.captured_piece]
 
     return move
+
+  
