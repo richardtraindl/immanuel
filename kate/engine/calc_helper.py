@@ -18,19 +18,19 @@ SCORES = {
         match.PIECES['bQu'] : 950 }
 
 REVERSED_SCORES = {
-        match.PIECES['blk'] : PIECES['blk'],
-        match.PIECES['wKg'] : PIECES['bKg'],
-        match.PIECES['wPw'] : PIECES['bPw'],
-        match.PIECES['wRk'] : PIECES['bRk'] ,
-        match.PIECES['wKn'] : PIECES['bKn'],
-        match.PIECES['wBp'] : PIECES['bBp'],
-        match.PIECES['wQu'] : PIECES['bQu'],
-        match.PIECES['bKg'] : PIECES['wKg'],
-        match.PIECES['bPw'] : PIECES['wPw'],
-        match.PIECES['bRk'] : PIECES['wRk'],
-        match.PIECES['bKn'] : PIECES['wKn'],
-        match.PIECES['bBp'] : PIECES['wBp'],
-        match.PIECES['bQu'] : PIECES['wQu'] }
+        match.PIECES['blk'] : match.PIECES['blk'],
+        match.PIECES['wKg'] : match.PIECES['bKg'],
+        match.PIECES['wPw'] : match.PIECES['bPw'],
+        match.PIECES['wRk'] : match.PIECES['bRk'] ,
+        match.PIECES['wKn'] : match.PIECES['bKn'],
+        match.PIECES['wBp'] : match.PIECES['bBp'],
+        match.PIECES['wQu'] : match.PIECES['bQu'],
+        match.PIECES['bKg'] : match.PIECES['wKg'],
+        match.PIECES['bPw'] : match.PIECES['wPw'],
+        match.PIECES['bRk'] : match.PIECES['wRk'],
+        match.PIECES['bKn'] : match.PIECES['wKn'],
+        match.PIECES['bBp'] : match.PIECES['wBp'],
+        match.PIECES['bQu'] : match.PIECES['wQu'] }
 
 ATTACKED_SCORES = {
         match.PIECES['blk'] : 0,
