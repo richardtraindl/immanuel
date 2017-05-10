@@ -7,7 +7,7 @@ from kate.engine import helper, rules, calc, kate, match, move
 
 
 def calc_move_for_immanuel(match):
-    if(rules.game_status(match) == Match.STATUS['open'] and match.next_color_human() == False):
+    if(rules.game_status(match) == match.STATUS['open'] and match.next_color_human() == False):
         calc.thread_do_move(match)
 
 
@@ -42,19 +42,19 @@ def fill_fmtboard(match, switch):
 
 def index(request):
     context = RequestContext(request)
-    matches = Match.objects.order_by("begin").reverse()[:10]
-    return render(request, 'kate/index.html', { 'matches': matches } )
+    mmatches = ModelMatch.objects.order_by("begin").reverse()[:10]
+    return render(request, 'kate/index.html', { 'matches': mmatches } )
 
 
 def match(request, matchid=None, switch=0, msg=None):
     context = RequestContext(request)
     if(matchid == None):
-        match = Match(white_player=None, black_player=None)
-        match.setboardbase()
+        mmatch = ModelMatch(white_player=None, black_player=None)
+        mmatch.setboardbase()
     else:
-        match = ModelMatch.objects.get(id=matchid)
+        mmatch = ModelMatch.objects.get(id=matchid)
 
-    lastmove = ModelMove.objects.filter(match_id=match.id).order_by("count").last()
+    lastmove = ModelMove.objects.filter(match_id=mmatch.id).order_by("count").last()
     if(lastmove):
         movesrc = match.index_to_koord(lastmove.srcx, lastmove.srcy)
         movedst = match.index_to_koord(lastmove.dstx, lastmove.dsty)
@@ -62,20 +62,20 @@ def match(request, matchid=None, switch=0, msg=None):
         movesrc = ''
         movedst = ''
 
-    fmtboard = fill_fmtboard(match, int(switch))
+    fmtboard = fill_fmtboard(mmatch, int(switch))
 
     moves = []
-    currmove = ModelMove.objects.filter(match_id=match.id).order_by("count").last()
+    currmove = ModelMove.objects.filter(match_id=mmatch.id).order_by("count").last()
     if(currmove != None):
         if(currmove.count % 2 == 0):
             limit = 22
         else:
             limit = 21
-        qmoves = ModelMove.objects.filter(match_id=match.id).order_by("-count")[:limit]
+        qmoves = ModelMove.objects.filter(match_id=mmatch.id).order_by("-count")[:limit]
         for qmove in reversed(qmoves):
             moves.append(qmove)
 
-    comments = ModelComment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:3]
+    comments = ModelComment.objects.filter(match_id=mmatch.id).order_by("created_at").reverse()[:3]
     
     if(msg == None):
         fmtmsg = "<p class='ok'></p>"
@@ -89,12 +89,12 @@ def match(request, matchid=None, switch=0, msg=None):
     else:
         rangeobj = range(7, -1, -1)
 
-    thread = ModelMatch.get_active_thread(match)
+    thread = ModelMatch.get_active_thread(mmatch)
     if(thread and thread.running):
         if(thread.searchcnt and thread.search):
             cnt = thread.searchcnt
             gmove = thread.search
-            search = "current search: " + str(cnt) + ". " + Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+            search = "current search: " + str(cnt) + ". " + match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + match.index_to_koord(gmove.dstx, gmove.dsty)
         else:
             search = "current search:"
 
@@ -102,7 +102,7 @@ def match(request, matchid=None, switch=0, msg=None):
             candidates = "candidates: "
             for cand in thread.candidates[:3]:
                 if(cand):
-                    candidates += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
+                    candidates += "[" + match.index_to_koord(cand.srcx, cand.srcy) + "-" + match.index_to_koord(cand.dstx, cand.dsty) + "]"
         else:
             candidates = "candidates:"
             
@@ -115,7 +115,7 @@ def match(request, matchid=None, switch=0, msg=None):
         candidates = "candidates:"
         debuginfo = ""
 
-    return render(request, 'kate/match.html', { 'match': match, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'search': search, 'candidates': candidates, 'debuginfo': debuginfo } )
+    return render(request, 'kate/match.html', { 'match': mmatch, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'search': search, 'candidates': candidates, 'debuginfo': debuginfo } )
 
 
 def new(request):
@@ -126,30 +126,30 @@ def new(request):
 def create(request):
     context = RequestContext(request)
     if(request.method == 'POST'):
-        match = Match()
+        mmatch = ModelMatch()
 
-        match.white_player = request.POST['white_player']
+        mmatch.white_player = request.POST['white_player']
         if(request.POST.get('white_player_human')):
-            match.white_player_human = True
+            mmatch.white_player_human = True
         else:
-            match.white_player_human = False
+            mmatch.white_player_human = False
 
-        match.black_player = request.POST['black_player']
+        mmatch.black_player = request.POST['black_player']
         if(request.POST.get('black_player_human')):
-            match.black_player_human = True
+            mmatch.black_player_human = True
         else:
-            match.black_player_human = False
+            mmatch.black_player_human = False
 
         levellist = request.POST.getlist('level')
-        match.level = Match.LEVELS[levellist[0]]
+        mmatch.level = match.LEVELS[levellist[0]]
 
-        if(len(match.white_player) > 0 and len(match.black_player) > 0):
-            match.setboardbase()
-            match.save()
-            calc_move_for_immanuel(match)
-            return HttpResponseRedirect(reverse('kate:match', args=(match.id,)))
+        if(len(mmatch.white_player) > 0 and len(mmatch.black_player) > 0):
+            mmatch.setboardbase()
+            mmatch.save()
+            calc_move_for_immanuel(mmatch)
+            return HttpResponseRedirect(reverse('kate:match', args=(mmatch.id,)))
 
-    return render(request, 'kate/new.html', { 'white_player': match.white_player, 'white_player_human': match.white_player_human, 'black_player': match.black_player, 'black_player_human': match.black_player_human } )
+    return render(request, 'kate/new.html', { 'white_player': mmatch.white_player, 'white_player_human': mmatch.white_player_human, 'black_player': mmatch.black_player, 'black_player_human': mmatch.black_player_human } )
 
 
 def edit(request, matchid, switch=0):
@@ -160,33 +160,33 @@ def edit(request, matchid, switch=0):
 
 def update(request, matchid, switch=0):
     context = RequestContext(request)
-    match = get_object_or_404(Match, pk=matchid)
+    mmatch = get_object_or_404(ModelMatch, pk=matchid)
     if(request.method == 'POST'):
-        match.white_player = request.POST['white_player']
+        mmatch.white_player = request.POST['white_player']
         if(request.POST.get('white_player_human')):
-            match.white_player_human = True
+            mmatch.white_player_human = True
         else:
-            match.white_player_human = False
+            mmatch.white_player_human = False
 
-        match.black_player = request.POST['black_player']
+        mmatch.black_player = request.POST['black_player']
         if(request.POST.get('black_player_human')):
-            match.black_player_human = True
+            mmatch.black_player_human = True
         else:
-            match.black_player_human = False
+            mmatch.black_player_human = False
 
         levellist = request.POST.getlist('level')
-        match.level = Match.LEVELS[levellist[0]]
+        mmatch.level = match.LEVELS[levellist[0]]
 
-        if(len(match.white_player) > 0 and len(match.black_player) > 0):
-            match.save()
-            calc_move_for_immanuel(match)
-            return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch,)))
+        if(len(mmatch.white_player) > 0 and len(mmatch.black_player) > 0):
+            mmatch.save()
+            calc_move_for_immanuel(mmatch)
+            return HttpResponseRedirect(reverse('kate:match', args=(mmatch.id, switch,)))
 
     return render(request, 'kate/edit.html', { 'match': match, 'switch': switch } )
 
 
 def delete(request, matchid):
-    Match.objects.filter(id=matchid).delete()
+    ModelMatch.objects.filter(id=matchid).delete()
     return index(request)
 
 
@@ -245,18 +245,18 @@ def do_move(request, matchid):
 
 def force_move(request, matchid, switch=0):
     context = RequestContext(request)
-    match = Match.objects.get(id=matchid)
+    mmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = Match.get_active_thread(match)
+    thread = ModelMatch.get_active_thread(mmatch)
     if(thread and thread.running and thread.candidates[0]):
         thread.running = False
         gmove = thread.candidates[0]
-        Match.remove_threads(match)
+        ModelMatch.remove_threads(mmatch)
         msg = rules.RETURN_CODES['ok']
-        move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        move = kate.do_move(mmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
         
         move.save()
-        match.save()
+        mmatch.save()
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
@@ -264,57 +264,57 @@ def force_move(request, matchid, switch=0):
 
 def undo_move(request, matchid, switch=0):
     context = RequestContext(request)
-    match = Match.objects.get(id=matchid)
+    mmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = Match.get_active_thread(match)
+    thread = Match.get_active_thread(mmatch)
     if(thread):
         if(thread.running):
             thread.running = False
-        Match.remove_threads(match)
+        ModelMatch.remove_threads(mmatch)
 
-    move = kate.undo_move(match, False)
+    move = kate.undo_move(mmatch, False)
 
     if(move != None):
         move.delete()
-        match.save()
+        mmatch.save()
 
-    return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
+    return HttpResponseRedirect(reverse('kate:match', args=(mmatch.id, switch)))
 
 
 def resume(request, matchid, switch=0):
     context = RequestContext(request)
-    match = Match.objects.get(id=matchid)
+    mmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = Match.get_active_thread(match)
+    thread = ModelMatch.get_active_thread(mmatch)
     if(thread):
         if(thread.running == False):
-            Match.remove_threads(match)
-            calc_move_for_immanuel(match)
+            ModelMatch.remove_threads(match)
+            calc_move_for_immanuel(mmatch)
     else:
-        calc_move_for_immanuel(match)
+        calc_move_for_immanuel(mmatch)
 
-    return HttpResponseRedirect(reverse('kate:match', args=(match.id, switch)))
+    return HttpResponseRedirect(reverse('kate:match', args=(mmatch.id, switch)))
 
 
 def add_comment(request, matchid):
     context = RequestContext(request)
-    match = get_object_or_404(Match, pk=matchid)
+    mmatch = get_object_or_404(ModelMatch, pk=matchid)
     if request.method == 'POST':
         newcomment = request.POST['newcomment']
         switchflag = request.POST['switchflag']        
         if(len(newcomment) > 0):
-            comment = Comment()
-            comment.match_id = match.id
+            comment = ModelComment()
+            comment.match_id = mmatch.id
             comment.text = newcomment
             comment.save()
-    return HttpResponseRedirect(reverse('kate:match', args=(match.id, switchflag)))
+    return HttpResponseRedirect(reverse('kate:match', args=(mmatch.id, switchflag)))
 
 
 def fetch_comments(request):
     context = RequestContext(request)
     if request.method == 'GET':
         matchid = request.GET['matchid']
-        comments = Comment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:3]
+        comments = ModelComment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:3]
         data = ""
         for comment in reversed(comments):
             data += "<p>" + comment.text + "</p>"
@@ -343,7 +343,7 @@ def html_board(match, switch, movesrc, movedst):
             if(col[0] == 0):
                 htmldata += "&nbsp;"
             else:
-                piece = helper.reverse_lookup(Match.PIECES, col[0])
+                piece = helper.reverse_lookup(match.PIECES, col[0])
                 htmldata += "<img class=\"draggable\" " + " src=\"/static/img/" + piece + ".png\">"
             htmldata += "</td>"
         htmldata += "<td class=\"board-label\">" + str(row[0][1])[1] + "</td></tr>"
@@ -371,13 +371,13 @@ def html_moves(match):
         htmlmoves += "<td>" + match.black_player + "</td>"
     htmlmoves += "</tr>"
 
-    currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+    currmove = ModelMove.objects.filter(match_id=match.id).order_by("count").last()
     if(currmove != None):
         if(currmove.count % 2 == 0):
             limit = 22
         else:
             limit = 21
-        moves = Move.objects.filter(match_id=match.id).order_by("-count")[:limit]
+        moves = ModelMove.objects.filter(match_id=match.id).order_by("-count")[:limit]
         for move in reversed(moves):
             if(move.count % 2 == 1 ):
                 htmlmoves += "<tr><td>" + str( (move.count + 1) // 2) + ".</td>"
