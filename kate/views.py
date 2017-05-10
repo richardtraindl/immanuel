@@ -5,14 +5,16 @@ from django.template import RequestContext
 from kate.models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from kate.engine import helper, rules, calc, kate, move
 from kate.engine.match import *
+from kate.modules.interface import *
 
 
-def calc_move_for_immanuel(match):
+def calc_move_for_immanuel(modelmatch):
+    match = map(modelmatch, MAP_DIR['model-to-engine']    
     if(rules.game_status(match) == match.STATUS['open'] and match.next_color_human() == False):
         calc.thread_do_move(match)
 
 
-def fill_fmtboard(match, switch):
+def fill_fmtboard(modelmatch, switch):
     fmtboard = [ [ [0  for k in range(2)] for x in range(8)] for x in range(8) ]
     if(switch == 0):
         rowstart = 7
@@ -32,7 +34,7 @@ def fill_fmtboard(match, switch):
     for i in range(rowstart, rowend, rowstep):
         idx2 = 0
         for j in range(colstart, colend, colstep):
-            fmtboard[idx1][idx2][0] = match.readfield(j, i)
+            fmtboard[idx1][idx2][0] = modelmatch.readfield(j, i)
             field = chr(ord('a') + j) + chr(ord('1') + i)
             fmtboard[idx1][idx2][1] = field
             idx2 += 1
@@ -43,19 +45,19 @@ def fill_fmtboard(match, switch):
 
 def index(request):
     context = RequestContext(request)
-    mmatches = ModelMatch.objects.order_by("begin").reverse()[:10]
-    return render(request, 'kate/index.html', { 'matches': mmatches } )
+    modelmatches = ModelMatch.objects.order_by("begin").reverse()[:10]
+    return render(request, 'kate/index.html', { 'matches': modelmatches } )
 
 
 def match(request, matchid=None, switch=0, msg=None):
     context = RequestContext(request)
     if(matchid == None):
-        mmatch = ModelMatch(white_player=None, black_player=None)
-        mmatch.setboardbase()
+        modelmatch = ModelMatch(white_player=None, black_player=None)
+        modelmatch.setboardbase()
     else:
-        mmatch = ModelMatch.objects.get(id=matchid)
+        modelmatch = ModelMatch.objects.get(id=matchid)
 
-    lastmove = ModelMove.objects.filter(match_id=mmatch.id).order_by("count").last()
+    lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(lastmove):
         movesrc = match.index_to_koord(lastmove.srcx, lastmove.srcy)
         movedst = match.index_to_koord(lastmove.dstx, lastmove.dsty)
@@ -63,20 +65,20 @@ def match(request, matchid=None, switch=0, msg=None):
         movesrc = ''
         movedst = ''
 
-    fmtboard = fill_fmtboard(mmatch, int(switch))
+    fmtboard = fill_fmtboard(modelmatch, int(switch))
 
     moves = []
-    currmove = ModelMove.objects.filter(match_id=mmatch.id).order_by("count").last()
+    currmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(currmove != None):
         if(currmove.count % 2 == 0):
             limit = 22
         else:
             limit = 21
-        qmoves = ModelMove.objects.filter(match_id=mmatch.id).order_by("-count")[:limit]
+        qmoves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")[:limit]
         for qmove in reversed(qmoves):
             moves.append(qmove)
 
-    comments = ModelComment.objects.filter(match_id=mmatch.id).order_by("created_at").reverse()[:3]
+    comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:3]
     
     if(msg == None):
         fmtmsg = "<p class='ok'></p>"
@@ -90,12 +92,12 @@ def match(request, matchid=None, switch=0, msg=None):
     else:
         rangeobj = range(7, -1, -1)
 
-    thread = ModelMatch.get_active_thread(mmatch)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread and thread.running):
         if(thread.searchcnt and thread.search):
             cnt = thread.searchcnt
             gmove = thread.search
-            search = "current search: " + str(cnt) + ". " + match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + match.index_to_koord(gmove.dstx, gmove.dsty)
+            search = "current search: " + str(cnt) + ". " + Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
         else:
             search = "current search:"
 
@@ -103,7 +105,7 @@ def match(request, matchid=None, switch=0, msg=None):
             candidates = "candidates: "
             for cand in thread.candidates[:3]:
                 if(cand):
-                    candidates += "[" + match.index_to_koord(cand.srcx, cand.srcy) + "-" + match.index_to_koord(cand.dstx, cand.dsty) + "]"
+                    candidates += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
         else:
             candidates = "candidates:"
             
@@ -116,7 +118,7 @@ def match(request, matchid=None, switch=0, msg=None):
         candidates = "candidates:"
         debuginfo = ""
 
-    return render(request, 'kate/match.html', { 'match': mmatch, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'search': search, 'candidates': candidates, 'debuginfo': debuginfo } )
+    return render(request, 'kate/match.html', { 'match': modelmatch, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'search': search, 'candidates': candidates, 'debuginfo': debuginfo } )
 
 
 def new(request):
@@ -127,63 +129,63 @@ def new(request):
 def create(request):
     context = RequestContext(request)
     if(request.method == 'POST'):
-        mmatch = ModelMatch()
+        modelmatch = ModelMatch()
 
-        mmatch.white_player = request.POST['white_player']
+        modelmatch.white_player = request.POST['white_player']
         if(request.POST.get('white_player_human')):
-            mmatch.white_player_human = True
+            modelmatch.white_player_human = True
         else:
-            mmatch.white_player_human = False
+            modelmatch.white_player_human = False
 
-        mmatch.black_player = request.POST['black_player']
+        modelmatch.black_player = request.POST['black_player']
         if(request.POST.get('black_player_human')):
-            mmatch.black_player_human = True
+            modelmatch.black_player_human = True
         else:
-            mmatch.black_player_human = False
+            modelmatch.black_player_human = False
 
         levellist = request.POST.getlist('level')
-        mmatch.level = LEVELS[levellist[0]]
+        modelmatch.level = LEVELS[levellist[0]]
 
-        if(len(mmatch.white_player) > 0 and len(mmatch.black_player) > 0):
-            mmatch.setboardbase()
-            mmatch.save()
-            calc_move_for_immanuel(mmatch)
-            return HttpResponseRedirect(reverse('kate:match', args=(mmatch.id,)))
+        if(len(modelmatch.white_player) > 0 and len(modelmatch.black_player) > 0):
+            modelmatch.setboardbase()
+            modelmatch.save()
+            calc_move_for_immanuel(modelmatch)
+            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id,)))
 
-    return render(request, 'kate/new.html', { 'white_player': mmatch.white_player, 'white_player_human': mmatch.white_player_human, 'black_player': mmatch.black_player, 'black_player_human': mmatch.black_player_human } )
+    return render(request, 'kate/new.html', { 'white_player': modelmatch.white_player, 'white_player_human': modelmatch.white_player_human, 'black_player': modelmatch.black_player, 'black_player_human': modelmatch.black_player_human } )
 
 
 def edit(request, matchid, switch=0):
     context = RequestContext(request)
-    match = get_object_or_404(Match, pk=matchid)
-    return render(request, 'kate/edit.html', { 'match': match, 'switch': switch } )
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+    return render(request, 'kate/edit.html', { 'match': modelmatch, 'switch': switch } )
 
 
 def update(request, matchid, switch=0):
     context = RequestContext(request)
-    mmatch = get_object_or_404(ModelMatch, pk=matchid)
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     if(request.method == 'POST'):
-        mmatch.white_player = request.POST['white_player']
+        modelmatch.white_player = request.POST['white_player']
         if(request.POST.get('white_player_human')):
-            mmatch.white_player_human = True
+            modelmatch.white_player_human = True
         else:
-            mmatch.white_player_human = False
+            modelmatch.white_player_human = False
 
-        mmatch.black_player = request.POST['black_player']
+        modelmatch.black_player = request.POST['black_player']
         if(request.POST.get('black_player_human')):
-            mmatch.black_player_human = True
+            modelmatch.black_player_human = True
         else:
-            mmatch.black_player_human = False
+            modelmatch.black_player_human = False
 
         levellist = request.POST.getlist('level')
-        mmatch.level = match.LEVELS[levellist[0]]
+        modelmatch.level = match.LEVELS[levellist[0]]
 
-        if(len(mmatch.white_player) > 0 and len(mmatch.black_player) > 0):
-            mmatch.save()
-            calc_move_for_immanuel(mmatch)
-            return HttpResponseRedirect(reverse('kate:match', args=(mmatch.id, switch,)))
+        if(len(modelmatch.white_player) > 0 and len(modelmatch.black_player) > 0):
+            modelmatch.save()
+            calc_move_for_immanuel(modelmatch)
+            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch,)))
 
-    return render(request, 'kate/edit.html', { 'match': match, 'switch': switch } )
+    return render(request, 'kate/edit.html', { 'match': modelmatch, 'switch': switch } )
 
 
 def delete(request, matchid):
@@ -246,18 +248,17 @@ def do_move(request, matchid):
 
 def force_move(request, matchid, switch=0):
     context = RequestContext(request)
-    mmatch = ModelMatch.objects.get(id=matchid)
+    modelmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = ModelMatch.get_active_thread(mmatch)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread and thread.running and thread.candidates[0]):
         thread.running = False
         gmove = thread.candidates[0]
-        ModelMatch.remove_threads(mmatch)
+        ModelMatch.remove_threads(modelmatch)
         msg = rules.RETURN_CODES['ok']
-        move = kate.do_move(mmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-        
+        move = kate.do_move(modelmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
         move.save()
-        mmatch.save()
+        modelmatch.save()
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
@@ -265,50 +266,50 @@ def force_move(request, matchid, switch=0):
 
 def undo_move(request, matchid, switch=0):
     context = RequestContext(request)
-    mmatch = ModelMatch.objects.get(id=matchid)
+    modelmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = Match.get_active_thread(mmatch)
+    thread = Match.get_active_thread(modelmatch)
     if(thread):
         if(thread.running):
             thread.running = False
-        ModelMatch.remove_threads(mmatch)
+        ModelMatch.remove_threads(modelmatch)
 
     move = kate.undo_move(mmatch, False)
 
     if(move != None):
         move.delete()
-        mmatch.save()
+        modelmatch.save()
 
-    return HttpResponseRedirect(reverse('kate:match', args=(mmatch.id, switch)))
+    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
 
 
 def resume(request, matchid, switch=0):
     context = RequestContext(request)
-    mmatch = ModelMatch.objects.get(id=matchid)
+    modelmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = ModelMatch.get_active_thread(mmatch)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
         if(thread.running == False):
-            ModelMatch.remove_threads(match)
-            calc_move_for_immanuel(mmatch)
+            ModelMatch.remove_threads(modelmatch)
+            calc_move_for_immanuel(modelmatch)
     else:
-        calc_move_for_immanuel(mmatch)
+        calc_move_for_immanuel(modelmatch)
 
-    return HttpResponseRedirect(reverse('kate:match', args=(mmatch.id, switch)))
+    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
 
 
 def add_comment(request, matchid):
     context = RequestContext(request)
-    mmatch = get_object_or_404(ModelMatch, pk=matchid)
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     if request.method == 'POST':
         newcomment = request.POST['newcomment']
         switchflag = request.POST['switchflag']        
         if(len(newcomment) > 0):
             comment = ModelComment()
-            comment.match_id = mmatch.id
+            comment.match_id = modelmatch.id
             comment.text = newcomment
             comment.save()
-    return HttpResponseRedirect(reverse('kate:match', args=(mmatch.id, switchflag)))
+    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switchflag)))
 
 
 def fetch_comments(request):
@@ -359,26 +360,26 @@ def html_board(match, switch, movesrc, movedst):
     return htmldata
 
 
-def html_moves(match):
+def html_moves(modelmatch):
     htmlmoves = "<table>"
     htmlmoves += "<tr><td>&nbsp;</td>"
-    if(match.white_player_human == False):
-        htmlmoves += "<td><span class=\"fbold\">" + match.white_player + "</span></td>"
+    if(modelmatch.white_player_human == False):
+        htmlmoves += "<td><span class=\"fbold\">" + modelmatch.white_player + "</span></td>"
     else:
-        htmlmoves += "<td>" + match.white_player + "</td>"
-    if(match.black_player_human == False):
-        htmlmoves += "<td><span class=\"fbold\">" + match.black_player + "</span></td>"
+        htmlmoves += "<td>" + modelmatch.white_player + "</td>"
+    if(modelmatch.black_player_human == False):
+        htmlmoves += "<td><span class=\"fbold\">" + modelmatch.black_player + "</span></td>"
     else:
-        htmlmoves += "<td>" + match.black_player + "</td>"
+        htmlmoves += "<td>" + modelmatch.black_player + "</td>"
     htmlmoves += "</tr>"
 
-    currmove = ModelMove.objects.filter(match_id=match.id).order_by("count").last()
+    currmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(currmove != None):
         if(currmove.count % 2 == 0):
             limit = 22
         else:
             limit = 21
-        moves = ModelMove.objects.filter(match_id=match.id).order_by("-count")[:limit]
+        moves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")[:limit]
         for move in reversed(moves):
             if(move.count % 2 == 1 ):
                 htmlmoves += "<tr><td>" + str( (move.count + 1) // 2) + ".</td>"
@@ -396,29 +397,29 @@ def fetch_match(request):
     matchid = request.GET['matchid']
     movecnt = request.GET['movecnt']
     switchflag = request.GET['switchflag']
-    mmatch = ModelMatch.objects.get(id=matchid)
-    if(mmatch == None):
+    modelmatch = ModelMatch.objects.get(id=matchid)
+    if(modelmatch == None):
         data = "§§§§"
     else:
-        lastmove = ModelMove.objects.filter(match_id=mmatch.id).order_by("count").last()
+        lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
         if(lastmove != None):
-            movesrc = match.index_to_koord(lastmove.srcx, lastmove.srcy)
-            movedst = match.index_to_koord(lastmove.dstx, lastmove.dsty)
+            movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
+            movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
 
-        if(int(movecnt) == mmatch.count):
+        if(int(movecnt) == modelmatch.count):
             data = "§§"
         else:
             data = html_board(mmatch, int(switchflag), movesrc, movedst)
-            data += "§" + html_moves(mmatch)
-            data += "§<p>Score: &nbsp;" + str(mmatch.score) + "</p>"
+            data += "§" + html_moves(modelmatch)
+            data += "§<p>Score: &nbsp;" + str(modelmatch.score) + "</p>"
 
-        thread = ModelMatch.get_active_thread(mmatch)
+        thread = ModelMatch.get_active_thread(modelmatch)
         if(thread and thread.running):
             if(thread.searchcnt and thread.search):
                 cnt = thread.searchcnt
                 gmove = thread.search
                 data += "§<p>current search: " + str(cnt) + ". "
-                data += match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + match.index_to_koord(gmove.dstx, gmove.dsty)
+                data += match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
                 data += "</p>"
             else:
                 data += "§"
@@ -427,7 +428,7 @@ def fetch_match(request):
                 data += "§<p>candidates: "
                 for cand in thread.candidates[:3]:
                     if(cand):
-                        data += "[" + match.index_to_koord(cand.srcx, cand.srcy) + "-" + match.index_to_koord(cand.dstx, cand.dsty) + "]"
+                        data += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
                 data += "</p>"
             else:
                 data += "§"
