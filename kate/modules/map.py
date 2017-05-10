@@ -1,4 +1,5 @@
-from 
+from kate.models import Match as ModelMatch, Move as ModelMove
+from kate.engine import match, move
 
 
 def database_to_engine(modelmatch):
@@ -30,5 +31,9 @@ def database_to_engine(modelmatch):
             piece = modelmatch.readfield(x, y)                
             match.writefield(x, y, PIECES[piece])       
         
-        
-        # self.move_list = []
+    move = ModelMove.objects.get(match_id=modelmatch.id, count=modelmatch.count)        
+    match.move_list.append(move)
+    
+    return match
+
+
