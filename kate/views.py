@@ -395,29 +395,29 @@ def fetch_match(request):
     matchid = request.GET['matchid']
     movecnt = request.GET['movecnt']
     switchflag = request.GET['switchflag']
-    match = Match.objects.get(id=matchid)
-    if(match == None):
+    mmatch = ModelMatch.objects.get(id=matchid)
+    if(mmatch == None):
         data = "§§§§"
     else:
-        lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+        lastmove = ModelMove.objects.filter(match_id=mmatch.id).order_by("count").last()
         if(lastmove != None):
-            movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
-            movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
+            movesrc = match.index_to_koord(lastmove.srcx, lastmove.srcy)
+            movedst = match.index_to_koord(lastmove.dstx, lastmove.dsty)
 
-        if(int(movecnt) == match.count):
+        if(int(movecnt) == mmatch.count):
             data = "§§"
         else:
-            data = html_board(match, int(switchflag), movesrc, movedst)
-            data += "§" + html_moves(match)
-            data += "§<p>Score: &nbsp;" + str(match.score) + "</p>"
+            data = html_board(mmatch, int(switchflag), movesrc, movedst)
+            data += "§" + html_moves(mmatch)
+            data += "§<p>Score: &nbsp;" + str(mmatch.score) + "</p>"
 
-        thread = Match.get_active_thread(match)
+        thread = ModelMatch.get_active_thread(mmatch)
         if(thread and thread.running):
             if(thread.searchcnt and thread.search):
                 cnt = thread.searchcnt
                 gmove = thread.search
                 data += "§<p>current search: " + str(cnt) + ". "
-                data += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+                data += match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + match.index_to_koord(gmove.dstx, gmove.dsty)
                 data += "</p>"
             else:
                 data += "§"
@@ -426,7 +426,7 @@ def fetch_match(request):
                 data += "§<p>candidates: "
                 for cand in thread.candidates[:3]:
                     if(cand):
-                        data += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
+                        data += "[" + match.index_to_koord(cand.srcx, cand.srcy) + "-" + match.index_to_koord(cand.dstx, cand.dsty) + "]"
                 data += "</p>"
             else:
                 data += "§"
