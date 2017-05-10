@@ -2,6 +2,67 @@ from kate.engine import match, move
 from kate.engine import rules, pawn, debug, helper
 
 
+SCORES = {
+        match.PIECES['blk'] : 0,
+        match.PIECES['wKg'] : -20000,
+        match.PIECES['wPw'] : -100,
+        match.PIECES['wRk'] : -500,
+        match.PIECES['wKn'] : -336,
+        match.PIECES['wBp'] : -340,
+        match.PIECES['wQu'] : -950,
+        match.PIECES['bKg'] : 20000,
+        match.PIECES['bPw'] : 100,
+        match.PIECES['bRk'] : 500,
+        match.PIECES['bKn'] : 336,
+        match.PIECES['bBp'] : 340,
+        match.PIECES['bQu'] : 950 }
+
+REVERSED_SCORES = {
+        match.PIECES['blk'] : PIECES['blk'],
+        match.PIECES['wKg'] : PIECES['bKg'],
+        match.PIECES['wPw'] : PIECES['bPw'],
+        match.PIECES['wRk'] : PIECES['bRk'] ,
+        match.PIECES['wKn'] : PIECES['bKn'],
+        match.PIECES['wBp'] : PIECES['bBp'],
+        match.PIECES['wQu'] : PIECES['bQu'],
+        match.PIECES['bKg'] : PIECES['wKg'],
+        match.PIECES['bPw'] : PIECES['wPw'],
+        match.PIECES['bRk'] : PIECES['wRk'],
+        match.PIECES['bKn'] : PIECES['wKn'],
+        match.PIECES['bBp'] : PIECES['wBp'],
+        match.PIECES['bQu'] : PIECES['wQu'] }
+
+ATTACKED_SCORES = {
+        match.PIECES['blk'] : 0,
+        match.PIECES['wKg'] : -10,
+        match.PIECES['wPw'] : -1,
+        match.PIECES['wRk'] : -5,
+        match.PIECES['wKn'] : -4,
+        match.PIECES['wBp'] : -4,
+        match.PIECES['wQu'] : -7,
+        match.PIECES['bKg'] : 10,
+        match.PIECES['bPw'] : 1,
+        match.PIECES['bRk'] : 5,
+        match.PIECES['bKn'] : 4,
+        match.PIECES['bBp'] : 4,
+        match.PIECES['bQu'] : 7 }
+
+SUPPORTED_SCORES = {
+        match.PIECES['blk'] : 0,
+        match.PIECES['wKg'] : 10,
+        match.PIECES['wPw'] : 1,
+        match.PIECES['wRk'] : 5,
+        match.PIECES['wKn'] : 4,
+        match.PIECES['wBp'] : 4,
+        match.PIECES['wQu'] : 7,
+        match.PIECES['bKg'] : -10,
+        match.PIECES['bPw'] : -1,
+        match.PIECES['bRk'] : -5,
+        match.PIECES['bKn'] : -4,
+        match.PIECES['bBp'] : -4,
+        match.PIECES['bQu'] : -7 }
+
+
 """
 def analyse(match):
     analyses = []
