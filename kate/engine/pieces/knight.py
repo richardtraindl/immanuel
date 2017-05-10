@@ -1,5 +1,5 @@
-from kate.engine import match
-from kate.engine import rules
+from kate.engine import rules, calc_helper
+from kate.engine.match import *
 
 
 STEP_2N1E_X = 1
@@ -21,7 +21,7 @@ STEP_2N1W_Y = 2
 
 STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
 
-blank = match.PIECES['blk']
+blank = PIECES['blk']
 GEN_STEPS = [ [[1, 2, blank]],
               [[2, 1, blank]],
               [[2, -1, blank]], 
@@ -38,8 +38,8 @@ def is_field_touched(match, color, fieldx, fieldy):
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( (color == match.COLORS['white'] and piece == match.PIECES['wKn']) or
-                (color == match.COLORS['black'] and piece == match.PIECES['bKn']) ):
+            if( (color == COLORS['white'] and piece == PIECES['wKn']) or
+                (color == COLORS['black'] and piece == PIECES['bKn']) ):
                 return True
 
     return False
@@ -53,8 +53,8 @@ def list_field_touches(match, color, fieldx, fieldy):
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( (color == match.COLORS['white'] and piece == match.PIECES['wKn']) or
-                (color == match.COLORS['black'] and piece == match.PIECES['bKn']) ):
+            if( (color == COLORS['white'] and piece == PIECES['wKn']) or
+                (color == COLORS['black'] and piece == PIECES['bKn']) ):
                 touches.append([piece, x1, y1])
 
     return touches
@@ -65,26 +65,26 @@ def does_attack(match, srcx, srcy, dstx, dsty):
 
     knight = match.readfield(srcx, srcy)
 
-    if(knight != match.PIECES['wKn'] and knight != match.PIECES['bKn']):
+    if(knight != PIECES['wKn'] and knight != PIECES['bKn']):
         return False, 0
 
-    color = match.color_of_piece(knight)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(knight)
+    opp_color = Match.oppcolor_of_piece(knight)
 
     for i in range(8):
         x1 = dstx + STEPS[i][0]
         y1 = dsty + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == opp_color):
-                if(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+            if(Match.color_of_piece(piece) == opp_color):
+                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     return True, 2 # priority
                 else:
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
                         priority = min(priority, 2)
                     else:
-                        match.writefield(srcx, srcy, match.PIECES['blk'])
+                        match.writefield(srcx, srcy, PIECES['blk'])
                         touched = rules.is_field_touched(match, opp_color, dstx, dsty)
                         match.writefield(srcx, srcy, knight)
                         if(touched):
@@ -108,18 +108,18 @@ def count_attacks(match, srcx, srcy, dstx, dsty):
 
     knight = match.readfield(srcx, srcy)
 
-    if(knight != match.PIECES['wKn'] and knight != match.PIECES['bKn']):
+    if(knight != PIECES['wKn'] and knight != PIECES['bKn']):
         return count
 
-    color = match.color_of_piece(knight)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(knight)
+    opp_color = Match.oppcolor_of_piece(knight)
 
     for i in range(8):
         x1 = dstx + STEPS[i][0]
         y1 = dsty + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == opp_color):
+            if(Match.color_of_piece(piece) == opp_color):
                 count += 1
 
     return count
@@ -130,18 +130,18 @@ def score_attacks(match, srcx, srcy):
 
     knight = match.readfield(srcx, srcy)
 
-    if(knight != match.PIECES['wKn'] and knight != match.PIECES['bKn']):
+    if(knight != PIECES['wKn'] and knight != PIECES['bKn']):
         return score
 
-    color = match.color_of_piece(knight)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(knight)
+    opp_color = Match.oppcolor_of_piece(knight)
 
     for i in range(8):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == opp_color):
+            if(Match.color_of_piece(piece) == opp_color):
                 score += calc_helper.ATTACKED_SCORES[piece]
 
     return score
@@ -152,11 +152,11 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
 
     knight = match.readfield(srcx, srcy)
 
-    if(knight != match.PIECES['wKn'] and knight != match.PIECES['bKn']):
+    if(knight != PIECES['wKn'] and knight != PIECES['bKn']):
         return False, 0
 
-    color = match.color_of_piece(knight)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(knight)
+    opp_color = Match.oppcolor_of_piece(knight)
 
     for i in range(8):
         x1 = dstx + STEPS[i][0]
@@ -165,9 +165,9 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
             if(x1 == srcx and y1 == srcy):
                 continue
             piece = match.readfield(x1, y1)
-            if(piece == match.PIECES['blk'] or piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+            if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
-            if( color == match.color_of_piece(piece) ):
+            if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
@@ -193,8 +193,8 @@ def score_supports_of_attacked(match, srcx, srcy):
     if(knight != match.PIECES['wKn'] and knight != match.PIECES['bKn']):
         return score
 
-    color = match.color_of_piece(knight)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(knight)
+    opp_color = Match.oppcolor_of_piece(knight)
 
     for i in range(8):
         stepx = STEPS[i][0]
@@ -204,9 +204,9 @@ def score_supports_of_attacked(match, srcx, srcy):
             if(x1 == srcx and y1 == srcy):
                 continue
             piece = match.readfield(x1, y1)
-            if(piece == match.PIECES['blk'] or piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+            if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
-            if( color == match.color_of_piece(piece) ):
+            if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += calc_helper.SUPPORTED_SCORES[piece]
 
@@ -243,7 +243,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
     if(direction == DIRS['undefined']):
         return False
 
-    color = match.color_of_piece(piece)
+    color = Match.color_of_piece(piece)
 
     pin_dir = rules.pin_dir(match, srcx, srcy)
 
@@ -251,7 +251,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
         return False
 
     field = match.readfield(dstx, dsty)
-    if(match.color_of_piece(field) == color):
+    if(Match.color_of_piece(field) == color):
         return False
 
     return True
