@@ -1,4 +1,4 @@
-from kate.engine import rules, calc_helper
+from kate.engine import move, rules, calc_helper
 from kate.engine.match import *
 
 
@@ -12,7 +12,7 @@ def do_move(match, srcx, srcy, dstx, dsty, prom_piece):
                 dsty=dsty, 
                 e_p_fieldx=None,
                 e_p_fieldy=None,
-                captured_piece=match.PIECES['blk'], 
+                captured_piece=PIECES['blk'], 
                 prom_piece=prom_piece, 
                 fifty_moves_count=match.fifty_moves_count)
 
@@ -100,6 +100,7 @@ def pawn_do_move(match, move, srcpiece, dstpiece):
         return move
     else:
         return generic_do_move(match, move, srcpiece, dstpiece)
+
 
 def king_do_move(match, move, srcpiece, dstpiece):
     if(move.dstx - move.srcx == 2):
@@ -207,7 +208,8 @@ def generic_undo_nmove(match, nmove):
             match.bRk_h8_first_nmovecnt = 0
 
     return nmove
-    
+
+
 def king_undo_short_castling(match, move):
     match.count -= 1
     match.fifty_moves_count = move.fifty_moves_count
