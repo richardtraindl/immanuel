@@ -1,5 +1,4 @@
-from kate.engine import match, move
-from kate.engine import rules, generic
+from kate.engine import match, move, rules, generic, calc_helper
 
 
 STEP_1N_X = 0
@@ -137,7 +136,7 @@ def score_attacks(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
-                score += match.ATTACKED_SCORES[piece]
+                score += calc_helper.ATTACKED_SCORES[piece]
 
     return score
 
@@ -198,7 +197,7 @@ def score_supports_of_attacked(match, srcx, srcy):
                 continue
             if( color == match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
-                    score += match.SUPPORTED_SCORES[piece]
+                    score += calc_helper.SUPPORTED_SCORES[piece]
 
     return score 
 
