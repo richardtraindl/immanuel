@@ -7,17 +7,22 @@ MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
 def map(nmatch, map_dir):
     if(map_dir == MAP_DIR['model-to-engine']):
         match = Match()
-        
+
         for y in range(0, 8, 1):
             for x in range(0, 8, 1):
                 piece = nmatch.readfield(x, y)
-                match.writefield(x, y, PIECES[piece])
+                match.writefield(x, y, piece)
 
         move = ModelMove.objects.get(match_id=nmatch.id, count=nmatch.count)
         if(move):
             match.move_list.append(move)
     else:
         match = ModelMatch()
+
+        for y in range(0, 8, 1):
+            for x in range(0, 8, 1):
+                piece = nmatch.readfield(x, y)
+                match.writefield(x, y, piece)
 
     match.status = nmatch.status
     match.count = nmatch.count
