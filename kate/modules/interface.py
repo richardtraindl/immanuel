@@ -4,7 +4,8 @@ from kate.engine import match, move
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
 
-def map(nmatch, map_dir):
+
+def map_matches(nmatch, map_dir):
     if(map_dir == MAP_DIR['model-to-engine']):
         match = Match()
 
@@ -47,4 +48,26 @@ def map(nmatch, map_dir):
     match.bRk_h8_first_movecnt = nmatch.bRk_h8_first_movecnt
 
     return match
+
+
+def map_moves(src, map_dir):
+    if(map_dir == MAP_DIR['model-to-engine']):
+        move = Move()
+    else:
+        move = ModelMove()
+
+     move.match = src.match
+     move.count = src.count
+     move.move_type = src.move_type
+     move.srcx = src.srcx
+     move.srcy = src.srcy
+     move.dstx = src.dstx.
+     move.dsty = src.dsty
+     move.e_p_fieldx = src.e_p_fieldx
+     move.e_p_fieldy = src.e_p_fieldy
+     move.captured_piece = src.captured_piece
+     move.prom_piece = src.prom_piece
+     move.fifty_moves_count = src.fifty_moves_count
+
+     return move
 
