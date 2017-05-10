@@ -1,4 +1,5 @@
-from kate.engine import match, move, rules, generic, calc_helper
+from kate.engine import rules, calc_helper
+from kate.engine.match import *
 
 
 STEP_1N_X = 0
@@ -24,7 +25,7 @@ STEP_LG_CASTLING_Y = 0
 
 STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
 
-blank = match.PIECES['blk']
+blank = PIECES['blk']
 GEN_STEPS = [ [[0, 1, blank]],
               [[1, 1, blank]],
               [[1, 0, blank]], 
@@ -43,8 +44,8 @@ def is_field_touched(match, color, fieldx, fieldy):
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( (color == match.COLORS['white'] and piece == match.PIECES['wKg']) or
-                (color == match.COLORS['black'] and piece == match.PIECES['bKg']) ):
+            if( (color == COLORS['white'] and piece == PIECES['wKg']) or
+                (color == COLORS['black'] and piece == PIECES['bKg']) ):
                 return True
     return False
 
@@ -57,8 +58,8 @@ def list_field_touches(match, color, fieldx, fieldy):
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( (color == match.COLORS['white'] and piece == match.PIECES['wKg']) or
-                (color == match.COLORS['black'] and piece == match.PIECES['bKg']) ):
+            if( (color == COLORS['white'] and piece == PIECES['wKg']) or
+                (color == COLORS['black'] and piece == PIECES['bKg']) ):
                 touches.append([piece, x1, y1])
                 return touches
 
@@ -70,11 +71,11 @@ def does_attack(match, srcx, srcy, dstx, dsty):
 
     king = match.readfield(srcx, srcy)
 
-    if(king != match.PIECES['wKg'] and king != match.PIECES['bKg']):
+    if(king != PIECES['wKg'] and king != PIECES['bKg']):
         return False, 0
 
-    color = match.color_of_piece(king) 
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(king) 
+    opp_color = Match.oppcolor_of_piece(king)
 
     for i in range(8):
         x1 = dstx + STEPS[i][0]
@@ -102,12 +103,11 @@ def count_attacks(match, srcx, srcy, dstx, dsty):
 
     king = match.readfield(srcx, srcy)
 
-    if(king != match.PIECES['wKg'] and king != match.PIECES['bKg']):
+    if(king != PIECES['wKg'] and king != PIECES['bKg']):
         return count
 
-    color = match.color_of_piece(king)
-    opp_color = match.REVERSED_COLORS[color]
-
+    color = Match.color_of_piece(king)
+    opp_color = Match.oppcolor_of_piece(king)
     for i in range(8):
         x1 = dstx + STEPS[i][0]
         y1 = dsty + STEPS[i][1]
@@ -124,18 +124,18 @@ def score_attacks(match, srcx, srcy):
 
     king = match.readfield(srcx, srcy)
 
-    if(king != match.PIECES['wKg'] and king != match.PIECES['bKg']):
+    if(king != PIECES['wKg'] and king != PIECES['bKg']):
         return score
 
-    color = match.color_of_piece(king)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(king)
+    opp_color = Match.oppcolor_of_piece(king)
 
     for i in range(8):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == opp_color):
+            if(Match.color_of_piece(piece) == opp_color):
                 score += calc_helper.ATTACKED_SCORES[piece]
 
     return score
@@ -146,11 +146,11 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
 
     king = match.readfield(srcx, srcy)
 
-    if(king != match.PIECES['wKg'] and king != match.PIECES['bKg']):
+    if(king != PIECES['wKg'] and king != PIECES['bKg']):
         return False, 0
 
-    color = match.color_of_piece(king)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(king)
+    opp_color = Match.oppcolor_of_piece(king)
 
     for i in range(8):
         x1 = dstx + STEPS[i][0]
@@ -159,9 +159,9 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
             if(x1 == srcx and y1 == srcy):
                 continue
             piece = match.readfield(x1, y1)
-            if(piece == match.PIECES['blk']):
+            if(piece == PIECES['blk']):
                 continue
-            if( color == match.color_of_piece(piece) ):
+            if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
@@ -180,11 +180,11 @@ def score_supports_of_attacked(match, srcx, srcy):
 
     king = match.readfield(srcx, srcy)
 
-    if(king != match.PIECES['wKg'] and king != match.PIECES['bKg']):
+    if(king != PIECES['wKg'] and king != PIECES['bKg']):
         return score
 
-    color = match.color_of_piece(king)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(king)
+    opp_color = Match.oppcolor_of_piece(king)
 
     for i in range(8):
         x1 = srcx + STEPS[i][0]
@@ -193,9 +193,9 @@ def score_supports_of_attacked(match, srcx, srcy):
             if(x1 == srcx and y1 == srcy):
                 continue
             piece = match.readfield(x1, y1)
-            if(piece == match.PIECES['blk']):
+            if(piece == PIECES['blk']):
                 continue
-            if( color == match.color_of_piece(piece) ):
+            if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += calc_helper.SUPPORTED_SCORES[piece]
 
@@ -231,14 +231,13 @@ def kg_dir(srcx, srcy, dstx, dsty):
 
 
 def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
-    color = match.color_of_piece(piece)
-
-    opp_color = match.REVERSED_COLORS[color]
+    color = Mtch.color_of_piece(piece)
+    opp_color = Match.oppcolor_of_piece(piece)
 
     for i in range(1, 3, 1):
         fieldx = srcx + i
         field = match.readfield(fieldx, srcy)
-        if(field != match.PIECES['blk']):
+        if(field != PIECES['blk']):
             return False
 
     if( rules.is_inbounds(dstx + 1, dsty ) ):
@@ -247,14 +246,14 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
         return False
 
     if(color == match.COLORS['white']):
-        if(match.wKg_first_movecnt != 0 or match.wRk_h1_first_movecnt != 0 or rook != match.PIECES['wRk']):
+        if(match.wKg_first_movecnt != 0 or match.wRk_h1_first_movecnt != 0 or rook != PIECES['wRk']):
             return False
     else:
-        if(match.bKg_first_movecnt != 0 or match.bRk_h8_first_movecnt != 0 or rook != match.PIECES['bRk']):
+        if(match.bKg_first_movecnt != 0 or match.bRk_h8_first_movecnt != 0 or rook != PIECES['bRk']):
             return False            
 
     king = match.readfield(srcx, srcy)
-    match.writefield(srcx, srcy, match.PIECES['blk'])
+    match.writefield(srcx, srcy, PIECES['blk'])
     for i in range(3):
         castlingx = srcx + i
         attacked = rules.is_field_touched(match, opp_color, castlingx, srcy)
@@ -267,14 +266,13 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
 
 
 def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
-    color = match.color_of_piece(piece)
-
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(piece)
+    opp_color = Match.oppcolor_of_piece(piece)
 
     for i in range(1, 4, 1):
         fieldx = srcx - i
         field = match.readfield(fieldx, srcy)
-        if(field != match.PIECES['blk']):
+        if(field != PIECES['blk']):
             return False
 
     if( rules.is_inbounds(dstx - 2, dsty) ):
@@ -283,14 +281,14 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
         return False
 
     if(color == match.COLORS['white']):
-        if(match.wKg_first_movecnt != 0 or match.wRk_a1_first_movecnt != 0 or rook != match.PIECES['wRk']):
+        if(match.wKg_first_movecnt != 0 or match.wRk_a1_first_movecnt != 0 or rook != PIECES['wRk']):
             return False
     else:
-        if(match.bKg_first_movecnt != 0 or match.bRk_a8_first_movecnt != 0 or rook != match.PIECES['bRk']):
+        if(match.bKg_first_movecnt != 0 or match.bRk_a8_first_movecnt != 0 or rook != PIECES['bRk']):
             return False
 
     king = match.readfield(srcx, srcy)
-    match.writefield(srcx, srcy, match.PIECES['blk'])
+    match.writefield(srcx, srcy, PIECES['blk'])
     for i in range(0, -3, -1):
         castlingx = srcx + i
         attacked = rules.is_field_touched(match, opp_color, castlingx, srcy)
@@ -305,9 +303,8 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
 def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
     DIRS = rules.DIRS
 
-    color = match.color_of_piece(piece)
-
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(piece)
+    opp_color = Match.oppcolor_of_piece(piece)
 
     direction = kg_dir(srcx, srcy, dstx, dsty)
     if(direction == DIRS['sh-castling']):
@@ -319,7 +316,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
 
     king = match.readfield(srcx, srcy)
     captured = match.readfield(dstx, dsty)
-    match.writefield(srcx, srcy, match.PIECES['blk'])
+    match.writefield(srcx, srcy, PIECES['blk'])
     match.writefield(dstx, dsty, king)
     attacked = rules.is_field_touched(match, opp_color, dstx, dsty)
     match.writefield(srcx, srcy, king)
@@ -328,7 +325,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
         return False
 
     field = match.readfield(dstx, dsty)
-    if(match.color_of_piece(field) == color):
+    if(Match.color_of_piece(field) == color):
         return False
 
     return True
@@ -340,13 +337,13 @@ def do_move(match, move, srcpiece, dstpiece):
         move.captured_piece = dstpiece
 
         match.count += 1   
-        match.writefield(move.srcx, move.srcy, match.PIECES['blk'])
+        match.writefield(move.srcx, move.srcy, PIECES['blk'])
         match.writefield(move.dstx, move.dsty, srcpiece)
         rook = match.readfield(move.srcx + 3, move.srcy)
-        match.writefield(move.srcx + 3, move.srcy, match.PIECES['blk'])
+        match.writefield(move.srcx + 3, move.srcy, PIECES['blk'])
         match.writefield(move.dstx - 1, move.dsty, rook)
         match.fifty_moves_count += 1
-        if(srcpiece == match.PIECES['wKg']):
+        if(srcpiece == PIECES['wKg']):
             match.wKg_x = move.dstx
             match.wKg_y = move.dsty
             if(match.wKg_first_movecnt == 0):
@@ -364,13 +361,13 @@ def do_move(match, move, srcpiece, dstpiece):
         move.captured_piece = dstpiece
 
         match.count += 1   
-        match.writefield(move.srcx, move.srcy, match.PIECES['blk'])
+        match.writefield(move.srcx, move.srcy, PIECES['blk'])
         match.writefield(move.dstx, move.dsty, srcpiece)
         rook = match.readfield(move.srcx - 4, move.srcy)
-        match.writefield(move.srcx - 4, move.srcy, match.PIECES['blk'])
+        match.writefield(move.srcx - 4, move.srcy, PIECES['blk'])
         match.writefield(move.dstx + 1, move.dsty, rook)
         match.fifty_moves_count += 1
-        if(srcpiece == match.PIECES['wKg']):
+        if(srcpiece == PIECES['wKg']):
             match.wKg_x = move.dstx
             match.wKg_y = move.dsty
             if(match.wKg_first_movecnt == 0):
@@ -394,10 +391,10 @@ def undo_short_castling(match, move):
     piece = match.readfield(move.dstx, move.dsty)
     rook = match.readfield(move.dstx - 1, move.dsty)
     match.writefield(move.srcx, move.srcy, piece)
-    match.writefield(move.dstx, move.dsty, match.PIECES['blk'])
-    match.writefield(move.dstx - 1, move.dsty, match.PIECES['blk'])
+    match.writefield(move.dstx, move.dsty, PIECES['blk'])
+    match.writefield(move.dstx - 1, move.dsty, PIECES['blk'])
     match.writefield(move.dstx + 1, move.dsty, rook)
-    if(piece == match.PIECES['wKg']):
+    if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
         match.wKg_y = move.srcy
         match.wKg_first_movecnt = 0
@@ -418,10 +415,10 @@ def undo_long_castling(match, move):
     piece = match.readfield(move.dstx, move.dsty)
     rook = match.readfield(move.dstx + 1, move.dsty)
     match.writefield(move.srcx, move.srcy, piece)
-    match.writefield(move.dstx, move.dsty, match.PIECES['blk'])
-    match.writefield(move.dstx + 1, move.dsty, match.PIECES['blk'])
+    match.writefield(move.dstx, move.dsty, PIECES['blk'])
+    match.writefield(move.dstx + 1, move.dsty, PIECES['blk'])
     match.writefield(move.dstx - 2, move.dsty, rook)
-    if(piece == match.PIECES['wKg']):
+    if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
         match.wKg_y = move.srcy
         match.wKg_first_movecnt = 0
