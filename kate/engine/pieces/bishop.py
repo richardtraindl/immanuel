@@ -1,4 +1,5 @@
-from kate.engine import match, rules, calc_helper
+from kate.engine import rules, calc_helper
+from kate.engine.match import *
 
 
 NEAST_X = 1
@@ -12,7 +13,7 @@ SEAST_Y = -1
 
 STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
 
-blank = match.PIECES['blk']
+blank = PIECES['blk']
 GEN_STEPS = [ [[1, 1, blank], [2, 2, blank], [3, 3, blank], [4, 4, blank], [5, 5, blank], [6, 6, blank], [7, 7, blank]],
               [[-1, -1, blank], [-2, -2, blank], [-3, -3, blank], [-4, -4, blank], [-5, -5, blank], [-6, -6, blank], [-7, -7, blank]],
               [[1, -1, blank], [2, -2, blank], [3, -3, blank], [4, -4, blank], [5, -5, blank], [6, -6, blank], [7, -7, blank]],
@@ -26,8 +27,8 @@ def is_field_touched(match, color, fieldx, fieldy):
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
-            if( (color == match.COLORS['white'] and (piece == match.PIECES['wQu'] or piece == match.PIECES['wBp'])) or
-                (color == match.COLORS['black'] and (piece == match.PIECES['bQu'] or piece == match.PIECES['bBp'])) ):
+            if( (color == COLORS['white'] and (piece == PIECES['wQu'] or piece == PIECES['wBp'])) or
+                (color == COLORS['black'] and (piece == PIECES['bQu'] or piece == PIECES['bBp'])) ):
                 return True
 
     return False
@@ -42,8 +43,8 @@ def list_field_touches(match, color, fieldx, fieldy):
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
-            if( (color == match.COLORS['white'] and (piece == match.PIECES['wQu'] or piece == match.PIECES['wBp'])) or
-                (color == match.COLORS['black'] and (piece == match.PIECES['bQu'] or piece == match.PIECES['bBp'])) ):
+            if( (color == COLORS['white'] and (piece == PIECES['wQu'] or piece == PIECES['wBp'])) or
+                (color == COLORS['black'] and (piece == PIECES['bQu'] or piece == PIECES['bBp'])) ):
                 touches.append([piece, x1, y1])
 
     return touches
@@ -54,11 +55,11 @@ def does_attack(match, srcx, srcy, dstx, dsty):
 
     bishop = match.readfield(srcx, srcy)
 
-    if(bishop != match.PIECES['wBp'] and bishop != match.PIECES['wQu'] and bishop != match.PIECES['bBp'] and bishop != match.PIECES['bQu']):
+    if(bishop != PIECES['wBp'] and bishop != PIECES['wQu'] and bishop != PIECES['bBp'] and bishop != PIECES['bQu']):
         return False, 0
 
-    color = match.color_of_piece(bishop)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(bishop)
+    opp_color = Match.oppcolor_of_piece(bishop)
 
     for i in range(4):
         stepx = STEPS[i][0]
@@ -66,7 +67,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
         x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == opp_color):
+            if(Match.color_of_piece(piece) == opp_color):
                 if(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
                     return True, 2 # priority
                 else:
@@ -98,11 +99,11 @@ def count_attacks(match, srcx, srcy, dstx, dsty):
 
     bishop = match.readfield(srcx, srcy)
 
-    if(bishop != match.PIECES['wBp'] and bishop != match.PIECES['wQu'] and bishop != match.PIECES['bBp'] and bishop != match.PIECES['bQu']):
+    if(bishop != PIECES['wBp'] and bishop != PIECES['wQu'] and bishop != PIECES['bBp'] and bishop != PIECES['bQu']):
         return count
 
-    color = match.color_of_piece(bishop)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(bishop)
+    opp_color = Match.oppcolor_of_piece(bishop)
 
     for i in range(4):
         stepx = STEPS[i][0]
@@ -124,8 +125,8 @@ def score_attacks(match, srcx, srcy):
     if(bishop != match.PIECES['wBp'] and bishop != match.PIECES['wQu'] and bishop != match.PIECES['bBp'] and bishop != match.PIECES['bQu']):
         return score
 
-    color = match.color_of_piece(bishop)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(bishop)
+    opp_color = Match.oppcolor_of_piece(bishop)
 
     for i in range(4):
         stepx = STEPS[i][0]
@@ -138,7 +139,7 @@ def score_attacks(match, srcx, srcy):
                 pin_dir = rules.pin_dir(match, x1, y1)
                 direction = bp_dir(srcx, srcy, x1, y1)
                 if(pin_dir == direction):
-                    if(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp'] or piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
+                    if(piece == PIECES['wBp'] or piece == PIECES['bBp'] or piece == PIECES['wQu'] or piece == PIECES['bQu']):
                         score += calc_helper.ATTACKED_SCORES[piece] // 4
                     else:
                         score += calc_helper.ATTACKED_SCORES[piece] // 2     
@@ -151,11 +152,11 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
 
     bishop = match.readfield(srcx, srcy)
 
-    if(bishop != match.PIECES['wBp'] and bishop != match.PIECES['wQu'] and bishop != match.PIECES['bBp'] and bishop != match.PIECES['bQu']):
+    if(bishop != PIECES['wBp'] and bishop != PIECES['wQu'] and bishop != PIECES['bBp'] and bishop != PIECES['bQu']):
         return False, 0
 
-    color = match.color_of_piece(bishop)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(bishop)
+    opp_color = Match.oppcolor_of_piece(bishop)
 
     for i in range(4):
         stepx = STEPS[i][0]
@@ -165,7 +166,7 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
             if(x1 == srcx and y1 == srcy):
                 continue
             piece = match.readfield(x1, y1)
-            if(piece == match.PIECES['blk'] or piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+            if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
             if( color == match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
@@ -189,11 +190,11 @@ def score_supports_of_attacked(match, srcx, srcy):
 
     bishop = match.readfield(srcx, srcy)
 
-    if(bishop != match.PIECES['wBp'] and bishop != match.PIECES['wQu'] and bishop != match.PIECES['bBp'] and bishop != match.PIECES['bQu']):
+    if(bishop != PIECES['wBp'] and bishop != PIECES['wQu'] and bishop != PIECES['bBp'] and bishop != PIECES['bQu']):
         return score
 
-    color = match.color_of_piece(bishop)
-    opp_color = match.REVERSED_COLORS[color]
+    color = Match.color_of_piece(bishop)
+    opp_color = Match.oppcolor_of_piece(bishop)
 
     for i in range(4):
         stepx = STEPS[i][0]
@@ -203,9 +204,9 @@ def score_supports_of_attacked(match, srcx, srcy):
             if(x1 == srcx and y1 == srcy):
                 continue
             piece = match.readfield(x1, y1)
-            if(piece == match.PIECES['blk'] or piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+            if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
-            if( color == match.color_of_piece(piece) ):
+            if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += calc_helper.SUPPORTED_SCORES[piece]
 
@@ -249,7 +250,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
     if(direction == DIRS['undefined']):
         return False
 
-    color = match.color_of_piece(piece)
+    color = Match.color_of_piece(piece)
 
     pin_dir = rules.pin_dir(match, srcx, srcy)
 
@@ -265,11 +266,11 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
     while(x >= 0 and x <= 7 and y >= 0 and y <= 7):
         field = match.readfield(x, y)
         if(x == dstx and y == dsty):
-            if(match.color_of_piece(field) == color):
+            if(Match.color_of_piece(field) == color):
                 return False
             else:
                 return True
-        elif(field != match.PIECES['blk']):
+        elif(field != PIECES['blk']):
             return False
 
         x += stepx
