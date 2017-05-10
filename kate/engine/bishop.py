@@ -1,5 +1,4 @@
-from kate.engine import match
-from kate.engine import rules
+from kate.engine import match, rules, calc_helper
 
 
 NEAST_X = 1
@@ -81,7 +80,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                         if(touched):
                             priority = min(priority, 3)
                         elif(rules.is_field_touched(match, opp_color, x1, y1)):
-                            if(match.PIECES_RANK[piece] >= match.PIECES_RANK[bishop]):
+                            if(calc_helper.PIECES_RANK[piece] >= calc_helper.PIECES_RANK[bishop]):
                                 priority = min(priority, 2)
                             else:
                                 priority = min(priority, 3)
@@ -135,14 +134,14 @@ def score_attacks(match, srcx, srcy):
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
-                score += match.ATTACKED_SCORES[piece]
+                score += calc_helper.ATTACKED_SCORES[piece]
                 pin_dir = rules.pin_dir(match, x1, y1)
                 direction = bp_dir(srcx, srcy, x1, y1)
                 if(pin_dir == direction):
                     if(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp'] or piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
-                        score += match.ATTACKED_SCORES[piece] // 4
+                        score += calc_helper.ATTACKED_SCORES[piece] // 4
                     else:
-                        score += match.ATTACKED_SCORES[piece] // 2     
+                        score += calc_helper.ATTACKED_SCORES[piece] // 2     
 
     return score
 
@@ -174,7 +173,7 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                     if(pin_dir != rules.DIRS['undefined']):
                         return True, 2 # priority
                     else:
-                        if(match.PIECES_RANK[piece] >= match.PIECES_RANK[bishop]):
+                        if(calc_helper.PIECES_RANK[piece] >= calc_helper.PIECES_RANK[bishop]):
                             return True, 2 # priority
                         else:
                             priority = min(priority, 3)
@@ -208,7 +207,7 @@ def score_supports_of_attacked(match, srcx, srcy):
                 continue
             if( color == match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
-                    score += match.SUPPORTED_SCORES[piece]
+                    score += calc_helper.SUPPORTED_SCORES[piece]
 
     return score 
 
