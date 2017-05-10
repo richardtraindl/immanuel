@@ -61,7 +61,7 @@ def map_moves(src, map_dir):
      move.move_type = src.move_type
      move.srcx = src.srcx
      move.srcy = src.srcy
-     move.dstx = src.dstx.
+     move.dstx = src.dstx
      move.dsty = src.dsty
      move.e_p_fieldx = src.e_p_fieldx
      move.e_p_fieldy = src.e_p_fieldy
