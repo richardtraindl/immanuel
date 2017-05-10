@@ -1,4 +1,4 @@
-from kate.engine.match.pieces import rook, bishop
+from kate.engine.pieces import rook, bishop
 from kate.engine.match import *
 
 
