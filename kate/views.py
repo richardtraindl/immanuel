@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from kate.models import Match, Move, Comment
-from kate.modules import helper, rules, calc, kate
+from kate.models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
+from kate.engine import helper, rules, calc, kate, match, move
 
 
 def calc_move_for_immanuel(match):
@@ -52,12 +52,12 @@ def match(request, matchid=None, switch=0, msg=None):
         match = Match(white_player=None, black_player=None)
         match.setboardbase()
     else:
-        match = Match.objects.get(id=matchid)
+        match = ModelMatch.objects.get(id=matchid)
 
-    lastmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+    lastmove = ModelMove.objects.filter(match_id=match.id).order_by("count").last()
     if(lastmove):
-        movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
-        movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
+        movesrc = match.index_to_koord(lastmove.srcx, lastmove.srcy)
+        movedst = match.index_to_koord(lastmove.dstx, lastmove.dsty)
     else:
         movesrc = ''
         movedst = ''
@@ -65,17 +65,17 @@ def match(request, matchid=None, switch=0, msg=None):
     fmtboard = fill_fmtboard(match, int(switch))
 
     moves = []
-    currmove = Move.objects.filter(match_id=match.id).order_by("count").last()
+    currmove = ModelMove.objects.filter(match_id=match.id).order_by("count").last()
     if(currmove != None):
         if(currmove.count % 2 == 0):
             limit = 22
         else:
             limit = 21
-        qmoves = Move.objects.filter(match_id=match.id).order_by("-count")[:limit]
+        qmoves = ModelMove.objects.filter(match_id=match.id).order_by("-count")[:limit]
         for qmove in reversed(qmoves):
             moves.append(qmove)
 
-    comments = Comment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:3]
+    comments = ModelComment.objects.filter(match_id=match.id).order_by("created_at").reverse()[:3]
     
     if(msg == None):
         fmtmsg = "<p class='ok'></p>"
@@ -89,7 +89,7 @@ def match(request, matchid=None, switch=0, msg=None):
     else:
         rangeobj = range(7, -1, -1)
 
-    thread = Match.get_active_thread(match)
+    thread = ModelMatch.get_active_thread(match)
     if(thread and thread.running):
         if(thread.searchcnt and thread.search):
             cnt = thread.searchcnt
@@ -193,15 +193,15 @@ def delete(request, matchid):
 def do_move(request, matchid):
     context = RequestContext(request)
     if request.method == 'POST':
-        match = get_object_or_404(Match, pk=matchid)
+        match = get_object_or_404(ModelMatch, pk=matchid)
         switch = request.POST['switch']        
         status = rules.game_status(match)
-        if(status != Match.STATUS['open']):
-            if(status == Match.STATUS['draw']):
+        if(status != match.STATUS['open']):
+            if(status == match.STATUS['draw']):
                 msg = rules.RETURN_CODES['draw']
-            elif(status == Match.STATUS['winner_white']):
+            elif(status == match.STATUS['winner_white']):
                 msg = rules.RETURN_CODES['winner_white']
-            elif(status == Match.STATUS['winner_black']):
+            elif(status == match.STATUS['winner_black']):
                 msg = rules.RETURN_CODES['winner_black']
             else:
                 msg = rules.RETURN_CODES['match-cancelled']
@@ -214,13 +214,25 @@ def do_move(request, matchid):
         movedst = request.POST['move_dst']
         prompiece = request.POST['prom_piece']        
         if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
-            srcx,srcy = Match.koord_to_index(movesrc)
-            dstx,dsty = Match.koord_to_index(movedst)
+            srcx,srcy = match.koord_to_index(movesrc)
+            dstx,dsty = match.koord_to_index(movedst)
             prom_piece = match.PIECES[prompiece]
             flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
             if(flag == True):
                 move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
-                move.save()
+                mmove = ModelMove(move.match, 
+                                        move.count, 
+                                        move.move_type,
+                                        move.srcx, 
+                                        move.srcy, 
+                                        move.dstx, 
+                                        move.dsty, 
+                                        move.e_p_fieldx,
+                                        move.e_p_fieldy,
+                                        move.captured_piece, 
+                                        move.prom_piece, 
+                                        move.fifty_moves_count)
+                mmove.save()
                 match.save()
                 calc_move_for_immanuel(match)
         else:
@@ -242,6 +254,7 @@ def force_move(request, matchid, switch=0):
         Match.remove_threads(match)
         msg = rules.RETURN_CODES['ok']
         move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        
         move.save()
         match.save()
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
