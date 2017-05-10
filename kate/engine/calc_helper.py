@@ -1,5 +1,5 @@
-from kate.engine import match, move
-from kate.engine import rules, pawn, debug, helper
+from kate.engine import move, rules, pawn, debug, helper
+from kate.engine.match import *
 
 
 SCORES = {
@@ -62,6 +62,20 @@ SUPPORTED_SCORES = {
         match.PIECES['bBp'] : -4,
         match.PIECES['bQu'] : -7 }
 
+PIECES_RANK = {
+        PIECES['blk'] : 0,
+        PIECES['wPw'] : 1,
+        PIECES['bPw'] : 1,
+        PIECES['wKn'] : 2,
+        PIECES['bKn'] : 2,
+        PIECES['wBp'] : 2,
+        PIECES['bBp'] : 2,
+        PIECES['wRk'] : 4,
+        PIECES['bRk'] : 4,
+        PIECES['wQu'] : 5,
+        PIECES['bQu'] : 5,
+        PIECES['wKg'] : 6,
+        PIECES['bKg'] : 6 }
 
 """
 def analyse(match):
@@ -112,25 +126,25 @@ def is_capture(match, move):
 
     dstpiece = match.readfield(move.dstx, move.dsty)
 
-    if(dstpiece != Match.PIECES['blk']):
-        if(Match.PIECES_RANK[dstpiece] >= Match.PIECES_RANK[piece]):
+    if(dstpiece != PIECES['blk']):
+        if(PIECES_RANK[dstpiece] >= PIECES_RANK[piece]):
             return True, 1 # priority
         else:
-            match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+            match.writefield(move.srcx, move.srcy, PIECES['blk'])
             touched = rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty)
             match.writefield(move.srcx, move.srcy, piece)        
             if(touched):
                 return True, 2 # priority
             else:
                 return True, 1 # priority
-    elif( (piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw']) and move.srcx != move.dstx ):
+    elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and move.srcx != move.dstx ):
         return True, 1 # priority
     else:
         return False, 0  # priority
 
 
 def is_promotion(match, move):
-    if(move.prom_piece == Match.PIECES['blk']):
+    if(move.prom_piece == PIECES['blk']):
         return False, 0 # priority
     else:
         return True, 1 # priority
@@ -138,7 +152,7 @@ def is_promotion(match, move):
 
 def is_castling(match, move):
     piece = match.readfield(move.srcx, move.srcy)
-    if(piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
         if(move.srcx - move.dstx == 2 or move.srcx - move.dstx == -2):
             return True, 1 # priority
 
@@ -158,7 +172,7 @@ def does_attacked_flee(match, move):
     piece = match.readfield(move.srcx, move.srcy)
     
     color = Match.color_of_piece(piece)
-    opp_color = Match.REVERSED_COLORS[color]
+    opp_color = Match.oppcolor_of_piece(piece)
 
     touches = rules.list_field_touches(match, opp_color, move.srcx, move.srcy)
     if(len(touches) > 0):
@@ -179,7 +193,7 @@ def is_endgame_move(match, move):
             return True, 2 # priority
         else:
             piece = match.readfield(move.srcx, move.srcy)
-            if(piece == Match.PIECES['wPw'] or piece == Match.PIECES['bPw'] or piece == Match.PIECES['wKg'] or piece == Match.PIECES['bKg']):
+            if(piece == PIECES['wPw'] or piece == PIECES['bPw'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 return True, 3 # priority
             else:
                 return False, 0 # priority
@@ -222,7 +236,7 @@ def evaluate_contacts(match):
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
-            if(Match.color_of_piece(piece) == Match.COLORS['undefined']):
+            if(Match.color_of_piece(piece) == COLORS['undefined']):
                 continue
 
             supporter += rules.score_supports_of_attacked(match, x, y)
@@ -239,22 +253,22 @@ def evaluate_piece_moves(match, srcx, srcy):
     if(Match.color_of_piece(piece) != color):
         return movecnt
         
-    if(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
+    if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 8
         stepcnt = 7
         value = 2
-    elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
         dircnt = 4
         stepcnt = 7
         value = 4
-    elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
         dirs = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 4
         stepcnt = 7
         value = 6
-    elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
         dirs =  [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
         dircnt = 8
         stepcnt = 1
@@ -270,7 +284,7 @@ def evaluate_piece_moves(match, srcx, srcy):
         for i in range(stepcnt):
             dstx += stepx
             dsty += stepy
-            flag,errcode = rules.is_move_valid(match, srcx, srcy, dstx, dsty, Match.PIECES['blk'])
+            flag,errcode = rules.is_move_valid(match, srcx, srcy, dstx, dsty, PIECES['blk'])
             if(flag):
                 movecnt += value
             elif(errcode == rules.RETURN_CODES['out-of-bounds']):
@@ -286,7 +300,7 @@ def evaluate_movecnt(match):
         for x1 in range(8):
             movecnt += evaluate_piece_moves(match, x1, y1)
 
-    if(match.next_color() == Match.COLORS['white']):
+    if(match.next_color() == COLORS['white']):
         return movecnt
     else:
         return (movecnt * -1)
@@ -312,16 +326,16 @@ def evaluate_endgame(match):
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
-            if(piece == Match.PIECES['wPw']):
+            if(piece == PIECES['wPw']):
                 if(pawn.is_running):
-                    running += Match.REVERSED_SCORES[piece] // 2
+                    running += REVERSED_SCORES[piece] // 2
                     if(y >= 4):
-                        running += Match.REVERSED_SCORES[piece]
-            elif(piece == Match.PIECES['bPw']):
+                        running += REVERSED_SCORES[piece]
+            elif(piece == PIECES['bPw']):
                 if(pawn.is_running):
-                    running += Match.REVERSED_SCORES[piece] // 2
+                    running += REVERSED_SCORES[piece] // 2
                     if(y <= 3):
-                        running += Match.REVERSED_SCORES[piece]
+                        running += REVERSED_SCORES[piece]
 
     return running
 
@@ -329,12 +343,12 @@ def evaluate_endgame(match):
 def evaluate_position(match, movecnt):    
     if(movecnt == 0):
         status = rules.game_status(match)
-        if(status == Match.STATUS['winner_black']):
-            return ( Match.SCORES[Match.PIECES['wKg']] + match.count )
-        elif(status == Match.STATUS['winner_white']):
-            return ( Match.SCORES[Match.PIECES['bKg']] - match.count )
+        if(status == STATUS['winner_black']):
+            return ( SCORES[PIECES['wKg']] + match.count )
+        elif(status == STATUS['winner_white']):
+            return ( SCORES[PIECES['bKg']] - match.count )
         else:   # Match.STATUS['draw']):
-            return Match.SCORES[Match.PIECES['blk']]
+            return SCORES[PIECES['blk']]
     else:  
         value = match.score
         
