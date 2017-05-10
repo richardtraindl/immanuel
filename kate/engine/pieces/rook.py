@@ -127,21 +127,21 @@ def score_attacks(match, srcx, srcy):
     color = Match.color_of_piece(rook)
     opp_color = Match.oppcolor_of_piece(rook)
 
-        for i in range(4):
-            stepx = STEPS[i][0]
-            stepy = STEPS[i][1]
-            x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
-            if(x1 != rules.UNDEF_X):
-                piece = match.readfield(x1, y1)
-                if(Match.color_of_piece(piece) == opp_color):
-                    score += calc_helper.ATTACKED_SCORES[piece]
-                    pin_dir = rules.pin_dir(match, x1, y1)
-                    direction = rk_dir(srcx, srcy, x1, y1)
-                    if(pin_dir == direction):
-                        if(piece == PIECES['wRk'] or piece == PIECES['bRk'] or piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                            score += calc_helper.ATTACKED_SCORES[piece] // 4
-                        else:
-                            score += calc_helper.ATTACKED_SCORES[piece] // 2
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
+        if(x1 != rules.UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if(Match.color_of_piece(piece) == opp_color):
+                score += calc_helper.ATTACKED_SCORES[piece]
+                pin_dir = rules.pin_dir(match, x1, y1)
+                direction = rk_dir(srcx, srcy, x1, y1)
+                if(pin_dir == direction):
+                    if(piece == PIECES['wRk'] or piece == PIECES['bRk'] or piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                        score += calc_helper.ATTACKED_SCORES[piece] // 4
+                    else:
+                        score += calc_helper.ATTACKED_SCORES[piece] // 2
     return score
 
 
