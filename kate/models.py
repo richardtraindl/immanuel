@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
+# from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 from kate.modules import helper
 import threading
@@ -171,7 +171,15 @@ class Match(models.Model):
     black_player_human = models.BooleanField(null=False, default=True)
     elapsed_time_black = models.IntegerField(null=False, default=0)
     level = models.SmallIntegerField(null=False, default=1)
-    board = ArrayField(ArrayField(models.PositiveSmallIntegerField(null=False, blank=False, default=PIECES['blk']), size=8), size=8)
+    board = models.CharField(max_length=256, blank=False, default='wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;' \
+                                                                  'wPw;wPw;wPw;wPw;wPw;wPw;wPw;wPw;' \
+                                                                  'blk;blk;blk;blk;blk;blk;blk;blk;' \
+                                                                  'blk;blk;blk;blk;blk;blk;blk;blk;' \
+                                                                  'blk;blk;blk;blk;blk;blk;blk;blk;' \
+                                                                  'blk;blk;blk;blk;blk;blk;blk;blk;' \
+                                                                  'bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;' \
+                                                                  'bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;')
+    # board = ArrayField(ArrayField(models.PositiveSmallIntegerField(null=False, blank=False, default=PIECES['blk']), size=8), size=8)
     fifty_moves_count = models.SmallIntegerField(null=False, default=0)
     wKg_x = models.SmallIntegerField(null=False, default=0)
     wKg_y = models.SmallIntegerField(null=False, default=0)
@@ -189,10 +197,30 @@ class Match(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Match, self).__init__(*args, **kwargs)
-        self.move_list = []
 
 
     def setboardbase(self):
+        self.board ='wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;' \
+                    'wPw;wPw;wPw;wPw;wPw;wPw;wPw;wPw;' \
+                    'blk;blk;blk;blk;blk;blk;blk;blk;' \
+                    'blk;blk;blk;blk;blk;blk;blk;blk;' \
+                    'blk;blk;blk;blk;blk;blk;blk;blk;' \
+                    'blk;blk;blk;blk;blk;blk;blk;blk;' \
+                    'bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;' \
+                    'bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;'
+        self.fifty_moves_count = 0
+        self.wKg_x = 4
+        self.wKg_y = 0
+        self.bKg_x = 4
+        self.bKg_y = 7
+        self.wKg_first_movecnt = 0
+        self.bKg_first_movecnt = 0
+        self.wRk_a1_first_movecnt = 0
+        self.wRk_h1_first_movecnt = 0
+        self.bRk_a8_first_movecnt = 0
+        self.bRk_h8_first_movecnt = 0
+
+    def setboardbase_old(self):
         self.board = [ [0 for x in range(8)] for x in range(8) ]
         self.board[0][0] = self.PIECES['wRk']
         self.board[0][1] = self.PIECES['wKn']
@@ -231,10 +259,22 @@ class Match(models.Model):
 
 
     def writefield(self, x, y, value):
-        self.board[y][x] = value
+        idx = y*32 + x*4
+        str_value = helper.reverse_lookup(Match.PIECES, value)
+        self.board = self.board[:idx] + str_value + self.board[(idx+3):]
 
 
     def readfield(self, x, y):
+        idx = y*32 + x*4
+        str_value = self.board[idx:idx+3]
+        return Match.PIECES[str_value]
+
+
+    def writefield_old(self, x, y, value):
+        self.board[y][x] = value
+
+
+    def readfield_old(self, x, y):
         return self.board[y][x]
 
 
@@ -254,56 +294,7 @@ class Match(models.Model):
 
     def is_immanuel(self):
         return (self.white_player_human == False or self.black_player_human == False)
-
-
-    def is_last_move_capture(self):
-        if(len(self.move_list) > 0):
-            move = self.move_list[-1]
-            if(move.captured_piece != self.PIECES['blk']):
-                return True
-
-        return False
-
-
-    def is_last_move_promotion(self):
-        if(len(self.move_list) > 0):
-            move = self.move_list[-1]
-            if(move.prom_piece != self.PIECES['blk']):
-                return True
-
-        return False
-
-
-    def read_move_list(self, idx):
-        if(len(self.move_list) > 0):
-            return self.move_list[idx]
-        else:
-            return None
-
-
-    @staticmethod
-    def color_of_piece(piece):
-        return Match.PIECES_COLOR[piece]
-
-    @staticmethod
-    def oppcolor_of_piece(piece):
-        color = Match.PIECES_COLOR[piece]
-        return Match.REVERSED_COLORS[color]
-
-    @staticmethod
-    def koord_to_index(koord):
-        x = ord(koord[0]) - ord('a')
-        y = ord(koord[1]) - ord('1')
-        return x,y
-
-
-    @staticmethod
-    def index_to_koord(x, y):
-        col = chr(x + ord('a'))
-        row = chr(y + ord('1'))
-        koord = str(col + row)
-        return koord
-
+   
 
     @classmethod
     def remove_threads(cls, match):
