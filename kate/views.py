@@ -9,7 +9,7 @@ from kate.modules.interface import *
 
 
 def calc_move_for_immanuel(modelmatch):
-    match = map(modelmatch, MAP_DIR['model-to-engine']    
+    match = map_matches(modelmatch, MAP_DIR['model-to-engine'])
     if(rules.game_status(match) == match.STATUS['open'] and match.next_color_human() == False):
         calc.thread_do_move(match)
 
@@ -196,19 +196,22 @@ def delete(request, matchid):
 def do_move(request, matchid):
     context = RequestContext(request)
     if request.method == 'POST':
-        match = get_object_or_404(ModelMatch, pk=matchid)
-        switch = request.POST['switch']        
+        modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+        switch = request.POST['switch']
+
+        match = map_matches(modelmatch, MAP_DIR['model-to-engine'])
         status = rules.game_status(match)
-        if(status != match.STATUS['open']):
-            if(status == match.STATUS['draw']):
+        if(status != STATUS['open']):
+            if(status == STATUS['draw']):
                 msg = rules.RETURN_CODES['draw']
-            elif(status == match.STATUS['winner_white']):
+            elif(status == STATUS['winner_white']):
                 msg = rules.RETURN_CODES['winner_white']
-            elif(status == match.STATUS['winner_black']):
+            elif(status == STATUS['winner_black']):
                 msg = rules.RETURN_CODES['winner_black']
             else:
                 msg = rules.RETURN_CODES['match-cancelled']
             return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
+
         if(match.next_color_human() == False):
             msg= rules.RETURN_CODES['wrong-color']
             return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
@@ -217,27 +220,17 @@ def do_move(request, matchid):
         movedst = request.POST['move_dst']
         prompiece = request.POST['prom_piece']        
         if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
-            srcx,srcy = match.koord_to_index(movesrc)
-            dstx,dsty = match.koord_to_index(movedst)
-            prom_piece = match.PIECES[prompiece]
+            srcx,srcy = Match.koord_to_index(movesrc)
+            dstx,dsty = Match.koord_to_index(movedst)
+            prom_piece = PIECES[prompiece]            
             flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
             if(flag == True):
                 move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
-                mmove = ModelMove(move.match, 
-                                        move.count, 
-                                        move.move_type,
-                                        move.srcx, 
-                                        move.srcy, 
-                                        move.dstx, 
-                                        move.dsty, 
-                                        move.e_p_fieldx,
-                                        move.e_p_fieldy,
-                                        move.captured_piece, 
-                                        move.prom_piece, 
-                                        move.fifty_moves_count)
-                mmove.save()
-                match.save()
-                calc_move_for_immanuel(match)
+                modelmatch = map_matches(match, MAP_DIR['engine-to-model'])                
+                modelmove = map_moves(move, MAP_DIR['engine-to-model'])
+                modelmove.save()
+                modelmatch.save()
+                calc_move_for_immanuel(modelmatch)
         else:
             msg = rules.RETURN_CODES['format-error']
 
