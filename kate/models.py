@@ -13,12 +13,6 @@ class Match(models.Model):
         'black' : 9 
     }
 
-    REVERSED_COLORS = {
-        COLORS['undefined'] : COLORS['undefined'],
-        COLORS['white'] : COLORS['black'],
-        COLORS['black'] : COLORS['white'] 
-    }
-
     PIECES = {
         'blk' : 0,
         'wKg' : 1,
@@ -35,22 +29,6 @@ class Match(models.Model):
         'bQu' : 14 
     }
 
-    PIECES_COLOR = {
-        PIECES['blk'] : COLORS['undefined'],
-        PIECES['wKg'] : COLORS['white'],
-        PIECES['wPw'] : COLORS['white'],
-        PIECES['wRk'] : COLORS['white'],
-        PIECES['wKn'] : COLORS['white'],
-        PIECES['wBp'] : COLORS['white'],
-        PIECES['wQu'] : COLORS['white'],
-        PIECES['bKg'] : COLORS['black'],
-        PIECES['bPw'] : COLORS['black'],
-        PIECES['bRk'] : COLORS['black'],
-        PIECES['bKn'] : COLORS['black'],
-        PIECES['bBp'] : COLORS['black'],
-        PIECES['bQu'] : COLORS['black']
-    }
-
     PIECES_RANK = {
         PIECES['blk'] : 0,
         PIECES['wPw'] : 1,
@@ -65,86 +43,6 @@ class Match(models.Model):
         PIECES['bQu'] : 5,
         PIECES['wKg'] : 6,
         PIECES['bKg'] : 6
-    }
-
-    EXPORT_PIECES = {
-        0 : '0',
-        1 : '1',
-        2 : '2',
-        3 : '3',
-        4 : '4',
-        5 : '5',
-        6 : '6',
-        9 : '9',
-        10 : 'A',
-        11 : 'B',
-        12 : 'C',
-        13 : 'D',
-        14 : 'E' 
-    }
-
-    SCORES = {
-        PIECES['blk'] : 0,
-        PIECES['wKg'] : -20000,
-        PIECES['wPw'] : -100,
-        PIECES['wRk'] : -500,
-        PIECES['wKn'] : -336,
-        PIECES['wBp'] : -340,
-        PIECES['wQu'] : -950,
-        PIECES['bKg'] : 20000,
-        PIECES['bPw'] : 100,
-        PIECES['bRk'] : 500,
-        PIECES['bKn'] : 336,
-        PIECES['bBp'] : 340,
-        PIECES['bQu'] : 950
-    }
-
-    REVERSED_SCORES = {
-        PIECES['blk'] : PIECES['blk'],
-        PIECES['wKg'] : PIECES['bKg'],
-        PIECES['wPw'] : PIECES['bPw'],
-        PIECES['wRk'] : PIECES['bRk'] ,
-        PIECES['wKn'] : PIECES['bKn'],
-        PIECES['wBp'] : PIECES['bBp'],
-        PIECES['wQu'] : PIECES['bQu'],
-        PIECES['bKg'] : PIECES['wKg'],
-        PIECES['bPw'] : PIECES['wPw'],
-        PIECES['bRk'] : PIECES['wRk'],
-        PIECES['bKn'] : PIECES['wKn'],
-        PIECES['bBp'] : PIECES['wBp'],
-        PIECES['bQu'] : PIECES['wQu']
-    }
-
-    ATTACKED_SCORES = {
-        PIECES['blk'] : 0,
-        PIECES['wKg'] : -10,
-        PIECES['wPw'] : -1,
-        PIECES['wRk'] : -5,
-        PIECES['wKn'] : -4,
-        PIECES['wBp'] : -4,
-        PIECES['wQu'] : -7,
-        PIECES['bKg'] : 10,
-        PIECES['bPw'] : 1,
-        PIECES['bRk'] : 5,
-        PIECES['bKn'] : 4,
-        PIECES['bBp'] : 4,
-        PIECES['bQu'] : 7
-    }
-
-    SUPPORTED_SCORES = {
-        PIECES['blk'] : 0,
-        PIECES['wKg'] : 10,
-        PIECES['wPw'] : 1,
-        PIECES['wRk'] : 5,
-        PIECES['wKn'] : 4,
-        PIECES['wBp'] : 4,
-        PIECES['wQu'] : 7,
-        PIECES['bKg'] : -10,
-        PIECES['bPw'] : -1,
-        PIECES['bRk'] : -5,
-        PIECES['bKn'] : -4,
-        PIECES['bBp'] : -4,
-        PIECES['bQu'] : -7
     }
 
     STATUS = {
