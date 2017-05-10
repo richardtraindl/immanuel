@@ -1,5 +1,5 @@
 from kate.engine import match
-from kate.engine import pawn, rook, knight, bishop, queen, king
+from kate.engine.pieces import pawn, rook, knight, bishop, queen, king
 
 
 RETURN_CODES = {
