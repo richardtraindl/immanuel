@@ -1,5 +1,6 @@
 from kate.engine import match, move
-from kate.engine import helper, rules, pawn, rook, bishop, knight, queen, king, kate, openings, calc_helper, debug
+from kate.engine import helper, rules, kate, openings, calc_helper, debug
+from kate.engine.pieces import pawn, rook, bishop, knight, queen, king
 import random, threading, copy, time
 from operator import itemgetter
 
