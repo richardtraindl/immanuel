@@ -1,4 +1,5 @@
-from kate.engine import move, rules, pawn, debug, helper
+from kate.engine import move, rules, debug, helper
+from kate.engine.pieces import pawn
 from kate.engine.match import *
 
 

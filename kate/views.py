@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from kate.models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
-from kate.engine import helper, rules, calc, kate, match, move
+from kate.engine import helper, rules, calc, kate, move
+from kate.engine.match import *
 
 
 def calc_move_for_immanuel(match):
@@ -31,7 +32,7 @@ def fill_fmtboard(match, switch):
     for i in range(rowstart, rowend, rowstep):
         idx2 = 0
         for j in range(colstart, colend, colstep):
-            fmtboard[idx1][idx2][0] = match.board[i][j]
+            fmtboard[idx1][idx2][0] = match.readfield(j, i)
             field = chr(ord('a') + j) + chr(ord('1') + i)
             fmtboard[idx1][idx2][1] = field
             idx2 += 1
@@ -141,7 +142,7 @@ def create(request):
             mmatch.black_player_human = False
 
         levellist = request.POST.getlist('level')
-        mmatch.level = match.LEVELS[levellist[0]]
+        mmatch.level = LEVELS[levellist[0]]
 
         if(len(mmatch.white_player) > 0 and len(mmatch.black_player) > 0):
             mmatch.setboardbase()
