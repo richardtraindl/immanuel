@@ -76,6 +76,7 @@ class Match:
         self.wRk_h1_first_movecnt = 0
         self.bRk_a8_first_movecnt = 0
         self.bRk_h8_first_movecnt = 0
+        self.move_list = []
 
             
         def setboardbase(self):
