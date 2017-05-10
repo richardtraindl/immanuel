@@ -14,7 +14,6 @@ REVERSED_COLORS = { COLORS['undefined'] : COLORS['undefined'],
 PIECES = { 'blk' : 0, 'wKg' : 1, 'wPw' : 2, 'wRk' : 3, 'wKn' : 4, 'wBp' : 5, 'wQu' : 6, 
                       'bKg' : 9, 'bPw' : 10, 'bRk' : 11, 'bKn' : 12, 'bBp' : 13, 'bQu' : 14 }
 
-
 PIECES_COLOR = {
         PIECES['blk'] : COLORS['undefined'],
         PIECES['wKg'] : COLORS['white'],
