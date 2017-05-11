@@ -1,4 +1,4 @@
-
+from kate.engine.match import *
 
 
 TYPES = { 'standard' : 1, 
@@ -33,4 +33,28 @@ class Move:
         self.captured_piece = captured_piece
         self.prom_piece = prom_piece
         self.fifty_moves_count = fifty_moves_count
+
+
+    def format_move(self):
+        if(self.move_type == TYPES['standard']):
+            if(self.captured_piece == 0):
+                hyphen = "-"
+            else:
+                hyphen = "x"
+            fmtmove = Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty)
+            return fmtmove
+        elif(self.move_type == TYPES['short_castling']):
+            return "0-0"
+        elif(self.move_type == TYPES['long_castling']):
+            return "0-0-0"
+        elif(self.move_type == TYPES['promotion']):
+            if(self.captured_piece == 0):
+                hyphen = "-"
+            else:
+                hyphen = "x"
+            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty) + " " + helper.reverse_lookup(PIECES, self.prom_piece)
+            return fmtmove
+        else:
+            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + "x" + Match.index_to_koord(self.dstx, self.dsty) + " e.p."
+            return fmtmove
 
