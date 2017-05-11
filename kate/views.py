@@ -30,8 +30,8 @@ def match(request, matchid=None, switch=0, msg=None):
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(lastmove):
-        movesrc = match.index_to_koord(lastmove.srcx, lastmove.srcy)
-        movedst = match.index_to_koord(lastmove.dstx, lastmove.dsty)
+        movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
+        movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
     else:
         movesrc = ''
         movedst = ''
@@ -322,7 +322,7 @@ def fetch_match(request):
                 cnt = thread.searchcnt
                 gmove = thread.search
                 data += "§<p>current search: " + str(cnt) + ". "
-                data += match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
+                data += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
                 data += "</p>"
             else:
                 data += "§"
