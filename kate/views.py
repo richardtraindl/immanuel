@@ -10,7 +10,8 @@ from kate.utils import *
 
 
 def calc_move_for_immanuel(modelmatch):
-    match = map_matches(modelmatch, MAP_DIR['model-to-engine'])
+    match = Match()
+    map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
     if(rules.game_status(match) == STATUS['open'] and match.next_color_human() == False):
         calc.thread_do_move(match)
 
@@ -39,6 +40,7 @@ def match(request, matchid=None, switch=0, msg=None):
     fmtboard = fill_fmtboard(modelmatch, int(switch))
 
     moves = []
+    move = Move()
     currmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(currmove != None):
         if(currmove.count % 2 == 0):
@@ -47,7 +49,8 @@ def match(request, matchid=None, switch=0, msg=None):
             limit = 21
         qmoves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")[:limit]
         for qmove in reversed(qmoves):
-            moves.append(qmove)
+            map_moves(qmove, move, MAP_DIR['model-to-engine'])
+            moves.append(move)
 
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:3]
     
