@@ -25,7 +25,6 @@ def match(request, matchid=None, switch=0, msg=None):
     context = RequestContext(request)
     if(matchid == None):
         modelmatch = ModelMatch(white_player=None, black_player=None)
-        modelmatch.setboardbase()
     else:
         modelmatch = ModelMatch.objects.get(id=matchid)
 
