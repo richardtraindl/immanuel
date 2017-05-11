@@ -364,10 +364,10 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
             return False
         elif(direction == DIRS['2north']):
             midpiece = match.readfield(dstx, srcy + WHITE_1N_Y)
-            if(midpiece != match.PIECES['blk'] or dstpiece != match.PIECES['blk']):
+            if(midpiece != PIECES['blk'] or dstpiece != PIECES['blk']):
                 return False
         elif(direction == DIRS['north-west'] or direction == DIRS['north-east']):
-            if(Match.color_of_piece(dstpiece) != match.COLORS['black']):
+            if(Match.color_of_piece(dstpiece) != COLORS['black']):
                 return is_white_ep_move_ok(match, srcx, srcy, dstx, dsty)
 
         # check promotion
