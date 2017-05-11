@@ -63,121 +63,121 @@ class Match:
         self.move_list = []
 
             
-        def setboardbase(self):
-            self.board[0][0] = PIECES['wRk']
-            self.board[0][1] = PIECES['wKn']
-            self.board[0][2] = PIECES['wBp']
-            self.board[0][3] = PIECES['wQu']
-            self.board[0][4] = PIECES['wKg']
-            self.board[0][5] = PIECES['wBp']
-            self.board[0][6] = PIECES['wKn']
-            self.board[0][7] = PIECES['wRk']
+    def setboardbase(self):
+        self.board[0][0] = PIECES['wRk']
+        self.board[0][1] = PIECES['wKn']
+        self.board[0][2] = PIECES['wBp']
+        self.board[0][3] = PIECES['wQu']
+        self.board[0][4] = PIECES['wKg']
+        self.board[0][5] = PIECES['wBp']
+        self.board[0][6] = PIECES['wKn']
+        self.board[0][7] = PIECES['wRk']
 
+        for i in range(0, 8, 1):
+            self.board[1][i] = PIECES['wPw']
+
+        for j in range(2, 6, 1):
             for i in range(0, 8, 1):
-                self.board[1][i] = PIECES['wPw']
+                self.board[j][i] = PIECES['blk']
 
-            for j in range(2, 6, 1):
-                for i in range(0, 8, 1):
-                    self.board[j][i] = PIECES['blk']
+        for i in range(0, 8, 1):
+            self.board[6][i] = PIECES['bPw']
 
-            for i in range(0, 8, 1):
-                self.board[6][i] = PIECES['bPw']
-
-            self.board[7][0] = PIECES['bRk']
-            self.board[7][1] = PIECES['bKn']
-            self.board[7][2] = PIECES['bBp']
-            self.board[7][3] = PIECES['bQu']
-            self.board[7][4] = PIECES['bKg']
-            self.board[7][5] = PIECES['bBp']
-            self.board[7][6] = PIECES['bKn']
-            self.board[7][7] = PIECES['bRk']
-            self.fifty_moves_count = 0
-            self.wKg_x = E1_X
-            self.wKg_y = E1_Y
-            self.bKg_x = E8_X
-            self.bKg_y = E8_Y
-            self.wKg_first_movecnt = 0
-            self.bKg_first_movecnt = 0
-            self.wRk_a1_first_movecnt = 0
-            self.wRk_h1_first_movecnt = 0
-            self.bRk_a8_first_movecnt = 0
-            self.bRk_h8_first_movecnt = 0
-            self.move_list = []
+        self.board[7][0] = PIECES['bRk']
+        self.board[7][1] = PIECES['bKn']
+        self.board[7][2] = PIECES['bBp']
+        self.board[7][3] = PIECES['bQu']
+        self.board[7][4] = PIECES['bKg']
+        self.board[7][5] = PIECES['bBp']
+        self.board[7][6] = PIECES['bKn']
+        self.board[7][7] = PIECES['bRk']
+        self.fifty_moves_count = 0
+        self.wKg_x = E1_X
+        self.wKg_y = E1_Y
+        self.bKg_x = E8_X
+        self.bKg_y = E8_Y
+        self.wKg_first_movecnt = 0
+        self.bKg_first_movecnt = 0
+        self.wRk_a1_first_movecnt = 0
+        self.wRk_h1_first_movecnt = 0
+        self.bRk_a8_first_movecnt = 0
+        self.bRk_h8_first_movecnt = 0
+        self.move_list = []
 
 
-        def writefield(self, x, y, value):
-            self.board[y][x] = value
+    def writefield(self, x, y, value):
+        self.board[y][x] = value
 
 
-        def readfield(self, x, y):
-            return self.board[y][x]
+    def readfield(self, x, y):
+        return self.board[y][x]
 
 
-        def next_color(self):
-            if(self.count % 2 == 0 ):
-                return COLORS['white']
-            else:
-                return COLORS['black']
+    def next_color(self):
+        if(self.count % 2 == 0 ):
+            return COLORS['white']
+        else:
+            return COLORS['black']
 
 
-        def next_color_human(self):
-            if(self.count % 2 == 0 ):
-                return self.white_player_human
-            else:
-                return self.black_player_human
+    def next_color_human(self):
+        if(self.count % 2 == 0 ):
+            return self.white_player_human
+        else:
+            return self.black_player_human
 
 
-        def is_immanuel(self):
-            return (self.white_player_human == False or self.black_player_human == False)
+    def is_immanuel(self):
+        return (self.white_player_human == False or self.black_player_human == False)
 
 
-        def is_last_move_capture(self):
-            if(len(self.move_list) > 0):
-                move = self.move_list[-1]
-                if(move.captured_piece != PIECES['blk']):
-                    return True
+    def is_last_move_capture(self):
+        if(len(self.move_list) > 0):
+            move = self.move_list[-1]
+            if(move.captured_piece != PIECES['blk']):
+                return True
 
-            return False
-
-
-        def is_last_move_promotion(self):
-            if(len(self.move_list) > 0):
-                move = self.move_list[-1]
-                if(move.prom_piece != PIECES['blk']):
-                    return True
-
-            return False
+        return False
 
 
-        def read_move_list(self, idx):
-            if(len(self.move_list) > 0):
-                return self.move_list[idx]
-            else:
-                return None
+    def is_last_move_promotion(self):
+        if(len(self.move_list) > 0):
+            move = self.move_list[-1]
+            if(move.prom_piece != PIECES['blk']):
+                return True
+
+        return False
 
 
-        @staticmethod
-        def color_of_piece(piece):
-            return PIECES_COLOR[piece]
+    def read_move_list(self, idx):
+        if(len(self.move_list) > 0):
+            return self.move_list[idx]
+        else:
+            return None
 
 
-        @staticmethod
-        def oppcolor_of_piece(piece):
-            color = PIECES_COLOR[piece]
-            return REVERSED_COLORS[color]
+    @staticmethod
+    def color_of_piece(piece):
+        return PIECES_COLOR[piece]
 
 
-        @staticmethod
-        def koord_to_index(koord):
-            x = ord(koord[0]) - ord('a')
-            y = ord(koord[1]) - ord('1')
-            return x,y
+    @staticmethod
+    def oppcolor_of_piece(piece):
+        color = PIECES_COLOR[piece]
+        return REVERSED_COLORS[color]
 
 
-        @staticmethod
-        def index_to_koord(x, y):
-            col = chr(x + ord('a'))
-            row = chr(y + ord('1'))
-            koord = str(col + row)
-            return koord
+    @staticmethod
+    def koord_to_index(koord):
+        x = ord(koord[0]) - ord('a')
+        y = ord(koord[1]) - ord('1')
+        return x,y
+
+
+    @staticmethod
+    def index_to_koord(x, y):
+        col = chr(x + ord('a'))
+        row = chr(y + ord('1'))
+        koord = str(col + row)
+        return koord
 

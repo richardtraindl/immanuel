@@ -1,4 +1,4 @@
-from kate.engine import match
+from kate.engine.match import *
 from kate.engine.pieces import pawn, rook, knight, bishop, queen, king
 
 
@@ -98,7 +98,7 @@ def search(match, srcx, srcy, stepx, stepy):
     y = srcy + stepy
     while(x >= 0 and x <= 7 and y >= 0 and y <= 7):
         field = match.readfield(x, y)
-        if(field != match.PIECES['blk']):
+        if(field != PIECES['blk']):
             return x, y
 
         x += stepx
@@ -109,7 +109,7 @@ def search(match, srcx, srcy, stepx, stepy):
 def pin_dir(match, scrx, srcy):
     piece = match.readfield(scrx, srcy)
     color = match.color_of_piece(piece)
-    if(color == match.COLORS['white']):
+    if(color == COLORS['white']):
         kgx = match.wKg_x
         kgy = match.wKg_y
     else:
@@ -121,20 +121,20 @@ def pin_dir(match, scrx, srcy):
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
             piece = match.readfield(dstx, dsty)
-            if( (color == match.COLORS['white'] and piece == match.PIECES['wKg']) or
-                (color == match.COLORS['black'] and piece == match.PIECES['bKg']) ):
+            if( (color == COLORS['white'] and piece == PIECES['wKg']) or
+                (color == COLORS['black'] and piece == PIECES['bKg']) ):
                 reverse_dir = REVERSE_DIRS[direction]
                 reverse_dir, stepx, stepy = rook.rk_step(reverse_dir, None, None, None, None)
                 dstx, dsty = search(match, scrx, srcy, stepx, stepy)
                 if(dstx != UNDEF_X):
                     piece = match.readfield(dstx, dsty)
-                    if(color == match.COLORS['white']):
-                        if(piece == match.PIECES['bQu'] or piece == match.PIECES['bRk']):
+                    if(color == COLORS['white']):
+                        if(piece == PIECES['bQu'] or piece == PIECES['bRk']):
                             return direction
                         else:
                             return DIRS['undefined']
                     else:
-                        if(piece == match.PIECES['wQu'] or piece == match.PIECES['wRk']):
+                        if(piece == PIECES['wQu'] or piece == PIECES['wRk']):
                             return direction
                         else:
                             return DIRS['undefined']
@@ -144,20 +144,20 @@ def pin_dir(match, scrx, srcy):
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
             piece = match.readfield(dstx, dsty)
-            if( (color == match.COLORS['white'] and piece == match.PIECES['wKg']) or
-                (color == match.COLORS['black'] and piece == match.PIECES['bKg']) ):
+            if( (color == COLORS['white'] and piece == PIECES['wKg']) or
+                (color == COLORS['black'] and piece == PIECES['bKg']) ):
                 reverse_dir = REVERSE_DIRS[direction]
                 reverse_dir, stepx, stepy = bishop.bp_step(reverse_dir, None, None, None, None)
                 dstx, dsty = search(match, scrx, srcy, stepx, stepy)
                 if(dstx != UNDEF_X):
                     piece = match.readfield(dstx, dsty)
-                    if(color == match.COLORS['white']):
-                        if(piece == match.PIECES['bQu'] or piece == match.PIECES['bBp']):
+                    if(color == COLORS['white']):
+                        if(piece == PIECES['bQu'] or piece == PIECES['bBp']):
                             return direction
                         else:
                             return DIRS['undefined']
                     else:
-                        if(piece == match.PIECES['wQu'] or piece == match.PIECES['wBp']):
+                        if(piece == PIECES['wQu'] or piece == PIECES['wBp']):
                             return direction
                         else:
                             return DIRS['undefined']
@@ -308,7 +308,7 @@ def score_supports_of_attacked(match, srcx, srcy):
 def is_king_attacked(match, x1, y1):
     king = match.readfield(x1, y1)
 
-    if(king != match.PIECES['wKg'] and king != match.PIECES['bKg']):
+    if(king != PIECES['wKg'] and king != PIECES['bKg']):
         return False
 
     color = match.color_of_piece(king)
@@ -318,16 +318,16 @@ def is_king_attacked(match, x1, y1):
 
 def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
     piece = match.readfield(srcx, srcy)
-    match.writefield(srcx, srcy, match.PIECES['blk'])
+    match.writefield(srcx, srcy, PIECES['blk'])
     dstpiece = match.readfield(dstx, dsty)
     match.writefield(dstx, dsty, piece)
 
     color = match.color_of_piece(piece)
 
-    if(color == match.COLORS['white']):
-        flag = is_field_touched(match, match.COLORS['black'], match.wKg_x, match.wKg_y)
+    if(color == COLORS['white']):
+        flag = is_field_touched(match, COLORS['black'], match.wKg_x, match.wKg_y)
     else:
-        flag = is_field_touched(match,  match.COLORS['white'], match.bKg_x, match.bKg_y)
+        flag = is_field_touched(match,  COLORS['white'], match.bKg_x, match.bKg_y)
         
     match.writefield(dstx, dsty, dstpiece)
     match.writefield(srcx, srcy, piece)
@@ -341,10 +341,10 @@ def is_move_available(match):
         for x1 in range(8):
             piece = match.readfield(x1, y1)
             if(color == match.color_of_piece(piece)):
-                if(color == match.COLORS['white']):
-                    prom_piece = match.PIECES['wQu']
+                if(color == COLORS['white']):
+                    prom_piece = PIECES['wQu']
                 else:
-                    prom_piece = match.PIECES['bQu']
+                    prom_piece = PIECES['bQu']
 
                 for y2 in range(8):
                     for x2 in range(8):
@@ -356,14 +356,14 @@ def is_move_available(match):
 
 def game_status(match):
     if(is_move_available(match)):
-        return match.STATUS['open']
+        return STATUS['open']
     else:
-        if(match.next_color() == match.COLORS['white']):
-            if(is_field_touched(match, match.COLORS['black'], match.wKg_x, match.wKg_y)):
-                return match.STATUS['winner_black']
+        if(match.next_color() == COLORS['white']):
+            if(is_field_touched(match, COLORS['black'], match.wKg_x, match.wKg_y)):
+                return STATUS['winner_black']
         else:
-            if(is_field_touched(match, match.COLORS['white'], match.bKg_x, match.bKg_y)):
-                return match.STATUS['winner_white']
+            if(is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)):
+                return STATUS['winner_white']
 
     return match.STATUS['draw']
 
@@ -380,36 +380,36 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
     if(match.next_color() != match.color_of_piece(piece)):
         return False, RETURN_CODES['wrong-color']
 
-    if(piece != match.PIECES['wKg'] and piece != match.PIECES['bKg']):
+    if(piece != PIECES['wKg'] and piece != PIECES['bKg']):
         if(is_king_after_move_attacked(match, srcx, srcy, dstx, dsty)):
             return False, RETURN_CODES['king-error']
 
-    if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
+    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
         if(pawn.is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece)):
             return True, RETURN_CODES['ok']
         else:
             return False, RETURN_CODES['pawn-error']
-    elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
         if(rook.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
             return True, RETURN_CODES['ok']
         else:
             return False, RETURN_CODES['rook-error']
-    elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
         if(knight.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
             return True, RETURN_CODES['ok']
         else:
             return False, RETURN_CODES['knight-error']
-    elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
         if(bishop.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
             return True, RETURN_CODES['ok']
         else:
             return False, RETURN_CODES['bishop-error']
-    elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
+    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         if(queen.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
             return True, RETURN_CODES['ok']
         else:
             return False, RETURN_CODES['queen-error']
-    elif(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+    elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
         if(king.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
             return True, RETURN_CODES['ok']
         else:

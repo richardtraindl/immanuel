@@ -1,5 +1,6 @@
 from kate.models import Match as ModelMatch, Move as ModelMove
-from kate.engine import match, move
+from kate.engine.match import Match
+from kate.engine.move import Move
 
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
@@ -14,7 +15,7 @@ def map_matches(nmatch, map_dir):
                 piece = nmatch.readfield(x, y)
                 match.writefield(x, y, piece)
 
-        move = ModelMove.objects.get(match_id=nmatch.id, count=nmatch.count)
+        move = ModelMove.objects.filter(match_id=nmatch.id, count=nmatch.count).last()
         if(move):
             match.move_list.append(move)
     else:
@@ -56,18 +57,18 @@ def map_moves(src, map_dir):
     else:
         move = ModelMove()
 
-     move.match = src.match
-     move.count = src.count
-     move.move_type = src.move_type
-     move.srcx = src.srcx
-     move.srcy = src.srcy
-     move.dstx = src.dstx
-     move.dsty = src.dsty
-     move.e_p_fieldx = src.e_p_fieldx
-     move.e_p_fieldy = src.e_p_fieldy
-     move.captured_piece = src.captured_piece
-     move.prom_piece = src.prom_piece
-     move.fifty_moves_count = src.fifty_moves_count
+    move.match = src.match
+    move.count = src.count
+    move.move_type = src.move_type
+    move.srcx = src.srcx
+    move.srcy = src.srcy
+    move.dstx = src.dstx
+    move.dsty = src.dsty
+    move.e_p_fieldx = src.e_p_fieldx
+    move.e_p_fieldy = src.e_p_fieldy
+    move.captured_piece = src.captured_piece
+    move.prom_piece = src.prom_piece
+    move.fifty_moves_count = src.fifty_moves_count
 
-     return move
+    return move
 

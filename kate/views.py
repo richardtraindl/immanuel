@@ -10,7 +10,7 @@ from kate.modules.interface import *
 
 def calc_move_for_immanuel(modelmatch):
     match = map_matches(modelmatch, MAP_DIR['model-to-engine'])
-    if(rules.game_status(match) == match.STATUS['open'] and match.next_color_human() == False):
+    if(rules.game_status(match) == STATUS['open'] and match.next_color_human() == False):
         calc.thread_do_move(match)
 
 
