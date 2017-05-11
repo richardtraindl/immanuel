@@ -169,7 +169,7 @@ def do_move(request, matchid):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
         switch = request.POST['switch']
 
-        match = map_matches(modelmatch, MAP_DIR['model-to-engine'])
+        """match = map_matches(modelmatch, MAP_DIR['model-to-engine'])
         status = rules.game_status(match)
         if(status != STATUS['open']):
             if(status == STATUS['draw']):
@@ -184,7 +184,7 @@ def do_move(request, matchid):
 
         if(match.next_color_human() == False):
             msg= rules.RETURN_CODES['wrong-color']
-            return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
+            return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))"""
 
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
@@ -192,15 +192,24 @@ def do_move(request, matchid):
         if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
             srcx,srcy = Match.koord_to_index(movesrc)
             dstx,dsty = Match.koord_to_index(movedst)
-            prom_piece = PIECES[prompiece]            
+            prom_piece = PIECES[prompiece]
+            match = Match()
+            map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
             flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
             if(flag == True):
+                move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
+                map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
+                modelmatch.save()                
+                modelmove = ModelMove()
+                modelmove.match = modelmatch
+                map_moves(move, modelmove, MAP_DIR['engine-to-model'])                
+                modelmove.save()
+                calc_move_for_immanuel(modelmatch)
                 move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
                 modelmatch = map_matches(match, MAP_DIR['engine-to-model'])                
                 modelmove = map_moves(move, MAP_DIR['engine-to-model'])
                 modelmove.save()
                 modelmatch.save()
-                calc_move_for_immanuel(modelmatch)
         else:
             msg = rules.RETURN_CODES['format-error']
 
