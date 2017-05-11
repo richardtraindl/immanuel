@@ -97,65 +97,6 @@ class Match(models.Model):
         super(Match, self).__init__(*args, **kwargs)
 
 
-    def setboardbase(self):
-        self.board ='wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;' \
-                    'wPw;wPw;wPw;wPw;wPw;wPw;wPw;wPw;' \
-                    'blk;blk;blk;blk;blk;blk;blk;blk;' \
-                    'blk;blk;blk;blk;blk;blk;blk;blk;' \
-                    'blk;blk;blk;blk;blk;blk;blk;blk;' \
-                    'blk;blk;blk;blk;blk;blk;blk;blk;' \
-                    'bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;' \
-                    'bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;'
-        self.fifty_moves_count = 0
-        self.wKg_x = 4
-        self.wKg_y = 0
-        self.bKg_x = 4
-        self.bKg_y = 7
-        self.wKg_first_movecnt = 0
-        self.bKg_first_movecnt = 0
-        self.wRk_a1_first_movecnt = 0
-        self.wRk_h1_first_movecnt = 0
-        self.bRk_a8_first_movecnt = 0
-        self.bRk_h8_first_movecnt = 0
-
-    def setboardbase_old(self):
-        self.board = [ [0 for x in range(8)] for x in range(8) ]
-        self.board[0][0] = self.PIECES['wRk']
-        self.board[0][1] = self.PIECES['wKn']
-        self.board[0][2] = self.PIECES['wBp']
-        self.board[0][3] = self.PIECES['wQu']
-        self.board[0][4] = self.PIECES['wKg']
-        self.board[0][5] = self.PIECES['wBp']
-        self.board[0][6] = self.PIECES['wKn']
-        self.board[0][7] = self.PIECES['wRk']
-        for i in range(0, 8, 1):
-            self.board[1][i] = self.PIECES['wPw']
-        for j in range(2, 6, 1):
-            for i in range(0, 8, 1):
-                self.board[j][i] = self.PIECES['blk']
-        for i in range(0, 8, 1):
-            self.board[6][i] = self.PIECES['bPw']
-        self.board[7][0] = self.PIECES['bRk']
-        self.board[7][1] = self.PIECES['bKn']
-        self.board[7][2] = self.PIECES['bBp']
-        self.board[7][3] = self.PIECES['bQu']
-        self.board[7][4] = self.PIECES['bKg']
-        self.board[7][5] = self.PIECES['bBp']
-        self.board[7][6] = self.PIECES['bKn']
-        self.board[7][7] = self.PIECES['bRk']
-        self.fifty_moves_count = 0
-        self.wKg_x = 4
-        self.wKg_y = 0
-        self.bKg_x = 4
-        self.bKg_y = 7
-        self.wKg_first_movecnt = 0
-        self.bKg_first_movecnt = 0
-        self.wRk_a1_first_movecnt = 0
-        self.wRk_h1_first_movecnt = 0
-        self.bRk_a8_first_movecnt = 0
-        self.bRk_h8_first_movecnt = 0
-
-
     def writefield(self, x, y, value):
         idx = y*32 + x*4
         str_value = helper.reverse_lookup(Match.PIECES, value)
@@ -167,32 +108,6 @@ class Match(models.Model):
         str_value = self.board[idx:idx+3]
         return Match.PIECES[str_value]
 
-
-    def writefield_old(self, x, y, value):
-        self.board[y][x] = value
-
-
-    def readfield_old(self, x, y):
-        return self.board[y][x]
-
-
-    def next_color(self):
-        if(self.count % 2 == 0 ):
-            return self.COLORS['white']
-        else:
-            return self.COLORS['black']
-
-
-    def next_color_human(self):
-        if(self.count % 2 == 0 ):
-            return self.white_player_human
-        else:
-            return self.black_player_human
-
-
-    def is_immanuel(self):
-        return (self.white_player_human == False or self.black_player_human == False)
-   
 
     @classmethod
     def remove_threads(cls, match):
@@ -255,31 +170,6 @@ class Move(models.Model):
 
     class Meta:
         unique_together = (("match", "count"),)
-
-
-    def format_move(self):
-        if(self.move_type == Move.TYPES['standard']):
-            if(self.captured_piece == 0):
-                hyphen = "-"
-            else:
-                hyphen = "x"
-            fmtmove = Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty)
-            return fmtmove
-        elif(self.move_type == Move.TYPES['short_castling']):
-            return "0-0"
-        elif(self.move_type == Move.TYPES['long_castling']):
-            return "0-0-0"
-        elif(self.move_type == Move.TYPES['promotion']):
-            if(self.captured_piece == 0):
-                hyphen = "-"
-            else:
-                hyphen = "x"
-            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty) + " " + helper.reverse_lookup(Match.PIECES, self.prom_piece)
-            return fmtmove
-        else:
-            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + "x" + Match.index_to_koord(self.dstx, self.dsty) + " e.p."
-            return fmtmove
-
 
 
 class Comment(models.Model):
