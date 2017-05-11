@@ -68,14 +68,14 @@ def does_attack(match, srcx, srcy, dstx, dsty):
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                if(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     return True, 2 # priority
                 else:
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
                         priority = min(priority, 2)
                     else:
-                        match.writefield(srcx, srcy, match.PIECES['blk'])
+                        match.writefield(srcx, srcy, PIECES['blk'])
                         touched = rules.is_field_touched(match, opp_color, dstx, dsty)
                         match.writefield(srcx, srcy, bishop)
                         if(touched):
@@ -122,7 +122,7 @@ def score_attacks(match, srcx, srcy):
 
     bishop = match.readfield(srcx, srcy)
 
-    if(bishop != match.PIECES['wBp'] and bishop != match.PIECES['wQu'] and bishop != match.PIECES['bBp'] and bishop != match.PIECES['bQu']):
+    if(bishop != PIECES['wBp'] and bishop != PIECES['wQu'] and bishop != PIECES['bBp'] and bishop != PIECES['bQu']):
         return score
 
     color = Match.color_of_piece(bishop)

@@ -360,7 +360,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
                 return False
 
         # check fields
-        if(direction == DIRS['north'] and dstpiece != match.PIECES['blk']):
+        if(direction == DIRS['north'] and dstpiece != PIECES['blk']):
             return False
         elif(direction == DIRS['2north']):
             midpiece = match.readfield(dstx, srcy + WHITE_1N_Y)

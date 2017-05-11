@@ -13,7 +13,7 @@ def calc_move_for_immanuel(modelmatch):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
     if(rules.game_status(match) == STATUS['open'] and match.next_color_human() == False):
-        calc.thread_do_move(match)
+        thread_do_move(match)
 
 
 def index(request):
@@ -66,7 +66,7 @@ def match(request, matchid=None, switch=0, msg=None):
     else:
         rangeobj = range(7, -1, -1)
 
-    thread = ModelMatch.get_active_thread(modelmatch)
+    thread = Match.get_active_thread(modelmatch)
     if(thread and thread.running):
         if(thread.searchcnt and thread.search):
             cnt = thread.searchcnt
@@ -151,7 +151,7 @@ def update(request, matchid, switch=0):
             modelmatch.black_player_human = False
 
         levellist = request.POST.getlist('level')
-        modelmatch.level = match.LEVELS[levellist[0]]
+        modelmatch.level = LEVELS[levellist[0]]
 
         if(len(modelmatch.white_player) > 0 and len(modelmatch.black_player) > 0):
             modelmatch.save()
@@ -201,12 +201,15 @@ def do_move(request, matchid):
             flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
             if(flag == True):
                 move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
+
                 map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
-                modelmatch.save()                
-                modelmove = ModelMove()
+                modelmatch.save()
+
+                modelmove = ModelMove()                
                 modelmove.match = modelmatch
                 map_moves(move, modelmove, MAP_DIR['engine-to-model'])                
                 modelmove.save()
+
                 calc_move_for_immanuel(modelmatch)
         else:
             msg = rules.RETURN_CODES['format-error']
@@ -310,11 +313,11 @@ def fetch_match(request):
         if(int(movecnt) == modelmatch.count):
             data = "§§"
         else:
-            data = html_board(mmatch, int(switchflag), movesrc, movedst)
+            data = html_board(modelmatch, int(switchflag), movesrc, movedst)
             data += "§" + html_moves(modelmatch)
             data += "§<p>Score: &nbsp;" + str(modelmatch.score) + "</p>"
 
-        thread = ModelMatch.get_active_thread(modelmatch)
+        thread = Match.get_active_thread(modelmatch)
         if(thread and thread.running):
             if(thread.searchcnt and thread.search):
                 cnt = thread.searchcnt

@@ -1,7 +1,8 @@
-from kate.engine import match, move
+from kate.engine.move import *
+from kate.engine.match import *
 from kate.engine import helper, rules, kate, openings, calc_helper, debug
 from kate.engine.pieces import pawn, rook, bishop, knight, queen, king
-import random, threading, copy, time
+import time
 from operator import itemgetter
 
 
@@ -12,8 +13,8 @@ def prnt_move(msg, move):
         print(msg + 
             Match.index_to_koord(move.srcx, move.srcy) + "-" +
             Match.index_to_koord(move.dstx, move.dsty), end="")
-        if(move.prom_piece != Match.PIECES['blk']):
-            print(helper.reverse_lookup(Match.PIECES, move.prom_piece), end="")
+        if(move.prom_piece != PIECES['blk']):
+            print(helper.reverse_lookup(PIECES, move.prom_piece), end="")
 
 
 def prnt_moves(msg, moves):
@@ -113,12 +114,12 @@ def generate_moves(match):
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
-            if(piece == Match.PIECES['blk'] or color != Match.color_of_piece(piece)):
+            if(piece == PIECES['blk'] or color != Match.color_of_piece(piece)):
                 continue
             else:
                 dir_idx = 0
                 step_idx = 0
-                if(piece == Match.PIECES['wPw']):
+                if(piece == PIECES['wPw']):
                     piece_prio = 2
                     if(y < 6):
                         steps = pawn.GEN_WSTEPS
@@ -128,7 +129,7 @@ def generate_moves(match):
                         steps = pawn.GEN_WPROM_STEPS
                         max_dir = 3
                         max_step = 4
-                elif(piece == Match.PIECES['bPw']):
+                elif(piece == PIECES['bPw']):
                     piece_prio = 2
                     if(y > 1):
                         steps = pawn.GEN_BSTEPS
@@ -138,22 +139,22 @@ def generate_moves(match):
                         steps = pawn.GEN_BPROM_STEPS
                         max_dir = 3
                         max_step = 4
-                elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
+                elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
                     piece_prio = 5
                     steps = rook.GEN_STEPS
                     max_dir = 4
                     max_step = 7
-                elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
+                elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
                     piece_prio = 4
                     steps = bishop.GEN_STEPS
                     max_dir = 4
                     max_step = 7
-                elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
+                elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
                     piece_prio = 3
                     steps = knight.GEN_STEPS
                     max_dir = 8
                     max_step = 1
-                elif(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
+                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                     piece_prio = 6
                     steps = queen.GEN_STEPS
                     max_dir = 8
@@ -178,10 +179,10 @@ def generate_moves(match):
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
 
-    if(match.next_color() == Match.COLORS['white']):
-        kg_attacked = rules.is_field_touched(match, Match.COLORS['black'], match.wKg_x, match.wKg_y)
+    if(match.next_color() == COLORS['white']):
+        kg_attacked = rules.is_field_touched(match, COLORS['black'], match.wKg_x, match.wKg_y)
     else:
-        kg_attacked = rules.is_field_touched(match, Match.COLORS['white'], match.bKg_x, match.bKg_y)
+        kg_attacked = rules.is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked):
         priorities[0]= len(prio_moves)
@@ -194,64 +195,8 @@ def generate_moves(match):
     return prio_moves, priorities
 
 
-class immanuelsThread(threading.Thread):
-    def __init__(self, name, match):
-        threading.Thread.__init__(self)
-        self.name = name
-        self.running = True
-        self.match = copy.deepcopy(match)
-        self.searchcnt = None
-        self.search = None
-        self.candidates = [None] * 10
-        self.debuginfo = None
-
-        Match.remove_threads(match)
-        Match.add_thread(self)
-        print("match.id: " + str(match.id))
-
-
-    def run(self):
-        print("Starting " + str(self.name))
-        move = Move.objects.filter(match_id=self.match.id).order_by("count").last()
-        if(move != None):
-            self.match.move_list.append(move)
-
-        gmove = calc_move(self.match)
-        if(gmove and Match.does_thread_exist(self) and self.running):
-            move = kate.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-            move.save()
-            self.match.save()
-            print("move saved")
-        else:
-            print("thread outdated - move dropped")
-
-        return gmove
-
-
-    def populate_candiates(self, candiates):
-        if(candiates[0]):
-            idx = 0
-            for cand in candiates:
-                if(cand):
-                    self.candidates[idx] = cand
-                    idx += 1
-                else:
-                    break
-
-
-    def populate_search(self, gmove, cnt):
-        if(gmove and cnt):
-            self.searchcnt = cnt
-            self.search = gmove
-
-
-    def populate_debuginfo(self, debuginfo):
-        if(debuginfo):
-            self.debuginfo = debuginfo
-
-
 def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates):
-    if( (color == Match.COLORS["white"] and candidatescore >= gmovescore) or (color == Match.COLORS["black"] and candidatescore <= gmovescore) ):
+    if( (color == COLORS["white"] and candidatescore >= gmovescore) or (color == COLORS["black"] and candidatescore <= gmovescore) ):
         return candidatescore
     else:
         candidates[0] = gmove
@@ -271,15 +216,15 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
 
 
 def select_maxcnt(match, depth, priorities):
-    if(match.level == Match.LEVELS['blitz']):
+    if(match.level == LEVELS['blitz']):
         maxdepth = 5
         counts = [12, 12]
         limit = 2
-    elif(match.level == Match.LEVELS['low']):
+    elif(match.level == LEVELS['low']):
         maxdepth = 6
         counts = [12, 12]
         limit = 2
-    elif(match.level == Match.LEVELS['medium']):
+    elif(match.level == LEVELS['medium']):
         maxdepth = 8
         counts = [16, 12]
         limit = 2
@@ -413,11 +358,11 @@ def calc_move(match):
 
     start = time.time()
     
-    candidates[0] = openings.retrieve_move(match)
+    # candidates[0] = openings.retrieve_move(match)
 
     if(candidates[0]):
         score = match.score
-    elif(match.next_color() == Match.COLORS['white']):
+    elif(match.next_color() == COLORS['white']):
         score, candidates = calc_max(match, 1, -200000, 200000)
     else:
         score, candidates = calc_min(match, 1, -200000, 200000)
@@ -428,9 +373,3 @@ def calc_move(match):
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
     return candidates[0]
-
-
-def thread_do_move(match):
-    thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
-    thread.start()
-

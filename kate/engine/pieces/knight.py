@@ -190,7 +190,7 @@ def score_supports_of_attacked(match, srcx, srcy):
 
     knight = match.readfield(srcx, srcy)
 
-    if(knight != match.PIECES['wKn'] and knight != match.PIECES['bKn']):
+    if(knight != PIECES['wKn'] and knight != PIECES['bKn']):
         return score
 
     color = Match.color_of_piece(knight)

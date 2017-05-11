@@ -8,12 +8,12 @@ MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
 
 def map_matches(src, dst, map_dir):
     if(map_dir == MAP_DIR['model-to-engine']):
-        dst.id = src.id
         moves = ModelMove.objects.filter(match_id=src.id).order_by("count")
         if(len(moves) > 0):
             for move in moves:
                 dst.move_list.append(move)
 
+    dst.id = src.id
     dst.status = src.status
     dst.count = src.count
     dst.score = src.score
@@ -58,4 +58,3 @@ def map_moves(src, dst, map_dir):
     dst.captured_piece = src.captured_piece
     dst.prom_piece = src.prom_piece
     dst.fifty_moves_count = src.fifty_moves_count
-
