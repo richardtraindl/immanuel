@@ -205,11 +205,6 @@ def do_move(request, matchid):
                 map_moves(move, modelmove, MAP_DIR['engine-to-model'])                
                 modelmove.save()
                 calc_move_for_immanuel(modelmatch)
-                move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
-                modelmatch = map_matches(match, MAP_DIR['engine-to-model'])                
-                modelmove = map_moves(move, MAP_DIR['engine-to-model'])
-                modelmove.save()
-                modelmatch.save()
         else:
             msg = rules.RETURN_CODES['format-error']
 
