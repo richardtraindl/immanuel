@@ -118,7 +118,6 @@ def create(request):
         modelmatch.level = LEVELS[levellist[0]]
 
         if(len(modelmatch.white_player) > 0 and len(modelmatch.black_player) > 0):
-            modelmatch.setboardbase()
             modelmatch.save()
             calc_move_for_immanuel(modelmatch)
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id,)))
