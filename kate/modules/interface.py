@@ -6,69 +6,56 @@ from kate.engine.move import Move
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
 
 
-def map_matches(nmatch, map_dir):
+def map_matches(src, dst, map_dir):
     if(map_dir == MAP_DIR['model-to-engine']):
-        match = Match()
+        dst.id = src.id
+        moves = ModelMove.objects.filter(match_id=src.id).order_by("count")
+        if(len(moves) > 0):
+            for move in moves:
+                dst.move_list.append(move)
 
-        for y in range(0, 8, 1):
-            for x in range(0, 8, 1):
-                piece = nmatch.readfield(x, y)
-                match.writefield(x, y, piece)
+    dst.status = src.status
+    dst.count = src.count
+    dst.score = src.score
+    dst.white_player = src.white_player
+    dst.white_player_human = src.white_player_human
+    dst.elapsed_time_white = src.elapsed_time_white
+    dst.black_player = src.black_player
+    dst.black_player_human = src.black_player_human
+    dst.elapsed_time_black = src.elapsed_time_black
+    dst.level = src.level
+    dst.fifty_moves_count = src.fifty_moves_count
+    dst.wKg_x = src.wKg_x
+    dst.wKg_y = src.wKg_y
+    dst.bKg_x = src.bKg_x
+    dst.bKg_y = src.bKg_y
+    dst.wKg_first_movecnt = src.wKg_first_movecnt
+    dst.bKg_first_movecnt = src.bKg_first_movecnt
+    dst.wRk_a1_first_movecnt = src.wRk_a1_first_movecnt
+    dst.wRk_h1_first_movecnt = src.wRk_h1_first_movecnt
+    dst.bRk_a8_first_movecnt = src.bRk_a8_first_movecnt
+    dst.bRk_h8_first_movecnt = src.bRk_h8_first_movecnt
 
-        move = ModelMove.objects.filter(match_id=nmatch.id, count=nmatch.count).last()
-        if(move):
-            match.move_list.append(move)
-    else:
-        match = ModelMatch()
-
-        for y in range(0, 8, 1):
-            for x in range(0, 8, 1):
-                piece = nmatch.readfield(x, y)
-                match.writefield(x, y, piece)
-
-    match.status = nmatch.status
-    match.count = nmatch.count
-    match.score = nmatch.score
-    match.white_player = nmatch.white_player
-    match.white_player_human = nmatch.white_player_human
-    match.elapsed_time_white = nmatch.elapsed_time_white
-    match.black_player = nmatch.black_player
-    match.black_player_human = nmatch.black_player_human
-    match.elapsed_time_black = nmatch.elapsed_time_black
-    match.level = nmatch.level
-    match.fifty_moves_count = nmatch.fifty_moves_count
-    match.wKg_x = nmatch.wKg_x
-    match.wKg_y = nmatch.wKg_y
-    match.bKg_x = nmatch.bKg_x
-    match.bKg_y = nmatch.bKg_y
-    match.wKg_first_movecnt = nmatch.wKg_first_movecnt
-    match.bKg_first_movecnt = nmatch.bKg_first_movecnt
-    match.wRk_a1_first_movecnt = nmatch.wRk_a1_first_movecnt
-    match.wRk_h1_first_movecnt = nmatch.wRk_h1_first_movecnt
-    match.bRk_a8_first_movecnt = nmatch.bRk_a8_first_movecnt
-    match.bRk_h8_first_movecnt = nmatch.bRk_h8_first_movecnt
-
-    return match
+    for y in range(0, 8, 1):
+        for x in range(0, 8, 1):
+            piece = src.readfield(x, y)
+            dst.writefield(x, y, piece)
 
 
-def map_moves(src, map_dir):
+def map_moves(src, dst, map_dir):
     if(map_dir == MAP_DIR['model-to-engine']):
-        move = Move()
-    else:
-        move = ModelMove()
+        dst.id = src.id
+        dst.match = src.match
 
-    move.match = src.match
-    move.count = src.count
-    move.move_type = src.move_type
-    move.srcx = src.srcx
-    move.srcy = src.srcy
-    move.dstx = src.dstx
-    move.dsty = src.dsty
-    move.e_p_fieldx = src.e_p_fieldx
-    move.e_p_fieldy = src.e_p_fieldy
-    move.captured_piece = src.captured_piece
-    move.prom_piece = src.prom_piece
-    move.fifty_moves_count = src.fifty_moves_count
-
-    return move
+    dst.count = src.count
+    dst.move_type = src.move_type
+    dst.srcx = src.srcx
+    dst.srcy = src.srcy
+    dst.dstx = src.dstx
+    dst.dsty = src.dsty
+    dst.e_p_fieldx = src.e_p_fieldx
+    dst.e_p_fieldy = src.e_p_fieldy
+    dst.captured_piece = src.captured_piece
+    dst.prom_piece = src.prom_piece
+    dst.fifty_moves_count = src.fifty_moves_count
 
