@@ -34,29 +34,29 @@ def generic_do_move(match, nmove, srcpiece, dstpiece):
     match.count += 1            
     match.writefield(nmove.srcx, nmove.srcy, PIECES['blk'])
     match.writefield(nmove.dstx, nmove.dsty, srcpiece)
-    if(dstpiece != match.PIECES['blk']):
+    if(dstpiece != PIECES['blk']):
         match.fifty_nmoves_count = 0
         nmove.fifty_nmoves_count = match.fifty_nmoves_count
     else:
         match.fifty_nmoves_count += 1
         nmove.fifty_nmoves_count = match.fifty_nmoves_count
 
-    if(srcpiece == match.PIECES['wKg']):
+    if(srcpiece == PIECES['wKg']):
         match.wKg_x = nmove.dstx
         match.wKg_y = nmove.dsty
         if(match.wKg_first_nmovecnt == 0):
             match.wKg_first_nmovecnt = match.count
-    elif(srcpiece == match.PIECES['bKg']):
+    elif(srcpiece == PIECES['bKg']):
         match.bKg_x = nmove.dstx
         match.bKg_y = nmove.dsty
         if(match.bKg_first_nmovecnt == 0):
             match.bKg_first_nmovecnt = match.count
-    elif(srcpiece == match.PIECES['wRk']):
+    elif(srcpiece == PIECES['wRk']):
         if(nmove.srcx == 0 and nmove.srcy == 0 and match.wRk_a1_first_nmovecnt == 0):
             match.wRk_a1_first_nmovecnt = match.count
         elif(nmove.srcx == 7 and nmove.srcy == 0 and match.wRk_h1_first_nmovecnt == 0):
             match.wRk_h1_first_nmovecnt = match.count
-    elif(srcpiece == match.PIECES['bRk']):
+    elif(srcpiece == PIECES['bRk']):
         if(nmove.srcx == 0 and nmove.srcy == 7 and match.bRk_a8_first_nmovecnt == 0):
             match.bRk_a8_first_nmovecnt = match.count
         elif(nmove.srcx == 7 and nmove.srcy == 7 and match.bRk_h8_first_nmovecnt == 0):
@@ -186,22 +186,22 @@ def generic_undo_nmove(match, nmove):
     match.writefield(nmove.srcx, nmove.srcy, piece)
     match.writefield(nmove.dstx, nmove.dsty, nmove.captured_piece)
     match.score -= match.SCORES[nmove.captured_piece]
-    if(piece == match.PIECES['wKg']):
+    if(piece == PIECES['wKg']):
         match.wKg_x = nmove.srcx
         match.wKg_y = nmove.srcy
         if(match.wKg_first_nmovecnt == match.count + 1):
             match.wKg_first_nmovecnt = 0
-    elif(piece == match.PIECES['bKg']):
+    elif(piece == PIECES['bKg']):
         match.bKg_x = nmove.srcx
         match.bKg_y = nmove.srcy
         if(match.bKg_first_nmovecnt == match.count + 1):
             match.bKg_first_nmovecnt = 0
-    elif(piece == match.PIECES['wRk']):
+    elif(piece == PIECES['wRk']):
         if(match.wRk_a1_first_nmovecnt == match.count + 1):
             match.wRk_a1_first_nmovecnt = 0
         elif(match.wRk_h1_first_nmovecnt == match.count + 1):
             match.wRk_h1_first_nmovecnt = 0
-    elif(piece == match.PIECES['bRk']):
+    elif(piece == PIECES['bRk']):
         if(match.bRk_a8_first_nmovecnt == match.count + 1):
             match.bRk_a8_first_nmovecnt = 0
         elif(match.bRk_h8_first_nmovecnt == match.count + 1):
