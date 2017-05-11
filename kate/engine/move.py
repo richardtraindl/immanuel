@@ -9,7 +9,18 @@ TYPES = { 'standard' : 1,
 
 
 class Move:
-    def __init__(self, match=None, count=None, move_type=None, srcx=None, srcy=None, dstx=None, dsty=None, e_p_fieldx=None, e_p_fieldy=None, captured_piece=None, prom_piece=None, fifty_moves_count=None):
+    def __init__(self, match=None, 
+                       count=None, 
+                       move_type=None, 
+                       srcx=None, 
+                       srcy=None, 
+                       dstx=None, 
+                       dsty=None, 
+                       e_p_fieldx=None, 
+                       e_p_fieldy=None, 
+                       captured_piece=None, 
+                       prom_piece=None, 
+                       fifty_moves_count=None):
         self.match = match
         self.count = count
         self.move_type = move_type
