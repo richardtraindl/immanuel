@@ -40,7 +40,6 @@ def match(request, matchid=None, switch=0, msg=None):
     fmtboard = fill_fmtboard(modelmatch, int(switch))
 
     moves = []
-    move = Move()
     currmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(currmove != None):
         if(currmove.count % 2 == 0):
@@ -49,6 +48,7 @@ def match(request, matchid=None, switch=0, msg=None):
             limit = 21
         qmoves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")[:limit]
         for qmove in reversed(qmoves):
+            move = Move()
             map_moves(qmove, move, MAP_DIR['model-to-engine'])
             moves.append(move)
 
