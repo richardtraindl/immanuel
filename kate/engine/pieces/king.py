@@ -245,7 +245,7 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     else:
         return False
 
-    if(color == match.COLORS['white']):
+    if(color == COLORS['white']):
         if(match.wKg_first_movecnt != 0 or match.wRk_h1_first_movecnt != 0 or rook != PIECES['wRk']):
             return False
     else:
@@ -280,7 +280,7 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     else:
         return False
 
-    if(color == match.COLORS['white']):
+    if(color == COLORS['white']):
         if(match.wKg_first_movecnt != 0 or match.wRk_a1_first_movecnt != 0 or rook != PIECES['wRk']):
             return False
     else:
