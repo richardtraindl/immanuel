@@ -231,7 +231,7 @@ def kg_dir(srcx, srcy, dstx, dsty):
 
 
 def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
-    color = Mtch.color_of_piece(piece)
+    color = Match.color_of_piece(piece)
     opp_color = Match.oppcolor_of_piece(piece)
 
     for i in range(1, 3, 1):
