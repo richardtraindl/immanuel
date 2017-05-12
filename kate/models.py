@@ -2,7 +2,7 @@ from django.db import models
 # from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 from kate.engine import helper
-
+import threading
 
 
 class Match(models.Model):
@@ -89,6 +89,7 @@ class Match(models.Model):
     bRk_a8_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_h8_first_movecnt = models.SmallIntegerField(null=False, default=0)
 
+
     def __init__(self, *args, **kwargs):
         super(Match, self).__init__(*args, **kwargs)
 
@@ -103,6 +104,39 @@ class Match(models.Model):
         idx = y*32 + x*4
         str_value = self.board[idx:idx+3]
         return Match.PIECES[str_value]
+
+
+    @classmethod
+    def remove_threads(cls, match):
+        with cls._immanuels_thread_lock:
+            for item in cls._immanuels_threads_list:
+                if(item.match.id == match.id and item.is_alive() == False):
+                    cls._immanuels_threads_list.remove(item)
+                    item.join()
+
+
+    @classmethod
+    def add_thread(cls, thread):
+        with cls._immanuels_thread_lock:
+            cls._immanuels_threads_list.append(thread)
+
+
+    @classmethod
+    def get_active_thread(cls, match):
+        with cls._immanuels_thread_lock:
+            for item in cls._immanuels_threads_list:
+                if(item.match.id == match.id and item.is_alive()):
+                    return item
+        return None
+
+
+    @classmethod
+    def does_thread_exist(cls, thread):
+        with cls._immanuels_thread_lock:
+            for item in cls._immanuels_threads_list:
+                if(item is thread and item.is_alive()):
+                    return True
+            return False
 
 
 class Move(models.Model):
