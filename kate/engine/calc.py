@@ -1,6 +1,7 @@
 from kate.engine.move import *
 from kate.engine.match import *
-from kate.engine import helper, rules, kate, openings, calc_helper, debug
+from kate.engine.matchmove import *
+from kate.engine import helper, rules, openings, calc_helper, debug
 from kate.engine.pieces import pawn, rook, bishop, knight, queen, king
 import time
 from operator import itemgetter
@@ -258,7 +259,7 @@ def calc_max(match, depth, alpha, beta):
         
     for pmove in prio_moves[:maxcnt]:
         gmove = pmove[0]
-        move = kate.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        move = do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
         score, search_candidates = calc_min(match, depth + 1, maxscore, beta)
 
@@ -287,7 +288,7 @@ def calc_max(match, depth, alpha, beta):
             print(" score: " + str(score) + " / maxscore: " + str(maxscore))
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
-        kate.undo_move(match, True)
+        undo_move(match)
 
         if(score > maxscore):
             maxscore = score
@@ -314,13 +315,13 @@ def calc_min(match, depth, alpha, beta):
 
     for pmove in prio_moves[:maxcnt]:
         gmove = pmove[0]
-        move = kate.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        move = do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
         score, search_candidates = calc_max(match, depth + 1, alpha, minscore)
 
         score = rate(color, gmove, score, candidates, minscore, search_candidates)
 
-        kate.undo_move(match, True)
+        undo_move(match)
 
         if(depth == 1):
             count += 1
