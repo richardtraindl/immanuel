@@ -5,7 +5,6 @@ from django.template import RequestContext
 from kate.models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from kate.engine.match import *
 from kate.engine.move import *
-from kate.engine.matchmove import *
 from kate.modules import interface
 from kate.engine import rules
 from kate.utils import *
