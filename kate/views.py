@@ -10,13 +10,6 @@ from kate.modules.interface import *
 from kate.utils import *
 
 
-def calc_move_for_immanuel(modelmatch):
-    match = Match()
-    map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    if(rules.game_status(match) == STATUS['open'] and match.next_color_human() == False):
-        thread_do_move(match)
-
-
 def index(request):
     context = RequestContext(request)
     modelmatches = ModelMatch.objects.order_by("begin").reverse()[:10]
