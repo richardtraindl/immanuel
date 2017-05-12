@@ -43,7 +43,7 @@ def match(request, matchid=None, switch=0, msg=None):
         qmoves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")[:limit]
         for qmove in reversed(qmoves):
             move = Move()
-            map_moves(qmove, move, MAP_DIR['model-to-engine'])
+            interface.map_moves(qmove, move, MAP_DIR['model-to-engine'])
             moves.append(move)
 
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:3]
