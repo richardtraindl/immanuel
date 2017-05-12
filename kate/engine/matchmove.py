@@ -1,4 +1,4 @@
-from kate.engine import rules, calc_helper
+from kate.engine.calc_helper import SCORES
 from kate.engine.match import *
 from kate.engine.move import *
 
@@ -63,7 +63,7 @@ def generic_do_move(match, move, srcpiece, dstpiece):
         elif(move.srcx == 7 and move.srcy == 7 and match.bRk_h8_first_movecnt == 0):
             match.bRk_h8_first_movecnt = match.count
 
-    match.score += calc_helper.SCORES[dstpiece]
+    match.score += SCORES[dstpiece]
     match.move_list.append(move)
 
     return move
@@ -78,8 +78,8 @@ def pawn_do_move(match, move, srcpiece, dstpiece):
         match.writefield(move.srcx, move.srcy, PIECES['blk'])
         match.writefield(move.dstx, move.dsty, move.prom_piece)
         match.fifty_moves_count = 0
-        match.score -= (calc_helper.SCORES[move.prom_piece] - calc_helper.SCORES[srcpiece])
-        match.score += calc_helper.SCORES[dstpiece]
+        match.score -= (SCORES[move.prom_piece] - SCORES[srcpiece])
+        match.score += SCORES[dstpiece]
         match.move_list.append(move)
 
         return move
@@ -95,7 +95,7 @@ def pawn_do_move(match, move, srcpiece, dstpiece):
         match.writefield(move.dstx, move.dsty, srcpiece)
         match.fifty_moves_count = 0
         match.writefield(move.e_p_fieldx, move.e_p_fieldy, PIECES['blk'])
-        match.score += calc_helper.SCORES[pawn]
+        match.score += SCORES[pawn]
         match.move_list.append(move)
 
         return move
@@ -186,7 +186,7 @@ def generic_undo_move(match, move):
     piece = match.readfield(move.dstx, move.dsty)
     match.writefield(move.srcx, move.srcy, piece)
     match.writefield(move.dstx, move.dsty, move.captured_piece)
-    match.score -= calc_helper.SCORES[move.captured_piece]
+    match.score -= SCORES[move.captured_piece]
     if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
         match.wKg_y = move.srcy
