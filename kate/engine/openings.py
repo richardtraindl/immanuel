@@ -1,4 +1,4 @@
-from kate.models import OpeningMove
+# from kate.models import OpeningMove
 from kate.engine import match, move
 from kate.engine import rules, calc
 import random, copy
@@ -41,7 +41,7 @@ def generate_move(match, cnt):
     return CNT + 1, None
 
 
-def retrieve_move(match):
+"""def retrieve_move(match):
     if(match.count == 0):
         omoves = OpeningMove.objects.filter(movecnt=1)
         if(omoves):
@@ -92,5 +92,5 @@ def retrieve_move(match):
             return None
     else:
         print("############ No opening move found! ###############")
-        return None
+        return None"""
 

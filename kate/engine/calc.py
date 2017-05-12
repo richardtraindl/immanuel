@@ -1,7 +1,7 @@
 from kate.engine.move import *
 from kate.engine.match import *
 from kate.engine.matchmove import *
-from kate.engine import helper, rules, openings, calc_helper, debug
+from kate.engine import helper, rules, calc_helper, debug
 from kate.engine.pieces import pawn, rook, bishop, knight, queen, king
 import time
 from operator import itemgetter
