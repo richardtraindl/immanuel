@@ -191,7 +191,7 @@ def do_move(request, matchid):
             dstx,dsty = Match.koord_to_index(movedst)
             prom_piece = PIECES[prompiece]
             match = Match()
-            map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+            interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
             flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
             if(flag == True):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
