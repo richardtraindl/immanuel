@@ -2,6 +2,7 @@ from kate.models import Match as ModelMatch, Move as ModelMove
 from kate.engine.match import *
 from kate.engine.move import *
 from kate.engine import helper
+from kate.modules import interface
 
 
 def fill_fmtboard(modelmatch, switch):
@@ -92,7 +93,7 @@ def html_moves(modelmatch):
         moves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")[:limit]
         for move in reversed(moves):
             emove = Move()
-            map_moves(move, emove, MAP_DIR['model-to-engine'])
+            interface.map_moves(move, emove, interface.MAP_DIR['model-to-engine'])
             if(emove.count % 2 == 1 ):
                 htmlmoves += "<tr><td>" + str( (emove.count + 1) // 2) + ".</td>"
                 htmlmoves += "<td>" + emove.format_move() + "</td>"
