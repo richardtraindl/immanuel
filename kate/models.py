@@ -108,6 +108,10 @@ class Match(models.Model):
         return Match.PIECES[str_value]
 
 
+    def is_immanuel(self):
+        return (self.white_player_human == False or self.black_player_human == False)
+
+
     @classmethod
     def remove_threads(cls, match):
         with cls._immanuels_thread_lock:
