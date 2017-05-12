@@ -62,31 +62,10 @@ def match(request, matchid=None, switch=0, msg=None):
 
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread and thread.running):
-        if(thread.searchcnt and thread.search):
-            cnt = thread.searchcnt
-            gmove = thread.search
-            search = "current search: " + str(cnt) + ". " + Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
-        else:
-            search = "current search:"
-
-        if(thread.candidates[0]):
-            candidates = "candidates: "
-            for cand in thread.candidates[:3]:
-                if(cand):
-                    candidates += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
-        else:
-            candidates = "candidates:"
-            
-        if(thread.debuginfo):
-            debuginfo = thread.debuginfo
-        else:
-            debuginfo = ""
+        running = "calculation is running..."
     else:
-        search = "current search:"
-        candidates = "candidates:"
-        debuginfo = ""
-
-    return render(request, 'kate/match.html', { 'match': modelmatch, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'search': search, 'candidates': candidates, 'debuginfo': debuginfo } )
+        running = ""
+    return render(request, 'kate/match.html', { 'match': modelmatch, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'running': running } )
 
 
 def new(request):
@@ -282,41 +261,23 @@ def fetch_match(request):
     switchflag = request.GET['switchflag']
     modelmatch = ModelMatch.objects.get(id=matchid)
     if(modelmatch == None):
-        data = "§§§§"
+        data = ""
     else:
         lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
         if(lastmove != None):
             movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
             movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
-
-        if(int(movecnt) == modelmatch.count):
-            data = "§§"
-        else:
             data = html_board(modelmatch, int(switchflag), movesrc, movedst)
+
             data += "§" + html_moves(modelmatch)
+
             data += "§<p>Score: &nbsp;" + str(modelmatch.score) + "</p>"
 
         thread = ModelMatch.get_active_thread(modelmatch)
         if(thread and thread.running):
-            if(thread.searchcnt and thread.search):
-                cnt = thread.searchcnt
-                gmove = thread.search
-                data += "§<p>current search: " + str(cnt) + ". "
-                data += Match.index_to_koord(gmove.srcx, gmove.srcy) + "-" + Match.index_to_koord(gmove.dstx, gmove.dsty)
-                data += "</p>"
-            else:
+            if(len(data) > 0):
                 data += "§"
-
-            if(thread.candidates[0]):
-                data += "§<p>candidates: "
-                for cand in thread.candidates[:3]:
-                    if(cand):
-                        data += "[" + Match.index_to_koord(cand.srcx, cand.srcy) + "-" + Match.index_to_koord(cand.dstx, cand.dsty) + "]"
-                data += "</p>"
-            else:
-                data += "§"
-        else:
-            data += "§§"
+            data += "<p>calculation is running...</p>"
 
     return HttpResponse(data)
 
