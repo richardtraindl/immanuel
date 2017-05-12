@@ -1,10 +1,7 @@
 from kate.models import Match as ModelMatch, Move as ModelMove
 from kate.engine.match import *
 from kate.engine.move import *
-from kate.engine import kate, helper
-from kate.engine.calc import calc_move
-from kate.modules.interface import *
-import random, threading, copy
+from kate.engine import helper
 
 
 def fill_fmtboard(modelmatch, switch):
