@@ -60,7 +60,7 @@ def match(request, matchid=None, switch=0, msg=None):
     else:
         rangeobj = range(7, -1, -1)
 
-    thread = Match.get_active_thread(modelmatch)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread and thread.running):
         if(thread.searchcnt and thread.search):
             cnt = thread.searchcnt
@@ -208,7 +208,7 @@ def force_move(request, matchid, switch=0):
     context = RequestContext(request)
     modelmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = Match.get_active_thread(modelmatch)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread and thread.running and thread.candidates[0]):
         thread.running = False
         gmove = thread.candidates[0]
@@ -224,7 +224,7 @@ def undo_move(request, matchid, switch=0):
     context = RequestContext(request)
     modelmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = Match.get_active_thread(modelmatch)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
         if(thread.running):
             thread.running = False
@@ -239,7 +239,7 @@ def resume(request, matchid, switch=0):
     context = RequestContext(request)
     modelmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = Match.get_active_thread(modelmatch)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
         if(thread.running == False):
             ModelMatch.remove_threads(modelmatch)
@@ -296,7 +296,7 @@ def fetch_match(request):
             data += "§" + html_moves(modelmatch)
             data += "§<p>Score: &nbsp;" + str(modelmatch.score) + "</p>"
 
-        thread = Match.get_active_thread(modelmatch)
+        thread = ModelMatch.get_active_thread(modelmatch)
         if(thread and thread.running):
             if(thread.searchcnt and thread.search):
                 cnt = thread.searchcnt
