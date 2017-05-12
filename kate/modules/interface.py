@@ -78,14 +78,14 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
 def undo_move(modelmatch):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    move = matchmove.undo_move(match, srcx, srcy, dstx, dsty, prom_piece)
-    map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
-    modelmatch.save()
+    move = matchmove.undo_move(match)
+    if(move):
+        map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
+        modelmatch.save()
 
-    modelmove = ModelMove()
-    map_moves(move, modelmove, MAP_DIR['engine-to-model'])
-    modelmove.match = modelmatch
-    modelmove.delete()
+        modelmove = ModelMove.objects.filter(match_id=modelmatch.id, count=move.count).last()
+        if(modelmove):
+            modelmove.delete()
 
 
 class immanuelsThread(threading.Thread):
