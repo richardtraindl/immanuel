@@ -269,8 +269,8 @@ def pawn_undo_promotion(match, move):
     match.fifty_moves_count = move.fifty_moves_count
     match.writefield(move.srcx, move.srcy, piece)
     match.writefield(move.dstx, move.dsty, move.captured_piece)
-    match.score += (calc_helper.SCORES[move.prom_piece] - calc_helper.SCORES[piece])
-    match.score -= calc_helper.SCORES[move.captured_piece]
+    match.score += (SCORES[move.prom_piece] - SCORES[piece])
+    match.score -= SCORES[move.captured_piece]
     return move
 
 
@@ -281,6 +281,6 @@ def pawn_undo_en_passant(match, move):
     match.writefield(move.srcx, move.srcy, piece)
     match.writefield(move.dstx, move.dsty, PIECES['blk'])
     match.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
-    match.score -= calc_helper.SCORES[move.captured_piece]
+    match.score -= SCORES[move.captured_piece]
     return move
 
