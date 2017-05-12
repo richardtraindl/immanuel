@@ -201,16 +201,7 @@ def do_move(request, matchid):
             map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
             flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
             if(flag == True):
-                move = do_move(match, srcx, srcy, dstx, dsty, prom_piece)
-
-                map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
-                modelmatch.save()
-
-                modelmove = ModelMove()                
-                modelmove.match = modelmatch
-                map_moves(move, modelmove, MAP_DIR['engine-to-model'])                
-                modelmove.save()
-
+                interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
                 calc_move_for_immanuel(modelmatch)
         else:
             msg = rules.RETURN_CODES['format-error']
@@ -230,11 +221,7 @@ def force_move(request, matchid, switch=0):
         gmove = thread.candidates[0]
         Match.remove_threads(modelmatch)
         msg = rules.RETURN_CODES['ok']
-        match = Match()
-        map_matches(modelmatch, match, MAP_DIR['model-to-engine'])        
-        move = do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-        move.save()
-        modelmatch.save()
+        interface.do_move(modelmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
@@ -250,11 +237,7 @@ def undo_move(request, matchid, switch=0):
             thread.running = False
         ModelMatch.remove_threads(modelmatch)
 
-    move = undo_move(mmatch)
-
-    if(move != None):
-        move.delete()
-        modelmatch.save()
+    interface.undo_move(modelmatch)
 
     return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
 
