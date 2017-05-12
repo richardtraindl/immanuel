@@ -3,8 +3,9 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from kate.models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
-from kate.engine import helper, rules, calc, kate, move
+from kate.engine import helper, rules, calc, move
 from kate.engine.match import *
+from kate.engine.matchmove import *
 from kate.modules.interface import *
 from kate.utils import *
 
@@ -200,7 +201,7 @@ def do_move(request, matchid):
             map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
             flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
             if(flag == True):
-                move = kate.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
+                move = do_move(match, srcx, srcy, dstx, dsty, prom_piece)
 
                 map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
                 modelmatch.save()
@@ -223,13 +224,15 @@ def force_move(request, matchid, switch=0):
     context = RequestContext(request)
     modelmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = ModelMatch.get_active_thread(modelmatch)
+    thread = Match.get_active_thread(modelmatch)
     if(thread and thread.running and thread.candidates[0]):
         thread.running = False
         gmove = thread.candidates[0]
-        ModelMatch.remove_threads(modelmatch)
+        Match.remove_threads(modelmatch)
         msg = rules.RETURN_CODES['ok']
-        move = kate.do_move(modelmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        match = Match()
+        map_matches(modelmatch, match, MAP_DIR['model-to-engine'])        
+        move = do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
         move.save()
         modelmatch.save()
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
@@ -247,7 +250,7 @@ def undo_move(request, matchid, switch=0):
             thread.running = False
         ModelMatch.remove_threads(modelmatch)
 
-    move = kate.undo_move(mmatch, False)
+    move = undo_move(mmatch)
 
     if(move != None):
         move.delete()
