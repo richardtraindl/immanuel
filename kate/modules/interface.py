@@ -111,7 +111,7 @@ class immanuelsThread(threading.Thread):
         #     self.match.move_list.append(move)
 
         gmove = calc.calc_move(self.match)
-        if(gmove and Match.does_thread_exist(self) and self.running):
+        if(gmove and ModelMatch.does_thread_exist(self) and self.running):
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             modelmatch = ModelMatch()
