@@ -26,13 +26,13 @@ SECRET_KEY = '2bn+w*o&$(x7--v6(3^xpy%!d#04j-lx)4t(u6t1k1qr@8n&s5'
 
 # Application definition
 INSTALLED_APPS = [
+    'kate',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'kate',
+    'django.contrib.staticfiles',    
 ]
 
 MIDDLEWARE_CLASSES = [
