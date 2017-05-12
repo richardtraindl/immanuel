@@ -34,9 +34,6 @@ E8_X = 3
 E8_Y = 7
 
 class Match:
-    _immanuels_thread_lock = threading.Lock()
-    _immanuels_threads_list = []
-
     def __init__(self):
         self.status = STATUS['open']
         self.count = 0
