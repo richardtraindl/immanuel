@@ -94,10 +94,6 @@ class immanuelsThread(threading.Thread):
         self.name = name
         self.running = True
         self.match = copy.deepcopy(match)
-        self.searchcnt = None
-        self.search = None
-        self.candidates = [None] * 10
-        self.debuginfo = None
 
         ModelMatch.remove_threads(match)
         ModelMatch.add_thread(self)
@@ -106,10 +102,6 @@ class immanuelsThread(threading.Thread):
 
     def run(self):
         print("Starting " + str(self.name))
-        # move = Move.objects.filter(match_id=self.match.id).order_by("count").last()
-        # if(move != None):
-        #     self.match.move_list.append(move)
-
         gmove = calc.calc_move(self.match)
         if(gmove and ModelMatch.does_thread_exist(self) and self.running):
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -127,28 +119,6 @@ class immanuelsThread(threading.Thread):
             print("thread outdated - move dropped")
 
         return gmove
-
-
-    def populate_candiates(self, candiates):
-        if(candiates[0]):
-            idx = 0
-            for cand in candiates:
-                if(cand):
-                    self.candidates[idx] = cand
-                    idx += 1
-                else:
-                    break
-
-
-    def populate_search(self, gmove, cnt):
-        if(gmove and cnt):
-            self.searchcnt = cnt
-            self.search = gmove
-
-
-    def populate_debuginfo(self, debuginfo):
-        if(debuginfo):
-            self.debuginfo = debuginfo
 
 
 def thread_do_move(match):
