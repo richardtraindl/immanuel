@@ -87,6 +87,74 @@ def undo_move(modelmatch):
     modelmove.delete()
 
 
+class immanuelsThread(threading.Thread):
+    def __init__(self, name, match):
+        threading.Thread.__init__(self)
+        self.name = name
+        self.running = True
+        self.match = copy.deepcopy(match)
+        self.searchcnt = None
+        self.search = None
+        self.candidates = [None] * 10
+        self.debuginfo = None
+
+        Match.remove_threads(match)
+        Match.add_thread(self)
+        print("match.id: " + str(match.id))
+
+
+    def run(self):
+        print("Starting " + str(self.name))
+        # move = Move.objects.filter(match_id=self.match.id).order_by("count").last()
+        # if(move != None):
+        #     self.match.move_list.append(move)
+
+        gmove = calc_move(self.match)
+        if(gmove and Match.does_thread_exist(self) and self.running):
+            move = kate.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+
+            modelmatch = ModelMatch()
+            map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
+            modelmatch.save()
+
+            modelmove = ModelMove()
+            modelmove.match = modelmatch
+            map_moves(move, modelmove, MAP_DIR['engine-to-model'])                
+            modelmove.save()
+            print("move saved")
+        else:
+            print("thread outdated - move dropped")
+
+        return gmove
+
+
+    def populate_candiates(self, candiates):
+        if(candiates[0]):
+            idx = 0
+            for cand in candiates:
+                if(cand):
+                    self.candidates[idx] = cand
+                    idx += 1
+                else:
+                    break
+
+
+    def populate_search(self, gmove, cnt):
+        if(gmove and cnt):
+            self.searchcnt = cnt
+            self.search = gmove
+
+
+    def populate_debuginfo(self, debuginfo):
+        if(debuginfo):
+            self.debuginfo = debuginfo
+
+
+def thread_do_move(match):
+    thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
+    thread.start()
+
+
 def calc_move_for_immanuel(modelmatch):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
