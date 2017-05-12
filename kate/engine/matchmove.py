@@ -156,16 +156,11 @@ def king_do_move(match, move, srcpiece, dstpiece):
         return generic_do_move(match, move, srcpiece, dstpiece)
 
 
-def undo_move(match, calc):
-    if(calc == False):
-        move = Move.objects.filter(match_id=match.id).order_by("count").last()
-        if(move == None):
-            return None
+def undo_move(match):
+    if(len(match.move_list) > 0):
+        move = match.move_list.pop()
     else:
-        if(len(match.move_list) > 0):
-            move = match.move_list.pop()
-        else:
-            return None
+        return None
 
     if(move.move_type == TYPES['standard']):
         return generic_undo_move(match, move)
