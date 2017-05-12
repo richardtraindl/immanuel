@@ -214,9 +214,8 @@
             setInterval(function(){
                 var matchid;
                 matchid = $('#board').attr("matchid");
-                movecnt = $('#board').attr("movecnt");
                 switchflag = $('#switch').attr("value");
-                $.get('/kate/fetchmatch', { matchid: matchid, movecnt: movecnt, switchflag: switchflag }, function(data){
+                $.get('/kate/fetchmatch', { matchid: matchid, switchflag: switchflag }, function(data){
                     if(data.length > 0){
                         var arr = data.split('§');
                         if(arr[0].length > 0){

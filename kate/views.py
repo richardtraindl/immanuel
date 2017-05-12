@@ -257,17 +257,17 @@ def fetch_comments(request):
 def fetch_match(request):
     context = RequestContext(request)
     matchid = request.GET['matchid']
-    movecnt = request.GET['movecnt']
     switchflag = request.GET['switchflag']
+
+    data = ""
+
     modelmatch = ModelMatch.objects.get(id=matchid)
-    if(modelmatch == None):
-        data = ""
-    else:
+    if(modelmatch):
         lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
         if(lastmove != None):
             movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
             movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
-            data = html_board(modelmatch, int(switchflag), movesrc, movedst)
+            data += html_board(modelmatch, int(switchflag), movesrc, movedst)
 
             data += "§" + html_moves(modelmatch)
 

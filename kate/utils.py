@@ -57,7 +57,7 @@ def html_board(match, switch, movesrc, movedst):
                 htmldata += "&nbsp;"
             else:
                 piece = helper.reverse_lookup(PIECES, col[0])
-                htmldata += "<img class=\"draggable\" " + " src=\"/static/img/" + piece + ".png\">"
+                htmldata += "<img class=\"draggable\" " + " src='/static/img/" + piece + ".png'>"
             htmldata += "</td>"
         htmldata += "<td class=\"board-label\">" + str(row[0][1])[1] + "</td></tr>"
     htmldata += "<tr id=\"board-letters2\"><td>&nbsp;</td>"
