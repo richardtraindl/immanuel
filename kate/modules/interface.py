@@ -1,6 +1,7 @@
 from kate.models import Match as ModelMatch, Move as ModelMove
 from kate.engine.match import Match
 from kate.engine.move import Move
+from kate.engine.matchmove import *
 
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
@@ -58,3 +59,32 @@ def map_moves(src, dst, map_dir):
     dst.captured_piece = src.captured_piece
     dst.prom_piece = src.prom_piece
     dst.fifty_moves_count = src.fifty_moves_count
+    
+ 
+def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
+    match = Match()
+    map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+    move = do_move(match, srcx, srcy, dstx, dsty, prom_piece)
+    map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
+    modelmatch.save()
+
+    modelmove = ModelMove()                
+    modelmove.match = modelmatch
+    map_moves(move, modelmove, MAP_DIR['engine-to-model'])                
+    modelmove.save()
+    
+    
+def undo_move(modelmatch):
+    match = Match()
+    map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+    move = do_move(match, srcx, srcy, dstx, dsty, prom_piece)
+    map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
+    modelmatch.save()
+
+    modelmove = ModelMove()                
+    modelmove.match = modelmatch
+    map_moves(move, modelmove, MAP_DIR['engine-to-model'])                
+    modelmove.save()
+    
+    
+    
