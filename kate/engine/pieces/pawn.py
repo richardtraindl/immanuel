@@ -303,9 +303,7 @@ def pw_dir(srcx, srcy, dstx, dsty, piece):
 
 def is_white_ep_move_ok(match, srcx, srcy, dstx, dsty):
     if(len(match.move_list) == 0):
-        move = Move.objects.filter(match_id=match.id).order_by("count").last()
-        if(move == None):
-            return False
+        return False
     else:
         move = match.move_list[-1]
 
@@ -321,9 +319,7 @@ def is_white_ep_move_ok(match, srcx, srcy, dstx, dsty):
 
 def is_black_ep_move_ok(match, srcx, srcy, dstx, dsty):
     if(len(match.move_list) == 0):
-        move = Move.objects.filter(match_id=match.id).order_by("count").last()
-        if(move == None):
-            return False
+        return False
     else:
         move = match.move_list[-1]
 
