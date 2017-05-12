@@ -99,8 +99,8 @@ class immanuelsThread(threading.Thread):
         self.candidates = [None] * 10
         self.debuginfo = None
 
-        Match.remove_threads(match)
-        Match.add_thread(self)
+        ModelMatch.remove_threads(match)
+        ModelMatch.add_thread(self)
         print("match.id: " + str(match.id))
 
 
