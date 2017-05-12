@@ -118,9 +118,9 @@ class immanuelsThread(threading.Thread):
             map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
             modelmatch.save()
 
-            modelmove = ModelMove()
+            modelmove = ModelMove()            
+            map_moves(move, modelmove, MAP_DIR['engine-to-model'])
             modelmove.match = modelmatch
-            map_moves(move, modelmove, MAP_DIR['engine-to-model'])                
             modelmove.save()
             print("move saved")
         else:
