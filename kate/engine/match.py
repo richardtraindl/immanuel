@@ -1,4 +1,3 @@
-import threading
 
 
 STATUS = { 'open' : 1, 'draw' : 2, 'winner_white' : 3, 'winner_black' : 4, 'cancelled' : 5 }
@@ -182,34 +181,3 @@ class Match:
         koord = str(col + row)
         return koord
 
-    @classmethod
-    def remove_threads(cls, match):
-        with cls._immanuels_thread_lock:
-            for item in cls._immanuels_threads_list:
-                if(item.match.id == match.id and item.is_alive() == False):
-                    cls._immanuels_threads_list.remove(item)
-                    item.join()
-
-
-    @classmethod
-    def add_thread(cls, thread):
-        with cls._immanuels_thread_lock:
-            cls._immanuels_threads_list.append(thread)
-
-
-    @classmethod
-    def get_active_thread(cls, match):
-        with cls._immanuels_thread_lock:
-            for item in cls._immanuels_threads_list:
-                if(item.match.id == match.id and item.is_alive()):
-                    return item
-        return None
-
-
-    @classmethod
-    def does_thread_exist(cls, thread):
-        with cls._immanuels_thread_lock:
-            for item in cls._immanuels_threads_list:
-                if(item is thread and item.is_alive()):
-                    return True
-            return False
