@@ -268,13 +268,6 @@ def calc_max(match, depth, alpha, beta):
         if(depth == 1):
             count += 1
 
-            thread = Match.get_active_thread(match)
-            if(thread):
-                thread.populate_search(gmove, count)
-                thread.populate_candiates(candidates)
-                debuginfo = "prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3])
-                thread.populate_debuginfo(debuginfo)
-
             print("\n____________________________________________________________")
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
@@ -286,6 +279,8 @@ def calc_max(match, depth, alpha, beta):
             msg = "\nCANDIDATES:  "
             prnt_moves(msg, candidates)
             print(" score: " + str(score) + " / maxscore: " + str(maxscore))
+            
+            print("debuginfo: prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3]))
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         undo_move(match)
@@ -326,13 +321,6 @@ def calc_min(match, depth, alpha, beta):
         if(depth == 1):
             count += 1
 
-            thread = Match.get_active_thread(match)
-            if(thread):
-                thread.populate_search(gmove, count)
-                thread.populate_candiates(candidates)
-                debuginfo = "prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3])
-                thread.populate_debuginfo(debuginfo)
-
             print("\n____________________________________________________________")
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
@@ -344,6 +332,8 @@ def calc_min(match, depth, alpha, beta):
             msg = "\nCANDIDATES:  "
             prnt_moves(msg, candidates)
             print(" score: " + str(score) + " / minscore: " + str(minscore))
+
+            print("debuginfo: prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3]))
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         if(score < minscore):
