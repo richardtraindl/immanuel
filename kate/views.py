@@ -6,7 +6,7 @@ from kate.models import Match as ModelMatch, Move as ModelMove, Comment as Model
 from kate.engine import helper, rules, calc, move
 from kate.engine.match import *
 from kate.engine.matchmove import *
-from kate.modules.interface import *
+from kate.modules import interface
 from kate.utils import *
 
 
@@ -116,7 +116,7 @@ def create(request):
 
         if(len(modelmatch.white_player) > 0 and len(modelmatch.black_player) > 0):
             modelmatch.save()
-            calc_move_for_immanuel(modelmatch)
+            interface.calc_move_for_immanuel(modelmatch)
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id,)))
 
     return render(request, 'kate/new.html', { 'white_player': modelmatch.white_player, 'white_player_human': modelmatch.white_player_human, 'black_player': modelmatch.black_player, 'black_player_human': modelmatch.black_player_human } )
@@ -149,7 +149,7 @@ def update(request, matchid, switch=0):
 
         if(len(modelmatch.white_player) > 0 and len(modelmatch.black_player) > 0):
             modelmatch.save()
-            calc_move_for_immanuel(modelmatch)
+            interface.calc_move_for_immanuel(modelmatch)
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch,)))
 
     return render(request, 'kate/edit.html', { 'match': modelmatch, 'switch': switch } )
@@ -195,7 +195,7 @@ def do_move(request, matchid):
             flag, msg = rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
             if(flag == True):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-                calc_move_for_immanuel(modelmatch)
+                interface.calc_move_for_immanuel(modelmatch)
         else:
             msg = rules.RETURN_CODES['format-error']
 
@@ -245,7 +245,7 @@ def resume(request, matchid, switch=0):
             ModelMatch.remove_threads(modelmatch)
             calc_move_for_immanuel(modelmatch)
     else:
-        calc_move_for_immanuel(modelmatch)
+        interface.calc_move_for_immanuel(modelmatch)
 
     return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
 
