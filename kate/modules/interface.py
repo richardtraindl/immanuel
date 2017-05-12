@@ -2,6 +2,8 @@ from kate.models import Match as ModelMatch, Move as ModelMove
 from kate.engine.match import Match
 from kate.engine.move import Move
 from kate.engine.matchmove import do_move, undo_move
+from kate.engine.calc import calc_move
+import random, threading, copy
 
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
