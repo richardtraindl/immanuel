@@ -180,15 +180,3 @@ class Comment(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=500)
 
-
-
-class OpeningMove(models.Model):
-    previous = models.ForeignKey('OpeningMove', null=True)
-    movecnt = models.PositiveSmallIntegerField(null=False)
-    src = models.CharField(max_length=2, blank=False)
-    dst = models.CharField(max_length=2, blank=False)
-
-
-    class Meta:
-        unique_together = (("previous", "movecnt", "src", "dst"),)
-
