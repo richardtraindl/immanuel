@@ -243,7 +243,7 @@ def resume(request, matchid, switch=0):
     if(thread):
         if(thread.running == False):
             ModelMatch.remove_threads(modelmatch)
-            calc_move_for_immanuel(modelmatch)
+            interface.calc_move_for_immanuel(modelmatch)
     else:
         interface.calc_move_for_immanuel(modelmatch)
 
