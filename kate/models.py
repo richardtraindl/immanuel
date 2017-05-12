@@ -88,6 +88,8 @@ class Match(models.Model):
     wRk_h1_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_a8_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_h8_first_movecnt = models.SmallIntegerField(null=False, default=0)
+    _immanuels_thread_lock = threading.Lock()
+    _immanuels_threads_list = []
 
 
     def __init__(self, *args, **kwargs):
