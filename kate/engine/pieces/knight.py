@@ -173,7 +173,7 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                     if(pin_dir != rules.DIRS['undefined']):
                         return True, 2 # priority
                     else:
-                        if(macalc_helpertch.PIECES_RANK[piece] >= calc_helper.PIECES_RANK[knight]):
+                        if(calc_helper.PIECES_RANK[piece] >= calc_helper.PIECES_RANK[knight]):
                             return True, 2 # priority
                         else:
                             priority = min(priority, 3)
