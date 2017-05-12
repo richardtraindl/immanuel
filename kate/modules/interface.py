@@ -1,9 +1,7 @@
 from kate.models import Match as ModelMatch, Move as ModelMove
 from kate.engine.match import *
 from kate.engine.move import *
-from kate.engine.matchmove import do_move, undo_move
-from kate.engine.calc import calc_move
-from kate.engine import rules
+from kate.engine import matchmove, rules, calc
 import random, threading, copy
 
 
@@ -67,7 +65,7 @@ def map_moves(src, dst, map_dir):
 def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    move = do_move(match, srcx, srcy, dstx, dsty, prom_piece)
+    move = matchmove.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
     map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
     modelmatch.save()
 
@@ -80,7 +78,7 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
 def undo_move(modelmatch):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    move = undo_move(match, srcx, srcy, dstx, dsty, prom_piece)
+    move = matchmove.undo_move(match, srcx, srcy, dstx, dsty, prom_piece)
     map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
     modelmatch.save()
 
@@ -112,9 +110,9 @@ class immanuelsThread(threading.Thread):
         # if(move != None):
         #     self.match.move_list.append(move)
 
-        gmove = calc_move(self.match)
+        gmove = calc.calc_move(self.match)
         if(gmove and Match.does_thread_exist(self) and self.running):
-            move = kate.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+            move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             modelmatch = ModelMatch()
             map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
