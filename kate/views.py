@@ -239,7 +239,7 @@ def resume(request, matchid, switch=0):
     context = RequestContext(request)
     modelmatch = ModelMatch.objects.get(id=matchid)
 
-    thread = ModelMatch.get_active_thread(modelmatch)
+    thread = Match.get_active_thread(modelmatch)
     if(thread):
         if(thread.running == False):
             ModelMatch.remove_threads(modelmatch)
