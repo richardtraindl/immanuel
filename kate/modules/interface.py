@@ -60,6 +60,12 @@ def map_moves(src, dst, map_dir):
     dst.captured_piece = src.captured_piece
     dst.prom_piece = src.prom_piece
     dst.fifty_moves_count = src.fifty_moves_count
+
+    
+def is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
+    match = Match()
+    map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+    return rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
     
  
 def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
