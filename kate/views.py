@@ -183,22 +183,6 @@ def do_move(request, matchid):
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
 
 
-def force_move(request, matchid, switch=0):
-    context = RequestContext(request)
-    modelmatch = ModelMatch.objects.get(id=matchid)
-
-    thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread and thread.running and thread.candidates[0]):
-        thread.running = False
-        gmove = thread.candidates[0]
-        Match.remove_threads(modelmatch)
-        msg = rules.RETURN_CODES['ok']
-        interface.do_move(modelmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-        return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
-    else:
-        return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
-
-
 def undo_move(request, matchid, switch=0):
     context = RequestContext(request)
     modelmatch = ModelMatch.objects.get(id=matchid)
