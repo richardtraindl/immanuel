@@ -144,24 +144,6 @@ def do_move(request, matchid):
     if request.method == 'POST':
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
         switch = request.POST['switch']
-
-        """match = map_matches(modelmatch, MAP_DIR['model-to-engine'])
-        status = rules.game_status(match)
-        if(status != STATUS['open']):
-            if(status == STATUS['draw']):
-                msg = rules.RETURN_CODES['draw']
-            elif(status == STATUS['winner_white']):
-                msg = rules.RETURN_CODES['winner_white']
-            elif(status == STATUS['winner_black']):
-                msg = rules.RETURN_CODES['winner_black']
-            else:
-                msg = rules.RETURN_CODES['match-cancelled']
-            return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
-
-        if(match.next_color_human() == False):
-            msg= rules.RETURN_CODES['wrong-color']
-            return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))"""
-
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
         prompiece = request.POST['prom_piece']        
@@ -205,8 +187,7 @@ def resume(request, matchid, switch=0):
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
         if(thread.running == False):
-            ModelMatch.remove_threads(modelmatch)
-            interface.calc_move_for_immanuel(modelmatch)
+            thread.running = True  
     else:
         interface.calc_move_for_immanuel(modelmatch)
 
