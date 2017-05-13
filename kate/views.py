@@ -51,9 +51,9 @@ def match(request, matchid=None, switch=0, msg=None):
     if(msg == None):
         fmtmsg = "<p class='ok'></p>"
     elif(int(msg) == 0):
-        fmtmsg = "<p class='ok'>" + rules.RETURN_MSGS[int(msg)] + "</p>"
+        fmtmsg = "<p class='ok'>" + RETURN_MSGS[int(msg)] + "</p>"
     else:
-        fmtmsg = "<p class='error'>" + rules.RETURN_MSGS[int(msg)] + "</p>"
+        fmtmsg = "<p class='error'>" + RETURN_MSGS[int(msg)] + "</p>"
 
     if(int(switch) == 0):
         rangeobj = range(8)
@@ -156,7 +156,7 @@ def do_move(request, matchid):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
                 interface.calc_move_for_immanuel(modelmatch)
         else:
-            msg = rules.RETURN_CODES['format-error']
+            msg = RETURN_CODES['format-error']
 
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
