@@ -122,9 +122,7 @@ class immanuelsThread(threading.Thread):
             modelmove.save()
             print("move saved")
         else:
-            print("thread outdated - move dropped")
-
-        return gmove
+            print("no move found or thread outdated!")
 
 
 def thread_do_move(match):

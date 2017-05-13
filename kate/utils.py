@@ -36,8 +36,8 @@ def fill_fmtboard(modelmatch, switch):
 
 def html_board(match, switch, movesrc, movedst):
     fmtboard = fill_fmtboard(match, switch)
-    htmldata = "<table id=\"board\" matchid=\"" + str(match.id) + "\" movecnt=\"" + str(match.count) + "\">"
-    htmldata += "<tr id=\"board-letters1\"><td>&nbsp;</td>"
+    htmldata = "<table id='board' matchid='" + str(match.id) + "'>"
+    htmldata += "<tr id='board-letters1'><td>&nbsp;</td>"
     if(switch == 0):
         for i in range(8):
             htmldata += "<td>" + chr(i + ord('A')) + "</td>"
@@ -46,21 +46,21 @@ def html_board(match, switch, movesrc, movedst):
             htmldata += "<td>" + chr(ord('H') - i) + "</td>"
     htmldata += "<td>&nbsp;</td></tr>"
     for row in fmtboard:
-        htmldata += "<tr><td class=\"board-label\">" + str(row[0][1])[1] + "</td>"
+        htmldata += "<tr><td class='board-label'>" + str(row[0][1])[1] + "</td>"
         for col in row:
             if(col[1] == movesrc or col[1] == movedst):
-                htmldata += "<td id=\"" + str(col[1]) + "\" class=\"hint droppable\"  value=\"" + str(col[0]) + "\">"
+                htmldata += "<td id='" + str(col[1]) + "' class='hint droppable'  value='" + str(col[0]) + "'>"
             else:
-                htmldata += "<td id=\"" + str(col[1]) + "\" class=\"droppable\" value=\"" + str(col[0]) + "\">"
+                htmldata += "<td id='" + str(col[1]) + "' class='droppable' value='" + str(col[0]) + "'>"
 
             if(col[0] == 0):
                 htmldata += "&nbsp;"
             else:
                 piece = helper.reverse_lookup(PIECES, col[0])
-                htmldata += "<img class=\"draggable\" " + " src='/static/img/" + piece + ".png'>"
+                htmldata += "<img class='draggable' " + " src='/static/img/" + piece + ".png'>"
             htmldata += "</td>"
-        htmldata += "<td class=\"board-label\">" + str(row[0][1])[1] + "</td></tr>"
-    htmldata += "<tr id=\"board-letters2\"><td>&nbsp;</td>"
+        htmldata += "<td class='board-label'>" + str(row[0][1])[1] + "</td></tr>"
+    htmldata += "<tr id='board-letters2'><td>&nbsp;</td>"
     if(switch == 0):
         for i in range(8):
             htmldata += "<td>" + chr(i + ord('A')) + "</td>"
@@ -72,14 +72,14 @@ def html_board(match, switch, movesrc, movedst):
 
 
 def html_moves(modelmatch):
-    htmlmoves = "<table>"
-    htmlmoves += "<tr><td>&nbsp;</td>"
+    htmlmoves = "<p>Minutes</p><table>"
+    htmlmoves += "<tr><td># &nbsp;</td>"
     if(modelmatch.white_player_human == False):
-        htmlmoves += "<td><span class=\"fbold\">" + modelmatch.white_player + "</span></td>"
+        htmlmoves += "<td><span class='fbold'>" + modelmatch.white_player + "</span></td>"
     else:
         htmlmoves += "<td>" + modelmatch.white_player + "</td>"
     if(modelmatch.black_player_human == False):
-        htmlmoves += "<td><span class=\"fbold\">" + modelmatch.black_player + "</span></td>"
+        htmlmoves += "<td><span class='fbold'>" + modelmatch.black_player + "</span></td>"
     else:
         htmlmoves += "<td>" + modelmatch.black_player + "</td>"
     htmlmoves += "</tr>"

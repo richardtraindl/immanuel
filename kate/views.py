@@ -234,13 +234,13 @@ def fetch_match(request):
 
             data += "§" + html_moves(modelmatch)
 
-            data += "§<p>Score: &nbsp;" + str(modelmatch.score) + "</p>"
+            data += "§<p>Score: &nbsp; " + str(modelmatch.score) + "</p>"
 
         thread = ModelMatch.get_active_thread(modelmatch)
         if(thread and thread.running):
             if(len(data) > 0):
                 data += "§"
-            data += "<p>calculation is running...</p>"
+            data += "<p> &nbsp; calculation is running...</p>"
 
     return HttpResponse(data)
 
