@@ -215,7 +215,7 @@
                 var newcomment;
                 matchid = $('#board').attr("matchid");
                 movecnt = $('#board').attr("movecnt");
-                newcomment = $('#newcomment').text();
+                newcomment = $('#newcomment').val();
                 if(newcomment.length  == 0){
                     $.get('/kate/fetchmatch', { matchid: matchid, movecnt: movecnt }, function(data){
                         if(data.length > 0){
