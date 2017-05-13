@@ -76,7 +76,6 @@ class Match(models.Model):
                                                                   'blk;blk;blk;blk;blk;blk;blk;blk;' \
                                                                   'bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;' \
                                                                   'bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;')
-    # board = ArrayField(ArrayField(models.PositiveSmallIntegerField(null=False, blank=False, default=PIECES['blk']), size=8), size=8)
     fifty_moves_count = models.SmallIntegerField(null=False, default=0)
     wKg_x = models.SmallIntegerField(null=False, default=0)
     wKg_y = models.SmallIntegerField(null=False, default=0)
@@ -106,10 +105,6 @@ class Match(models.Model):
         idx = y*32 + x*4
         str_value = self.board[idx:idx+3]
         return Match.PIECES[str_value]
-
-
-    def is_immanuel(self):
-        return (self.white_player_human == False or self.black_player_human == False)
 
 
     @classmethod
