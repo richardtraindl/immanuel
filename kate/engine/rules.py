@@ -365,7 +365,7 @@ def game_status(match):
             if(is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)):
                 return STATUS['winner_white']
 
-    return match.STATUS['draw']
+    return STATUS['draw']
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):

@@ -6,7 +6,7 @@ from kate.models import Match as ModelMatch, Move as ModelMove, Comment as Model
 from kate.engine.match import *
 from kate.engine.move import *
 from kate.modules import interface
-from kate.engine.rules import RETURN_CODES, RETURN_MSGS
+from kate.engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
 from kate.utils import *
 
 
@@ -147,16 +147,25 @@ def do_move(request, matchid):
         movesrc = request.POST['move_src']
         movedst = request.POST['move_dst']
         prompiece = request.POST['prom_piece']        
-        if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
-            srcx,srcy = Match.koord_to_index(movesrc)
-            dstx,dsty = Match.koord_to_index(movedst)
-            prom_piece = PIECES[prompiece]
-            valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-            if(valid):
-                interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-                interface.calc_move_for_immanuel(modelmatch)
-        else:
-            msg = RETURN_CODES['format-error']
+
+        status = interface.game_status(modelmatch)
+        if(status == STATUS['open']):
+            if(len(movesrc) > 0 and len(movedst) > 0 and len(prompiece) > 0):
+                srcx,srcy = Match.koord_to_index(movesrc)
+                dstx,dsty = Match.koord_to_index(movedst)
+                prom_piece = PIECES[prompiece]
+                valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+                if(valid):
+                    interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+                    interface.calc_move_for_immanuel(modelmatch)
+            else:
+                msg = RETURN_CODES['format-error']
+        elif(status == STATUS['winner_white']):
+            msg = RETURN_CODES['winner_white']    
+        elif(status == STATUS['winner_black']):
+            msg = RETURN_CODES['winner_black']
+        else: # draw
+            msg = RETURN_CODES['draw']
 
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
@@ -220,27 +229,13 @@ def fetch_comments(request):
 def fetch_match(request):
     context = RequestContext(request)
     matchid = request.GET['matchid']
-    switchflag = request.GET['switchflag']
-
-    data = ""
+    movecnt = request.GET['movecnt']
 
     modelmatch = ModelMatch.objects.get(id=matchid)
-    if(modelmatch):
-        lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
-        if(lastmove != None):
-            movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
-            movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
-            data += html_board(modelmatch, int(switchflag), movesrc, movedst)
-
-            data += "§" + html_moves(modelmatch)
-
-            data += "§<p>Score: &nbsp; " + str(modelmatch.score) + "</p>"
-
-        thread = ModelMatch.get_active_thread(modelmatch)
-        if(thread and thread.running):
-            if(len(data) > 0):
-                data += "§"
-            data += "<p> &nbsp; calculation is running...</p>"
+    if(modelmatch and modelmatch.count != int(movecnt)):
+        data = "1"
+    else:
+        data = ""
 
     return HttpResponse(data)
 

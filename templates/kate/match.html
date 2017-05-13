@@ -65,7 +65,7 @@
             </div>
 
             <div id="board-wrapper">
-                <table id="board" matchid="{{ match.id }}">
+                <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
                     <tr id="board-letters1">
                         <td>&nbsp;</td>
                         {% for i in range %}
@@ -212,30 +212,12 @@
 
             setInterval(function(){
                 var matchid;
+                var movecnt;
                 matchid = $('#board').attr("matchid");
-                switchflag = $('#switch').attr("value");
-                $.get('/kate/fetchmatch', { matchid: matchid, switchflag: switchflag }, function(data){
+                movecnt = $('#board').attr("movecnt");
+                $.get('/kate/fetchmatch', { matchid: matchid, movecnt: movecnt }, function(data){
                     if(data.length > 0){
-                        var arr = data.split('§');
-                        arr[0].replace("§", "");
-                        if(arr[0].length > 0){
-                            $('#board-wrapper').html(arr[0]);
-                        }
-                        arr[1].replace("§", "");
-                        if(arr[1].length > 0){
-                            $('#minutes').html(arr[1]);
-                        }
-                        arr[2].replace("§", "");
-                        if(arr[2].length > 0){
-                            $('#score').html(arr[2]);
-                        }
-                        arr[3].replace("§", "");
-                        if(arr[3].length > 0){
-                            $('#running').html(arr[3]);
-                        }
-                        performMove();
-                        drag();
-                        drop();
+                        location.reload();
                     }
                 });
             }, 20000);
