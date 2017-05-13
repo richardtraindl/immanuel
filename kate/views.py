@@ -6,7 +6,7 @@ from kate.models import Match as ModelMatch, Move as ModelMove, Comment as Model
 from kate.engine.match import *
 from kate.engine.move import *
 from kate.modules import interface
-from kate.engine import rules
+from kate.engine.rules import RETURN_CODES, RETURN_MSGS
 from kate.utils import *
 
 
