@@ -1,7 +1,7 @@
 from kate.engine.move import *
 from kate.engine.match import *
 from kate.engine.matchmove import *
-from kate.engine import helper, rules, calc_helper, debug
+from kate.engine import helper, rules, calc_helper, openingmove, debug
 from kate.engine.pieces import pawn, rook, bishop, knight, queen, king
 import time
 from operator import itemgetter
@@ -349,7 +349,7 @@ def calc_move(match):
 
     start = time.time()
     
-    # candidates[0] = openings.retrieve_move(match)
+    # candidates[0] = openingmove.retrieve_move(match)
 
     if(candidates[0]):
         score = match.score
