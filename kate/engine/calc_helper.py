@@ -3,7 +3,7 @@ from kate.engine.pieces import pawn
 from kate.engine.match import *
 
 
-SCORES = {
+SCORES = { 
         PIECES['blk'] : 0,
         PIECES['wKg'] : -20000,
         PIECES['wPw'] : -100,
@@ -78,6 +78,16 @@ PIECES_RANK = {
         PIECES['wKg'] : 6,
         PIECES['bKg'] : 6 }
 
+PRIO = {
+    'prio1' : 1,
+    'prio2' : 2,
+    'prio3' : 3,
+    'prio4' : 4,
+    'prio5' : 5,
+    'prio6' : 6,
+    'priolast' : 7,
+    'undefinded' : 10 }
+
 """
 def analyse(match):
     analyses = []
@@ -129,35 +139,35 @@ def is_capture(match, move):
 
     if(dstpiece != PIECES['blk']):
         if(PIECES_RANK[dstpiece] >= PIECES_RANK[piece]):
-            return True, 1 # priority
+            return True, PRIO['prio1']
         else:
             match.writefield(move.srcx, move.srcy, PIECES['blk'])
             touched = rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty)
             match.writefield(move.srcx, move.srcy, piece)        
             if(touched):
-                return True, 2 # priority
+                return True, PRIO['prio2']
             else:
-                return True, 1 # priority
+                return True, PRIO['prio1']
     elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and move.srcx != move.dstx ):
-        return True, 1 # priority
+        return True, PRIO['prio1']
     else:
-        return False, 0  # priority
+        return False, PRIO['undefinded']
 
 
 def is_promotion(match, move):
     if(move.prom_piece == PIECES['blk']):
-        return False, 0 # priority
+        return False, PRIO['undefinded']
     else:
-        return True, 1 # priority
+        return True, PRIO['prio1']
 
 
 def is_castling(match, move):
     piece = match.readfield(move.srcx, move.srcy)
     if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
         if(move.srcx - move.dstx == 2 or move.srcx - move.dstx == -2):
-            return True, 1 # priority
+            return True, PRIO['prio1']
 
-    return False, 0 # priority
+    return False, PRIO['undefinded']
 
 
 def does_attack(match, move):
@@ -169,7 +179,7 @@ def does_support_attacked(match, move):
 
 
 def does_attacked_flee(match, move):
-    return False, 0 # priority
+    return False, PRIO['undefinded']
     piece = match.readfield(move.srcx, move.srcy)
     
     color = Match.color_of_piece(piece)
@@ -181,25 +191,25 @@ def does_attacked_flee(match, move):
         newtouches = rules.list_field_touches(match, opp_color, move.dstx, move.dsty)
         match.writefield(move.srcx, move.srcy, piece)
         if(len(newtouches) < len(touches)):
-            return True, 1 # priority
+            return True, PRIO['prio1']
         else:
-            return True, 2 # priority
+            return True, PRIO['prio2']
     else:
-        return False, 0 # priority
+        return False, PRIO['undefinded']
 
 
 def is_endgame_move(match, move):
     if(match.count > 60):
         if(pawn.is_running(match, move)):
-            return True, 2 # priority
+            return True, PRIO['prio2']
         else:
             piece = match.readfield(move.srcx, move.srcy)
             if(piece == PIECES['wPw'] or piece == PIECES['bPw'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                return True, 3 # priority
+                return True, PRIO['prio3']
             else:
-                return False, 0 # priority
+                return False, PRIO['undefinded']
     else:
-        return False, 0 # priority
+        return False, PRIO['undefinded']
 
 
 """

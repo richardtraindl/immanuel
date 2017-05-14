@@ -1,7 +1,8 @@
 from kate.engine.move import *
 from kate.engine.match import *
 from kate.engine.matchmove import *
-from kate.engine import helper, rules, calc_helper, openingmove, debug
+from kate.engine.calc_helper import *
+from kate.engine import helper, rules, openingmove, debug
 from kate.engine.pieces import pawn, rook, bishop, knight, queen, king
 import time
 from operator import itemgetter
@@ -54,62 +55,57 @@ def read_steps(steps, dir_idx, step_idx):
 
 
 def rank_move(match, gmove):
-    prio1 = 1
-    prio2 = 2
-    prio3 = 3
-    prio4 = 4
-    priority = 5
+    priority = PRIO['priolast']
 
-    capture, prio = calc_helper.is_capture(match, gmove)
+    capture, prio = is_capture(match, gmove)
     if(capture):
         priority = min(priority, prio)
-        if(priority == prio1):
+        if(priority == PRIO['prio1']):
             return priority
 
-    promotion, prio = calc_helper.is_promotion(match, gmove) 
+    promotion, prio = is_promotion(match, gmove) 
     if(promotion):
         priority = min(priority, prio)
-        if(priority == prio1):
+        if(priority == PRIO['prio1']):
             return priority
     
-    castling, prio = calc_helper.is_castling(match, gmove)
+    castling, prio = is_castling(match, gmove)
     if(castling):
         priority = min(priority, prio)
-        if(priority == prio1):
+        if(priority == PRIO['prio1']):
             return priority
 
-    attack, prio = calc_helper.does_attack(match, gmove)
+    attack, prio = does_attack(match, gmove)
     if(attack):
         priority = min(priority, prio)
-        if(priority == prio1):
+        if(priority == PRIO['prio1']):
             return priority
 
-    support, prio = calc_helper.does_support_attacked(match, gmove)
+    support, prio = does_support_attacked(match, gmove)
     if(support):
         priority = min(priority, prio)
-        if(priority == prio1):
+        if(priority == PRIO['prio1']):
             return priority
 
-    flee, prio = calc_helper.does_attacked_flee(match, gmove)
+    flee, prio = does_attacked_flee(match, gmove)
     if(flee):
         priority = min(priority, prio)
-        if(priority == prio1):
+        if(priority == PRIO['prio1']):
             return priority
 
-    endgame, prio = calc_helper.is_endgame_move(match, gmove)
+    endgame, prio = is_endgame_move(match, gmove)
     if(endgame):
         priority = min(priority, prio)
-        if(priority == prio1):
+        if(priority == PRIO['prio1']):
             return priority
         
-    priority = min(priority, prio4)
     return priority
 
 
 def generate_moves(match):
     color = match.next_color()
     prio_moves = []
-    priorities = [0] * 4
+    priorities = [0] * 7
     piece_prio = None
 
     for y in range(0, 8, 1):
@@ -251,11 +247,15 @@ def calc_max(match, depth, alpha, beta):
     count = 0
 
     prio_moves, priorities = generate_moves(match)
+    if(depth == 1):
+        for pmove in prio_moves:
+            prnt_move(" ", pmove[0])
+        print("prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3]))
 
     maxcnt = select_maxcnt(match, depth, priorities)
 
     if(maxcnt == 0):
-        return calc_helper.evaluate_position(match, len(prio_moves)), candidates
+        return evaluate_position(match, len(prio_moves)), candidates
         
     for pmove in prio_moves[:maxcnt]:
         gmove = pmove[0]
@@ -269,6 +269,7 @@ def calc_max(match, depth, alpha, beta):
             count += 1
 
             print("\n____________________________________________________________")
+
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
             print(" p:" + str(pmove[1]) + " r:" + str(pmove[2]), end="")
@@ -281,6 +282,7 @@ def calc_max(match, depth, alpha, beta):
             print(" score: " + str(score) + " / maxscore: " + str(maxscore))
             
             print("debuginfo: prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3]))
+
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         undo_move(match)
@@ -302,11 +304,15 @@ def calc_min(match, depth, alpha, beta):
     count = 0
 
     prio_moves, priorities = generate_moves(match)
+    if(depth == 1):
+        for pmove in prio_moves:
+            prnt_move(" ", pmove[0])
+        print("prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3]))
 
     maxcnt = select_maxcnt(match, depth, priorities)
 
     if(maxcnt == 0):
-        return calc_helper.evaluate_position(match, len(prio_moves)), candidates
+        return evaluate_position(match, len(prio_moves)), candidates
 
     for pmove in prio_moves[:maxcnt]:
         gmove = pmove[0]
@@ -322,6 +328,7 @@ def calc_min(match, depth, alpha, beta):
             count += 1
 
             print("\n____________________________________________________________")
+
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove)
             print(" p:" + str(pmove[1]) + " r:" + str(pmove[2]), end="")
@@ -333,7 +340,6 @@ def calc_min(match, depth, alpha, beta):
             prnt_moves(msg, candidates)
             print(" score: " + str(score) + " / minscore: " + str(minscore))
 
-            print("debuginfo: prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3]))
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         if(score < minscore):

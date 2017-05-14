@@ -84,7 +84,7 @@ def list_field_touches(match, color, fieldx, fieldy):
  
  
 def does_attack(match, srcx, srcy, dstx, dsty):
-    priority = 5
+    priority = calc_helper.PRIO['undefinded']
 
     pawn = match.readfield(srcx, srcy)
 
@@ -106,21 +106,21 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
                 if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    return True, 2 # priority
+                    return True, calc_helper.PRIO['prio2']
                 else:
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
-                        priority = min(priority, 2)
+                        priority = min(priority, calc_helper.PRIO['prio2'])
                     else:
                         match.writefield(srcx, srcy, PIECES['blk'])
                         touched = rules.is_field_touched(match, opp_color, dstx, dsty)
                         match.writefield(srcx, srcy, pawn)
                         if(touched):
-                            priority = min(priority, 3)
+                            priority = min(priority, calc_helper.PRIO['prio3'])
                         else:
-                            priority = min(priority, 2)
+                            priority = min(priority, calc_helper.PRIO['prio2'])
 
-    if(priority == 5):
+    if(priority == calc_helper.PRIO['undefinded']):
         return False, 0
     else:
         return True, priority 
@@ -181,12 +181,12 @@ def score_attacks(match, srcx, srcy):
 
 
 def does_support_attacked(match, srcx, srcy, dstx, dsty):
-    priority = 5
+    priority = calc_helper.PRIO['undefinded']
 
     pawn = match.readfield(srcx, srcy)
 
     if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
-        return False, 0
+        return False, priority
 
     color = Match.color_of_piece(pawn)
     opp_color = Match.oppcolor_of_piece(pawn)
@@ -205,10 +205,10 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                 continue
             if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
-                    return True, 2 # priority
+                    return True, calc_helper.PRIO['prio3']
 
-    if(priority == 5):
-        return False, 0
+    if(priority == calc_helper.PRIO['undefinded']):
+        return False, priority
     else:
         return True, priority
 

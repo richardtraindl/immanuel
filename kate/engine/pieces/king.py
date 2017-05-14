@@ -67,12 +67,12 @@ def list_field_touches(match, color, fieldx, fieldy):
 
 
 def does_attack(match, srcx, srcy, dstx, dsty):
-    priority = 5
+    priority = calc_helper.PRIO['undefinded']
 
     king = match.readfield(srcx, srcy)
 
     if(king != PIECES['wKg'] and king != PIECES['bKg']):
-        return False, 0
+        return False, priority
 
     color = Match.color_of_piece(king) 
     opp_color = Match.oppcolor_of_piece(king)
@@ -85,15 +85,15 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             if(match.color_of_piece(piece) == opp_color):
                 pin_dir = rules.pin_dir(match, x1, y1)
                 if(pin_dir != rules.DIRS['undefined']):
-                    return True, 2 # priority
+                    return True, calc_helper.PRIO['prio2']
                 else:
                     if(rules.is_field_touched(match, opp_color, x1, y1)):
-                        priority = min(priority, 3)
+                        priority = min(priority, calc_helper.PRIO['prio3'])
                     else:
-                        return True, 2 # priority
+                        return True, calc_helper.PRIO['prio2']
 
-    if(priority == 5):
-        return False, 0
+    if(priority == calc_helper.PRIO['undefinded']):
+        return False, priority
     else:
         return True, priority
 
@@ -142,12 +142,12 @@ def score_attacks(match, srcx, srcy):
 
 
 def does_support_attacked(match, srcx, srcy, dstx, dsty):
-    priority = 5
+    priority = calc_helper.PRIO['undefinded']
 
     king = match.readfield(srcx, srcy)
 
     if(king != PIECES['wKg'] and king != PIECES['bKg']):
-        return False, 0
+        return False, priority
 
     color = Match.color_of_piece(king)
     opp_color = Match.oppcolor_of_piece(king)
@@ -165,12 +165,12 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
-                        return True, 2 # priority
+                        return True, calc_helper.PRIO['prio3']
                     else:
-                        priority = min(priority, 3)
+                        priority = min(priority, calc_helper.PRIO['prio4'])
 
-    if(priority == 5):
-        return False, 0
+    if(priority == calc_helper.PRIO['undefinded']):
+        return False, priority
     else:
         return True, priority
 

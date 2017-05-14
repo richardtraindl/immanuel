@@ -61,12 +61,12 @@ def list_field_touches(match, color, fieldx, fieldy):
 
 
 def does_attack(match, srcx, srcy, dstx, dsty):
-    priority = 5
+    priority = calc_helper.PRIO['undefinded']
 
     knight = match.readfield(srcx, srcy)
 
     if(knight != PIECES['wKn'] and knight != PIECES['bKn']):
-        return False, 0
+        return False, priority
 
     color = Match.color_of_piece(knight)
     opp_color = Match.oppcolor_of_piece(knight)
@@ -78,27 +78,27 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
                 if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    return True, 2 # priority
+                    return True, calc_helper.PRIO['prio2']
                 else:
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
-                        priority = min(priority, 2)
+                        priority = min(priority, calc_helper.PRIO['prio2'])
                     else:
                         match.writefield(srcx, srcy, PIECES['blk'])
                         touched = rules.is_field_touched(match, opp_color, dstx, dsty)
                         match.writefield(srcx, srcy, knight)
                         if(touched):
-                            priority = min(priority, 3)
+                            priority = min(priority, calc_helper.PRIO['prio3'])
                         elif(rules.is_field_touched(match, opp_color, x1, y1)):
                             if(calc_helper.PIECES_RANK[piece] >= calc_helper.PIECES_RANK[knight]):
-                                priority = min(priority, 2)
+                                priority = min(priority, calc_helper.PRIO['prio2'])
                             else:
-                                priority = min(priority, 3)
+                                priority = min(priority, calc_helper.PRIO['prio3'])
                         else:
-                            priority = min(priority, 2)
+                            priority = min(priority, calc_helper.PRIO['prio2'])
 
-    if(priority == 5):
-        return False, 0
+    if(priority == calc_helper.PRIO['undefinded']):
+        return False, priority
     else:
         return True, priority
 
@@ -148,7 +148,7 @@ def score_attacks(match, srcx, srcy):
 
 
 def does_support_attacked(match, srcx, srcy, dstx, dsty):
-    priority = 5
+    priority = calc_helper.PRIO['undefinded']
 
     knight = match.readfield(srcx, srcy)
 
@@ -171,14 +171,14 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
-                        return True, 2 # priority
+                        return True, calc_helper.PRIO['prio3']
                     else:
                         if(calc_helper.PIECES_RANK[piece] >= calc_helper.PIECES_RANK[knight]):
-                            return True, 2 # priority
+                            return True, calc_helper.PRIO['prio3']
                         else:
-                            priority = min(priority, 3)
+                            priority = min(priority, calc_helper.PRIO['prio4'])
 
-    if(priority == 5):
+    if(priority == calc_helper.PRIO['undefinded']):
         return False, 0
     else:
         return True, priority
