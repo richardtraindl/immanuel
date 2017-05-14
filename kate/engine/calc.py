@@ -349,7 +349,7 @@ def calc_move(match):
 
     start = time.time()
     
-    # candidates[0] = openingmove.retrieve_move(match)
+    candidates[0] = openingmove.retrieve_move(match)
 
     if(candidates[0]):
         score = match.score

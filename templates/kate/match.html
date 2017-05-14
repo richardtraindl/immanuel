@@ -208,23 +208,18 @@
                 $('#move').submit();
             });
 
-          {% if match.white_player_human or match.black_player_human %}
             setInterval(function(){
                 var matchid;
                 var movecnt;
                 var newcomment;
                 matchid = $('#board').attr("matchid");
                 movecnt = $('#board').attr("movecnt");
-                newcomment = $('#newcomment').val();
-                if(newcomment.length  == 0){
-                    $.get('/kate/fetchmatch', { matchid: matchid, movecnt: movecnt }, function(data){
-                        if(data.length > 0){
-                            location.reload();
-                        }
-                    });
-                }
+                $.get('/kate/fetchmatch', { matchid: matchid, movecnt: movecnt }, function(data){
+                    if(data.length > 0){
+                        location.reload();
+                    }
+                });
             }, 20000);
-          {% endif %}
 
           {% if match.white_player_human and match.black_player_human %}
             setInterval(function() {
