@@ -175,32 +175,29 @@ def do_move(request, matchid):
 def undo_move(request, matchid, switch=0):
     context = RequestContext(request)
     modelmatch = ModelMatch.objects.get(id=matchid)
-
-    thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread):
-        ModelMatch.deactivate_threads(modelmatch)
-        ModelMatch.remove_outdated_threads()
-
-    interface.undo_move(modelmatch)
-
-    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
+    if(modelmatch.exists()):
+        thread = ModelMatch.get_active_thread(modelmatch)
+        if(thread):
+            ModelMatch.deactivate_threads(modelmatch)
+            ModelMatch.remove_outdated_threads()
+        interface.undo_move(modelmatch)
+        return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
 
 
 def resume(request, matchid, switch=0):
     context = RequestContext(request)
     modelmatch = ModelMatch.objects.get(id=matchid)
-
-    thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread is None):
-        interface.calc_move_for_immanuel(modelmatch)
-
-    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
+    if(modelmatch.exists()):
+        thread = ModelMatch.get_active_thread(modelmatch)
+        if(thread is None):
+            interface.calc_move_for_immanuel(modelmatch)
+        return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
 
 
 def add_comment(request, matchid):
     context = RequestContext(request)
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-    if request.method == 'POST':
+    if(request.method == 'POST' and modelmatch.exists()):
         newcomment = request.POST['newcomment']
         switchflag = request.POST['switchflag']        
         if(len(newcomment) > 0):
@@ -208,12 +205,12 @@ def add_comment(request, matchid):
             comment.match_id = modelmatch.id
             comment.text = newcomment
             comment.save()
-    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switchflag)))
+        return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switchflag)))
 
 
 def fetch_comments(request):
     context = RequestContext(request)
-    if request.method == 'GET':
+    if(request.method == 'GET'):
         matchid = request.GET['matchid']
         comments = ModelComment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:3]
         data = ""
@@ -228,10 +225,10 @@ def fetch_match(request):
     movecnt = request.GET['movecnt']
 
     modelmatch = ModelMatch.objects.get(id=matchid)
-    if(modelmatch and modelmatch.count != int(movecnt)):
-        data = "1"
-    else:
-        data = ""
-
-    return HttpResponse(data)
+    if(modelmatch.exists()):
+        if(modelmatch.count != int(movecnt)):
+            data = "1"
+        else:
+            data = ""
+        return HttpResponse(data)
 
