@@ -1,7 +1,7 @@
-from kate.engine import match, move, openings, rules, calc
-from kate.engine.match import *
-from kate.engine.openings import * 
-import random, copy
+import random
+from .match import *
+from .move import *
+from .openings import * 
 
 
 def retrieve_move(match):
@@ -13,7 +13,7 @@ def retrieve_move(match):
     for move in match.move_list:
         lastmoves += Match.index_to_koord(move.srcx, move.srcy)
         lastmoves += "-"
-        lastmoves +=Match.index_to_koord(move.dstx, move.dsty)
+        lastmoves += Match.index_to_koord(move.dstx, move.dsty)
         lastmoves += ","
     
     lastmoves = lastmoves[:-1]
@@ -39,5 +39,5 @@ def retrieve_move(match):
         candidate = candidates[idx]
         srcx, srcy = Match.koord_to_index(candidate[:2])
         dstx, dsty = Match.koord_to_index(candidate[3:])
-        return calc.GenMove(srcx, srcy, dstx, dsty, PIECES['blk'])
+        return GenMove(srcx, srcy, dstx, dsty, PIECES['blk'])
 
