@@ -61,7 +61,7 @@ def match(request, matchid=None, switch=0, msg=None):
         rangeobj = range(7, -1, -1)
 
     thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread and thread.running):
+    if(thread):
         running = "calculation is running..."
     else:
         running = ""
@@ -178,8 +178,6 @@ def undo_move(request, matchid, switch=0):
 
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
-        if(thread.running):
-            thread.running = False
         ModelMatch.remove_threads(modelmatch)
 
     interface.undo_move(modelmatch)
@@ -193,8 +191,7 @@ def resume(request, matchid, switch=0):
 
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
-        if(thread.running == False):
-            thread.running = True  
+        thread.running = True
     else:
         interface.calc_move_for_immanuel(modelmatch)
 
