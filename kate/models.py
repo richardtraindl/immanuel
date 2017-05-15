@@ -131,6 +131,14 @@ class Match(models.Model):
             return None
 
 
+    @classmethod
+    def deactivate_threads(cls, match):
+        with cls._immanuels_thread_lock:
+            for item in cls._immanuels_threads_list:
+                if(item.match.id == match.id):
+                    item.running = False
+
+
 class Move(models.Model):
     TYPES = {
         'standard' : 1,
