@@ -180,7 +180,6 @@ def does_support_attacked(match, move):
 
 
 def does_attacked_flee(match, move):
-    return False, PRIO['undefinded']
     piece = match.readfield(move.srcx, move.srcy)
     
     color = Match.color_of_piece(piece)
@@ -188,7 +187,7 @@ def does_attacked_flee(match, move):
 
     touches = rules.list_field_touches(match, opp_color, move.srcx, move.srcy)
     if(len(touches) > 0):
-        match.writefield(move.srcx, move.srcy, Match.PIECES['blk'])
+        match.writefield(move.srcx, move.srcy, PIECES['blk'])
         newtouches = rules.list_field_touches(match, opp_color, move.dstx, move.dsty)
         match.writefield(move.srcx, move.srcy, piece)
         if(len(newtouches) < len(touches)):
