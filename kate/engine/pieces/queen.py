@@ -1,5 +1,5 @@
-from kate.engine.pieces import rook, bishop
-from kate.engine.match import *
+from .. match import *
+from . import rook, bishop
 
 
 blank = PIECES['blk']
