@@ -1,4 +1,4 @@
-from kate.engine.match import *
+from .match import *
 
 
 TYPES = { 'standard' : 1, 
@@ -57,4 +57,14 @@ class Move:
         else:
             fmtmove= Match.index_to_koord(self.srcx, self.srcy) + "x" + Match.index_to_koord(self.dstx, self.dsty) + " e.p."
             return fmtmove
+
+
+class GenMove(object):
+    def __init__(self, srcx=None, srcy=None, dstx=None, dsty=None, prom_piece=None):
+        self.srcx = srcx
+        self.srcy = srcy
+        self.dstx = dstx
+        self.dsty = dsty
+        self.prom_piece = prom_piece
+
 
