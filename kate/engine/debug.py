@@ -1,5 +1,5 @@
-from kate.engine import match, move
-from kate.engine import helper
+from . import match, move
+from . import helper
 
 
 def prnt_moves(match):
