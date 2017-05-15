@@ -105,19 +105,19 @@ def analyse(match):
         for x1 in range(8):
             piece = match.readfield(x1, y1)
             if(color == Match.color_of_piece(piece)):
-                if(piece == Match.PIECES['wPw'] or Match.PIECES['bPw']):
+                if(piece == PIECES['wPw'] or PIECES['bPw']):
                     if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         pw_analyses.append("pw")
-                elif(piece == Match.PIECES['wRk'] or piece == Match.PIECES['bRk']):
+                elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
                     if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         rk_analyses.append("rk")
-                elif(piece == Match.PIECES['wBp'] or piece == Match.PIECES['bBp']):
+                elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
                     if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         bp_analyses.append("bp")
-                elif(piece == Match.PIECES['wKn'] or piece == Match.PIECES['bKn']):
+                elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
                     if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         kn_analyses.append("kn")
-                elif(piece == Match.PIECES['wQu'] or piece == Match.PIECES['bQu']):
+                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                     if( rules.is_field_touched(match, opp_color, x1, y1) ):
                         qu_analyses.append("qu")
                 else:
