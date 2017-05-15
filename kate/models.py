@@ -107,10 +107,10 @@ class Match(models.Model):
 
 
     @classmethod
-    def remove_threads(cls, match):
+    def remove_outdated_threads(cls):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
-                if(item.match.id == match.id and (item.is_alive() == False or item.running == False)):
+                if(item.is_alive() == False or item.running == False):
                     item.running = False
                     cls._immanuels_threads_list.remove(item)
                     item.join()
@@ -129,15 +129,6 @@ class Match(models.Model):
                 if(item.match.id == match.id and item.is_alive() and item.running):
                     return item
             return None
-
-
-    @classmethod
-    def does_thread_exist(cls, thread):
-        with cls._immanuels_thread_lock:
-            for item in cls._immanuels_threads_list:
-                if(item is thread and item.is_alive() and item.running):
-                    return True
-            return False
 
 
 class Move(models.Model):
