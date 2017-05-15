@@ -277,8 +277,6 @@ def calc_max(match, depth, alpha, beta):
             prnt_moves(msg, candidates)
             print(" score: " + str(score) + " / maxscore: " + str(maxscore))
             
-            print("debuginfo: prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3]))
-
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         undo_move(match)
@@ -349,7 +347,7 @@ def calc_move(match):
 
     start = time.time()
     
-    candidates[0] = openingmove.retrieve_move(match)
+    candidates[0] = retrieve_move(match)
 
     if(candidates[0]):
         score = match.score
