@@ -110,7 +110,8 @@ class Match(models.Model):
     def remove_threads(cls, match):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
-                if(item.match.id == match.id and item.is_alive() == False):
+                if(item.match.id == match.id and (item.is_alive() == False or item.running == False)):
+                    Item.running = False
                     cls._immanuels_threads_list.remove(item)
                     item.join()
 
@@ -125,16 +126,16 @@ class Match(models.Model):
     def get_active_thread(cls, match):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
-                if(item.match.id == match.id and item.is_alive()):
+                if(item.match.id == match.id and item.is_alive() and item.running):
                     return item
-        return None
+            return None
 
 
     @classmethod
     def does_thread_exist(cls, thread):
         with cls._immanuels_thread_lock:
             for item in cls._immanuels_threads_list:
-                if(item is thread and item.is_alive()):
+                if(item is thread and item.is_alive() and item.running):
                     return True
             return False
 
