@@ -1,11 +1,13 @@
-from kate.engine.move import *
-from kate.engine.match import *
-from kate.engine.matchmove import *
-from kate.engine.calc_helper import *
-from kate.engine import helper, rules, openingmove, debug
-from kate.engine.pieces import pawn, rook, bishop, knight, queen, king
 import time
 from operator import itemgetter
+from .match import *
+from .move import *
+from .matchmove import *
+from .calc_helper import *
+from .openingmove import retrieve_move
+from .helper import reverse_lookup
+from .rules import is_move_valid, RETURN_CODES, is_field_touched
+from .pieces import pawn, rook, bishop, knight, queen, king
 
 
 def prnt_move(msg, move):
@@ -32,19 +34,15 @@ def prnt_moves(msg, moves):
                 break
 
 
+def prnt_priorities(priorities):
+    for i in range(7):
+        print("prio" + str(i + 1) + ":" + str(priorities[i]), end=" ")
+
+
 def prnt_fmttime(msg, seconds):
     minute, sec = divmod(seconds, 60)
     hour, minute = divmod(minute, 60)
     print( msg + "%02d:%02d:%02d" % (hour, minute, sec))
-
-
-class GenMove(object):
-    def __init__(self, srcx=None, srcy=None, dstx=None, dsty=None, prom_piece=None):
-        self.srcx = srcx
-        self.srcy = srcy
-        self.dstx = dstx
-        self.dsty = dsty
-        self.prom_piece = prom_piece
 
 
 def read_steps(steps, dir_idx, step_idx):
@@ -248,9 +246,7 @@ def calc_max(match, depth, alpha, beta):
 
     prio_moves, priorities = generate_moves(match)
     if(depth == 1):
-        for pmove in prio_moves:
-            prnt_move(" ", pmove[0])
-        print("prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3]))
+        prnt_priorities(priorities)
 
     maxcnt = select_maxcnt(match, depth, priorities)
 
@@ -305,9 +301,7 @@ def calc_min(match, depth, alpha, beta):
 
     prio_moves, priorities = generate_moves(match)
     if(depth == 1):
-        for pmove in prio_moves:
-            prnt_move(" ", pmove[0])
-        print("prio1:" + str(priorities[0]) + " prio2:" + str(priorities[1]) + " prio3:" + str(priorities[2]) + " prio4:" + str(priorities[3]))
+        prnt_priorities(priorities)
 
     maxcnt = select_maxcnt(match, depth, priorities)
 
