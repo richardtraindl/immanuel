@@ -1,6 +1,7 @@
-from kate.engine import move, rules, debug, helper
-from kate.engine.pieces import pawn
-from kate.engine.match import *
+from .match import *
+from .move import *
+from . import rules
+from .pieces import pawn
 
 
 SCORES = { 
