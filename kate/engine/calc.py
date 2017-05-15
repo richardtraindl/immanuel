@@ -34,9 +34,10 @@ def prnt_moves(msg, moves):
                 break
 
 
-def prnt_priorities(priorities):
-    for i in range(7):
-        print("prio" + str(i + 1) + ":" + str(priorities[i]), end=" ")
+def prnt_priorities(prio_moves, priorities):
+    for pmove in prio_moves:
+        prnt_move(" ", pmove[0])
+        print(" prio:" + str(pmove[1]) + "/" + str(pmove[2]))
 
 
 def prnt_fmttime(msg, seconds):
@@ -246,7 +247,7 @@ def calc_max(match, depth, alpha, beta):
 
     prio_moves, priorities = generate_moves(match)
     if(depth == 1):
-        prnt_priorities(priorities)
+        prnt_priorities(prio_moves, priorities)
 
     maxcnt = select_maxcnt(match, depth, priorities)
 
@@ -299,7 +300,7 @@ def calc_min(match, depth, alpha, beta):
 
     prio_moves, priorities = generate_moves(match)
     if(depth == 1):
-        prnt_priorities(priorities)
+        prnt_priorities(prio_moves, priorities)
 
     maxcnt = select_maxcnt(match, depth, priorities)
 
