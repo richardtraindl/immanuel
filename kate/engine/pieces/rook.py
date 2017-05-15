@@ -1,5 +1,5 @@
-from kate.engine import rules, calc_helper
-from kate.engine.match import *
+from .. match import *
+from .. import rules, calc_helper
 
 
 NORTH_X = 0
