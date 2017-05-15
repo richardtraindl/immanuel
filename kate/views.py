@@ -178,7 +178,8 @@ def undo_move(request, matchid, switch=0):
 
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
-        ModelMatch.remove_threads(modelmatch)
+        ModelMatch.deactivate_threads(modelmatch)
+        ModelMatch.remove_outdated_threads()
 
     interface.undo_move(modelmatch)
 
@@ -190,9 +191,7 @@ def resume(request, matchid, switch=0):
     modelmatch = ModelMatch.objects.get(id=matchid)
 
     thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread):
-        thread.running = True
-    else:
+    if(thread == None):
         interface.calc_move_for_immanuel(modelmatch)
 
     return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
