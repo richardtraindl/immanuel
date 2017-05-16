@@ -1,8 +1,8 @@
+import random, threading, copy
 from kate.models import Match as ModelMatch, Move as ModelMove
 from kate.engine.match import *
 from kate.engine.move import *
 from kate.engine import matchmove, rules, calc
-import random, threading, copy
 
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
@@ -107,13 +107,11 @@ class immanuelsThread(threading.Thread):
         self.running = True
         self.match = copy.deepcopy(match)
 
-        ModelMatch.remove_threads(match)
         ModelMatch.add_thread(self)
-        print("match.id: " + str(match.id))
 
 
     def run(self):
-        print("Starting " + str(self.name))
+        print("Thread starting " + str(self.name))
         gmove = calc.calc_move(self.match)
         if(gmove and ModelMatch.does_thread_exist(self) and self.running):
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
