@@ -3,8 +3,8 @@ from operator import itemgetter
 from .match import *
 from .move import *
 from .matchmove import *
-from .calc_helper import *
 from .openingmove import retrieve_move
+from .calc_helper import *
 from .helper import reverse_lookup
 from .rules import is_move_valid, RETURN_CODES, is_field_touched
 from .pieces import pawn, rook, bishop, knight, queen, king
@@ -18,7 +18,7 @@ def prnt_move(msg, move):
             Match.index_to_koord(move.srcx, move.srcy) + "-" +
             Match.index_to_koord(move.dstx, move.dsty), end="")
         if(move.prom_piece != PIECES['blk']):
-            print(helper.reverse_lookup(PIECES, move.prom_piece), end="")
+            print(reverse_lookup(PIECES, move.prom_piece), end="")
 
 
 def prnt_moves(msg, moves):
@@ -213,11 +213,11 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
 
 def select_maxcnt(match, depth, priorities):
     if(match.level == LEVELS['blitz']):
-        maxdepth = 4
+        maxdepth = 6
         counts = [12, 12]
         limit = 2
     elif(match.level == LEVELS['low']):
-        maxdepth = 6
+        maxdepth = 7
         counts = [12, 12]
         limit = 2
     elif(match.level == LEVELS['medium']):
@@ -232,9 +232,9 @@ def select_maxcnt(match, depth, priorities):
     if(depth > maxdepth or (priorities[0] + priorities[1] + priorities[2] + priorities[3]) == 0):
         return 0
     elif(depth <= limit):
-        return min( (priorities[0] + priorities[1] + priorities[2] + priorities[3]), counts[0] )
+        return max( (priorities[0] + priorities[1]), counts[0] )
     else:
-        return min( (priorities[0] + priorities[1] + priorities[2] + priorities[3]), counts[1] )
+        return min( (priorities[0] + priorities[1]), counts[1] )
 
 
 def calc_max(match, depth, alpha, beta):
