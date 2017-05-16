@@ -112,7 +112,7 @@ class Match(models.Model):
             for item in cls._matches_thread_list:
                 if(item.is_alive() == False or item.running == False):
                     item.running = False
-                    cls._immanuels_threads_list.remove(item)
+                    cls._matches_thread_list.remove(item)
                     item.join()
 
 
