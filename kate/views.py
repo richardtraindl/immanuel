@@ -175,7 +175,7 @@ def do_move(request, matchid):
 def undo_move(request, matchid, switch=0):
     context = RequestContext(request)
     modelmatch = ModelMatch.objects.get(id=matchid)
-    if(modelmatch.exists()):
+    if(modelmatch):
         thread = ModelMatch.get_active_thread(modelmatch)
         if(thread):
             ModelMatch.deactivate_threads(modelmatch)
@@ -187,7 +187,7 @@ def undo_move(request, matchid, switch=0):
 def resume(request, matchid, switch=0):
     context = RequestContext(request)
     modelmatch = ModelMatch.objects.get(id=matchid)
-    if(modelmatch.exists()):
+    if(modelmatch):
         thread = ModelMatch.get_active_thread(modelmatch)
         if(thread is None):
             interface.calc_move_for_immanuel(modelmatch)
@@ -197,7 +197,7 @@ def resume(request, matchid, switch=0):
 def add_comment(request, matchid):
     context = RequestContext(request)
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-    if(request.method == 'POST' and modelmatch.exists()):
+    if(request.method == 'POST' and modelmatch):
         newcomment = request.POST['newcomment']
         switchflag = request.POST['switchflag']        
         if(len(newcomment) > 0):
@@ -225,7 +225,7 @@ def fetch_match(request):
     movecnt = request.GET['movecnt']
 
     modelmatch = ModelMatch.objects.get(id=matchid)
-    if(modelmatch.exists()):
+    if(modelmatch):
         if(modelmatch.count != int(movecnt)):
             data = "1"
         else:
