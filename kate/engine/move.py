@@ -1,4 +1,5 @@
 from .match import *
+from .helper import reverse_lookup
 
 
 TYPES = { 'standard' : 1, 
@@ -52,7 +53,7 @@ class Move:
                 hyphen = "-"
             else:
                 hyphen = "x"
-            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty) + " " + helper.reverse_lookup(PIECES, self.prom_piece)
+            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty) + " " + reverse_lookup(PIECES, self.prom_piece)
             return fmtmove
         else:
             fmtmove= Match.index_to_koord(self.srcx, self.srcy) + "x" + Match.index_to_koord(self.dstx, self.dsty) + " e.p."

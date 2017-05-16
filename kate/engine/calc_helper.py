@@ -89,49 +89,6 @@ PRIO = {
     'priolast' : 7,
     'undefinded' : 10 }
 
-"""
-def analyse(match):
-    analyses = []
-    qu_analyses = []
-    rk_analyses = []
-    bp_analyses = []
-    kn_analyses = []
-    pw_analyses = []
-    
-    color = match.next_color()
-    opp_color = Match.REVERSED_COLORS[color]
-
-    for y1 in range(8):
-        for x1 in range(8):
-            piece = match.readfield(x1, y1)
-            if(color == Match.color_of_piece(piece)):
-                if(piece == PIECES['wPw'] or PIECES['bPw']):
-                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
-                        pw_analyses.append("pw")
-                elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
-                        rk_analyses.append("rk")
-                elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
-                        bp_analyses.append("bp")
-                elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
-                        kn_analyses.append("kn")
-                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
-                        qu_analyses.append("qu")
-                else:
-                    if( rules.is_field_touched(match, opp_color, x1, y1) ):
-                        analyses.append("kg")
-
-    analyses.extend(qu_analyses)
-    analyses.extend(rk_analyses)
-    analyses.extend(bp_analyses)
-    analyses.extend(kn_analyses)
-    analyses.extend(pw_manalyses)
-    return analyses
-"""
-
 
 def is_capture(match, move):
     piece = match.readfield(move.srcx, move.srcy)
