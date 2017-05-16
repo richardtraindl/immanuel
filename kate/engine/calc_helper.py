@@ -185,17 +185,40 @@ def does_attacked_flee(match, move):
     color = Match.color_of_piece(piece)
     opp_color = Match.oppcolor_of_piece(piece)
 
-    touches = rules.list_field_touches(match, opp_color, move.srcx, move.srcy)
-    if(len(touches) > 0):
-        match.writefield(move.srcx, move.srcy, PIECES['blk'])
-        newtouches = rules.list_field_touches(match, opp_color, move.dstx, move.dsty)
-        match.writefield(move.srcx, move.srcy, piece)
-        if(len(newtouches) < len(touches)):
-            return True, PRIO['prio1']
-        else:
-            return True, PRIO['prio2']
-    else:
+    enemytouches = rules.list_field_touches(match, opp_color, move.srcx, move.srcy)
+
+    if(len(enemytouches) == 0):
         return False, PRIO['undefinded']
+    else:
+        friendlytouches = rules.list_field_touches(match, color, move.srcx, move.srcy)
+        
+        if(len(friendlytouches) > 0):
+            wellsupported = True
+            for etouch in enemytouches:
+                enemy = etouch[0]
+                if(PIECES_RANK[piece] > PIECES_RANK[enemy]):
+                    wellsupported = False
+
+            if(wellsupported == True):
+                return True, PRIO['prio3']
+
+        match.writefield(move.srcx, move.srcy, PIECES['blk'])
+        dstenemytouches = rules.list_field_touches(match, opp_color, move.dstx, move.dsty)
+        dstfriendlytouches = rules.list_field_touches(match, color, move.dstx, move.dsty)
+        match.writefield(move.srcx, move.srcy, piece)                
+
+        if(len(dstenemytouches) == 0):
+            return True, PRIO['prio2']
+        else:        
+          if(len(dstfriendlytouches) == 0):
+              return True, PRIO['prio3']
+          else:
+              for dstetouch in dstenemytouches:
+                  dstenemy = dstetouch[0]
+                  if(PIECES_RANK[piece] > PIECES_RANK[dstenemy]):
+                      return True, PRIO['prio3']
+                    
+              return True, PRIO['prio2']
 
 
 def is_endgame_move(match, move):
@@ -210,32 +233,6 @@ def is_endgame_move(match, move):
                 return False, PRIO['undefinded']
     else:
         return False, PRIO['undefinded']
-
-
-"""
-def is_king_attacked(match, move):
-    return rules.is_king_attacked(match, move.srcx, move.srcy)
-"""
-
-
-"""
-def pieces_attacked(match, color):
-    if(color == Match.COLORS['white']):
-        opp_color = Match.COLORS['black']
-    else:
-        opp_color = Match.COLORS['white']
-    
-    for y in range(0, 8, 1):
-        for x in range(0, 8, 1):
-            piece = match.readfield(x, y)
-            if(Match.color_of_piece(piece) == opp_color):
-                if(rules.is_field_touched(match, opp_color, x, y)):
-                    return True
-            else:
-                continue
-
-    return False
-"""
 
 
 def evaluate_contacts(match):
