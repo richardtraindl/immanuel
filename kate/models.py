@@ -86,8 +86,8 @@ class Match(models.Model):
     wRk_h1_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_a8_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bRk_h8_first_movecnt = models.SmallIntegerField(null=False, default=0)
-    _immanuels_thread_lock = threading.Lock()
-    _immanuels_threads_list = []
+    _matches_thread_lock = threading.Lock()
+    _matches_thread_list = []
 
 
     def __init__(self, *args, **kwargs):
@@ -108,8 +108,8 @@ class Match(models.Model):
 
     @classmethod
     def remove_outdated_threads(cls):
-        with cls._immanuels_thread_lock:
-            for item in cls._immanuels_threads_list:
+        with cls._matches_thread_lock:
+            for item in cls._matches_thread_list:
                 if(item.is_alive() == False or item.running == False):
                     item.running = False
                     cls._immanuels_threads_list.remove(item)
@@ -118,14 +118,14 @@ class Match(models.Model):
 
     @classmethod
     def add_thread(cls, thread):
-        with cls._immanuels_thread_lock:
-            cls._immanuels_threads_list.append(thread)
+        with cls._matches_thread_lock:
+            cls._matches_thread_list.append(thread)
 
 
     @classmethod
     def get_active_thread(cls, match):
-        with cls._immanuels_thread_lock:
-            for item in cls._immanuels_threads_list:
+        with cls._matches_thread_lock:
+            for item in cls._matches_thread_list:
                 if(item.match.id == match.id and item.is_alive() and item.running):
                     return item
             return None
@@ -133,8 +133,8 @@ class Match(models.Model):
 
     @classmethod
     def deactivate_threads(cls, match):
-        with cls._immanuels_thread_lock:
-            for item in cls._immanuels_threads_list:
+        with cls._matches_thread_lock:
+            for item in cls._matches_thread_list:
                 if(item.match.id == match.id):
                     item.running = False
 
