@@ -1,8 +1,8 @@
 import random, threading, copy
-from kate.models import Match as ModelMatch, Move as ModelMove
-from kate.engine.match import *
-from kate.engine.move import *
-from kate.engine import matchmove, rules, calc
+from .. models import Match as ModelMatch, Move as ModelMove
+from .. engine.match import *
+from .. engine.move import *
+from .. engine import matchmove, rules, calc
 
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
