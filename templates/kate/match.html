@@ -119,35 +119,11 @@
                 </table>
             </div>
 
-            <form id="move" method="post" action="{% url 'kate:domove' match.id %}" style="display: none;">
-                {% csrf_token %}
-                <table id="process-move">
-                    <tr>
-                        <td>
-                            <input id="move-src" type="text" name="move_src" value="" size="3" />
-                            &nbsp;
-                        </td>
-                        <td>
-                            <input id="move-dst" type="text" name="move_dst" value="" size="3" />
-                            &nbsp;
-                        </td>
-                        <td>
-                            <input id="prom-piece" type="text" name="prom_piece" value="blk" size="3" readonly="readonly" />
-                            &nbsp;
-                        </td>
-                        <td>
-                            <input id="switch" type="text" name="switch" value="{{ switch }}" size="3" readonly="readonly" />
-                            &nbsp;
-                        </td>
-
-                        <td>
-                            <input type="hidden" name="next" value="{{ request.path }}">
-                            <input type="submit" value="ziehen" />
-                            &nbsp;
-                        </td>
-                    </tr>
-                </table>
-            </form>
+           <form id="move" method="post" action="{% url 'kate:domove' match.id %}" style="display: none;">
+               {% csrf_token %}
+               {{ form }}
+               <input type="submit" value="submit" />
+           </form>
         </div>
 
         <div class="row_4_of_12">
