@@ -23,13 +23,16 @@ def retrieve_move(match):
         omovelist = FIRST
     elif(match.count == 1):
         omovelist = SECOND
-    else:
+    elif(match.count == 2):
         omovelist = THIRD
+    else:
+        omovelist = FOURTH
 
     candidates = []
     for omove in omovelist:
-        if(omove[0] == lastmoves):
-            candidates.append(omove[1])
+        if(omove[0] == lastmoves):            
+            candidates = omove[1:]
+            break
 
     if(len(candidates) == 0):
         print("############ No opening move found ############")
