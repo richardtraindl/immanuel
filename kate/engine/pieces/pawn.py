@@ -205,7 +205,11 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                 continue
             if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
-                    return True, calc_helper.PRIO['prio3']
+                    pin_dir = rules.pin_dir(match, x1, y1)
+                    if(pin_dir != rules.DIRS['undefined']):
+                        return True, calc_helper.PRIO['prio2']
+                    else:
+                        return True, calc_helper.PRIO['prio3']
 
     if(priority == calc_helper.PRIO['undefinded']):
         return False, priority
