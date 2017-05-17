@@ -2,12 +2,14 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from kate.models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
-from kate.engine.match import *
-from kate.engine.move import *
-from kate.modules import interface
-from kate.engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
-from kate.utils import *
+from .forms import DoMoveForm
+from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
+from .modules import interface
+from .utils import *
+from .engine.match import *
+from .engine.move import *
+from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
+
 
 
 def index(request):
@@ -65,7 +67,11 @@ def match(request, matchid=None, switch=0, msg=None):
         running = "calculation is running..."
     else:
         running = ""
-    return render(request, 'kate/match.html', { 'match': modelmatch, 'board': fmtboard, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'running': running } )
+
+    form = DoMoveForm()
+    form.switch = switch
+
+    return render(request, 'kate/match.html', { 'match': modelmatch, 'board': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'running': running } )
 
 
 def new(request):
