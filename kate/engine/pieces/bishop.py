@@ -172,12 +172,9 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
-                        return True, calc_helper.PRIO['prio3']
+                        return True, calc_helper.PRIO['prio2']
                     else:
-                        if(calc_helper.PIECES_RANK[piece] >= calc_helper.PIECES_RANK[bishop]):
-                            return True, calc_helper.PRIO['prio3']
-                        else:
-                            priority = min(priority, calc_helper.PRIO['prio4'])
+                        return True, calc_helper.PRIO['prio3']
 
     if(priority == calc_helper.PRIO['undefinded']):
         return False, priority
