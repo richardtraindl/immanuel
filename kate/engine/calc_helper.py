@@ -165,7 +165,7 @@ def does_attacked_flee(match, move):
         match.writefield(move.srcx, move.srcy, piece)                
 
         if(len(dstenemytouches) == 0):
-            return True, PRIO['prio2']-
+            return True, PRIO['prio2']
         else:        
             if(len(dstfriendlytouches) == 0):
                 return True, PRIO['prio3']
@@ -175,7 +175,7 @@ def does_attacked_flee(match, move):
                     if(PIECES_RANK[piece] > PIECES_RANK[dstenemy]):
                         return True, PRIO['prio3']
 
-        return True, PRIO['prio2']
+            return True, PRIO['prio2']
 
 
 def is_endgame_move(match, move):
