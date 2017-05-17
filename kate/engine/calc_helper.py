@@ -210,14 +210,18 @@ def evaluate_contacts(match):
     return (supporter + attacked)
 
 
-def evaluate_piece_moves(match, srcx, srcy):
+def evaluate_piece_moves(match, srcx, srcy, excludedpieces):
     color = match.next_color()
     piece = match.readfield(srcx, srcy)
     movecnt = 0
 
     if(Match.color_of_piece(piece) != color):
         return movecnt
-        
+
+    for expiece in excludedpieces:
+        if(piece == expiece):
+            return movecnt
+                
     if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 8
@@ -258,12 +262,12 @@ def evaluate_piece_moves(match, srcx, srcy):
     return (movecnt)
 
 
-def evaluate_movecnt(match):
+def evaluate_movecnt(match, excludedpieces):
     movecnt = 0
 
     for y1 in range(8):
         for x1 in range(8):
-            movecnt += evaluate_piece_moves(match, x1, y1)
+            movecnt += evaluate_piece_moves(match, x1, y1, excludedpieces)
 
     if(match.next_color() == COLORS['white']):
         return movecnt
@@ -320,7 +324,8 @@ def evaluate_position(match, movecnt):
         value += evaluate_contacts(match)
 
         if(match.count < 30):
-            value += evaluate_movecnt(match)
+            excludedpieces = [ PIECES['wQu'], PIECES['bQu'] ]
+            value += evaluate_movecnt(match, excludedpieces)
             value += evaluate_developments(match)
 
         if(match.count > 40):
