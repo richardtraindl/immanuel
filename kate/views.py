@@ -150,23 +150,24 @@ def do_move(request, matchid):
     if request.method == 'POST':
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
         form = DoMoveForm(request.POST)
-        # switch = request.POST['switch']
-        # movesrc = request.POST['move_src']
-        # movedst = request.POST['move_dst']
-        # prompiece = request.POST['prom_piece']
+        switch = 0
         if(form.is_valid()):
-            status = interface.game_status(modelmatch)
-            if(status == STATUS['open']):
-                if(len(form.move_src) > 0 and len(form.move_dst) > 0 and len(form.prom_piece) > 0):
-                    srcx,srcy = Match.koord_to_index(form.move_src)
-                    dstx,dsty = Match.koord_to_index(form.move_dst)
-                    prom_piece = PIECES[form.prom_piece]
-                    valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-                    if(valid):
-                        interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-                        interface.calc_move_for_immanuel(modelmatch)
+            movesrc = form.cleaned_data['move_src']
+            movedst = form.cleaned_data['move_dst']
+            prompiece = form.cleaned_data['prom_piece']
+
+            if(not interface.next_color_human(modelmatch)):
+                msg = RETURN_CODES['wrong-color']
+            elif(interface.game_status(modelmatch) == STATUS['open']):
+                srcx,srcy = Match.koord_to_index(movesrc)
+                dstx,dsty = Match.koord_to_index(movedst)
+                prom_piece = PIECES[prompiece]
+                valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+                if(valid):
+                    interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+                    interface.calc_move_for_immanuel(modelmatch)
                 else:
-                    msg = RETURN_CODES['format-error']
+                    msg = RETURN_CODES['general-error']
             elif(status == STATUS['winner_white']):
                 msg = RETURN_CODES['winner_white']    
             elif(status == STATUS['winner_black']):
@@ -174,7 +175,7 @@ def do_move(request, matchid):
             else: # draw
                 msg = RETURN_CODES['draw']
         else:
-            msg= RETURN_CODES['general-error']
+            msg= RETURN_CODES['format-error']
 
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:

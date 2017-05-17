@@ -140,3 +140,9 @@ def calc_move_for_immanuel(modelmatch):
     if(rules.game_status(match) == STATUS['open'] and match.next_color_human() == False):
         thread_do_move(match)
 
+
+def next_color_human(modelmatch):
+    match = Match()
+    map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+    return match.next_color_human()
+
