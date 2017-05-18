@@ -83,28 +83,19 @@ def create(request):
     context = RequestContext(request)
     if(request.method == 'POST'):
         modelmatch = ModelMatch()
-
-        modelmatch.white_player = request.POST['white_player']
-        if(request.POST.get('white_player_human')):
-            modelmatch.white_player_human = True
-        else:
-            modelmatch.white_player_human = False
-
-        modelmatch.black_player = request.POST['black_player']
-        if(request.POST.get('black_player_human')):
-            modelmatch.black_player_human = True
-        else:
-            modelmatch.black_player_human = False
-
-        levellist = request.POST.getlist('level')
-        modelmatch.level = LEVELS[levellist[0]]
-
-        if(len(modelmatch.white_player) > 0 and len(modelmatch.black_player) > 0):
+        
+        form = MatchForm(request.POST)
+        if(form.is_valid()):
+            modelmatch.white_player = form.cleaned_data['white_player']
+            modelmatch.white_player_human = form.cleaned_data['white_player_human']
+            modelmatch.black_player = form.cleaned_data['black_player']
+            modelmatch.black_player_human = form.cleaned_data['black_player_human']
+            modelmatch.level = form.cleaned_data['level']
             modelmatch.save()
             interface.calc_move_for_immanuel(modelmatch)
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id,)))
 
-    return render(request, 'kate/new.html', { 'white_player': modelmatch.white_player, 'white_player_human': modelmatch.white_player_human, 'black_player': modelmatch.black_player, 'black_player_human': modelmatch.black_player_human } )
+    return render(request, 'kate/new.html', { 'form': form } )
 
 
 def edit(request, matchid, switch=0):
