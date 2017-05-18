@@ -145,12 +145,10 @@ def delete(request, matchid):
     return index(request)
 
 
-def do_move(request, matchid):
+def do_move(request, matchid, switch=0):
     context = RequestContext(request)
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-        switch = 0
-        
         if(not interface.next_color_human(modelmatch)):
             msg = RETURN_CODES['wrong-color']
         elif(interface.game_status(modelmatch) != STATUS['open']):
