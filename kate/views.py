@@ -73,18 +73,13 @@ def match(request, matchid=None, switch=0, msg=None):
     return render(request, 'kate/match.html', { 'match': modelmatch, 'board': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'running': running } )
 
 
-def new(request):
-    context = RequestContext(request)
-    form = MatchForm()
-    return render(request, 'kate/settings.html', { 'form': form } )
-
-
 def settings(request, matchid=None, switch=0):
     context = RequestContext(request)
+
     if(matchid == None):
-            modelmatch = ModelMatch()
-        else:
-            modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+        modelmatch = ModelMatch()
+    else:
+        modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
     if(request.method == 'POST'):
         form = MatchForm(request.POST)
@@ -99,50 +94,16 @@ def settings(request, matchid=None, switch=0):
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
     else:
         if(matchid == None):
-            modelmatch = ModelMatch()
-        else:
-            modelmatch = get_object_or_404(ModelMatch, pk=matchid)
             form = MatchForm()
-            form.white_player = modelmatch.white_player
-            form.white_player_human = modelmatch.white_player_human
-            form.black_player = modelmatch.black_player
-            form.black_player_human = modelmatch.black_player_human
-            form.level = modelmatch.level
+        else:
+            form = MatchForm(initial={
+                'white_player': modelmatch.white_player, 
+                'white_player_human': modelmatch.white_player_human, 
+                'black_player': modelmatch.black_player, 
+                'black_player_human': modelmatch.black_player_human, 
+                'level': modelmatch.level })
 
     return render(request, 'kate/settings.html', { 'form': form } )
-
-
-def edit(request, matchid, switch=0):
-    context = RequestContext(request)
-    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-    return render(request, 'kate/edit.html', { 'match': modelmatch, 'switch': switch } )
-
-
-def update(request, matchid, switch=0):
-    context = RequestContext(request)
-    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-    if(request.method == 'POST'):
-        modelmatch.white_player = request.POST['white_player']
-        if(request.POST.get('white_player_human')):
-            modelmatch.white_player_human = True
-        else:
-            modelmatch.white_player_human = False
-
-        modelmatch.black_player = request.POST['black_player']
-        if(request.POST.get('black_player_human')):
-            modelmatch.black_player_human = True
-        else:
-            modelmatch.black_player_human = False
-
-        levellist = request.POST.getlist('level')
-        modelmatch.level = LEVELS[levellist[0]]
-
-        if(len(modelmatch.white_player) > 0 and len(modelmatch.black_player) > 0):
-            modelmatch.save()
-            interface.calc_move_for_immanuel(modelmatch)
-            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch,)))
-
-    return render(request, 'kate/edit.html', { 'match': modelmatch, 'switch': switch } )
 
 
 def delete(request, matchid):
