@@ -57,11 +57,6 @@ def match(request, matchid=None, switch=0, msg=None):
     else:
         fmtmsg = "<p class='error'>" + RETURN_MSGS[int(msg)] + "</p>"
 
-    if(int(switch) == 0):
-        rangeobj = range(8)
-    else:
-        rangeobj = range(7, -1, -1)
-
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
         running = "calculation is running..."
@@ -70,7 +65,7 @@ def match(request, matchid=None, switch=0, msg=None):
 
     form = DoMoveForm()
 
-    return render(request, 'kate/match.html', { 'match': modelmatch, 'board': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'running': running } )
+    return render(request, 'kate/match.html', { 'match': modelmatch, 'board': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running } )
 
 
 def settings(request, matchid=None, switch=0):

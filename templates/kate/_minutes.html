@@ -1,0 +1,33 @@
+{% load staticfiles %}
+{% load kate_extras %}
+
+                <p>Minutes</p>
+                <table>
+                    <tr>
+                        <td>
+                            # &nbsp;
+                        </td>
+                        <td>
+                            {% if match.white_player_human == False %}
+                                <span class="fbold">{{ match.white_player }}</span>
+                            {% else %}
+                                {{ match.white_player }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if match.black_player_human == False %}
+                                <span class="fbold"> {{ match.black_player }} </span>
+                            {% else %}
+                                {{ match.black_player }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% for move in moves %}
+                        {% if move.count|iseven == False %}
+                            <tr><td>{{ move.count|chesscnt }}.</td>
+                            <td>{{ move.format_move }}</td>
+                        {% else %}
+                            <td>{{ move.format_move }}</td></tr>
+                        {% endif %}
+                    {% endfor %}
+                </table>

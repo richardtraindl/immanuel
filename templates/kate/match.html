@@ -37,22 +37,7 @@
 
 {% block chat %}
     {% if match.white_player_human and match.black_player_human %}
-        <div class="grid">
-            <div id="comments" class="row_6_of_12">
-            {% for comment in comments reversed %}
-                <p>{{ comment.text }}</p>
-            {% endfor %}
-            </div>
-            
-            <div class="row_6_of_12">
-                <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}" matchid="{{ match.id }}">
-                    {% csrf_token %}
-                    <textarea id="newcomment" name="newcomment"></textarea>
-                    <input type="text" name="switchflag" value="{{ switch }}" style="display: none;" />
-                    <input type="submit" value="kommentieren" />
-                </form>
-            </div>
-        </div>
+        {% include "kate/_chat.html" with match=match %}
     {% endif %}
 {% endblock %}
 
@@ -65,53 +50,7 @@
             </div>
 
             <div id="board-wrapper">
-                <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
-                    <tr id="board-letters1">
-                        <td>&nbsp;</td>
-                      {% if switch == 0 %}
-                        {% for i in 8|times %}
-                            <td>{{ i|letter }}</td>
-                        {% endfor %}
-                      {% else %}
-                        {% for i in 8|reverse_times %}
-                            <td>{{ i|letter }}</td>
-                        {% endfor %}
-                      {% endif %}
-                        <td>&nbsp;</td>
-                    </tr>
-                {% for row in board %}
-                    <tr>
-                        <td class="board-label">{{ row.0.1|cut }}</td>
-                    {% for col in row %}
-                        {% if col.1 == movesrc or col.1 == movedst %}
-                            <td id="{{ col.1 }}" class="hint droppable" value="{{ col.0 }}">
-                        {% else %}
-                            <td id="{{ col.1 }}" class="droppable" value="{{ col.0 }}">
-                        {% endif %}
-                        {% if col.0 == 0 %}
-                            <div>&nbsp;</div>
-                        {% else %}
-                            <img class="draggable" src="{% static col.0|imgsrc %}">
-                        {% endif %}
-                        </td>
-                    {% endfor %}
-                        <td class="board-label">{{ row.0.1|cut }}</td>
-                    </tr>
-                {% endfor %}
-                    <tr id="board-letters2">
-                        <td>&nbsp;</td>
-                      {% if switch == 0 %}
-                        {% for i in 8|times %}
-                            <td>{{ i|letter }}</td>
-                        {% endfor %}
-                      {% else %}
-                        {% for i in 8|reverse_times %}
-                            <td>{{ i|letter }}</td>
-                        {% endfor %}
-                      {% endif %}
-                        <td>&nbsp;</td>
-                    </tr>
-                </table>
+                {% include "kate/_chessboard.html" with match=match %}
             </div>
 
             <div>
@@ -148,36 +87,7 @@
             </div>
 
             <div id="minutes">
-                <p>Minutes</p>
-                <table>
-                    <tr>
-                        <td>
-                            # &nbsp;
-                        </td>
-                        <td>
-                            {% if match.white_player_human == False %}
-                                <span class="fbold">{{ match.white_player }}</span>
-                            {% else %}
-                                {{ match.white_player }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if match.black_player_human == False %}
-                                <span class="fbold"> {{ match.black_player }} </span>
-                            {% else %}
-                                {{ match.black_player }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% for move in moves %}
-                        {% if move.count|iseven == False %}
-                            <tr><td>{{ move.count|chesscnt }}.</td>
-                            <td>{{ move.format_move }}</td>
-                        {% else %}
-                            <td>{{ move.format_move }}</td></tr>
-                        {% endif %}
-                    {% endfor %}
-                </table>
+              {% include "kate/_minutes.html" with match=match %}
             </div>
 
         </div>

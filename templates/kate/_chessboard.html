@@ -1,0 +1,50 @@
+{% load staticfiles %}
+{% load kate_extras %}
+
+                <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
+                    <tr id="board-letters1">
+                        <td>&nbsp;</td>
+                      {% if switch == '0' %}
+                        {% for i in 8|times %}
+                            <td>{{ i|letter }}</td>
+                        {% endfor %}
+                      {% else %}
+                        {% for i in 8|reverse_times %}
+                            <td>{{ i|letter }}</td>
+                        {% endfor %}
+                      {% endif %}
+                        <td>&nbsp;</td>
+                    </tr>
+                {% for row in board %}
+                    <tr>
+                        <td class="board-label">{{ row.0.1|cut }}</td>
+                    {% for col in row %}
+                        {% if col.1 == movesrc or col.1 == movedst %}
+                            <td id="{{ col.1 }}" class="hint droppable" value="{{ col.0 }}">
+                        {% else %}
+                            <td id="{{ col.1 }}" class="droppable" value="{{ col.0 }}">
+                        {% endif %}
+                        {% if col.0 == 0 %}
+                            <div>&nbsp;</div>
+                        {% else %}
+                            <img class="draggable" src="{% static col.0|imgsrc %}">
+                        {% endif %}
+                        </td>
+                    {% endfor %}
+                        <td class="board-label">{{ row.0.1|cut }}</td>
+                    </tr>
+                {% endfor %}
+                    <tr id="board-letters2">
+                        <td>&nbsp;</td>
+                      {% if switch == '0' %}
+                        {% for i in 8|times %}
+                            <td>{{ i|letter }}</td>
+                        {% endfor %}
+                      {% else %}
+                        {% for i in 8|reverse_times %}
+                            <td>{{ i|letter }}</td>
+                        {% endfor %}
+                      {% endif %}
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
