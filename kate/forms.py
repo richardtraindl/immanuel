@@ -25,9 +25,9 @@ LEVELS = (
 
 class MatchForm(forms.Form):
     white_player = forms.CharField(label=' White Player', max_length=100)
-    white_player_human = forms.BooleanField(label='Human', initial=True)
+    white_player_human = forms.BooleanField(label='Human', initial=True, required=False)
     black_player = forms.CharField(label='Black Player', max_length=100)
-    black_player_human = forms.BooleanField(label='Human', initial=True)
+    black_player_human = forms.BooleanField(label='Human', initial=True, required=False)
     level = forms.ChoiceField(label="Level", choices = LEVELS, initial='0')
 
     def clean(self):
