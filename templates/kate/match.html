@@ -119,7 +119,7 @@
                 </table>
             </div>
 
-           <form id="move" method="post" action="{% url 'kate:domove' match.id %}" style="display: none;">
+           <form id="move" method="post" action="{% url 'kate:domove' match.id switch %}" style="display: none;">
                {% csrf_token %}
                {{ form }}
                <input type="submit" value="submit" />
