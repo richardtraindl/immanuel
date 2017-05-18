@@ -103,7 +103,7 @@ def settings(request, matchid=None, switch=0):
                 'black_player_human': modelmatch.black_player_human, 
                 'level': modelmatch.level })
 
-    return render(request, 'kate/settings.html', { 'form': form } )
+    return render(request, 'kate/settings.html', { 'form': form, 'switch': switch } )
 
 
 def delete(request, matchid):
