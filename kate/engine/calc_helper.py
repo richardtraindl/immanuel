@@ -4,6 +4,28 @@ from . import rules
 from .pieces import pawn
 
 
+X_F1 = 5
+Y_F1 = 1
+X_G1 = 6
+Y_G1 = 1
+X_G2 = 6
+Y_G2 = 2
+X_H1 = 7
+Y_H1 = 1
+X_H2 = 7
+Y_H2 = 2
+X_F7 = 5
+Y_F7 = 6
+X_G7 = 6
+Y_G7 = 6
+X_G6 = 6
+Y_G6 = 5
+X_H7 = 7
+Y_H7 = 6
+X_H6 = 7
+Y_H6 = 5
+
+
 SCORES = { 
         PIECES['blk'] : 0,
         PIECES['wKg'] : -20000,
@@ -276,15 +298,20 @@ def evaluate_movecnt(match, excludedpieces):
 
 
 def evaluate_developments(match):
-    if(match.wKg_first_movecnt > 0 and (match.wRk_a1_first_movecnt > 0 or match.wRk_h1_first_movecnt > 0) ):
-        developed_whites = 20
-    else:
-        developed_whites = 0
+    developed_whites = 0
+    developed_blacks = 0
 
-    if(match.bKg_first_movecnt > 0 and (match.bRk_a8_first_movecnt > 0 or match.bRk_h8_first_movecnt > 0) ):
-        developed_blacks = -20
-    else:
-        developed_blacks = 0
+    if(match.wKg_first_movecnt > 0):
+        if(match.readfield(X_F1, Y_F1) == PIECES['wPw'] and 
+           (match.readfield(X_G1, Y_G1) == PIECES['wPw'] or match.readfield(X_G2, Y_G2) == PIECES['wPw']) and
+           (match.readfield(X_H1, Y_H1) == PIECES['wPw'] or match.readfield(X_H2, Y_H2) == PIECES['wPw'])):
+            developed_whites = SCORES[PIECES['bPw']] // 3
+
+    if(match.bKg_first_movecnt > 0):
+        if(match.readfield(X_F7, Y_F7) == PIECES['bPw'] and 
+           (match.readfield(X_G7, Y_G7) == PIECES['bPw'] or match.readfield(X_G6, Y_G6) == PIECES['bPw']) and
+           (match.readfield(X_H7, Y_H7) == PIECES['bPw'] or match.readfield(X_H6, Y_H6) == PIECES['bPw'])):
+            developed_blacks = developed_whites = SCORES[PIECES['wPw']] // 3
 
     return developed_whites + developed_blacks
 
