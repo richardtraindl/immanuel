@@ -69,7 +69,6 @@ def match(request, matchid=None, switch=0, msg=None):
         running = ""
 
     form = DoMoveForm()
-    form.switch = switch
 
     return render(request, 'kate/match.html', { 'match': modelmatch, 'board': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'range': rangeobj, 'running': running } )
 
