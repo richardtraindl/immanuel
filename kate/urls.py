@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^(?P<matchid>[0-9]+)/(?P<switch>[0-1])/undomove/$', views.undo_move, name='undomove'),
     url(r'^(?P<matchid>[0-9]+)/(?P<switch>[0-1])/resume/$', views.resume, name='resume'),
     url(r'^new/$', views.new, name='new'),
+    url(r'^settings/$', views.settings, name='settings'),
     url(r'^create/$', views.create, name='create'),
     url(r'^(?P<matchid>[0-9]+)/(?P<switch>[0-1])/edit/$', views.edit, name='edit'),
     url(r'^(?P<matchid>[0-9]+)/(?P<switch>[0-1])/update/$', views.update, name='update'),
