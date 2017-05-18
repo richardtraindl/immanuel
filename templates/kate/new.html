@@ -28,9 +28,15 @@
         <div class="row_12_of_12">
             <form id="new" method="post" action="{% url 'kate:create' %}">
                 {% csrf_token %}
-                {{ form }}
+                <table>
+                  {{ form.as_table }}
+                </table>
+
+                <div class="gap"></div>
+
                 <input type="submit" value="submit" />
             </form>
         </div>
     </div>
 {% endblock %}
+
