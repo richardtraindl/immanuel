@@ -1,5 +1,4 @@
 from django import forms
-from .models import LEVELS
 
 
 class DoMoveForm(forms.Form):
@@ -16,13 +15,20 @@ class DoMoveForm(forms.Form):
         if(not (len(move_src) > 0 and len(move_dst) > 0 and len(prom_piece) > 0) ):
             raise ValidationError("...")
 
+           
+LEVELS = (
+    ('0', 'blitz'),
+    ('1', 'low'),
+    ('2', 'medium'),
+    ('3', 'high'),
+)
 
 class MatchForm(forms.Form):
     white_player = forms.CharField(label=' White Player', max_length=100)
     white_player_human = forms.BooleanField(label='Human', initial=True)
     black_player = forms.CharField(label='Black Player', max_length=100)
     black_player_human = forms.BooleanField(label='Human', initial=True)
-    level = models.IntegerField(label='Level', choices=LEVELS, default=1)
+    level = forms.ChoiceField(label="Level", choices = LEVELS, initial='1')
 
     def clean(self):
         cleaned_data = super(MatchForm, self).clean()
