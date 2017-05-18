@@ -66,3 +66,4 @@ def times(number):
 @register.filter(name='reverse_times') 
 def reverse_times(number):
     return range(number, 1-, -1)
+
