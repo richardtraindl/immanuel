@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from .forms import DoMoveForm
+from .forms import *
 from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from .modules import interface
 from .utils import *
