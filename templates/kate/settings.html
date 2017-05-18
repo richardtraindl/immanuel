@@ -26,7 +26,11 @@
 {% block content %}
     <div class="grid">
         <div class="row_12_of_12">
+          {% if matchid %} 
             <form id="new" method="post" action="{% url 'kate:settings' matchid switch %}">
+          {% else %} 
+            <form id="new" method="post" action="{% url 'kate:settings' %}">
+          {% endif %} 
                 {% csrf_token %}
                 <table>
                   {{ form.as_table }}
