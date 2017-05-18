@@ -66,6 +66,7 @@ img {
 table {
     table-layout: fixed;
     border-collapse: collapse;
+    text-align: left;
 }
 
 #wrapper {
@@ -225,3 +226,8 @@ a.btn, a.btn:visited, a.btn:hover {
 .hint {
     background-color: LightBlue !important;
 }
+
+.gap {
+  padding-bottom: 20px;
+}
+
