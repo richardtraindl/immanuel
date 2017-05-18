@@ -92,9 +92,12 @@ def settings(request, matchid=None, switch=0):
             modelmatch.save()
             interface.calc_move_for_immanuel(modelmatch)
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
+        else:
+            return render(request, 'kate/settings.html', { 'form': form, 'matchid': matchid, 'switch': switch } )
     else:
         if(matchid == None):
             form = MatchForm()
+            return render(request, 'kate/settings.html', { 'form': form } )
         else:
             form = MatchForm(initial={
                 'white_player': modelmatch.white_player, 
@@ -102,8 +105,7 @@ def settings(request, matchid=None, switch=0):
                 'black_player': modelmatch.black_player, 
                 'black_player_human': modelmatch.black_player_human, 
                 'level': modelmatch.level })
-
-    return render(request, 'kate/settings.html', { 'form': form, 'switch': switch } )
+            return render(request, 'kate/settings.html', { 'form': form, 'matchid': matchid, 'switch': switch } )
 
 
 def delete(request, matchid):
