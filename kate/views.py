@@ -75,7 +75,8 @@ def match(request, matchid=None, switch=0, msg=None):
 
 def new(request):
     context = RequestContext(request)
-    return render(request, 'kate/new.html', { 'white_player': "", 'white_player_human': True, 'black_player': "", 'black_player_human': True } )
+    form = MatchForm()
+    return render(request, 'kate/new.html', { 'form': form } )
 
 
 def create(request):
