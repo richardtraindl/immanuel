@@ -76,14 +76,17 @@ def match(request, matchid=None, switch=0, msg=None):
 def new(request):
     context = RequestContext(request)
     form = MatchForm()
-    return render(request, 'kate/new.html', { 'form': form } )
+    return render(request, 'kate/settings.html', { 'form': form } )
 
 
-def create(request):
+def settings(request, matchid=None, switch=0):
     context = RequestContext(request)
+    if(matchid == None):
+            modelmatch = ModelMatch()
+        else:
+            modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+
     if(request.method == 'POST'):
-        modelmatch = ModelMatch()
-        
         form = MatchForm(request.POST)
         if(form.is_valid()):
             modelmatch.white_player = form.cleaned_data['white_player']
@@ -93,9 +96,20 @@ def create(request):
             modelmatch.level = form.cleaned_data['level']
             modelmatch.save()
             interface.calc_move_for_immanuel(modelmatch)
-            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id,)))
+            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
+    else:
+        if(matchid == None):
+            modelmatch = ModelMatch()
+        else:
+            modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+            form = MatchForm()
+            form.white_player = modelmatch.white_player
+            form.white_player_human = modelmatch.white_player_human
+            form.black_player = modelmatch.black_player
+            form.black_player_human = modelmatch.black_player_human
+            form.level = modelmatch.level
 
-    return render(request, 'kate/new.html', { 'form': form } )
+    return render(request, 'kate/settings.html', { 'form': form } )
 
 
 def edit(request, matchid, switch=0):
