@@ -4,26 +4,13 @@ from . import rules
 from .pieces import pawn
 
 
-X_F1 = 5
-Y_F1 = 1
-X_G1 = 6
-Y_G1 = 1
-X_G2 = 6
-Y_G2 = 2
-X_H1 = 7
-Y_H1 = 1
-X_H2 = 7
-Y_H2 = 2
-X_F7 = 5
-Y_F7 = 6
-X_G7 = 6
-Y_G7 = 6
-X_G6 = 6
-Y_G6 = 5
-X_H7 = 7
-Y_H7 = 6
-X_H6 = 7
-Y_H6 = 5
+X_F = 5
+X_G = 6
+X_H = 7
+Y_2 = 1
+Y_3 = 2
+Y_6 = 5
+Y_7 = 6
 
 
 SCORES = { 
@@ -302,17 +289,16 @@ def evaluate_developments(match):
     developed_blacks = 0
 
     if(match.wKg_first_movecnt > 0):
-        if(match.readfield(X_F1, Y_F1) == PIECES['wPw'] and 
-           (match.readfield(X_G1, Y_G1) == PIECES['wPw'] or match.readfield(X_G2, Y_G2) == PIECES['wPw']) and
-           (match.readfield(X_H1, Y_H1) == PIECES['wPw'] or match.readfield(X_H2, Y_H2) == PIECES['wPw'])):
-            developed_whites = SCORES[PIECES['bPw']] // 3
+        if(match.readfield(X_F, Y_2) == PIECES['wPw'] and 
+           (match.readfield(X_G, Y_2) == PIECES['wPw'] or match.readfield(X_G, Y_3) == PIECES['wPw']) and
+           (match.readfield(X_H, Y_2) == PIECES['wPw'] or match.readfield(X_H, Y_3) == PIECES['wPw'])):
+            developed_whites = SCORES[PIECES['bPw']] // 4
 
     if(match.bKg_first_movecnt > 0):
-        if(match.readfield(X_F7, Y_F7) == PIECES['bPw'] and 
-           (match.readfield(X_G7, Y_G7) == PIECES['bPw'] or match.readfield(X_G6, Y_G6) == PIECES['bPw']) and
-           (match.readfield(X_H7, Y_H7) == PIECES['bPw'] or match.readfield(X_H6, Y_H6) == PIECES['bPw'])):
-            developed_blacks = developed_whites = SCORES[PIECES['wPw']] // 3
-
+        if(match.readfield(X_F, Y_7) == PIECES['bPw'] and 
+           (match.readfield(X_G, Y_7) == PIECES['bPw'] or match.readfield(X_G, Y_6) == PIECES['bPw']) and
+           (match.readfield(X_H, Y_7) == PIECES['bPw'] or match.readfield(X_H, Y_6) == PIECES['bPw'])):
+            developed_blacks = SCORES[PIECES['wPw']] // 4
     return developed_whites + developed_blacks
 
 

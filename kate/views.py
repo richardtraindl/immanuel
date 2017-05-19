@@ -5,7 +5,6 @@ from django.template import RequestContext
 from .forms import *
 from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from .modules import interface
-from .utils import *
 from .engine.match import *
 from .engine.move import *
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS

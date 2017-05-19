@@ -26,11 +26,7 @@
                         {% if coord == movesrc or coord == movedst %}
                             <td id="{{ coord }}" class="hint droppable" value="{{ piece }}">
                         {% else %}
-                          {% if piece == "blk" %}
-                            <td id="{{ coord }}" class="droppable" value="">
-                          {% else %}
                             <td id="{{ coord }}" class="droppable" value="{{ piece }}">
-                          {% endif %}
                         {% endif %}
                         {% if piece == "blk" %}
                             <div>&nbsp;</div>

@@ -7,7 +7,7 @@ register = template.Library()
 
 @register.filter(name='imgsrc')
 def imgsrc(value):
-    return "img/" + piece + ".png"
+    return "img/" + value + ".png"
 
 @register.filter(name='alternate')
 def alternate(value):
