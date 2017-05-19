@@ -7,7 +7,6 @@ register = template.Library()
 
 @register.filter(name='imgsrc')
 def imgsrc(value):
-    piece = helper.reverse_lookup(Match.PIECES, value)
     return "img/" + piece + ".png"
 
 @register.filter(name='alternate')
@@ -66,4 +65,26 @@ def times(number):
 @register.filter(name='reverse_times') 
 def reverse_times(number):
     return range((number - 1), -1, -1)
+
+@register.filter(name='x_coord')
+def x_coord(value):
+    return chr(value + ord('a'))
+
+@register.filter(name='y_coord')
+def y_coord(value):
+    return chr(value + ord('1'))
+
+@register.filter(name='field_x') 
+def field_x(value):
+    return (value * 4)
+
+@register.filter(name='field_y') 
+def field_x(value):
+    return (value * 32)
+
+@register.filter(name='readfield') 
+def readfield(value, arg):
+    pos = int(arg)
+    return value[pos:(pos+3)]
+
 
