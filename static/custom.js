@@ -3,7 +3,7 @@
     function showPromotion(){
         var fieldid = $('#move-src').val();
         var piece = $('#' + fieldid).attr("value");
-        if( piece == '2' ){
+        if( piece == 'wPw' ){
             var row = $('#move-dst').val();
             if( row.charAt(1) == '8' ){
                 $('#white-pieces').removeClass("invisible");
@@ -11,7 +11,7 @@
                 return true;
             }
         }
-        else if( piece == '10' ){
+        else if( piece == 'bPw' ){
             var row = $('#move-dst').val();
             if( row.charAt(1) == '1' ){
                 $('#black-pieces').removeClass("invisible");
