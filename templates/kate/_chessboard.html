@@ -17,7 +17,7 @@
                     </tr>
                 {% for j in 8|reverse_times %}
                     <tr>
-                        <td class="board-label">{{  j|y_coord }}</td>
+                        <td class="board-label">{{  j|x_coord }}</td>
                     {% for i in 8|times %}
                       {% with xcoord=i|x_coord ycoord=j|y_coord xpos=i|field_x ypos=j|field_y %}
                         {% with coord=xcoord|add:ycoord pos=xpos|stringformat:"i"|add:ypos|stringformat:"i" %}
