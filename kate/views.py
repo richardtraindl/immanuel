@@ -125,9 +125,9 @@ def do_move(request, matchid, switch=0):
         else:
             form = DoMoveForm(request.POST)
             if(form.is_valid()):
-                srcx,srcy = Match.koord_to_index(form.cleaned_data['move_src'])
-                dstx,dsty = Match.koord_to_index(form.cleaned_data['move_dst'])
-                prom_piece = PIECES[form.cleaned_data['prom_piece']]
+                srcx,srcy = Match.koord_to_index(form.move_src)
+                dstx,dsty = Match.koord_to_index(form.move_dst)
+                prom_piece = PIECES[form.prom_piece]
                 valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
                 if(valid):
                     interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
