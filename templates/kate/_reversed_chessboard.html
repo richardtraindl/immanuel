@@ -1,0 +1,66 @@
+{% load staticfiles %}
+{% load kate_extras %}
+
+                <table id="board" matchid="{{ match.id }}" movecnt="{{ match.count }}">
+                    <tr id="board-letters1">
+                        <td>&nbsp;</td>
+                      {% if switch == '0' %}
+                        {% for i in 8|times %}
+                            <td>{{ i|letter }}</td>
+                        {% endfor %}
+                      {% else %}
+                        {% for i in 8|reverse_times %}
+                            <td>{{ i|letter }}</td>
+                        {% endfor %}
+                      {% endif %}
+                        <td>&nbsp;</td>
+                    </tr>
+              {% if switch == '0' %}
+                {% for j in 8|reverse_times %}
+              {% else %}
+                {% for j in 8|times %}
+              {% endif %}
+                    <tr>
+                        <td class="board-label">{{  j|y_coord }}</td>
+                  {% if switch == '0' %}                    
+                    {% for i in 8|times %}
+                  {% else %}
+                    {% for i in 8|reverse_times %}
+                  {% endif %}
+                      {% with xcoord=i|x_coord ycoord=j|y_coord xpos=i|field_x ypos=j|field_y %}
+                        {% with coord=xcoord|add:ycoord pos=xpos|stringformat:"i"|add:ypos|stringformat:"i" %}
+                          {% with piece=match.board|readfield:pos %}
+                        
+                        {% if coord == movesrc or coord == movedst %}
+                            <td id="{{ coord }}" class="hint droppable" value="{{ piece }}">
+                        {% else %}
+                            <td id="{{ coord }}" class="droppable" value="{{ piece }}">
+                        {% endif %}
+                        {% if piece == "blk" %}
+                            <div>&nbsp;</div>
+                        {% else %}
+                            <img class="draggable" src="{% static  piece|imgsrc %}">
+                        {% endif %}
+                            {% endwith %}
+                          {% endwith %}
+                        {% endwith %}
+                        </td>
+                    {% endfor %}
+                        <td class="board-label">{{ j|y_coord }}</td>
+                    </tr>
+                {% endfor %}
+                    <tr id="board-letters2">
+                        <td>&nbsp;</td>
+                      {% if switch == '0' %}
+                        {% for i in 8|times %}
+                            <td>{{ i|letter }}</td>
+                        {% endfor %}
+                      {% else %}
+                        {% for i in 8|reverse_times %}
+                            <td>{{ i|letter }}</td>
+                        {% endfor %}
+                      {% endif %}
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+
