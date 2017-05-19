@@ -50,7 +50,11 @@
             </div>
 
             <div id="board-wrapper">
+              {% if switch == '0' %}
                 {% include "kate/_chessboard.html" with match=match %}
+              {% else %}
+                {% include "kate/_reversed_chessboard.html" with match=match %}
+              {% endif %}
             </div>
 
             <div>
