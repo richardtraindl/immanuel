@@ -50,6 +50,10 @@
             </div>
 
             <div id="board-wrapper">
+                {% for x in 8|times %}
+                    {{ match.readfield(x, 0) }}
+                {% endfor %}
+                
                 {% include "kate/_chessboard.html" with match=match %}
             </div>
 
