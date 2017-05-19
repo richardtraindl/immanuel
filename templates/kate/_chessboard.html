@@ -15,23 +15,34 @@
                       {% endif %}
                         <td>&nbsp;</td>
                     </tr>
-                {% for row in board %}
+                {% for j in 8|reverse_times %}
                     <tr>
-                        <td class="board-label">{{ row.0.1|cut }}</td>
-                    {% for col in row %}
-                        {% if col.1 == movesrc or col.1 == movedst %}
-                            <td id="{{ col.1 }}" class="hint droppable" value="{{ col.0 }}">
+                        <td class="board-label">{{  j|y_coord }}</td>
+                    {% for i in 8|times %}
+                      {% with xcoord=i|x_coord ycoord=j|y_coord xpos=i|field_x ypos=j|field_y %}
+                        {% with coord=xcoord|add:ycoord pos=xpos|stringformat:"i"|add:ypos|stringformat:"i" %}
+                          {% with piece=match.board|readfield:pos %}
+                        
+                        {% if coord == movesrc or coord == movedst %}
+                            <td id="{{ coord }}" class="hint droppable" value="{{ piece }}">
                         {% else %}
-                            <td id="{{ col.1 }}" class="droppable" value="{{ col.0 }}">
+                          {% if piece == "blk" %}
+                            <td id="{{ coord }}" class="droppable" value="">
+                          {% else %}
+                            <td id="{{ coord }}" class="droppable" value="{{ piece }}">
+                          {% endif %}
                         {% endif %}
-                        {% if col.0 == 0 %}
+                        {% if piece == "blk" %}
                             <div>&nbsp;</div>
                         {% else %}
-                            <img class="draggable" src="{% static col.0|imgsrc %}">
+                            <img class="draggable" src="{% static  piece|imgsrc %}">
                         {% endif %}
+                            {% endwith %}
+                          {% endwith %}
+                        {% endwith %}
                         </td>
                     {% endfor %}
-                        <td class="board-label">{{ row.0.1|cut }}</td>
+                        <td class="board-label">{{ j|y_coord }}</td>
                     </tr>
                 {% endfor %}
                     <tr id="board-letters2">
@@ -48,3 +59,4 @@
                         <td>&nbsp;</td>
                     </tr>
                 </table>
+
