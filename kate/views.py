@@ -33,8 +33,6 @@ def match(request, matchid=None, switch=0, msg=None):
         movesrc = ''
         movedst = ''
 
-    fmtboard = fill_fmtboard(modelmatch, int(switch))
-
     moves = []
     currmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(currmove != None):
@@ -65,7 +63,7 @@ def match(request, matchid=None, switch=0, msg=None):
 
     form = DoMoveForm()
 
-    return render(request, 'kate/match.html', { 'match': modelmatch, 'board': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running } )
+    return render(request, 'kate/match.html', { 'match': modelmatch, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running } )
 
 
 def settings(request, matchid=None, switch=0):
