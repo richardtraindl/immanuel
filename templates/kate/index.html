@@ -30,7 +30,7 @@
                 {% for match in matches %}
                     <tr>
                         <td style="padding-right: 20px">
-                            <li><a href="{% url 'kate:match' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a></li>
+                            <li><a href="{% url 'kate:match' match.id '0' %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a></li>
                         </td>
                         <td>
                             <a style="color: #800000" href="{% url 'kate:delete' match.id %}" onclick="return confirm('Wollen sie diese Partie endgültig löschen?')">delete</a>
