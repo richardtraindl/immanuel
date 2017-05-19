@@ -8,11 +8,11 @@ class DoMoveForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(DoMoveForm, self).clean()
-        move_src = cleaned_data.get("move_src")
-        move_dst = cleaned_data.get("move_dst")
-        prom_piece = cleaned_data.get("prom_piece")
+        self.move_src = cleaned_data.get("move_src")
+        self.move_dst = cleaned_data.get("move_dst")
+        self.prom_piece = cleaned_data.get("prom_piece")
 
-        if(not (len(move_src) > 0 and len(move_dst) > 0 and len(prom_piece) > 0) ):
+        if(not (len(self.move_src) > 0 and len(self.move_dst) > 0 and len(self.prom_piece) > 0) ):
             raise ValidationError("...")
 
            
@@ -32,12 +32,12 @@ class MatchForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(MatchForm, self).clean()
-        white_player = cleaned_data.get("white_player")
-        white_player_human = cleaned_data.get("white_player_human")
-        black_player = cleaned_data.get("black_player")
-        black_player_human = cleaned_data.get("black_player_human")
-        level = cleaned_data.get("level")
+        self.white_player = cleaned_data.get("white_player")
+        self.white_player_human = cleaned_data.get("white_player_human")
+        self.black_player = cleaned_data.get("black_player")
+        self.black_player_human = cleaned_data.get("black_player_human")
+        self.level = cleaned_data.get("level")
 
-        if(not (len(white_player) > 0 and len(black_player) > 0)):
+        if(not (len(self.white_player) > 0 and len(self.black_player) > 0)):
             raise ValidationError("...")
 
