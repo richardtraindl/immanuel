@@ -230,27 +230,32 @@ def evaluate_piece_moves(match, srcx, srcy, excludedpieces):
     for expiece in excludedpieces:
         if(piece == expiece):
             return movecnt
-                
-    if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+
+    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+        dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+        dircnt = 8
+        stepcnt = 1
+        value = 1                
+    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 8
         stepcnt = 7
-        value = 2
+        value = 1
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
         dircnt = 4
         stepcnt = 7
-        value = 4
+        value = 2
     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
         dirs = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 4
         stepcnt = 7
-        value = 6
+        value = 2
     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
         dirs =  [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
         dircnt = 8
         stepcnt = 1
-        value = 6
+        value = 2
     else:
         return movecnt
 
@@ -322,22 +327,22 @@ def evaluate_endgame(match):
     return running
 
 
-def evaluate_position(match, movecnt):    
-    if(movecnt == 0):
-        status = rules.game_status(match)
+def evaluate_position(match, movecnt):
+    status = rules.game_status(match)
+    if(movecnt == 0 and status != STATUS['open']):
         if(status == STATUS['winner_black']):
             return ( SCORES[PIECES['wKg']] + match.count )
         elif(status == STATUS['winner_white']):
             return ( SCORES[PIECES['bKg']] - match.count )
-        else:   # Match.STATUS['draw']):
+        else: # Match.STATUS['draw']
             return SCORES[PIECES['blk']]
-    else:  
+    else:
         value = match.score
-        
+
         value += evaluate_contacts(match)
 
         if(match.count < 30):
-            excludedpieces = [ PIECES['wQu'], PIECES['bQu'] ]
+            excludedpieces = [ PIECES['wKg'], PIECES['bKg'], PIECES['wQu'], PIECES['bQu'] ]
             value += evaluate_movecnt(match, excludedpieces)
             value += evaluate_developments(match)
 
@@ -345,5 +350,4 @@ def evaluate_position(match, movecnt):
             value += evaluate_endgame(match)
 
         return value
-
 

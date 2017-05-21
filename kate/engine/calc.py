@@ -181,13 +181,12 @@ def generate_moves(match):
         kg_attacked = rules.is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked):
-        priorities[0]= len(prio_moves)
-        priorities[1]= 0
-        priorities[2]= 0
-        priorities[3]= 0
-        
+        for i in range(7):
+            priorities[i]= 0
+        priorities[0] = len(prio_moves)
+
     prio_moves.sort(key=itemgetter(1, 2))
-        
+
     return prio_moves, priorities
 
 
@@ -213,12 +212,12 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
 
 def select_maxcnt(match, depth, priorities):
     if(match.level == LEVELS['blitz']):
-        maxdepth = 4
-        counts = [12, 12]
-        limit = 4
+        maxdepth = 8
+        counts = [12, 6]
+        limit = 2
     elif(match.level == LEVELS['low']):
-        maxdepth = 7
-        counts = [12, 12]
+        maxdepth = 8
+        counts = [12, 8]
         limit = 5
     elif(match.level == LEVELS['medium']):
         maxdepth = 8
@@ -232,9 +231,9 @@ def select_maxcnt(match, depth, priorities):
     if(depth > maxdepth or (priorities[0] + priorities[1] + priorities[2] + priorities[3]) == 0):
         return 0
     elif(depth <= limit):
-        return max( (priorities[0] + priorities[1]), counts[0] )
+        return counts[0]
     else:
-        return min( (priorities[0] + priorities[1]), counts[0] )
+        return min( priorities[0], counts[1] )
 
 
 def calc_max(match, depth, alpha, beta):
