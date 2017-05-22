@@ -6,6 +6,7 @@ from .matchmove import *
 from .openingmove import retrieve_move
 from .calc_helper import *
 from .helper import reverse_lookup
+from .debug import prnt_attributes
 from .rules import is_move_valid, RETURN_CODES, is_field_touched
 from .pieces import pawn, rook, bishop, knight, queen, king
 
@@ -363,4 +364,5 @@ def calc_move(match):
 
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
+    prnt_attributes(match)
     return candidates[0]
