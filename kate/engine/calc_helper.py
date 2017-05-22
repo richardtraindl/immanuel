@@ -166,7 +166,7 @@ def does_attacked_flee(match, move):
                     wellsupported = False
 
             if(wellsupported == True):
-                return True, PRIO['prio3']
+                return True, PRIO['prio4']
 
         match.writefield(move.srcx, move.srcy, PIECES['blk'])
         dstenemytouches = rules.list_field_touches(match, opp_color, move.dstx, move.dsty)
@@ -174,27 +174,27 @@ def does_attacked_flee(match, move):
         match.writefield(move.srcx, move.srcy, piece)                
 
         if(len(dstenemytouches) == 0):
-            return True, PRIO['prio2']
+            return True, PRIO['prio3']
         else:        
             if(len(dstfriendlytouches) == 0):
-                return True, PRIO['prio3']
+                return True, PRIO['prio4']
             else:
                 for dstetouch in dstenemytouches:
                     dstenemy = dstetouch[0]
                     if(PIECES_RANK[piece] > PIECES_RANK[dstenemy]):
-                        return True, PRIO['prio3']
+                        return True, PRIO['prio4']
 
-            return True, PRIO['prio2']
+            return True, PRIO['prio3']
 
 
 def is_endgame_move(match, move):
     if(match.count > 60):
         if(pawn.is_running(match, move)):
-            return True, PRIO['prio2']
+            return True, PRIO['prio3']
         else:
             piece = match.readfield(move.srcx, move.srcy)
             if(piece == PIECES['wPw'] or piece == PIECES['bPw'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                return True, PRIO['prio3']
+                return True, PRIO['prio4']
             else:
                 return False, PRIO['undefinded']
     else:
