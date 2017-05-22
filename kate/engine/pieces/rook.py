@@ -73,20 +73,22 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                 else:
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
-                        priority = min(priority, 2)
+                        priority = min(priority, calc_helper.PRIO['prio2'])
                     else:
                         match.writefield(srcx, srcy, PIECES['blk'])
-                        touched = rules.is_field_touched(match, opp_color, dstx, dsty)
+                        friendlysupported = rules.is_field_touched(match, color, dstx, dsty)
+                        attacked = rules.is_field_touched(match, opp_color, dstx, dsty)
                         match.writefield(srcx, srcy, rook)
-                        if(touched):
-                            priority = min(priority, calc_helper.PRIO['prio3'])
-                        elif(rules.is_field_touched(match, opp_color, x1, y1)):
+                        if(not attacked):
+                            priority = min(priority, calc_helper.PRIO['prio2'])
+                        elif(friendlysupported):
                             if(calc_helper.PIECES_RANK[piece] >= calc_helper.PIECES_RANK[rook]):
                                 priority = min(priority, calc_helper.PRIO['prio2'])
                             else:
                                 priority = min(priority, calc_helper.PRIO['prio3'])
                         else:
-                            priority = min(priority, calc_helper.PRIO['prio2'])
+                            priority = min(priority, calc_helper.PRIO['prio3'])
+
     if(priority == calc_helper.PRIO['undefinded']):
         return False, priority
     else:
