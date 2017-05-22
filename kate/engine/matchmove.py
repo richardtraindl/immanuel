@@ -118,13 +118,14 @@ def king_do_move(match, move, srcpiece, dstpiece):
         if(srcpiece == PIECES['wKg']):
             match.wKg_x = move.dstx
             match.wKg_y = move.dsty
-            if(match.wKg_first_movecnt == 0):
-                match.wKg_first_movecnt = match.count
+            match.wKg_first_movecnt = match.count
+            match.wRk_h1_first_movecnt = match.count  
         else:
             match.bKg_x = move.dstx
             match.bKg_y = move.dsty
-            if(match.bKg_first_movecnt == 0):
-                match.bKg_first_movecnt = match.count
+            match.bKg_first_movecnt = match.count
+            match.bRk_h8_first_movecnt = match.count
+
         match.move_list.append(move)
 
         return move
@@ -142,13 +143,14 @@ def king_do_move(match, move, srcpiece, dstpiece):
         if(srcpiece == PIECES['wKg']):
             match.wKg_x = move.dstx
             match.wKg_y = move.dsty
-            if(match.wKg_first_movecnt == 0):
-                match.wKg_first_movecnt = match.count
+            match.wKg_first_movecnt = match.count
+            match.wRk_a1_first_movecnt = match.count
         else:
             match.bKg_x = move.dstx
             match.bKg_y = move.dsty
-            if(match.bKg_first_movecnt == 0):
-                match.bKg_first_movecnt = match.count
+            match.bKg_first_movecnt = match.count
+            match.bRk_a8_first_movecnt = match.count
+
         match.move_list.append(move)
 
         return move
