@@ -85,15 +85,15 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             if(match.color_of_piece(piece) == opp_color):
                 pin_dir = rules.pin_dir(match, x1, y1)
                 if(pin_dir != rules.DIRS['undefined']):
-                    return True, calc_helper.PRIO['prio2']
+                    return True, calc_helper.PRIO['prio3']
                 else:
                     match.writefield(srcx, srcy, PIECES['blk'])
                     enemysupported = rules.is_field_touched(match, opp_color, x1, y1)
                     match.writefield(srcx, srcy, king)
                     if(not enemysupported):
-                        priority = min(priority, calc_helper.PRIO['prio2'])
-                    else:
                         priority = min(priority, calc_helper.PRIO['prio3'])
+                    else:
+                        priority = min(priority, calc_helper.PRIO['prio4'])
 
     if(priority == calc_helper.PRIO['undefinded']):
         return False, priority
@@ -168,9 +168,9 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
-                        return True, calc_helper.PRIO['prio2']
+                        return True, calc_helper.PRIO['prio3']
                     else:
-                        priority = min(priority, calc_helper.PRIO['prio3'])
+                        priority = min(priority, calc_helper.PRIO['prio4'])
 
     if(priority == calc_helper.PRIO['undefinded']):
         return False, priority
