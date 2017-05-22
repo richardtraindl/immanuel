@@ -298,12 +298,17 @@ def evaluate_developments(match):
            (match.readfield(X_G, Y_2) == PIECES['wPw'] or match.readfield(X_G, Y_3) == PIECES['wPw']) and
            (match.readfield(X_H, Y_2) == PIECES['wPw'] or match.readfield(X_H, Y_3) == PIECES['wPw'])):
             developed_whites = SCORES[PIECES['bPw']] // 4
+    else:
+        developed_whites = SCORES[PIECES['bPw']] // 4
 
     if(match.bKg_first_movecnt > 0):
         if(match.readfield(X_F, Y_7) == PIECES['bPw'] and 
            (match.readfield(X_G, Y_7) == PIECES['bPw'] or match.readfield(X_G, Y_6) == PIECES['bPw']) and
            (match.readfield(X_H, Y_7) == PIECES['bPw'] or match.readfield(X_H, Y_6) == PIECES['bPw'])):
             developed_blacks = SCORES[PIECES['wPw']] // 4
+    else:
+        developed_blacks = SCORES[PIECES['bPw']] // 4
+
     return developed_whites + developed_blacks
 
 
