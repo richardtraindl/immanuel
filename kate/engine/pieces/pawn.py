@@ -113,12 +113,15 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                         priority = min(priority, calc_helper.PRIO['prio2'])
                     else:
                         match.writefield(srcx, srcy, PIECES['blk'])
-                        touched = rules.is_field_touched(match, opp_color, dstx, dsty)
+                        friendlysupported = rules.is_field_touched(match, color, dstx, dsty)
+                        attacked = rules.is_field_touched(match, opp_color, dstx, dsty)
                         match.writefield(srcx, srcy, pawn)
-                        if(touched):
-                            priority = min(priority, calc_helper.PRIO['prio3'])
-                        else:
+                        if(not attacked):
                             priority = min(priority, calc_helper.PRIO['prio2'])
+                        elif(friendlysupported):
+                            priority = min(priority, calc_helper.PRIO['prio2'])
+                        else:
+                            priority = min(priority, calc_helper.PRIO['prio3'])
 
     if(priority == calc_helper.PRIO['undefinded']):
         return False, 0
