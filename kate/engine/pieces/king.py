@@ -88,7 +88,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                     return True, calc_helper.PRIO['prio2']
                 else:
                     match.writefield(srcx, srcy, PIECES['blk'])
-                    enemysupported = rules.is_field_touched(match, opp_color, x1, y1)):
+                    enemysupported = rules.is_field_touched(match, opp_color, x1, y1)
                     match.writefield(srcx, srcy, king)
                     if(not enemysupported):
                         priority = min(priority, calc_helper.PRIO['prio2'])
