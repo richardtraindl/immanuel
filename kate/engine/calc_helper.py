@@ -293,15 +293,15 @@ def evaluate_developments(match):
     developed_whites = 0
     developed_blacks = 0
 
-    if(match.wKg_first_movecnt > 0):
+    if(match.wKg_first_movecnt > 0 and (match.wKg_first_movecnt == match.wRk_a1_first_movecnt or match.wKg_first_movecnt == match.wRk_h1_first_movecnt)):
         if(match.readfield(X_F, Y_2) == PIECES['wPw'] and 
            (match.readfield(X_G, Y_2) == PIECES['wPw'] or match.readfield(X_G, Y_3) == PIECES['wPw']) and
            (match.readfield(X_H, Y_2) == PIECES['wPw'] or match.readfield(X_H, Y_3) == PIECES['wPw'])):
             developed_whites = SCORES[PIECES['bPw']] // 4
     else:
-        developed_whites = SCORES[PIECES['bPw']] // 4
+        developed_whites = SCORES[PIECES['wPw']] // 4
 
-    if(match.bKg_first_movecnt > 0):
+    if(match.bKg_first_movecnt > 0 and (match.bKg_first_movecnt == match.bRk_a8_first_movecnt or match.bKg_first_movecnt == match.bRk_h8_first_movecnt)):
         if(match.readfield(X_F, Y_7) == PIECES['bPw'] and 
            (match.readfield(X_G, Y_7) == PIECES['bPw'] or match.readfield(X_G, Y_6) == PIECES['bPw']) and
            (match.readfield(X_H, Y_7) == PIECES['bPw'] or match.readfield(X_H, Y_6) == PIECES['bPw'])):
