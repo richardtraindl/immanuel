@@ -2,10 +2,12 @@ import time
 from operator import itemgetter
 from .match import *
 from .move import *
-from .matchmove import *
+from . import matchmove
 from .openingmove import retrieve_move
-from .calc_helper import *
-from .helper import reverse_lookup
+from .analyze_move import *
+from .analyze_position import *
+from .helper import *
+from .cvalues import *
 from .debug import prnt_attributes
 from .rules import is_move_valid, RETURN_CODES, is_field_touched
 from .pieces import pawn, rook, bishop, knight, queen, king
@@ -16,8 +18,8 @@ def prnt_move(msg, move):
         print("no move.....")
     else:
         print(msg + 
-            Match.index_to_koord(move.srcx, move.srcy) + "-" +
-            Match.index_to_koord(move.dstx, move.dsty), end="")
+            index_to_coord(move.srcx, move.srcy) + "-" +
+            index_to_coord(move.dstx, move.dsty), end="")
         if(move.prom_piece != PIECES['blk']):
             print(reverse_lookup(PIECES, move.prom_piece), end="")
 
@@ -75,13 +77,13 @@ def rank_move(match, gmove):
         if(priority == PRIO['prio1']):
             return priority
 
-    attack, prio = does_attack(match, gmove)
+    attack, prio = analyze_move.does_attack(match, gmove)
     if(attack):
         priority = min(priority, prio)
         if(priority == PRIO['prio1']):
             return priority
 
-    support, prio = does_support_attacked(match, gmove)
+    support, prio = analyze_move.does_support_attacked(match, gmove)
     if(support):
         priority = min(priority, prio)
         if(priority == PRIO['prio1']):
@@ -167,7 +169,7 @@ def generate_moves(match):
                     stepx, stepy, prom_piece = read_steps(steps, dir_idx, step_idx)
                     dstx = x + stepx
                     dsty = y + stepy
-                    flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
+                    flag, errmsg = is_move_valid(match, x, y, dstx, dsty, prom_piece)
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         priority = rank_move(match, gmove)
@@ -213,30 +215,30 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
 
 def select_maxcnt(match, depth, priorities):
     if(match.level == LEVELS['blitz']):
-        maxdepth = 10
-        counts = [12, 6]
-        limit = 2
+        maxdepth = 8
+        counts = [10, 8]
+        limit = 1
     elif(match.level == LEVELS['low']):
-        maxdepth = 10
-        counts = [16, 12]
-        limit = 3
+        maxdepth = 8
+        counts = [12, 8]
+        limit = 1
     elif(match.level == LEVELS['medium']):
-        maxdepth = 10
-        counts = [20, 12]
-        limit = 4
+        maxdepth = 9
+        counts = [16, 12]
+        limit = 1
     else:
         maxdepth = 10
         counts = [200, 12]
-        limit = 5
+        limit = 3
 
     if(depth > maxdepth or (priorities[0] + priorities[1] + priorities[2] + priorities[3]) == 0):
         return 0
     elif(depth <= limit):
         return counts[0]
-    elif(depth <= (limit + 2)):
-        return min( (priorities[0] + priorities[1] + priorities[2]), counts[1] )
+    elif(depth <= (limit + 3)):
+        return counts[1]
     else:
-        return (priorities[0] + priorities[1])
+        return priorities[0]
 
 
 def calc_max(match, depth, alpha, beta):
@@ -258,7 +260,7 @@ def calc_max(match, depth, alpha, beta):
         
     for pmove in prio_moves[:maxcnt]:
         gmove = pmove[0]
-        move = do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        move = matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
         score, search_candidates = calc_min(match, depth + 1, maxscore, beta)
 
@@ -282,7 +284,7 @@ def calc_max(match, depth, alpha, beta):
             
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
-        undo_move(match)
+        matchmove.undo_move(match)
 
         if(score > maxscore):
             maxscore = score
@@ -311,13 +313,13 @@ def calc_min(match, depth, alpha, beta):
 
     for pmove in prio_moves[:maxcnt]:
         gmove = pmove[0]
-        move = do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        move = matchmove.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
         score, search_candidates = calc_max(match, depth + 1, alpha, minscore)
 
         score = rate(color, gmove, score, candidates, minscore, search_candidates)
 
-        undo_move(match)
+        matchmove.undo_move(match)
 
         if(depth == 1):
             count += 1

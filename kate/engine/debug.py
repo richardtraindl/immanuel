@@ -1,5 +1,6 @@
-from . import match, move
-from . import helper
+from .match import *
+from .move import *
+from .helper import reverse_lookup
 
 
 def prnt_moves(match):
@@ -9,7 +10,7 @@ def prnt_moves(match):
         print(str(count) + ": " + 
               Match.index_to_koord(move.srcx, move.srcy) + " " +
               Match.index_to_koord(move.dstx, move.dsty) + " " +
-              helper.reverse_lookup(Match.PIECES, move.prom_piece))
+              reverse_lookup(Match.PIECES, move.prom_piece))
         count += 1
     print("------------------------------------------------------")
 
@@ -43,7 +44,7 @@ def prnt_board(match):
     for i in range(7, -1, -1):
         for j in range(8):
             piece = match.readfield(j, i)
-            print(helper.reverse_lookup(Match.PIECES, piece) + " ", end="")
+            print(reverse_lookup(Match.PIECES, piece) + " ", end="")
         print("")
     print("------------------------------------------------------")
 
@@ -58,12 +59,4 @@ def prnt_generator(generator):
     print("step_idx: " + str(generator.step_idx))
     print("max_step: " + str(generator.max_step))
     print("------------------------------------------------------")
-
-
-def prnt_status(match, generator):
-    prnt_moves(match)
-    prnt_board(match)
-    prnt_attributes(match)
-    prnt_generator(generator)
-
 

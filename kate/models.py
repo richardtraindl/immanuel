@@ -44,11 +44,11 @@ class Match(models.Model):
     }
 
     STATUS = {
-        'open' : 1,
-        'draw' : 2,
-        'winner_white' : 3,
-        'winner_black' : 4,
-        'cancelled' : 5 }
+        'open' : 10,
+        'draw' : 11,
+        'winner_white' : 12,
+        'winner_black' : 13,
+        'cancelled' : 14 }
 
     LEVELS = {
         'blitz' : 0,

@@ -3,12 +3,12 @@ from .pieces import pawn, rook, knight, bishop, queen, king
 
 
 RETURN_CODES = {
-    'ok' : 0,
-    'draw' : 10,
-    'winner_white' : 11,
-    'winner_black' : 12,
-    'match-cancelled' : 13,
-    'wrong-color' : 14,    
+    'ok' : 10,
+    'draw' : 11,
+    'winner_white' : 12,
+    'winner_black' : 13,
+    'match-cancelled' : 14,
+    'wrong-color' : 15,
     'pawn-error' : 20,
     'rook-error' : 21,
     'knight-error' : 22,
@@ -207,102 +207,6 @@ def list_field_touches(match, color, srcx, srcy):
         touches.extend(newtouches)
 
     return touches
-
-
-def does_attack(match, srcx, srcy, dstx, dsty):
-    flag, priority = rook.does_attack(match, srcx, srcy, dstx, dsty)
-    if(flag):
-        return True, priority
-
-    flag, priority = bishop.does_attack(match, srcx, srcy, dstx, dsty)
-    if(flag):
-        return True, priority
-
-    flag, priority = knight.does_attack(match, srcx, srcy, dstx, dsty)
-    if(flag):
-        return True, priority
-
-    flag, priority = king.does_attack(match, srcx, srcy, dstx, dsty)
-    if(flag ):
-        return True, priority
-
-    flag, priority = pawn.does_attack(match, srcx, srcy, dstx, dsty)
-    if(flag):
-        return True, priority
-
-    return False, 0
-
-
-def does_support_attacked(match, srcx, srcy, dstx, dsty):
-    flag, priority = rook.does_support_attacked(match, srcx, srcy, dstx, dsty)
-    if(flag):
-        return True, priority
-
-    flag, priority = bishop.does_support_attacked(match, srcx, srcy, dstx, dsty)
-    if(flag):
-        return True, priority
-
-    flag, priority = knight.does_support_attacked(match, srcx, srcy, dstx, dsty)
-    if(flag):
-        return True, priority
-
-    flag, priority = king.does_support_attacked(match, srcx, srcy, dstx, dsty)
-    if(flag):
-        return True, priority
-
-    flag, priority = pawn.does_support_attacked(match, srcx, srcy, dstx, dsty)
-    if(flag):
-        return True, priority
-
-    return False, 0
-
-
-def count_attacks(match, srcx, srcy, dstx, dsty):
-    count = 0
-
-    count += rook.count_attacks(match, srcx, srcy, dstx, dsty)
-
-    count += knight.count_attacks(match, srcx, srcy, dstx, dsty)
-
-    count += bishop.count_attacks(match, srcx, srcy, dstx, dsty)
-
-    count += king.count_attacks(match, srcx, srcy, dstx, dsty)
-
-    count += pawn.count_attacks(match, srcx, srcy, dstx, dsty)
-
-    return count
-
-
-def score_attacks(match, srcx, srcy):
-    score = 0
-
-    score += rook.score_attacks(match, srcx, srcy)
-
-    score += knight.score_attacks(match, srcx, srcy)
-
-    score += bishop.score_attacks(match, srcx, srcy)
-
-    score += king.score_attacks(match, srcx, srcy)
-
-    score += pawn.score_attacks(match, srcx, srcy)
-
-    return score
-
-
-def score_supports_of_attacked(match, srcx, srcy):
-    score = 0
-    
-    score += rook.score_supports_of_attacked(match, srcx, srcy)
-
-    score += bishop.score_supports_of_attacked(match, srcx, srcy)
-
-    score += knight.score_supports_of_attacked(match, srcx, srcy)
-
-    score += king.score_supports_of_attacked(match, srcx, srcy)
-
-    score += pawn.score_supports_of_attacked(match, srcx, srcy)
-
-    return score
 
 
 def is_king_attacked(match, x1, y1):

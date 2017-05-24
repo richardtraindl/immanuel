@@ -1,5 +1,6 @@
 from .. match import *
-from .. import rules, calc_helper
+from .. import rules
+from .. cvalues import *
 
 
 NORTH_X = 0
@@ -51,7 +52,7 @@ def list_field_touches(match, color, fieldx, fieldy):
 
 
 def does_attack(match, srcx, srcy, dstx, dsty):
-    priority = calc_helper.PRIO['undefinded']
+    priority = PRIO['undefinded']
 
     rook = match.readfield(srcx, srcy)
 
@@ -69,27 +70,27 @@ def does_attack(match, srcx, srcy, dstx, dsty):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
                 if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    return True, calc_helper.PRIO['prio2']
+                    return True, PRIO['prio2']
                 else:
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
-                        priority = min(priority, calc_helper.PRIO['prio3'])
+                        priority = min(priority, PRIO['prio3'])
                     else:
                         match.writefield(srcx, srcy, PIECES['blk'])
                         friendlysupported = rules.is_field_touched(match, color, dstx, dsty)
                         attacked = rules.is_field_touched(match, opp_color, dstx, dsty)
                         match.writefield(srcx, srcy, rook)
                         if(not attacked):
-                            priority = min(priority, calc_helper.PRIO['prio3'])
+                            priority = min(priority, PRIO['prio3'])
                         elif(friendlysupported):
-                            if(calc_helper.PIECES_RANK[piece] >= calc_helper.PIECES_RANK[rook]):
-                                priority = min(priority, calc_helper.PRIO['prio3'])
+                            if(PIECES_RANK[piece] >= PIECES_RANK[rook]):
+                                priority = min(priority, PRIO['prio3'])
                             else:
-                                priority = min(priority, calc_helper.PRIO['prio4'])
+                                priority = min(priority, PRIO['prio4'])
                         else:
-                            priority = min(priority, calc_helper.PRIO['prio4'])
+                            priority = min(priority, PRIO['prio4'])
 
-    if(priority == calc_helper.PRIO['undefinded']):
+    if(priority == PRIO['undefinded']):
         return False, priority
     else:
         return True, priority
@@ -136,19 +137,19 @@ def score_attacks(match, srcx, srcy):
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                score += calc_helper.ATTACKED_SCORES[piece]
+                score += ATTACKED_SCORES[piece]
                 pin_dir = rules.pin_dir(match, x1, y1)
                 direction = rk_dir(srcx, srcy, x1, y1)
                 if(pin_dir == direction):
                     if(piece == PIECES['wRk'] or piece == PIECES['bRk'] or piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                        score += calc_helper.ATTACKED_SCORES[piece] // 4
+                        score += ATTACKED_SCORES[piece] // 4
                     else:
-                        score += calc_helper.ATTACKED_SCORES[piece] // 2
+                        score += ATTACKED_SCORES[piece] // 2
     return score
 
 
 def does_support_attacked(match, srcx, srcy, dstx, dsty):
-    priority = calc_helper.PRIO['undefinded']
+    priority = PRIO['undefinded']
 
     rook = match.readfield(srcx, srcy)
 
@@ -172,11 +173,11 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     pin_dir = rules.pin_dir(match, x1, y1)
                     if(pin_dir != rules.DIRS['undefined']):
-                        return True, calc_helper.PRIO['prio3']
+                        return True, PRIO['prio3']
                     else:
-                        return True, calc_helper.PRIO['prio4']
+                        return True, PRIO['prio4']
 
-    if(priority == calc_helper.PRIO['undefinded']):
+    if(priority == PRIO['undefinded']):
         return False, priority
     else:
         return True, priority
@@ -205,7 +206,7 @@ def score_supports_of_attacked(match, srcx, srcy):
                 continue
             if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
-                    score += calc_helper.SUPPORTED_SCORES[piece]
+                    score += SUPPORTED_SCORES[piece]
 
     return score 
 

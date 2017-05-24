@@ -2,6 +2,7 @@ import random
 from .match import *
 from .move import *
 from .openings import * 
+from .helper import coord_to_index, index_to_coord
 
 
 def retrieve_move(match):
@@ -11,9 +12,9 @@ def retrieve_move(match):
         
     lastmoves = ""
     for move in match.move_list:
-        lastmoves += Match.index_to_koord(move.srcx, move.srcy)
+        lastmoves += index_to_coord(move.srcx, move.srcy)
         lastmoves += "-"
-        lastmoves += Match.index_to_koord(move.dstx, move.dsty)
+        lastmoves += index_to_coord(move.dstx, move.dsty)
         lastmoves += ","
     
     lastmoves = lastmoves[:-1]
@@ -40,7 +41,7 @@ def retrieve_move(match):
     else:
         idx = random.randint(0, len(candidates) - 1)
         candidate = candidates[idx]
-        srcx, srcy = Match.koord_to_index(candidate[:2])
-        dstx, dsty = Match.koord_to_index(candidate[3:])
+        srcx, srcy = coord_to_index(candidate[:2])
+        dstx, dsty = coord_to_index(candidate[3:])
         return GenMove(srcx, srcy, dstx, dsty, PIECES['blk'])
 

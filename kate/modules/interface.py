@@ -137,9 +137,13 @@ def thread_do_move(match):
 def calc_move_for_immanuel(modelmatch):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    if(rules.game_status(match) == STATUS['open'] and match.next_color_human() == False):
-        print("start thread...")
+    if(rules.game_status(match) != STATUS['open']):
+        return False, rules.game_status(match)
+    elif(match.next_color_human()):
+        return False, rules.RETURN_CODES['wrong-color']
+    else:
         thread_do_move(match)
+        return True, 0
 
 
 def next_color_human(modelmatch):

@@ -7,6 +7,7 @@ from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComm
 from .modules import interface
 from .engine.match import *
 from .engine.move import *
+from .engine.helper import index_to_coord, coord_to_index
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
 
 
@@ -26,8 +27,8 @@ def match(request, matchid=None, switch=0, msg=None):
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(lastmove):
-        movesrc = Match.index_to_koord(lastmove.srcx, lastmove.srcy)
-        movedst = Match.index_to_koord(lastmove.dstx, lastmove.dsty)
+        movesrc = index_to_coord(lastmove.srcx, lastmove.srcy)
+        movedst = index_to_coord(lastmove.dstx, lastmove.dsty)
     else:
         movesrc = ''
         movedst = ''
@@ -122,8 +123,8 @@ def do_move(request, matchid, switch=0):
         else:
             form = DoMoveForm(request.POST)
             if(form.is_valid()):
-                srcx,srcy = Match.koord_to_index(form.move_src)
-                dstx,dsty = Match.koord_to_index(form.move_dst)
+                srcx,srcy = coord_to_index(form.move_src)
+                dstx,dsty = coord_to_index(form.move_dst)
                 prom_piece = PIECES[form.prom_piece]
                 valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
                 if(valid):
@@ -155,7 +156,11 @@ def resume(request, matchid, switch=0):
     if(modelmatch):
         thread = ModelMatch.get_active_thread(modelmatch)
         if(thread is None):
-            interface.calc_move_for_immanuel(modelmatch)
+            flag, msg = interface.calc_move_for_immanuel(modelmatch)
+            print(str(msg))
+            if(flag == False):
+                return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch, msg)))
+
         return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
 
 

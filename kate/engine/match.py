@@ -2,16 +2,32 @@
 
 STATUS = { 'open' : 1, 'draw' : 2, 'winner_white' : 3, 'winner_black' : 4, 'cancelled' : 5 }
 
+
 LEVELS = { 'blitz' : 0, 'low' : 1, 'medium' : 2, 'high' : 3 }
 
+
 COLORS = { 'undefined' : 0, 'white' : 1, 'black' : 9 }
+
 
 REVERSED_COLORS = { COLORS['undefined'] : COLORS['undefined'],
                     COLORS['white'] : COLORS['black'],
                     COLORS['black'] : COLORS['white'] }
 
-PIECES = { 'blk' : 0, 'wKg' : 1, 'wPw' : 2, 'wRk' : 3, 'wKn' : 4, 'wBp' : 5, 'wQu' : 6, 
-                      'bKg' : 9, 'bPw' : 10, 'bRk' : 11, 'bKn' : 12, 'bBp' : 13, 'bQu' : 14 }
+
+PIECES = { 'blk' : 0, 
+           'wKg' : 1, 
+           'wPw' : 2, 
+           'wRk' : 3, 
+           'wKn' : 4, 
+           'wBp' : 5, 
+           'wQu' : 6, 
+           'bKg' : 9, 
+           'bPw' : 10, 
+           'bRk' : 11, 
+           'bKn' : 12, 
+           'bBp' : 13, 
+           'bQu' : 14 }
+
 
 PIECES_COLOR = {
         PIECES['blk'] : COLORS['undefined'],
@@ -28,10 +44,12 @@ PIECES_COLOR = {
         PIECES['bBp'] : COLORS['black'],
         PIECES['bQu'] : COLORS['black'] }
 
+
 E1_X = 3
 E1_Y = 0
 E8_X = 3
 E8_Y = 7
+
 
 class Match:
     def __init__(self):
@@ -164,17 +182,4 @@ class Match:
         return REVERSED_COLORS[color]
 
 
-    @staticmethod
-    def koord_to_index(koord):
-        x = ord(koord[0]) - ord('a')
-        y = ord(koord[1]) - ord('1')
-        return x,y
-
-
-    @staticmethod
-    def index_to_koord(x, y):
-        col = chr(x + ord('a'))
-        row = chr(y + ord('1'))
-        koord = str(col + row)
-        return koord
 

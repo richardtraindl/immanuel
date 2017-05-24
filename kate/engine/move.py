@@ -1,5 +1,5 @@
 from .match import *
-from .helper import reverse_lookup
+from .helper import reverse_lookup, index_to_coord
 
 
 TYPES = { 'standard' : 1, 
@@ -42,7 +42,7 @@ class Move:
                 hyphen = "-"
             else:
                 hyphen = "x"
-            fmtmove = Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty)
+            fmtmove = index_to_coord(self.srcx, self.srcy) + hyphen + index_to_coord(self.dstx, self.dsty)
             return fmtmove
         elif(self.move_type == TYPES['short_castling']):
             return "0-0"
@@ -53,10 +53,10 @@ class Move:
                 hyphen = "-"
             else:
                 hyphen = "x"
-            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + hyphen + Match.index_to_koord(self.dstx, self.dsty) + " " + reverse_lookup(PIECES, self.prom_piece)
+            fmtmove= index_to_coord(self.srcx, self.srcy) + hyphen + index_to_coord(self.dstx, self.dsty) + " " + reverse_lookup(PIECES, self.prom_piece)
             return fmtmove
         else:
-            fmtmove= Match.index_to_koord(self.srcx, self.srcy) + "x" + Match.index_to_koord(self.dstx, self.dsty) + " e.p."
+            fmtmove= index_to_coord(self.srcx, self.srcy) + "x" + index_to_coord(self.dstx, self.dsty) + " e.p."
             return fmtmove
 
 
