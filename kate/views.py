@@ -88,11 +88,11 @@ def settings(request, matchid=None, switch=0):
     if(request.method == 'POST' and modelmatch):
         form = MatchForm(request.POST)
         if(form.is_valid()):
-            """modelmatch.white_player = form.cleaned_data['white_player']
-            modelmatch.white_player_human = form.cleaned_data['white_player_human']
-            modelmatch.black_player = form.cleaned_data['black_player']
-            modelmatch.black_player_human = form.cleaned_data['black_player_human']
-            modelmatch.level = form.cleaned_data['level']"""
+            modelmatch.white_player = form.white_player
+            modelmatch.white_player_human = form.white_player_human
+            modelmatch.black_player = form.black_player
+            modelmatch.black_player_human = form.black_player_human
+            modelmatch.level = form.level
             modelmatch.save()
             
             thread = ModelMatch.get_active_thread(modelmatch)
