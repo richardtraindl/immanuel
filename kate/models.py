@@ -1,61 +1,11 @@
 from django.db import models
 from django.utils import timezone
+from kate.engine.match import STATUS, PIECES
 from kate.engine import helper
 import threading
 
 
 class Match(models.Model):
-    COLORS = {
-        'undefined' : 0,
-        'white' : 1,
-        'black' : 9 
-    }
-
-    PIECES = {
-        'blk' : 0,
-        'wKg' : 1,
-        'wPw' : 2,
-        'wRk' : 3,
-        'wKn' : 4,
-        'wBp' : 5,
-        'wQu' : 6,
-        'bKg' : 9,
-        'bPw' : 10,
-        'bRk' : 11,
-        'bKn' : 12,
-        'bBp' : 13,
-        'bQu' : 14 
-    }
-
-    PIECES_RANK = {
-        PIECES['blk'] : 0,
-        PIECES['wPw'] : 1,
-        PIECES['bPw'] : 1,
-        PIECES['wKn'] : 2,
-        PIECES['bKn'] : 2,
-        PIECES['wBp'] : 2,
-        PIECES['bBp'] : 2,
-        PIECES['wRk'] : 4,
-        PIECES['bRk'] : 4,
-        PIECES['wQu'] : 5,
-        PIECES['bQu'] : 5,
-        PIECES['wKg'] : 6,
-        PIECES['bKg'] : 6
-    }
-
-    STATUS = {
-        'open' : 10,
-        'draw' : 11,
-        'winner_white' : 12,
-        'winner_black' : 13,
-        'cancelled' : 14 }
-
-    LEVELS = {
-        'blitz' : 0,
-        'low' : 1,
-        'medium' : 2,
-        'high' : 3 }
-
     status = models.PositiveSmallIntegerField(null=False, default=STATUS['open'])
     count = models.SmallIntegerField(null=False, default=0)
     score = models.IntegerField(null=False, default=0)
@@ -96,14 +46,14 @@ class Match(models.Model):
 
     def writefield(self, x, y, value):
         idx = y*32 + x*4
-        str_value = helper.reverse_lookup(Match.PIECES, value)
+        str_value = helper.reverse_lookup(PIECES, value)
         self.board = self.board[:idx] + str_value + self.board[(idx+3):]
 
 
     def readfield(self, x, y):
         idx = y*32 + x*4
         str_value = self.board[idx:idx+3]
-        return Match.PIECES[str_value]
+        return PIECES[str_value]
 
 
     @classmethod
@@ -156,8 +106,8 @@ class Move(models.Model):
     dsty = models.PositiveSmallIntegerField(null=False)
     e_p_fieldx = models.PositiveSmallIntegerField(null=True)
     e_p_fieldy = models.PositiveSmallIntegerField(null=True)
-    captured_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
-    prom_piece = models.PositiveSmallIntegerField(null=False, default=Match.PIECES['blk'])
+    captured_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
+    prom_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
     fifty_moves_count = models.SmallIntegerField(null=False)
 
 

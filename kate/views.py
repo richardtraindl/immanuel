@@ -50,7 +50,7 @@ def match(request, matchid=None, switch=0, msg=None):
     
     if(msg == None):
         fmtmsg = "<p class='ok'></p>"
-    elif(int(msg) == 0):
+    elif(int(msg) == RETURN_CODES['ok']):
         fmtmsg = "<p class='ok'>" + RETURN_MSGS[int(msg)] + "</p>"
     else:
         fmtmsg = "<p class='error'>" + RETURN_MSGS[int(msg)] + "</p>"
@@ -110,28 +110,27 @@ def do_move(request, matchid, switch=0):
     context = RequestContext(request)
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-        if(not interface.next_color_human(modelmatch)):
-            msg = RETURN_CODES['wrong-color']
-        elif(interface.game_status(modelmatch) != STATUS['open']):
-            status = interface.game_status(modelmatch)            
-            if(status == STATUS['winner_white']):
-                msg = RETURN_CODES['winner_white']    
-            elif(status == STATUS['winner_black']):
-                msg = RETURN_CODES['winner_black']
-            else:
-                msg = RETURN_CODES['draw']
+        if(not modelmatch):
+            return HttpResponseRedirect(reverse('kate:index', args=(switch)))
+        form = DoMoveForm(request.POST)
+        if(form.is_valid()):
+            srcx,srcy = coord_to_index(form.move_src)
+            dstx,dsty = coord_to_index(form.move_dst)
+            prom_piece = PIECES[form.prom_piece]
+            valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+            if(valid):
+                interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+                interface.calc_move_for_immanuel(modelmatch)
+                status = interface.game_status(modelmatch)
+                if(status != STATUS['open']):
+                    if(status == STATUS['winner_white']):
+                        msg = RETURN_CODES['winner_white']    
+                    elif(status == STATUS['winner_black']):
+                        msg = RETURN_CODES['winner_black']
+                    else:
+                        msg = RETURN_CODES['draw']
         else:
-            form = DoMoveForm(request.POST)
-            if(form.is_valid()):
-                srcx,srcy = coord_to_index(form.move_src)
-                dstx,dsty = coord_to_index(form.move_dst)
-                prom_piece = PIECES[form.prom_piece]
-                valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-                if(valid):
-                    interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-                    interface.calc_move_for_immanuel(modelmatch)
-            else:
-                msg= RETURN_CODES['format-error']
+            msg= RETURN_CODES['format-error']
 
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:

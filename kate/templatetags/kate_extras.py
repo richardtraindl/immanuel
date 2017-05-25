@@ -1,6 +1,6 @@
 from django import template
 import datetime
-from kate.models import Match
+from kate.engine.match import LEVELS
 from kate.engine import helper
 
 register = template.Library()
@@ -45,7 +45,7 @@ def chesscnt(count):
 
 @register.filter(name='matchlevel')
 def matchlevel(level):
-    return helper.reverse_lookup(Match.LEVELS, level)
+    return helper.reverse_lookup(LEVELS, level)
 
 @register.filter(name='booltoint')
 def booltoint(value):
