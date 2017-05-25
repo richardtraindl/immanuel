@@ -36,6 +36,7 @@ def prnt_attributes(match):
     print("wRk_h1_first_movecnt: " + str(match.wRk_h1_first_movecnt)) 
     print("bRk_a8_first_movecnt: " + str(match.bRk_a8_first_movecnt)) 
     print("bRk_h8_first_movecnt: " + str(match.bRk_h8_first_movecnt))
+    print("level: " + str(match.level))    
     print("------------------------------------------------------")
 
 

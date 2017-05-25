@@ -267,6 +267,7 @@ def calc_max(match, depth, alpha, beta):
         score = rate(color, gmove, score, candidates, maxscore, search_candidates)
 
         if(depth == 1):
+            print("maxcnt " + str(maxcnt))
             count += 1
 
             print("\n____________________________________________________________")
@@ -322,6 +323,7 @@ def calc_min(match, depth, alpha, beta):
         matchmove.undo_move(match)
 
         if(depth == 1):
+            print("maxcnt " + str(maxcnt))
             count += 1
 
             print("\n____________________________________________________________")

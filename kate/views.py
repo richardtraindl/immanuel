@@ -49,7 +49,18 @@ def match(request, matchid=None, switch=0, msg=None):
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:3]
     
     if(msg == None):
-        fmtmsg = "<p class='ok'></p>"
+        status = interface.game_status(modelmatch)
+        if(status != STATUS['open']):
+            if(status == STATUS['winner_white']):
+                msg = RETURN_CODES['winner_white']
+            elif(status == STATUS['winner_black']):
+                msg = RETURN_CODES['winner_black']
+            else:
+                msg = RETURN_CODES['draw']
+
+            fmtmsg = "<p class='error'>" + RETURN_MSGS[msg] + "</p>"
+        else:
+            fmtmsg = "<p class='ok'></p>"
     elif(int(msg) == RETURN_CODES['ok']):
         fmtmsg = "<p class='ok'>" + RETURN_MSGS[int(msg)] + "</p>"
     else:
@@ -74,7 +85,7 @@ def settings(request, matchid=None, switch=0):
     else:
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
-    if(request.method == 'POST'):
+    if(request.method == 'POST' and modelmatch):
         form = MatchForm(request.POST)
         if(form.is_valid()):
             modelmatch.white_player = form.cleaned_data['white_player']
@@ -83,7 +94,11 @@ def settings(request, matchid=None, switch=0):
             modelmatch.black_player_human = form.cleaned_data['black_player_human']
             modelmatch.level = form.cleaned_data['level']
             modelmatch.save()
-            interface.calc_move_for_immanuel(modelmatch)
+            
+            thread = ModelMatch.get_active_thread(modelmatch)
+            if(thread is None):
+                interface.calc_move_for_immanuel(modelmatch)
+
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
         else:
             return render(request, 'kate/settings.html', { 'form': form, 'matchid': matchid, 'switch': switch } )

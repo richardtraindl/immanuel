@@ -16,11 +16,11 @@ class DoMoveForm(forms.Form):
             raise ValidationError("...")
 
            
-LEVELS = (
-    ('0', 'blitz'),
-    ('1', 'low'),
-    ('2', 'medium'),
-    ('3', 'high'),
+LEVEL_CHOICES = (
+    (0, 'blitz'),
+    (1, 'low'),
+    (2, 'medium'),
+    (3, 'high'),
 )
 
 class MatchForm(forms.Form):
@@ -28,7 +28,7 @@ class MatchForm(forms.Form):
     white_player_human = forms.BooleanField(label='Human', initial=True, required=False)
     black_player = forms.CharField(label='Black Player', max_length=100)
     black_player_human = forms.BooleanField(label='Human', initial=True, required=False)
-    level = forms.ChoiceField(label="Level", choices = LEVELS, initial='0')
+    level = forms.ChoiceField(label="Level", choices = LEVEL_CHOICES, initial=0)
 
     def clean(self):
         cleaned_data = super(MatchForm, self).clean()

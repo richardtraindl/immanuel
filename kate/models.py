@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from kate.engine.match import STATUS, PIECES
+from kate.engine.match import STATUS, LEVELS, PIECES
 from kate.engine import helper
 import threading
 
@@ -16,7 +16,7 @@ class Match(models.Model):
     black_player = models.CharField(max_length=100, blank=False)
     black_player_human = models.BooleanField(null=False, default=True)
     elapsed_time_black = models.IntegerField(null=False, default=0)
-    level = models.SmallIntegerField(null=False, default=1)
+    level = models.SmallIntegerField(null=False, default=LEVELS['blitz'])
     board = models.CharField(max_length=256, blank=False, default='wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;' \
                                                                   'wPw;wPw;wPw;wPw;wPw;wPw;wPw;wPw;' \
                                                                   'blk;blk;blk;blk;blk;blk;blk;blk;' \
