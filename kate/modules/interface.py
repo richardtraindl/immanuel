@@ -25,7 +25,7 @@ def map_matches(src, dst, map_dir):
     dst.black_player = src.black_player
     dst.black_player_human = src.black_player_human
     dst.elapsed_time_black = src.elapsed_time_black
-    dst.level = src.level
+    dst.level = int(src.level)
     dst.fifty_moves_count = src.fifty_moves_count
     dst.wKg_x = src.wKg_x
     dst.wKg_y = src.wKg_y
