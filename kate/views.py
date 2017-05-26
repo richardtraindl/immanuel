@@ -25,7 +25,7 @@ def match(request, matchid=None, switch=0, msg=None):
     else:
         modelmatch = ModelMatch.objects.get(id=matchid)
         if(modelmatch is None):
-            return HttpResponseRedirect(reverse('kate:index'))
+            return index(request)
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(lastmove):
