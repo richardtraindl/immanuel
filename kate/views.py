@@ -23,8 +23,9 @@ def match(request, matchid=None, switch=0, msg=None):
     if(matchid == None):
         modelmatch = ModelMatch(white_player=None, black_player=None)
     else:
-        modelmatch = ModelMatch.objects.get(id=matchid)
-        if(modelmatch is None):
+        try:
+            modelmatch = ModelMatch.objects.get(id=matchid)
+        except ModelMatch.DoesNotExist:
             return index(request)
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
