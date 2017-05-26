@@ -88,7 +88,7 @@ def settings(request, matchid=None, switch=0):
     else:
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
-    if(request.method == 'POST' and modelmatch):
+    if(request.method == 'POST'):
         form = MatchForm(request.POST)
         if(form.is_valid()):
             modelmatch.white_player = form.white_player
@@ -128,8 +128,6 @@ def do_move(request, matchid, switch=0):
     context = RequestContext(request)
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-        if(not modelmatch):
-            return HttpResponseRedirect(reverse('kate:index', args=(switch)))
         form = DoMoveForm(request.POST)
         if(form.is_valid()):
             srcx,srcy = coord_to_index(form.move_src)
@@ -157,34 +155,33 @@ def do_move(request, matchid, switch=0):
 
 def undo_move(request, matchid, switch=0):
     context = RequestContext(request)
-    modelmatch = ModelMatch.objects.get(id=matchid)
-    if(modelmatch):
-        thread = ModelMatch.get_active_thread(modelmatch)
-        if(thread):
-            ModelMatch.deactivate_threads(modelmatch)
-            ModelMatch.remove_outdated_threads()
-        interface.undo_move(modelmatch)
-        return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+    thread = ModelMatch.get_active_thread(modelmatch)
+    if(thread):
+        ModelMatch.deactivate_threads(modelmatch)
+        ModelMatch.remove_outdated_threads()
+
+    interface.undo_move(modelmatch)
+    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
 
 
 def resume(request, matchid, switch=0):
     context = RequestContext(request)
-    modelmatch = ModelMatch.objects.get(id=matchid)
-    if(modelmatch):
-        thread = ModelMatch.get_active_thread(modelmatch)
-        if(thread is None):
-            flag, msg = interface.calc_move_for_immanuel(modelmatch)
-            print(str(msg))
-            if(flag == False):
-                return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch, msg)))
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+    thread = ModelMatch.get_active_thread(modelmatch)
+    if(thread is None):
+        flag, msg = interface.calc_move_for_immanuel(modelmatch)
+        print(str(msg))
+        if(flag == False):
+            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch, msg)))
 
-        return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
+    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
 
 
 def add_comment(request, matchid):
     context = RequestContext(request)
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-    if(request.method == 'POST' and modelmatch):
+    if(request.method == 'POST'):
         newcomment = request.POST['newcomment']
         switchflag = request.POST['switchflag']        
         if(len(newcomment) > 0):
