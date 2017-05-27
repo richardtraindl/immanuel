@@ -26,7 +26,7 @@ def match(request, matchid=None, switch=0, msg=None):
         try:
             modelmatch = ModelMatch.objects.get(id=matchid)
         except ModelMatch.DoesNotExist:
-            return HttpResponseRedirect('kate/')
+            return HttpResponseRedirect('/kate/')
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(lastmove):
