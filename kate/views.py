@@ -33,7 +33,7 @@ def match(request, matchid=None, switch=0, msg=None):
         movesrc = index_to_coord(lastmove.srcx, lastmove.srcy)
         movedst = index_to_coord(lastmove.dstx, lastmove.dsty)
     else:
-        movesrc = '
+        movesrc = ''
         movedst = ''
 
     moves = []
