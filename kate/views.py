@@ -209,10 +209,10 @@ def fetch_match(request):
     movecnt = request.GET['movecnt']
 
     modelmatch = ModelMatch.objects.get(id=matchid)
-    if(modelmatch):
-        if(modelmatch.count != int(movecnt)):
-            data = "1"
-        else:
-            data = ""
-        return HttpResponse(data)
+    if(modelmatch and modelmatch.count > int(movecnt)):
+        data = "1"
+    else:
+        data = ""
+
+    return HttpResponse(data)
 

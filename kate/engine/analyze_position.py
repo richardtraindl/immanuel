@@ -94,12 +94,13 @@ def evaluate_movecnt(match, excludedpieces):
 
     for y1 in range(8):
         for x1 in range(8):
-            movecnt += evaluate_piece_moves(match, x1, y1, excludedpieces)
+            count = evaluate_piece_moves(match, x1, y1, excludedpieces)
+            if(match.next_color() == COLORS['white']):
+                movecnt += count
+            else:
+                movecnt += (count * -1)
 
-    if(match.next_color() == COLORS['white']):
-        return movecnt
-    else:
-        return (movecnt * -1)
+    return movecnt
 
 
 def evaluate_developments(match):
@@ -152,7 +153,7 @@ def evaluate_position(match, movecnt):
             return ( SCORES[PIECES['wKg']] + match.count )
         elif(status == STATUS['winner_white']):
             return ( SCORES[PIECES['bKg']] - match.count )
-        else: # Match.STATUS['draw']
+        else: # draw
             return SCORES[PIECES['blk']]
     else:
         value = match.score

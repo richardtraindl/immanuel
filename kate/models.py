@@ -56,6 +56,11 @@ class Match(models.Model):
         return PIECES[str_value]
 
 
+    def readfield_core(self, x, y):
+        idx = y*32 + x*4
+        return self.board[idx:idx+3]
+
+
     @classmethod
     def remove_outdated_threads(cls):
         with cls._matches_thread_lock:
