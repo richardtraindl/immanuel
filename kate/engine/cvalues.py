@@ -89,5 +89,5 @@ PRIO = {
     'prio5' : 5,
     'prio6' : 6,
     'priolast' : 7,
-    'undefinded' : 10 }
+    'undefined' : 10 }
 

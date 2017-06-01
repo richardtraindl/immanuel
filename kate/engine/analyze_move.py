@@ -15,21 +15,21 @@ def is_capture(match, move):
             return True, PRIO['prio1']
         else:
             match.writefield(move.srcx, move.srcy, PIECES['blk'])
-            touched = rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty)
+            enemytouched = rules.is_field_touched(match, Match.color_of_piece(dstpiece), move.dstx, move.dsty)
             match.writefield(move.srcx, move.srcy, piece)        
-            if(touched):
-                return True, PRIO['prio2']
+            if(enemytouched):
+                return True, PRIO['prio3']
             else:
                 return True, PRIO['prio1']
     elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and move.srcx != move.dstx ):
         return True, PRIO['prio1']
     else:
-        return False, PRIO['undefinded']
+        return False, PRIO['undefined']
 
 
 def is_promotion(match, move):
     if(move.prom_piece == PIECES['blk']):
-        return False, PRIO['undefinded']
+        return False, PRIO['undefined']
     else:
         return True, PRIO['prio1']
 
@@ -40,7 +40,7 @@ def is_castling(match, move):
         if(move.srcx - move.dstx == 2 or move.srcx - move.dstx == -2):
             return True, PRIO['prio1']
 
-    return False, PRIO['undefinded']
+    return False, PRIO['undefined']
 
 
 def does_attack(match, move):
@@ -148,7 +148,7 @@ def does_attacked_flee(match, move):
     enemytouches = rules.list_field_touches(match, opp_color, move.srcx, move.srcy)
 
     if(len(enemytouches) == 0):
-        return False, PRIO['undefinded']
+        return False, PRIO['undefined']
     else:
         friendlytouches = rules.list_field_touches(match, color, move.srcx, move.srcy)
         
@@ -168,7 +168,7 @@ def does_attacked_flee(match, move):
         match.writefield(move.srcx, move.srcy, piece)                
 
         if(len(dstenemytouches) == 0):
-            return True, PRIO['prio3']
+            return True, PRIO['prio2']
         else:        
             if(len(dstfriendlytouches) == 0):
                 return True, PRIO['prio4']
@@ -190,7 +190,7 @@ def is_endgame_move(match, move):
             if(piece == PIECES['wPw'] or piece == PIECES['bPw'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 return True, PRIO['prio4']
             else:
-                return False, PRIO['undefinded']
+                return False, PRIO['undefined']
     else:
-        return False, PRIO['undefinded']
+        return False, PRIO['undefined']
 

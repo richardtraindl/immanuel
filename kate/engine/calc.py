@@ -215,25 +215,25 @@ def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates
 
 def select_maxcnt(match, depth, priorities):
     if(match.level == LEVELS['blitz']):
-        counts = ([10, 2], [6, 4], [4, 10])
+        counts = ([2, 12], [3, 12], [5, 8])
     elif(match.level == LEVELS['low']):
-        counts = ([12, 2], [8, 4], [4, 10])
+        counts = ([2, 12], [3, 12], [7, 8])
     elif(match.level == LEVELS['medium']):
-        counts = ([20, 2], [12, 4], [6, 10])
+        counts = ([2, 20], [4, 12], [10, 8])
     else:
-        counts = ([200, 2], [16, 4], [12, 10])
+        counts = ([2, 200], [4, 16], [10, 12])
 
-    if(depth <= counts[0][1]):
-        return counts[0][0]
-    elif(depth <= counts[1][1]):
-        return counts[1][0]
-    elif(depth <= counts[2][1]):
-        return min(priorities[0], counts[2][0])
+    if(depth <= counts[0][0]):
+        return counts[0][1]
+    elif(depth <= counts[1][0]):
+        return counts[1][1]
+    elif(depth <= counts[2][0]):
+        return min( (priorities[0] + priorities[1]), counts[2][1] )
     else:
         return 0
 
 
-def calc_max(match, depth, alpha, beta):
+def calc_max(match, depth, alpha, beta, debug_candidates):
     color = match.next_color()
     candidates = [None] * 10
     search_candidates = [None] * 10
@@ -254,11 +254,23 @@ def calc_max(match, depth, alpha, beta):
         gmove = pmove[0]
         move = matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-        score, search_candidates = calc_min(match, depth + 1, maxscore, beta)
+        score, search_candidates = calc_min(match, depth + 1, maxscore, beta, debug_candidates)
 
         score = rate(color, gmove, score, candidates, maxscore, search_candidates)
 
         if(depth == 1):
+            debug_candidates[count][0] = gmove
+            if(search_candidates[0]):
+                idx = 1
+                for cand in search_candidates:
+                    if(cand):
+                        debug_candidates[count][idx] = cand
+                        idx += 1
+                    else:
+                        break
+            else:
+                debug_candidates[count][1] = None
+
             count += 1
 
             print("\n____________________________________________________________")
@@ -286,7 +298,7 @@ def calc_max(match, depth, alpha, beta):
     return maxscore, candidates
 
 
-def calc_min(match, depth, alpha, beta):
+def calc_min(match, depth, alpha, beta, debug_candidates):
     color = match.next_color()
     candidates = [None] * 10
     search_candidates = [None] * 10
@@ -307,13 +319,25 @@ def calc_min(match, depth, alpha, beta):
         gmove = pmove[0]
         move = matchmove.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-        score, search_candidates = calc_max(match, depth + 1, alpha, minscore)
+        score, search_candidates = calc_max(match, depth + 1, alpha, minscore, debug_candidates)
 
         score = rate(color, gmove, score, candidates, minscore, search_candidates)
 
         matchmove.undo_move(match)
 
         if(depth == 1):
+            debug_candidates[count][0] = gmove
+            if(search_candidates[0]):
+                idx = 1
+                for cand in search_candidates:
+                    if(cand):
+                        debug_candidates[count][idx] = cand
+                        idx += 1
+                    else:
+                        break
+            else:
+                debug_candidates[count][1] = None
+
             count += 1
 
             print("\n____________________________________________________________")
@@ -341,6 +365,7 @@ def calc_min(match, depth, alpha, beta):
 
 def calc_move(match):
     candidates = [None] * 10
+    debug_candidates = [[None for x in range(10)] for x in range(60)]
 
     start = time.time()
     
@@ -349,14 +374,21 @@ def calc_move(match):
     if(candidates[0]):
         score = match.score
     elif(match.next_color() == COLORS['white']):
-        score, candidates = calc_max(match, 1, -200000, 200000)
+        score, candidates = calc_max(match, 1, -200000, 200000, debug_candidates)
     else:
-        score, candidates = calc_min(match, 1, -200000, 200000)
+        score, candidates = calc_min(match, 1, -200000, 200000, debug_candidates)
 
     msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, candidates)
 
+    for i in range(10):
+        if(debug_candidates[i][0]):
+            msg = "\n" + str(i) + "debug: "
+            prnt_moves(msg, debug_candidates[i])
+        else:
+            break
+
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
     prnt_attributes(match)
-    return candidates[0]
+    return candidates, debug_candidates

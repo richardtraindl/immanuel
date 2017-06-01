@@ -122,8 +122,13 @@ def evaluate_developments(match):
             developed_blacks = SCORES[PIECES['wPw']] // 4
     else:
         developed_blacks = SCORES[PIECES['bPw']] // 4
+        
+    excludedpieces = [ PIECES['wKg'], PIECES['bKg'], PIECES['wQu'], PIECES['bQu'] ]
+    movecnt = evaluate_movecnt(match, excludedpieces)
+    
+    movecnt = (movecnt * 10) // 5
 
-    return developed_whites + developed_blacks
+    return developed_whites + developed_blacks + movecnt
 
 
 def evaluate_endgame(match):
@@ -160,12 +165,10 @@ def evaluate_position(match, movecnt):
 
         value += evaluate_contacts(match)
 
-        if(match.count < 30):
-            excludedpieces = [ PIECES['wKg'], PIECES['bKg'], PIECES['wQu'], PIECES['bQu'] ]
-            value += evaluate_movecnt(match, excludedpieces)
+        if(match.count < 40):
             value += evaluate_developments(match)
 
-        if(match.count > 40):
+        if(match.count > 50):
             value += evaluate_endgame(match)
 
         return value

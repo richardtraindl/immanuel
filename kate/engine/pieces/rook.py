@@ -52,7 +52,7 @@ def list_field_touches(match, color, fieldx, fieldy):
 
 
 def does_attack(match, srcx, srcy, dstx, dsty):
-    priority = PRIO['undefinded']
+    priority = PRIO['undefined']
 
     rook = match.readfield(srcx, srcy)
 
@@ -90,7 +90,7 @@ def does_attack(match, srcx, srcy, dstx, dsty):
                         else:
                             priority = min(priority, PRIO['prio4'])
 
-    if(priority == PRIO['undefinded']):
+    if(priority == PRIO['undefined']):
         return False, priority
     else:
         return True, priority
@@ -149,7 +149,7 @@ def score_attacks(match, srcx, srcy):
 
 
 def does_support_attacked(match, srcx, srcy, dstx, dsty):
-    priority = PRIO['undefinded']
+    priority = PRIO['undefined']
 
     rook = match.readfield(srcx, srcy)
 
@@ -177,7 +177,7 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
                     else:
                         return True, PRIO['prio4']
 
-    if(priority == PRIO['undefinded']):
+    if(priority == PRIO['undefined']):
         return False, priority
     else:
         return True, priority
