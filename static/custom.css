@@ -180,6 +180,7 @@ nav li a:active {
 
 #minutes {
     padding-top: 5px;
+    max-height: 30px;
 }
 
 #minutes table {
@@ -188,6 +189,10 @@ nav li a:active {
 
 #minutes td {
     padding-right: 10px;
+}
+
+#debug-info {
+    max-height: 30px;
 }
 
 button, input[type="submit"]{

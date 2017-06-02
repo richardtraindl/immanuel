@@ -1,8 +1,10 @@
 import random, threading, copy
+from django.conf import settings
 from .. models import Match as ModelMatch, Move as ModelMove
 from .. engine.match import *
 from .. engine.move import *
 from .. engine import matchmove, rules, calc
+from .. engine import debug
 
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
@@ -112,8 +114,8 @@ class immanuelsThread(threading.Thread):
 
     def run(self):
         print("Thread starting " + str(self.name))
-        gmoves, search_moves = calc.calc_move(self.match)
-        gmove = gmoves[0]
+        candidates, debug_candidates = calc.calc_move(self.match)
+        gmove = candidates[0]
         if(gmove and ModelMatch.get_active_thread(self.match) and self.running):            
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
@@ -126,6 +128,9 @@ class immanuelsThread(threading.Thread):
             modelmove.match = modelmatch
             modelmove.save()
             print("move saved")
+            
+            debug.write_searchmoves(debug_candidates, settings.BASE_DIR + "/kate/engine")
+            print("debug_candidates saved")
         else:
             print("no move found or thread outdated!")
 
@@ -151,4 +156,9 @@ def next_color_human(modelmatch):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
     return match.next_color_human()
+
+
+def read_searchmoves(): 
+    debug.read_searchmoves(settings.BASE_DIR + "/kate/engine")
+    return debug.read_searchmoves(settings.BASE_DIR + "/kate/engine")
 

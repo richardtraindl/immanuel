@@ -9,7 +9,7 @@ from .engine.match import *
 from .engine.move import *
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
-
+from .engine.debug import read_searchmoves
 
 
 def index(request):
@@ -77,7 +77,9 @@ def match(request, matchid=None, switch=0, msg=None):
 
     form = DoMoveForm()
 
-    return render(request, 'kate/match.html', { 'match': modelmatch, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running } )
+    searchmoves = interface.read_searchmoves()
+
+    return render(request, 'kate/match.html', { 'match': modelmatch, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running, 'searchmoves': searchmoves, } )
 
 
 def settings(request, matchid=None, switch=0):

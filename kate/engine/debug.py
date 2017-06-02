@@ -1,6 +1,6 @@
 from .match import *
 from .move import *
-from .helper import reverse_lookup
+from .helper import *
 
 
 def prnt_moves(match):
@@ -8,9 +8,9 @@ def prnt_moves(match):
     print("------------------------------------------------------")
     for move in match.move_list[1:]:
         print(str(count) + ": " + 
-              Match.index_to_koord(move.srcx, move.srcy) + " " +
-              Match.index_to_koord(move.dstx, move.dsty) + " " +
-              reverse_lookup(Match.PIECES, move.prom_piece))
+              index_to_coord(move.srcx, move.srcy) + " " +
+              index_to_coord(move.dstx, move.dsty) + " " +
+              reverse_lookup(PIECES, move.prom_piece))
         count += 1
     print("------------------------------------------------------")
 
@@ -45,7 +45,7 @@ def prnt_board(match):
     for i in range(7, -1, -1):
         for j in range(8):
             piece = match.readfield(j, i)
-            print(reverse_lookup(Match.PIECES, piece) + " ", end="")
+            print(reverse_lookup(PIECES, piece) + " ", end="")
         print("")
     print("------------------------------------------------------")
 
@@ -60,4 +60,39 @@ def prnt_generator(generator):
     print("step_idx: " + str(generator.step_idx))
     print("max_step: " + str(generator.max_step))
     print("------------------------------------------------------")
+
+
+def write_searchmoves(debug_candidates, path):
+    fobject = open(path + "/data/searchmoves.py","w")
+
+    for i in range(20):
+        """if(debug_candidates[i][0]):"""
+        for cand in debug_candidates[i]:
+            if(cand):
+                str_move = index_to_coord(cand.srcx, cand.srcy) + "-"
+                str_move += index_to_coord(cand.dstx, cand.dsty) + "-"
+                str_move += reverse_lookup(PIECES, cand.prom_piece) + ";"
+                fobject.write(str_move)
+            else:
+                fobject.write("\n")
+                break
+        """else:
+               break"""
+
+    fobject.close()
+
+
+def read_searchmoves(path):
+    fobject = open(path + "/data/searchmoves.py","r")
+    
+    data = ""
+
+    for line in fobject:
+        data += "[" + line + "]"
+
+    fobject.close()
+
+    return data
+
+
 

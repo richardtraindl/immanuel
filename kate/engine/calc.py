@@ -8,9 +8,9 @@ from .analyze_move import *
 from .analyze_position import *
 from .helper import *
 from .cvalues import *
-from .debug import prnt_attributes
 from .rules import is_move_valid, RETURN_CODES, is_field_touched
 from .pieces import pawn, rook, bishop, knight, queen, king
+from .debug import prnt_attributes
 
 
 def prnt_move(msg, move):
@@ -263,7 +263,7 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
             if(search_candidates[0]):
                 idx = 1
                 for cand in search_candidates:
-                    if(cand):
+                    if(cand and idx < 20):
                         debug_candidates[count][idx] = cand
                         idx += 1
                     else:
@@ -330,7 +330,7 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
             if(search_candidates[0]):
                 idx = 1
                 for cand in search_candidates:
-                    if(cand):
+                    if(cand and idx < 20):
                         debug_candidates[count][idx] = cand
                         idx += 1
                     else:
@@ -365,7 +365,7 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
 
 def calc_move(match):
     candidates = [None] * 10
-    debug_candidates = [[None for x in range(10)] for x in range(60)]
+    debug_candidates = [[None for x in range(10)] for x in range(20)]
 
     start = time.time()
     
@@ -380,13 +380,6 @@ def calc_move(match):
 
     msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, candidates)
-
-    for i in range(10):
-        if(debug_candidates[i][0]):
-            msg = "\n" + str(i) + "debug: "
-            prnt_moves(msg, debug_candidates[i])
-        else:
-            break
 
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
