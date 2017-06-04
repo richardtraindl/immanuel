@@ -62,37 +62,151 @@ def prnt_generator(generator):
     print("------------------------------------------------------")
 
 
-def write_searchmoves(debug_candidates, path):
+def write_searchmoves(match, debug_candidates, path):
     fobject = open(path + "/data/searchmoves.py","w")
+    
+    fobject.write(str(match.id) + "\n")
+    fobject.write(str(match.status) + "\n")
+    fobject.write(str(match.count) + "\n")
+    fobject.write(str(match.score) + "\n")
+    fobject.write(str(match.white_player) + "\n")
+    fobject.write(str(match.white_player_human) + "\n")
+    fobject.write(str(match.elapsed_time_white) + "\n")
+    fobject.write(str(match.black_player) + "\n")
+    fobject.write(str(match.black_player_human) + "\n")
+    fobject.write(str(match.elapsed_time_black) + "\n")
+    
+    for y in range(8):
+        for x in range(8):
+            if(x < 7):
+                delimeter = ";"
+            else:
+                delimeter = "\n"
+            fobject.write( str(match.readfield(x, y)) + delimeter )
+
+    fobject.write(str(match.fifty_moves_count) + "\n")
+    fobject.write(str(match.wKg_x) + "\n")
+    fobject.write(str(match.wKg_y) + "\n")
+    fobject.write(str(match.bKg_x) + "\n")
+    fobject.write(str(match.bKg_y) + "\n")
+    fobject.write(str(match.wKg_first_movecnt) + "\n")
+    fobject.write(str(match.bKg_first_movecnt) + "\n")
+    fobject.write(str(match.wRk_a1_first_movecnt) + "\n")
+    fobject.write(str(match.wRk_h1_first_movecnt) + "\n")
+    fobject.write(str(match.bRk_a8_first_movecnt) + "\n")
+    fobject.write(str(match.bRk_h8_first_movecnt) + "\n")
+
+    if(len(match.move_list) == 0):
+        fobject.write("\n")
+    else:
+        move = match.move_list[-1]
+        fobject.write(str(move.match.id) + ";")
+        fobject.write(str(move.count) + ";")
+        fobject.write(str(move.move_type) + ";")
+        fobject.write(str(move.srcx) + ";")
+        fobject.write(str(move.srcy) + ";")
+        fobject.write(str(move.dstx) + ";")
+        fobject.write(str(move.dsty) + ";")
+        fobject.write(str(move.e_p_fieldx) + ";")
+        fobject.write(str(move.e_p_fieldy) + ";")
+        fobject.write(str(move.captured_piece) + ";")
+        fobject.write(str(move.prom_piece) + ";")
+        fobject.write(str(move.fifty_moves_count) + ";\n")
 
     for i in range(20):
-        """if(debug_candidates[i][0]):"""
         for cand in debug_candidates[i]:
             if(cand):
-                str_move = index_to_coord(cand.srcx, cand.srcy) + "-"
-                str_move += index_to_coord(cand.dstx, cand.dsty) + "-"
-                str_move += reverse_lookup(PIECES, cand.prom_piece) + ";"
-                fobject.write(str_move)
+                src = str(cand.srcx) + ";" + str(cand.srcy) + ";" 
+                fobject.write(src)
+                dst = str(cand.dstx) + ";" + str(cand.dsty) + ";"
+                fobject.write(dst)
+                prom = str(cand.prom_piece) + "]"
+                fobject.write(prom)
             else:
-                fobject.write("\n")
+                # fobject.write("\n")
                 break
-        """else:
-               break"""
+
+        fobject.write("\n")
 
     fobject.close()
 
 
 def read_searchmoves(path):
     fobject = open(path + "/data/searchmoves.py","r")
-    
-    data = ""
+   
+    lines = fobject.read().splitlines() 
+    match = Match()    
+    match.id = lines[0].rstrip('\n')
+    match.status = lines[1].rstrip('\n')
+    match.count = lines[2].rstrip('\n')
+    match.score = lines[3].rstrip('\n')
+    match.white_player = lines[4].rstrip('\n')
+    match.white_player_human = lines[5].rstrip('\n')
+    match.elapsed_time_white = lines[6].rstrip('\n')
+    match.black_player = lines[7].rstrip('\n')
+    match.black_player_human = lines[8].rstrip('\n')
+    match.elapsed_time_black = lines[9].rstrip('\n')
 
-    for line in fobject:
-        data += "[" + line + "]"
+    y = 0
+    for line in lines[10:18]:
+        line = line.rstrip('\n')
+        fields = line.split(";")
+        x = 0
+        for field in fields:
+            match.writefield(x, y, int(field))
+            x += 1
+        y += 1
+
+    match.fifty_moves_count = lines[18].rstrip('\n')
+    match.wKg_x = lines[19].rstrip('\n')
+    match.wKg_y = lines[20].rstrip('\n')
+    match.bKg_x = lines[21].rstrip('\n')
+    match.bKg_y = lines[22].rstrip('\n')
+    match.wKg_first_movecnt = lines[23].rstrip('\n')
+    match.bKg_first_movecnt = lines[24].rstrip('\n')
+    match.wRk_a1_first_movecnt = lines[25].rstrip('\n')
+    match.wRk_h1_first_movecnt = lines[26].rstrip('\n')
+    match.bRk_a8_first_movecnt = lines[27].rstrip('\n')
+    match.bRk_h8_first_movecnt = lines[28].rstrip('\n')
+
+    line = lines[29].rstrip('\n')
+    if(len(line) > 0):
+        moveattr = line.split(";")
+        if(len(moveattr) == 12):
+            move = Move()
+            move.match.id = moveattr[0]
+            move.count = moveattr[1]
+            move.move_type = moveattr[2]
+            move.srcx = moveattr[3]
+            move.srcy = moveattr[4]
+            move.dstx = moveattr[5]
+            move.dsty = moveattr[6]
+            move.e_p_fieldx = moveattr[7]
+            move.e_p_fieldy = moveattr[8]
+            move.captured_piece = moveattr[9]
+            move.prom_piece = moveattr[10]
+            move.fifty_moves_count = moveattr[11]
+
+            match.move_list.append(move)
+
+    debug_candidates = [[None for x in range(10)] for x in range(20)]
+    idx = 0
+    for line in lines[30:51]:
+        line = line.rstrip('\n')
+        searchmoves = line.split("]")
+        for searchmove in searchmoves:
+            gmoveattr = searchmove.split(";")
+            if(len(gmoveattr) == 5):
+                gmove = GenMove()
+                gmove.srcx = gmoveattr[0]
+                gmove.srcy = gmoveattr[1]
+                gmove.dstx = gmoveattr[2]
+                gmove.dsty = gmoveattr[3]
+                gmove.prom_piece = gmoveattr[4]
+                debug_candidates[idx].append(gmove)
+
+        idx += 1
 
     fobject.close()
 
-    return data
-
-
-
+    return match, debug_candidates

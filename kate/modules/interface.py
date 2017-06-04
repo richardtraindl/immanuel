@@ -117,6 +117,9 @@ class immanuelsThread(threading.Thread):
         candidates, debug_candidates = calc.calc_move(self.match)
         gmove = candidates[0]
         if(gmove and ModelMatch.get_active_thread(self.match) and self.running):            
+            debug.write_searchmoves(self.match, debug_candidates, settings.BASE_DIR + "/kate/engine")            
+            print("debug_candidates saved")
+
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             modelmatch = ModelMatch()
@@ -128,9 +131,6 @@ class immanuelsThread(threading.Thread):
             modelmove.match = modelmatch
             modelmove.save()
             print("move saved")
-            
-            debug.write_searchmoves(debug_candidates, settings.BASE_DIR + "/kate/engine")
-            print("debug_candidates saved")
         else:
             print("no move found or thread outdated!")
 
@@ -159,6 +159,5 @@ def next_color_human(modelmatch):
 
 
 def read_searchmoves(): 
-    debug.read_searchmoves(settings.BASE_DIR + "/kate/engine")
     return debug.read_searchmoves(settings.BASE_DIR + "/kate/engine")
 

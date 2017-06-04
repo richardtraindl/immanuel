@@ -9,7 +9,7 @@ from .engine.match import *
 from .engine.move import *
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
-from .engine.debug import read_searchmoves
+from .modules.interface import read_searchmoves
 
 
 def index(request):
@@ -77,9 +77,7 @@ def match(request, matchid=None, switch=0, msg=None):
 
     form = DoMoveForm()
 
-    searchmoves = interface.read_searchmoves()
-
-    return render(request, 'kate/match.html', { 'match': modelmatch, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running, 'searchmoves': searchmoves, } )
+    return render(request, 'kate/match.html', { 'match': modelmatch, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running, } )
 
 
 def settings(request, matchid=None, switch=0):
@@ -178,6 +176,25 @@ def resume(request, matchid, switch=0):
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch, msg)))
 
     return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
+
+
+def analyze(request, matchid=None):
+    context = RequestContext(request)
+    if(matchid == None):
+        return HttpResponseRedirect('/kate')
+    else:
+        match, searchmoves = read_searchmoves()
+        try:
+            modelmatch = ModelMatch.objects.get(id=matchid)
+        except ModelMatch.DoesNotExist:
+            return HttpResponseRedirect('/kate')
+
+    if(match.id != matchid):
+        return HttpResponseRedirect('/kate')
+        
+    interface.map_matches(match, modelmatch, interface.MAP_DIR['engine-to-model'])
+
+    return render(request, 'kate/analyze.html', { 'match': modelmatch, 'searchmoves': searchmoves, } )
 
 
 def add_comment(request, matchid):

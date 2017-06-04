@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load kate_extras %}
+
+
+{% block header %}
+    <div class="grid">
+        <div class="row_12_of_12">
+            <h1>Analyze Game</h1>
+            <h2>
+                {{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }} , &nbsp; 
+                Level: &nbsp; {{ match.level|matchlevel }}
+            </h2>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block nav %}
+    <div class="grid">
+        <div class="row_12_of_12">
+            <h2>
+                <a href="{% url 'kate:index' %}">OVERVIEW</a>
+            </h2>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <div class="grid">
+        <div class="row_8_of_12">
+            <div id="board-wrapper">
+              {% include "kate/_chessboard.html" with match=match %}
+            </div>
+
+            <div>
+                <table id="promotion">
+                    <tr id="white-pieces" class="invisible">
+                        <td value="wQu"><img src="{% static 'wQu'|imgsrc %}"></td>
+                        <td value="wBp"><img src="{% static 'wBp'|imgsrc %}"></td>
+                        <td value="wKn"><img src="{% static 'wKn'|imgsrc %}"></td>
+                        <td value="wRk"><img src="{% static 'wRk'|imgsrc %}"></td>
+                     </tr>
+                     <tr id="black-pieces" class="invisible">
+                        <td value="bQu"><img src="{% static 'bQu'|imgsrc %}"></td>
+                        <td value="bBp"><img src="{% static 'bBp'|imgsrc %}"></td>
+                        <td value="bKn"><img src="{% static 'bKn'|imgsrc %}"></td>
+                        <td value="bRk"><img src="{% static 'bRk'|imgsrc %}"></td>
+                    </tr>
+                </table>
+            </div>
+
+           <form id="move" method="post" action="{% url 'kate:domove' match.id 0 %}" style="display: none;">
+               {% csrf_token %}
+               {{ form }}
+               <input type="submit" value="submit" />
+           </form>
+        </div>
+
+        <div class="row_4_of_12">
+            <div id="score">
+                <p>Score: &nbsp; {{ match.score }}</p>
+            </div>
+            <div id="analyze">
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            performMove();
+            drag();
+            drop();
+
+            $('#promotion td').click(function(){
+                var piece;
+                piece = $(this).attr("value");
+                $('#prom-piece').val(piece);
+                $('#move').submit();
+            });
+        });
+    </script>
+{% endblock %}
