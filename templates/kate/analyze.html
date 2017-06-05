@@ -64,6 +64,15 @@
                 <p>Score: &nbsp; {{ match.score }}</p>
             </div>
             <div id="analyze">
+                {% for gmoves in debug_candidates %}
+                    {% for gmove in gmoves %}
+                        {{ gmove.srcx }}
+                        {{ gmove.srcy }}
+                        {{ gmove.dstx }}
+                        {{ gmove.dsty }}
+                        {{ gmove.prom_piece }}
+                    {% endfor %}                
+                {% endfor %}
 
             </div>
         </div>
