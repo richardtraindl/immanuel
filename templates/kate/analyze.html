@@ -64,16 +64,17 @@
                 <p>Score: &nbsp; {{ match.score }}</p>
             </div>
             <div id="analyze">
-                {% for gmoves in debug_candidates %}
-                    {% for gmove in gmoves %}
-                        {{ gmove.srcx }}
-                        {{ gmove.srcy }}
-                        {{ gmove.dstx }}
-                        {{ gmove.dsty }}
-                        {{ gmove.prom_piece }}
-                    {% endfor %}                
-                {% endfor %}
-
+              {% for sthread in searchmoves %}
+                {% if sthread %}
+                  <p class="gap">
+                  {% for gmove in sthread %}
+                    {% if gmove %}
+                      [{{ gmove.format_genmove }}]
+                    {% endif %}
+                  {% endfor %}
+                  </p>
+                {% endif %}
+              {% endfor %}
             </div>
         </div>
     </div>

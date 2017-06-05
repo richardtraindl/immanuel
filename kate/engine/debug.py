@@ -137,15 +137,15 @@ def read_searchmoves(path):
     lines = fobject.read().splitlines() 
     match = Match()    
     match.id = lines[0].rstrip('\n')
-    match.status = lines[1].rstrip('\n')
-    match.count = lines[2].rstrip('\n')
-    match.score = lines[3].rstrip('\n')
+    match.status = int(lines[1].rstrip('\n'))
+    match.count = int(lines[2].rstrip('\n'))
+    match.score = int(lines[3].rstrip('\n'))
     match.white_player = lines[4].rstrip('\n')
-    match.white_player_human = lines[5].rstrip('\n')
-    match.elapsed_time_white = lines[6].rstrip('\n')
+    match.white_player_human = bool(lines[5].rstrip('\n'))
+    match.elapsed_time_white = int(lines[6].rstrip('\n'))
     match.black_player = lines[7].rstrip('\n')
-    match.black_player_human = lines[8].rstrip('\n')
-    match.elapsed_time_black = lines[9].rstrip('\n')
+    match.black_player_human = bool(lines[8].rstrip('\n'))
+    match.elapsed_time_black = int(lines[9].rstrip('\n'))
 
     y = 0
     for line in lines[10:18]:
@@ -157,17 +157,17 @@ def read_searchmoves(path):
             x += 1
         y += 1
 
-    match.fifty_moves_count = lines[18].rstrip('\n')
-    match.wKg_x = lines[19].rstrip('\n')
-    match.wKg_y = lines[20].rstrip('\n')
-    match.bKg_x = lines[21].rstrip('\n')
-    match.bKg_y = lines[22].rstrip('\n')
-    match.wKg_first_movecnt = lines[23].rstrip('\n')
-    match.bKg_first_movecnt = lines[24].rstrip('\n')
-    match.wRk_a1_first_movecnt = lines[25].rstrip('\n')
-    match.wRk_h1_first_movecnt = lines[26].rstrip('\n')
-    match.bRk_a8_first_movecnt = lines[27].rstrip('\n')
-    match.bRk_h8_first_movecnt = lines[28].rstrip('\n')
+    match.fifty_moves_count = int(lines[18].rstrip('\n'))
+    match.wKg_x = int(lines[19].rstrip('\n'))
+    match.wKg_y = int(lines[20].rstrip('\n'))
+    match.bKg_x = int(lines[21].rstrip('\n'))
+    match.bKg_y = int(lines[22].rstrip('\n'))
+    match.wKg_first_movecnt = int(lines[23].rstrip('\n'))
+    match.bKg_first_movecnt = int(lines[24].rstrip('\n'))
+    match.wRk_a1_first_movecnt = int(lines[25].rstrip('\n'))
+    match.wRk_h1_first_movecnt = int(lines[26].rstrip('\n'))
+    match.bRk_a8_first_movecnt = int(lines[27].rstrip('\n'))
+    match.bRk_h8_first_movecnt = int(lines[28].rstrip('\n'))
 
     line = lines[29].rstrip('\n')
     if(len(line) > 0):
@@ -175,17 +175,17 @@ def read_searchmoves(path):
         if(len(moveattr) == 12):
             move = Move()
             move.match.id = moveattr[0]
-            move.count = moveattr[1]
-            move.move_type = moveattr[2]
-            move.srcx = moveattr[3]
-            move.srcy = moveattr[4]
-            move.dstx = moveattr[5]
-            move.dsty = moveattr[6]
-            move.e_p_fieldx = moveattr[7]
-            move.e_p_fieldy = moveattr[8]
-            move.captured_piece = moveattr[9]
-            move.prom_piece = moveattr[10]
-            move.fifty_moves_count = moveattr[11]
+            move.count = int(moveattr[1])
+            move.move_type = int(moveattr[2])
+            move.srcx = int(moveattr[3])
+            move.srcy = int(moveattr[4])
+            move.dstx = int(moveattr[5])
+            move.dsty = int(moveattr[6])
+            move.e_p_fieldx = int(moveattr[7])
+            move.e_p_fieldy = int(moveattr[8])
+            move.captured_piece = int(moveattr[9])
+            move.prom_piece = int(moveattr[10])
+            move.fifty_moves_count = int(moveattr[11])
 
             match.move_list.append(move)
 
@@ -198,11 +198,11 @@ def read_searchmoves(path):
             gmoveattr = searchmove.split(";")
             if(len(gmoveattr) == 5):
                 gmove = GenMove()
-                gmove.srcx = gmoveattr[0]
-                gmove.srcy = gmoveattr[1]
-                gmove.dstx = gmoveattr[2]
-                gmove.dsty = gmoveattr[3]
-                gmove.prom_piece = gmoveattr[4]
+                gmove.srcx = int(gmoveattr[0])
+                gmove.srcy = int(gmoveattr[1])
+                gmove.dstx = int(gmoveattr[2])
+                gmove.dsty = int(gmoveattr[3])
+                gmove.prom_piece = int(gmoveattr[4])
                 debug_candidates[idx].append(gmove)
 
         idx += 1
