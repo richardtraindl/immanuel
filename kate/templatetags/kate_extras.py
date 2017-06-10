@@ -87,4 +87,6 @@ def readfield(value, arg):
     pos = int(arg)
     return value[pos:(pos+3)]
 
-
+@register.filter(name='length')
+def length(sthread):
+    return len(sthread)

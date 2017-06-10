@@ -34,29 +34,6 @@
             <div id="board-wrapper">
               {% include "kate/_chessboard.html" with match=match %}
             </div>
-
-            <div>
-                <table id="promotion">
-                    <tr id="white-pieces" class="invisible">
-                        <td value="wQu"><img src="{% static 'wQu'|imgsrc %}"></td>
-                        <td value="wBp"><img src="{% static 'wBp'|imgsrc %}"></td>
-                        <td value="wKn"><img src="{% static 'wKn'|imgsrc %}"></td>
-                        <td value="wRk"><img src="{% static 'wRk'|imgsrc %}"></td>
-                     </tr>
-                     <tr id="black-pieces" class="invisible">
-                        <td value="bQu"><img src="{% static 'bQu'|imgsrc %}"></td>
-                        <td value="bBp"><img src="{% static 'bBp'|imgsrc %}"></td>
-                        <td value="bKn"><img src="{% static 'bKn'|imgsrc %}"></td>
-                        <td value="bRk"><img src="{% static 'bRk'|imgsrc %}"></td>
-                    </tr>
-                </table>
-            </div>
-
-           <form id="move" method="post" action="{% url 'kate:domove' match.id 0 %}" style="display: none;">
-               {% csrf_token %}
-               {{ form }}
-               <input type="submit" value="submit" />
-           </form>
         </div>
 
         <div class="row_4_of_12">
@@ -64,16 +41,22 @@
                 <p>Score: &nbsp; {{ match.score }}</p>
             </div>
             <div id="analyze">
-              {% for sthread in searchmoves %}
-                {% if sthread %}
+                {% for sthread in searchmoves %}
                   <p class="gap">
+                    {% if threadidx == forloop.counter0 %}
+                      <form id="move" method="post" action="{% url 'kate:replay' match.id threadidx rcount %}">
+                    {% else %}
+                      <form id="move" method="post" action="{% url 'kate:replay' match.id forloop.counter0 0 %}">
+                    {% endif %}
+                        {% csrf_token %}
+                        <input type="submit" value="submit" />
+                    </form>
                   {% for gmove in sthread %}
                     {% if gmove %}
                       [{{ gmove.format_genmove }}]
                     {% endif %}
                   {% endfor %}
                   </p>
-                {% endif %}
               {% endfor %}
             </div>
         </div>

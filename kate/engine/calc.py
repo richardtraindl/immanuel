@@ -259,17 +259,17 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
         score = rate(color, gmove, score, candidates, maxscore, search_candidates)
 
         if(depth == 1):
-            debug_candidates[count][0] = gmove
-            if(search_candidates[0]):
-                idx = 1
-                for cand in search_candidates:
-                    if(cand and idx < 20):
-                        debug_candidates[count][idx] = cand
-                        idx += 1
-                    else:
-                        break
-            else:
-                debug_candidates[count][1] = None
+            threadmoves = []
+            threadmoves.append(gmove)
+
+            
+            for cand in search_candidates:
+                if(cand):
+                    threadmoves.append(cand)
+                else:
+                    break
+
+            debug_candidates.append(threadmoves)
 
             count += 1
 
@@ -326,17 +326,17 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
         matchmove.undo_move(match)
 
         if(depth == 1):
-            debug_candidates[count][0] = gmove
-            if(search_candidates[0]):
-                idx = 1
-                for cand in search_candidates:
-                    if(cand and idx < 20):
-                        debug_candidates[count][idx] = cand
-                        idx += 1
-                    else:
-                        break
-            else:
-                debug_candidates[count][1] = None
+            threadmoves = []
+            threadmoves.append(gmove)
+
+
+            for cand in search_candidates:
+                if(cand):
+                    threadmoves.append(cand)
+                else:
+                    break
+
+            debug_candidates.append(threadmoves)
 
             count += 1
 
@@ -365,11 +365,12 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
 
 def calc_move(match):
     candidates = [None] * 10
-    debug_candidates = [[None for x in range(10)] for x in range(20)]
+
+    debug_candidates = []
 
     start = time.time()
     
-    candidates[0] = retrieve_move(match)
+    candidates[0] = retrieve_move(match)    
 
     if(candidates[0]):
         score = match.score

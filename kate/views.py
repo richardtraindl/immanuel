@@ -7,6 +7,7 @@ from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComm
 from .modules import interface
 from .engine.match import *
 from .engine.move import *
+from .engine import matchmove
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
 from .modules.interface import read_searchmoves
@@ -178,7 +179,7 @@ def resume(request, matchid, switch=0):
     return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
 
 
-def analyze(request, matchid=None):
+def analyze(request, matchid=None, threadidx=0, rcount=0):
     context = RequestContext(request)
     if(matchid == None):
         return HttpResponseRedirect('/kate')
@@ -193,8 +194,36 @@ def analyze(request, matchid=None):
         return HttpResponseRedirect('/kate')
         
     interface.map_matches(match, modelmatch, interface.MAP_DIR['engine-to-model'])
+    
+    return render(request, 'kate/analyze.html', { 'match': modelmatch, 'searchmoves': searchmoves, 'threadidx': threadidx, 'rcount': rcount, } )
 
-    return render(request, 'kate/analyze.html', { 'match': modelmatch, 'searchmoves': searchmoves, } )
+
+def replay(request, matchid, threadidx=0, rcount=0):
+    context = RequestContext(request)
+    if(request.method == 'POST'):
+        match, searchmoves = read_searchmoves()
+        if(match.id != matchid or threadidx is None or rcount is None):
+            return HttpResponseRedirect('kate')
+
+        thridx = int(threadidx)
+        rcnt = int(rcount) + 1
+
+        if(len(searchmoves) > thridx and len(searchmoves[thridx]) >= rcnt):
+            for i in range(rcnt):
+                gmove = searchmoves[thridx][i]
+                if(gmove):
+                    matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+                else:
+                    break
+        else:
+            thridx = 0
+            rcnt = 0
+
+        modelmatch = ModelMatch()
+        interface.map_matches(match, modelmatch, interface.MAP_DIR['engine-to-model'])
+        return render(request, 'kate/analyze.html', { 'match': modelmatch, 'searchmoves': searchmoves, 'threadidx': thridx, 'rcount': rcnt, } )
+    else:
+        return HttpResponseRedirect('kate')
 
 
 def add_comment(request, matchid):

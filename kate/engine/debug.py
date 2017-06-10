@@ -113,17 +113,16 @@ def write_searchmoves(match, debug_candidates, path):
         fobject.write(str(move.prom_piece) + ";")
         fobject.write(str(move.fifty_moves_count) + ";\n")
 
-    for i in range(20):
-        for cand in debug_candidates[i]:
-            if(cand):
-                src = str(cand.srcx) + ";" + str(cand.srcy) + ";" 
+    for threadmoves in debug_candidates:
+        for gmove in threadmoves:
+            if(gmove):
+                src = str(gmove.srcx) + ";" + str(gmove.srcy) + ";" 
                 fobject.write(src)
-                dst = str(cand.dstx) + ";" + str(cand.dsty) + ";"
+                dst = str(gmove.dstx) + ";" + str(gmove.dsty) + ";"
                 fobject.write(dst)
-                prom = str(cand.prom_piece) + "]"
+                prom = str(gmove.prom_piece) + "]"
                 fobject.write(prom)
             else:
-                # fobject.write("\n")
                 break
 
         fobject.write("\n")
@@ -189,23 +188,26 @@ def read_searchmoves(path):
 
             match.move_list.append(move)
 
-    debug_candidates = [[None for x in range(10)] for x in range(20)]
-    idx = 0
+    debug_candidates = []
     for line in lines[30:51]:
         line = line.rstrip('\n')
         searchmoves = line.split("]")
-        for searchmove in searchmoves:
-            gmoveattr = searchmove.split(";")
-            if(len(gmoveattr) == 5):
-                gmove = GenMove()
-                gmove.srcx = int(gmoveattr[0])
-                gmove.srcy = int(gmoveattr[1])
-                gmove.dstx = int(gmoveattr[2])
-                gmove.dsty = int(gmoveattr[3])
-                gmove.prom_piece = int(gmoveattr[4])
-                debug_candidates[idx].append(gmove)
+        if(len(searchmoves) > 0):
+            threadmoves = []
+            for searchmove in searchmoves:
+                gmoveattr = searchmove.split(";")
+                if(len(gmoveattr) == 5):
+                    gmove = GenMove()
+                    gmove.srcx = int(gmoveattr[0])
+                    gmove.srcy = int(gmoveattr[1])
+                    gmove.dstx = int(gmoveattr[2])
+                    gmove.dsty = int(gmoveattr[3])
+                    gmove.prom_piece = int(gmoveattr[4])
+                    threadmoves.append(gmove)
+                else:
+                    break
 
-        idx += 1
+            debug_candidates.append(threadmoves)
 
     fobject.close()
 
