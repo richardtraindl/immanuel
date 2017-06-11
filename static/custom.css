@@ -211,7 +211,6 @@ button, input[type="submit"]{
   cursor: pointer;
   border: 1px solid Black;
   white-space: nowrap; 
-
 }
 
 a.btn, a.btn:visited, a.btn:hover {
@@ -236,3 +235,6 @@ a.btn, a.btn:visited, a.btn:hover {
   padding-bottom: 20px;
 }
 
+.small-gap {
+  padding-bottom: 5px;
+}

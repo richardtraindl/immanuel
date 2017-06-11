@@ -207,6 +207,8 @@ def replay(request, matchid, threadidx=0, rcount=0):
 
         thridx = int(threadidx)
         rcnt = int(rcount) + 1
+        movesrc = ''
+        movedst = ''
 
         if(len(searchmoves) > thridx and len(searchmoves[thridx]) >= rcnt):
             for i in range(rcnt):
@@ -215,13 +217,17 @@ def replay(request, matchid, threadidx=0, rcount=0):
                     matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
                 else:
                     break
+            lastmove = match.move_list[-1]
+            if(lastmove):
+                movesrc = index_to_coord(lastmove.srcx, lastmove.srcy)
+                movedst = index_to_coord(lastmove.dstx, lastmove.dsty)
         else:
             thridx = 0
             rcnt = 0
 
         modelmatch = ModelMatch()
         interface.map_matches(match, modelmatch, interface.MAP_DIR['engine-to-model'])
-        return render(request, 'kate/analyze.html', { 'match': modelmatch, 'searchmoves': searchmoves, 'threadidx': thridx, 'rcount': rcnt, } )
+        return render(request, 'kate/analyze.html', { 'match': modelmatch, 'searchmoves': searchmoves, 'threadidx': thridx, 'rcount': rcnt, 'movesrc': movesrc, 'movedst': movedst, } )
     else:
         return HttpResponseRedirect('kate')
 
