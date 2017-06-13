@@ -114,10 +114,10 @@ class immanuelsThread(threading.Thread):
 
     def run(self):
         print("Thread starting " + str(self.name))
-        candidates, debug_candidates = calc.calc_move(self.match)
-        gmove = candidates[0]
-        if(gmove and ModelMatch.get_active_thread(self.match) and self.running):            
-            debug.write_searchmoves(self.match, debug_candidates, settings.BASE_DIR + "/kate/engine")            
+        currcndts, debug_candidates = calc.calc_move(self.match)
+        if(len(currcndts) > 0 and ModelMatch.get_active_thread(self.match) and self.running):
+            gmove = currcndts[0]
+            debug.write_searchmoves(self.match, debug_candidates, settings.BASE_DIR + "/kate/engine")
             print("debug_candidates saved")
 
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)

@@ -25,7 +25,7 @@ def prnt_move(msg, move):
 
 
 def prnt_moves(msg, moves):
-    if(moves[0] == None):
+    if(len(moves) == 0):
         print("no move.....")
     else:
         print(msg, end=" ")
@@ -193,22 +193,18 @@ def generate_moves(match):
     return prio_moves, priorities
 
 
-def rate(color, gmove, gmovescore, candidates, candidatescore, search_candidates):
-    if( (color == COLORS["white"] and candidatescore >= gmovescore) or (color == COLORS["black"] and candidatescore <= gmovescore) ):
+def rate(color, gmove, gmovescore, currcndts, candidatescore, newcndts):
+    if( (color == COLORS["white"] and candidatescore > gmovescore) or (color == COLORS["black"] and candidatescore < gmovescore) ):
         return candidatescore
     else:
-        candidates[0] = gmove
+        currcndts.append(gmove)
 
-        if(search_candidates[0]):
-            idx = 1
-            for cand in search_candidates[:9]:
+        if(len(newcndts) > 0):
+            for cand in newcndts[:9]:
                 if(cand):
-                    candidates[idx] = cand
-                    idx += 1
+                    currcndts.append(cand)
                 else:
                     break
-        else:
-            candidates[1] = None
 
         return gmovescore
 
@@ -235,8 +231,8 @@ def select_maxcnt(match, depth, priorities):
 
 def calc_max(match, depth, alpha, beta, debug_candidates):
     color = match.next_color()
-    candidates = [None] * 10
-    search_candidates = [None] * 10
+    currcndts = []
+    newcndts = []
     score = None
     maxscore = -200000
     count = 0
@@ -248,22 +244,22 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
     maxcnt = select_maxcnt(match, depth, priorities)
 
     if(maxcnt == 0):
-        return evaluate_position(match, len(prio_moves)), candidates
+        return evaluate_position(match, len(prio_moves)), currcndts
         
     for pmove in prio_moves[:maxcnt]:
         gmove = pmove[0]
         move = matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-        score, search_candidates = calc_min(match, depth + 1, maxscore, beta, debug_candidates)
+        score, newcndts = calc_min(match, depth + 1, maxscore, beta, debug_candidates)
 
-        score = rate(color, gmove, score, candidates, maxscore, search_candidates)
+        score = rate(color, gmove, score, currcndts, maxscore, newcndts)
 
         if(depth == 1):
             threadmoves = []
             threadmoves.append(gmove)
 
             
-            for cand in search_candidates:
+            for cand in newcndts:
                 if(cand):
                     threadmoves.append(cand)
                 else:
@@ -280,10 +276,10 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
             print(" p:" + str(pmove[1]) + " r:" + str(pmove[2]), end="")
 
             msg = "\nCURR SEARCH: "
-            prnt_moves(msg, search_candidates)
+            prnt_moves(msg, newcndts)
 
             msg = "\nCANDIDATES:  "
-            prnt_moves(msg, candidates)
+            prnt_moves(msg, currcndts)
             print(" score: " + str(score) + " / maxscore: " + str(maxscore))
             
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
@@ -293,15 +289,15 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
         if(score > maxscore):
             maxscore = score
             if(maxscore > beta):
-                return maxscore, candidates
+                return maxscore, currcndts
 
-    return maxscore, candidates
+    return maxscore, currcndts
 
 
 def calc_min(match, depth, alpha, beta, debug_candidates):
     color = match.next_color()
-    candidates = [None] * 10
-    search_candidates = [None] * 10
+    currcndts = []
+    newcndts = []
     score = None
     minscore = 200000
     count = 0
@@ -313,15 +309,15 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
     maxcnt = select_maxcnt(match, depth, priorities)
 
     if(maxcnt == 0):
-        return evaluate_position(match, len(prio_moves)), candidates
+        return evaluate_position(match, len(prio_moves)), currcndts
 
     for pmove in prio_moves[:maxcnt]:
         gmove = pmove[0]
         move = matchmove.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-        score, search_candidates = calc_max(match, depth + 1, alpha, minscore, debug_candidates)
+        score, newcndts = calc_max(match, depth + 1, alpha, minscore, debug_candidates)
 
-        score = rate(color, gmove, score, candidates, minscore, search_candidates)
+        score = rate(color, gmove, score, currcndts, minscore, newcndts)
 
         matchmove.undo_move(match)
 
@@ -330,7 +326,7 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
             threadmoves.append(gmove)
 
 
-            for cand in search_candidates:
+            for cand in newcndts:
                 if(cand):
                     threadmoves.append(cand)
                 else:
@@ -347,10 +343,10 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
             print(" p:" + str(pmove[1]) + " r:" + str(pmove[2]), end="")
 
             msg = "\nCURR SEARCH: "
-            prnt_moves(msg, search_candidates)
+            prnt_moves(msg, newcndts)
 
             msg = "\nCANDIDATES:  "
-            prnt_moves(msg, candidates)
+            prnt_moves(msg, currcndts)
             print(" score: " + str(score) + " / minscore: " + str(minscore))
 
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
@@ -358,31 +354,31 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
         if(score < minscore):
             minscore = score
             if(minscore < alpha):
-                return minscore, candidates
+                return minscore, currcndts
 
-    return minscore, candidates
+    return minscore, currcndts
 
 
 def calc_move(match):
-    candidates = [None] * 10
+    currcndts = []
 
     debug_candidates = []
 
     start = time.time()
     
-    candidates[0] = retrieve_move(match)    
-
-    if(candidates[0]):
+    gmove = retrieve_move(match)
+    if(gmove):
+        currcndts.append(gmove)
         score = match.score
     elif(match.next_color() == COLORS['white']):
-        score, candidates = calc_max(match, 1, -200000, 200000, debug_candidates)
+        score, currcndts = calc_max(match, 1, -200000, 200000, debug_candidates)
     else:
-        score, candidates = calc_min(match, 1, -200000, 200000, debug_candidates)
+        score, currcndts = calc_min(match, 1, -200000, 200000, debug_candidates)
 
     msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
-    prnt_moves(msg, candidates)
+    prnt_moves(msg, currcndts)
 
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
     prnt_attributes(match)
-    return candidates, debug_candidates
+    return currcndts, debug_candidates
