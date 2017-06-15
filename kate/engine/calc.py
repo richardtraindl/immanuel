@@ -232,7 +232,6 @@ def select_maxcnt(match, depth, priorities):
 def calc_max(match, depth, alpha, beta, debug_candidates):
     color = match.next_color()
     currcndts = []
-    newcndts = []
     score = None
     maxscore = -200000
     count = 0
@@ -250,6 +249,7 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
         gmove = pmove[0]
         move = matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
+        newcndts = []
         score, newcndts = calc_min(match, depth + 1, maxscore, beta, debug_candidates)
 
         score = rate(color, gmove, score, currcndts, maxscore, newcndts)
@@ -258,10 +258,9 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
             threadmoves = []
             threadmoves.append(gmove)
 
-            
-            for cand in newcndts:
-                if(cand):
-                    threadmoves.append(cand)
+            for ncand in newcndts[:9]:
+                if(ncand):
+                    threadmoves.append(ncand)
                 else:
                     break
 
@@ -297,7 +296,6 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
 def calc_min(match, depth, alpha, beta, debug_candidates):
     color = match.next_color()
     currcndts = []
-    newcndts = []
     score = None
     minscore = 200000
     count = 0
@@ -315,9 +313,11 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
         gmove = pmove[0]
         move = matchmove.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
+        newcndts = []
         score, newcndts = calc_max(match, depth + 1, alpha, minscore, debug_candidates)
 
         score = rate(color, gmove, score, currcndts, minscore, newcndts)
+
 
         matchmove.undo_move(match)
 
@@ -325,10 +325,9 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
             threadmoves = []
             threadmoves.append(gmove)
 
-
-            for cand in newcndts:
-                if(cand):
-                    threadmoves.append(cand)
+            for ncand in newcndts[:9]:
+                if(ncand):
+                    threadmoves.append(ncand)
                 else:
                     break
 
