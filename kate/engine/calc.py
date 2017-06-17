@@ -29,7 +29,7 @@ def prnt_moves(msg, moves):
         print("no move.....")
     else:
         print(msg, end=" ")
-        for move in moves[:9]:
+        for move in moves: # [:9]
             if(move):
                 prnt_move("[", move)
                 print("] ", end="")
@@ -206,6 +206,7 @@ def rate(color, gmove, gmovescore, currcndts, candidatescore, newcndts):
                 else:
                     break
 
+        currcndts.append(None)
         return gmovescore
 
 
@@ -243,6 +244,7 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
     maxcnt = select_maxcnt(match, depth, priorities)
 
     if(maxcnt == 0):
+        currcndts.append(None)
         return evaluate_position(match, len(prio_moves)), currcndts
         
     for pmove in prio_moves[:maxcnt]:
@@ -258,11 +260,12 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
             threadmoves = []
             threadmoves.append(gmove)
 
-            for ncand in newcndts[:9]:
-                if(ncand):
-                    threadmoves.append(ncand)
-                else:
-                    break
+            if(len(newcndts) > 0):
+                for ncand in newcndts: # [:9]
+                    if(ncand):
+                        threadmoves.append(ncand)
+                    else:
+                        break
 
             debug_candidates.append(threadmoves)
 
@@ -307,6 +310,7 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
     maxcnt = select_maxcnt(match, depth, priorities)
 
     if(maxcnt == 0):
+        currcndts.append(None)
         return evaluate_position(match, len(prio_moves)), currcndts
 
     for pmove in prio_moves[:maxcnt]:
@@ -325,11 +329,12 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
             threadmoves = []
             threadmoves.append(gmove)
 
-            for ncand in newcndts[:9]:
-                if(ncand):
-                    threadmoves.append(ncand)
-                else:
-                    break
+            if(len(newcndts) > 0):
+                for ncand in newcndts: # [:9]
+                    if(ncand):
+                        threadmoves.append(ncand)
+                    else:
+                        break
 
             debug_candidates.append(threadmoves)
 
