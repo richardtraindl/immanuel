@@ -37,7 +37,7 @@ def prnt_moves(msg, moves):
                 break
 
 
-def prnt_priorities(prio_moves, priorities):
+def prnt_priorities(prio_moves, prio_cnts):
     for pmove in prio_moves:
         prnt_move(" ", pmove[0])
         print(" prio:" + str(pmove[1]) + "/" + str(pmove[2]))
@@ -107,7 +107,7 @@ def rank_move(match, gmove):
 def generate_moves(match):
     color = match.next_color()
     prio_moves = []
-    priorities = [0] * 7
+    prio_cnts = [0] * 7
     piece_prio = None
 
     for y in range(0, 8, 1):
@@ -174,7 +174,7 @@ def generate_moves(match):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         priority = rank_move(match, gmove)
                         prio_moves.append([gmove, priority, piece_prio])
-                        priorities[priority-1] += 1
+                        prio_cnts[priority-1] += 1
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
 
@@ -185,12 +185,12 @@ def generate_moves(match):
 
     if(kg_attacked):
         for i in range(7):
-            priorities[i]= 0
-        priorities[0] = len(prio_moves)
+            prio_cnts[i]= 0
+        prio_cnts[0] = len(prio_moves)
 
     prio_moves.sort(key=itemgetter(1, 2))
 
-    return prio_moves, priorities
+    return prio_moves, prio_cnts
 
 
 def rate(color, gmove, gmovescore, currcndts, candidatescore, newcndts):
@@ -210,7 +210,7 @@ def rate(color, gmove, gmovescore, currcndts, candidatescore, newcndts):
         return gmovescore
 
 
-def select_maxcnt(match, depth, priorities):
+def select_maxcnt(match, depth, prio_cnts):
     if(match.level == LEVELS['blitz']):
         counts = ([2, 12], [3, 12], [5, 8])
     elif(match.level == LEVELS['low']):
@@ -225,7 +225,7 @@ def select_maxcnt(match, depth, priorities):
     elif(depth <= counts[1][0]):
         return counts[1][1]
     elif(depth <= counts[2][0]):
-        return min( (priorities[0] + priorities[1]), counts[2][1] )
+        return min( (prio_cnts[0] + prio_cnts[1]), counts[2][1] )
     else:
         return 0
 
@@ -237,21 +237,20 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
     maxscore = -200000
     count = 0
 
-    prio_moves, priorities = generate_moves(match)
+    prio_moves, prio_cnts = generate_moves(match)
     if(depth == 1):
-        prnt_priorities(prio_moves, priorities)
+        prnt_priorities(prio_moves, prio_cnts)
 
-    maxcnt = select_maxcnt(match, depth, priorities)
+    maxcnt = select_maxcnt(match, depth, prio_cnts)
 
     if(maxcnt == 0):
         currcndts.append(None)
         return evaluate_position(match, len(prio_moves)), currcndts
-        
+
     for pmove in prio_moves[:maxcnt]:
         gmove = pmove[0]
         move = matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-        newcndts = []
         score, newcndts = calc_min(match, depth + 1, maxscore, beta, debug_candidates)
 
         score = rate(color, gmove, score, currcndts, maxscore, newcndts)
@@ -303,11 +302,11 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
     minscore = 200000
     count = 0
 
-    prio_moves, priorities = generate_moves(match)
+    prio_moves, prio_cnts = generate_moves(match)
     if(depth == 1):
-        prnt_priorities(prio_moves, priorities)
+        prnt_priorities(prio_moves, prio_cnts)
 
-    maxcnt = select_maxcnt(match, depth, priorities)
+    maxcnt = select_maxcnt(match, depth, prio_cnts)
 
     if(maxcnt == 0):
         currcndts.append(None)
@@ -317,11 +316,9 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
         gmove = pmove[0]
         move = matchmove.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-        newcndts = []
         score, newcndts = calc_max(match, depth + 1, alpha, minscore, debug_candidates)
 
         score = rate(color, gmove, score, currcndts, minscore, newcndts)
-
 
         matchmove.undo_move(match)
 
@@ -365,11 +362,9 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
 
 def calc_move(match):
     currcndts = []
-
     debug_candidates = []
-
     start = time.time()
-    
+
     gmove = retrieve_move(match)
     if(gmove):
         currcndts.append(gmove)
