@@ -11,4 +11,4 @@ __init__.py
 db.sqlite3
 .venv
 local_settings.py
-
+searchmoves.txt
