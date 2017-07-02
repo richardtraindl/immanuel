@@ -25,10 +25,11 @@ def prnt_move(msg, move):
 
 
 def prnt_moves(msg, moves):
+    print(msg, end=" ")
+
     if(len(moves) == 0):
-        print("no move.....")
+        print("no move.....", end="")
     else:
-        print(msg, end=" ")
         for move in moves: # [:9]
             if(move):
                 prnt_move("[", move)
@@ -169,7 +170,7 @@ def generate_moves(match):
                     stepx, stepy, prom_piece = read_steps(steps, dir_idx, step_idx)
                     dstx = x + stepx
                     dsty = y + stepy
-                    flag, errmsg = is_move_valid(match, x, y, dstx, dsty, prom_piece)
+                    flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         priority = rank_move(match, gmove)
@@ -193,11 +194,12 @@ def generate_moves(match):
     return prio_moves, prio_cnts
 
 
-def rate(color, gmove, gmovescore, currcndts, candidatescore, newcndts):
-    if( (color == COLORS["white"] and candidatescore > gmovescore) or (color == COLORS["black"] and candidatescore < gmovescore) ):
-        return candidatescore
+def rate(color, newmove, newscore, currcndts, cndtscore, newcndts):
+    if( (color == COLORS["white"] and cndtscore > newscore) or (color == COLORS["black"] and cndtscore < newscore) ):
+        return cndtscore
     else:
-        currcndts.append(gmove)
+        del currcndts[:]
+        currcndts.append(newmove)
 
         if(len(newcndts) > 0):
             for cand in newcndts[:9]:
@@ -207,10 +209,10 @@ def rate(color, gmove, gmovescore, currcndts, candidatescore, newcndts):
                     break
 
         currcndts.append(None)
-        return gmovescore
+        return newscore
 
 
-def select_maxcnt(match, depth, prio_cnts):
+def select_maxcnt(match, depth, prio_cnts, lastmv_prio):
     if(match.level == LEVELS['blitz']):
         counts = ([2, 12], [3, 12], [5, 8])
     elif(match.level == LEVELS['low']):
@@ -227,13 +229,15 @@ def select_maxcnt(match, depth, prio_cnts):
     elif(depth <= counts[2][0]):
         return min( (prio_cnts[0] + prio_cnts[1]), counts[2][1] )
     else:
-        return 0
+        if(lastmv_prio == PRIO['prio1']):
+            return prio_cnts[0]
+        else:
+            return 0
 
 
-def calc_max(match, depth, alpha, beta, debug_candidates):
+def calc_max(match, depth, alpha, beta, lastmv_prio, dbgcndts):
     color = match.next_color()
     currcndts = []
-    score = None
     maxscore = -200000
     count = 0
 
@@ -241,23 +245,24 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
 
-    maxcnt = select_maxcnt(match, depth, prio_cnts)
+    maxcnt = select_maxcnt(match, depth, prio_cnts, lastmv_prio)
 
-    if(maxcnt == 0):
+    if(len(prio_moves) == 0 or maxcnt == 0):
         currcndts.append(None)
         return evaluate_position(match, len(prio_moves)), currcndts
 
     for pmove in prio_moves[:maxcnt]:
-        gmove = pmove[0]
-        move = matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        newmove = pmove[0]
 
-        score, newcndts = calc_min(match, depth + 1, maxscore, beta, debug_candidates)
+        matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        score = rate(color, gmove, score, currcndts, maxscore, newcndts)
+        newscore, newcndts = calc_min(match, depth + 1, maxscore, beta, pmove[1], dbgcndts)
+
+        score = rate(color, newmove, newscore, currcndts, maxscore, newcndts)
 
         if(depth == 1):
             threadmoves = []
-            threadmoves.append(gmove)
+            threadmoves.append(newmove)
 
             if(len(newcndts) > 0):
                 for ncand in newcndts: # [:9]
@@ -266,14 +271,14 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
                     else:
                         break
 
-            debug_candidates.append(threadmoves)
+            dbgcndts.append(threadmoves)
 
             count += 1
 
             print("\n____________________________________________________________")
 
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, gmove)
+            prnt_move(msg, newmove)
             print(" p:" + str(pmove[1]) + " r:" + str(pmove[2]), end="")
 
             msg = "\nCURR SEARCH: "
@@ -281,7 +286,7 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
 
             msg = "\nCANDIDATES:  "
             prnt_moves(msg, currcndts)
-            print(" score: " + str(score) + " / maxscore: " + str(maxscore))
+            print(" newscore: " + str(newscore) + " / score: " + str(score) + " / maxscore: " + str(maxscore))
             
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
@@ -295,10 +300,9 @@ def calc_max(match, depth, alpha, beta, debug_candidates):
     return maxscore, currcndts
 
 
-def calc_min(match, depth, alpha, beta, debug_candidates):
+def calc_min(match, depth, alpha, beta, lastmv_prio, dbgcndts):
     color = match.next_color()
     currcndts = []
-    score = None
     minscore = 200000
     count = 0
 
@@ -306,25 +310,26 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
 
-    maxcnt = select_maxcnt(match, depth, prio_cnts)
+    maxcnt = select_maxcnt(match, depth, prio_cnts, lastmv_prio)
 
-    if(maxcnt == 0):
+    if(len(prio_moves) == 0 or maxcnt == 0):
         currcndts.append(None)
         return evaluate_position(match, len(prio_moves)), currcndts
 
     for pmove in prio_moves[:maxcnt]:
-        gmove = pmove[0]
-        move = matchmove.do_move(match,gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        newmove = pmove[0]
 
-        score, newcndts = calc_max(match, depth + 1, alpha, minscore, debug_candidates)
+        matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        score = rate(color, gmove, score, currcndts, minscore, newcndts)
+        newscore, newcndts = calc_max(match, depth + 1, alpha, minscore, pmove[1], dbgcndts)
+
+        score = rate(color, newmove, newscore, currcndts, minscore, newcndts)
 
         matchmove.undo_move(match)
 
         if(depth == 1):
             threadmoves = []
-            threadmoves.append(gmove)
+            threadmoves.append(newmove)
 
             if(len(newcndts) > 0):
                 for ncand in newcndts: # [:9]
@@ -333,14 +338,14 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
                     else:
                         break
 
-            debug_candidates.append(threadmoves)
+            dbgcndts.append(threadmoves)
 
             count += 1
 
             print("\n____________________________________________________________")
 
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, gmove)
+            prnt_move(msg, newmove)
             print(" p:" + str(pmove[1]) + " r:" + str(pmove[2]), end="")
 
             msg = "\nCURR SEARCH: "
@@ -348,7 +353,7 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
 
             msg = "\nCANDIDATES:  "
             prnt_moves(msg, currcndts)
-            print(" score: " + str(score) + " / minscore: " + str(minscore))
+            print(" newscore: " + str(newscore) + " / score: " + str(score) + " / minscore: " + str(minscore))
 
             print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
@@ -362,7 +367,7 @@ def calc_min(match, depth, alpha, beta, debug_candidates):
 
 def calc_move(match):
     currcndts = []
-    debug_candidates = []
+    dbgcndts = []
     start = time.time()
 
     gmove = retrieve_move(match)
@@ -370,9 +375,9 @@ def calc_move(match):
         currcndts.append(gmove)
         score = match.score
     elif(match.next_color() == COLORS['white']):
-        score, currcndts = calc_max(match, 1, -200000, 200000, debug_candidates)
+        score, currcndts = calc_max(match, 1, -200000, 200000, None, dbgcndts)
     else:
-        score, currcndts = calc_min(match, 1, -200000, 200000, debug_candidates)
+        score, currcndts = calc_min(match, 1, -200000, 200000, None, dbgcndts)
 
     msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, currcndts)
@@ -380,4 +385,4 @@ def calc_move(match):
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
     prnt_attributes(match)
-    return currcndts, debug_candidates
+    return currcndts, dbgcndts

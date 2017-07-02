@@ -63,7 +63,7 @@ def prnt_generator(generator):
 
 
 def write_searchmoves(match, debug_candidates, path):
-    fobject = open(path + "/data/searchmoves.txt","w")
+    fobject = open(path + "/data/searchmoves.dat","w")
     
     fobject.write(str(match.id) + "\n")
     fobject.write(str(match.status) + "\n")
@@ -131,7 +131,7 @@ def write_searchmoves(match, debug_candidates, path):
 
 
 def read_searchmoves(path):
-    fobject = open(path + "/data/searchmoves.txt","r")
+    fobject = open(path + "/data/searchmoves.dat","r")
    
     lines = fobject.read().splitlines() 
     match = Match()    
