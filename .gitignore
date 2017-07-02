@@ -9,6 +9,7 @@
 __pycache__
 __init__.py
 db.sqlite3
+*.dat
 .venv
 local_settings.py
-searchmoves.txt
+
