@@ -129,23 +129,24 @@ class Comment(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=500)
 
-
-#class MoveSearch(models.Model):
-    #match = models.ForeignKey(Match, on_delete=models.CASCADE, null=False)
-    #matchcnt = models.PositiveSmallIntegerField(null=False)
-    #rank = models.PositiveSmallIntegerField(null=False)
-    #movecnt = models.SmallIntegerField(null=False)
-    #srcx = models.PositiveSmallIntegerField(null=False)
-    #srcy = models.PositiveSmallIntegerField(null=False)
-    #dstx = models.PositiveSmallIntegerField(null=False)
-    #dsty = models.PositiveSmallIntegerField(null=False)
-    #prom_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
-
-
-    #def __init__(self, *args, **kwargs):
-        #super(MoveSearch, self).__init__(*args, **kwargs)
+"""
+class MoveSearch(models.Model):
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, null=False)
+    matchcnt = models.PositiveSmallIntegerField(null=False)
+    rank = models.PositiveSmallIntegerField(null=False)
+    movecnt = models.SmallIntegerField(null=False)
+    srcx = models.PositiveSmallIntegerField(null=False)
+    srcy = models.PositiveSmallIntegerField(null=False)
+    dstx = models.PositiveSmallIntegerField(null=False)
+    dsty = models.PositiveSmallIntegerField(null=False)
+    prom_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
 
 
-    #class Meta:
-        #unique_together = (("match", "matchcnt", "rank", "movecnt"),)
+    def __init__(self, *args, **kwargs):
+        super(MoveSearch, self).__init__(*args, **kwargs)
+
+
+    class Meta:
+        unique_together = (("match", "matchcnt", "rank", "movecnt"),)
+    """
 
