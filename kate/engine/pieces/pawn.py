@@ -190,10 +190,8 @@ def touches(match, srcx, srcy, dstx, dsty):
                     token = token | ATTACKED_IS_OFFICER
 
                 match.writefield(srcx, srcy, PIECES['blk'])
-
                 fdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
-
-                match.writefield(srcx, srcy, piece)
+                match.writefield(srcx, srcy, pawn)
 
                 pawncnt, officercnt = count_contacts(fdlycontacts)
                 if(pawncnt > 0):
@@ -220,10 +218,8 @@ def touches(match, srcx, srcy, dstx, dsty):
                     token = token | SUPPORTED_IS_OFFICER
 
                 match.writefield(srcx, srcy, PIECES['blk'])
-
                 fdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
-
-                match.writefield(srcx, srcy, piece)
+                match.writefield(srcx, srcy, pawn)
 
                 pawncnt, officercnt = count_contacts(fdlycontacts)
                 if(pawncnt > 0):
@@ -237,8 +233,7 @@ def touches(match, srcx, srcy, dstx, dsty):
                 if(officercnt > 0):
                     token = token | SUPPORTED_IS_ATT_FROM_OFFICER
 
-        print(str(token))
-        return token
+    return token
 
 
 def count_attacks(match, srcx, srcy, dstx, dsty):
