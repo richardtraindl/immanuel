@@ -132,7 +132,7 @@ def touches(match, move):
 
     token = token | king.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
 
-    # token = token | pawn.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+    token = token | pawn.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
 
     return token
 
