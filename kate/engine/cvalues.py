@@ -103,6 +103,8 @@ FIELD_IS_ATT_FROM_OFFICER          = 0x00000004
 FIELD_IS_SUPP_BY_PAWN              = 0x00000002
 FIELD_IS_SUPP_BY_OFFICER           = 0x00000001
 
+MV_IS_PROGRESS                     = 0x10000000
+
 MV_IS_CAPTURE                      = 0x08000000
 CAPTURED_IS_PAWN                   = 0x04000000
 CAPTURED_IS_OFFICER                = 0x02000000

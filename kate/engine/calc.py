@@ -118,7 +118,7 @@ def prioritize_move(match, move):
 
     token = token | flees(match, move)
 
-    # token = token | develops(match, move)
+    token = token | progress(match, move)
 
     return token
 

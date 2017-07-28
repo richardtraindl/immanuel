@@ -331,3 +331,19 @@ def is_endgame_move(match, move):
     else:
         return False, PRIO['undefined']
 
+
+def progress(match, move):
+    token = 0x0
+
+    if(match.count > 60):
+        if(pawn.is_running(match, move)):
+            return token | MV_IS_PROGRESS
+        else:
+            piece = match.readfield(move.srcx, move.srcy)
+            if(piece == PIECES['wPw'] or piece == PIECES['bPw'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                return token | MV_IS_PROGRESS
+            else:
+                return token
+    else:
+        return token
+
