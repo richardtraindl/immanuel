@@ -27,11 +27,56 @@ def is_capture(match, move):
         return False, PRIO['undefined']
 
 
+def captures(match, move, token):
+    piece = match.readfield(move.srcx, move.srcy)
+
+    color = Match.color_of_piece(piece)
+
+    dstpiece = match.readfield(move.dstx, move.dsty)
+
+    if(dstpiece != PIECES['blk']):
+        if(dstpiece == PIECES['wPw'] or dstpiece == PIECES['bPw']):
+            token = token | MV_IS_CAPTURE | CAPTURED_IS_PAWN
+        else:
+            token = token | MV_IS_CAPTURE | CAPTURED_IS_OFFICER
+    elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and move.srcx != move.dstx ):
+        token = token | MV_CAPTURES | CAPTURED_IS_PAWN
+    else:
+        return token
+
+    match.writefield(move.srcx, move.srcy, PIECES['blk'])
+
+    fdlytouches, enmytouches = rules.field_touches(match, color, move.dstx, move.dsty)
+
+    match.writefield(move.srcx, move.srcy, piece)
+
+    for friend in fdlytouches:
+        if(friend == PIECES['wPw'] or friend == PIECES['bPw']):
+            token = token | CAPTURED_IS_ADD_ATT_FROM_PAWN
+        else:
+            token = token | CAPTURED_IS_ADD_ATT_FROM_OFFICER
+
+    for enmy in enmytouches:
+        if(enmy == PIECES['wPw'] or enmy == PIECES['bPw']):
+            token = token | CAPTURED_IS_SUPP_BY_PAWN
+        else:
+            token = token | CAPTURED_IS_SUPP_BY_OFFICER
+
+    return token
+
+
 def is_promotion(match, move):
     if(move.prom_piece == PIECES['blk']):
         return False, PRIO['undefined']
     else:
         return True, PRIO['prio1']
+
+
+def promotes(match, move, token):
+    if(move.prom_piece == PIECES['blk']):
+        return token
+    else:
+        return token | MV_IS_PROMOTION
 
 
 def is_castling(match, move):
@@ -41,6 +86,15 @@ def is_castling(match, move):
             return True, PRIO['prio1']
 
     return False, PRIO['undefined']
+
+
+def castles(match, move, token):
+    piece = match.readfield(move.srcx, move.srcy)
+    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+        if(move.srcx - move.dstx == 2 or move.srcx - move.dstx == -2):
+            return token | MV_IS_CASTLING
+
+    return token
 
 
 def does_attack(match, move):
@@ -67,6 +121,22 @@ def does_attack(match, move):
     return False, 0
 
 
+def touches(match, move):
+    token = 0x0
+
+    token = token | rook.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+
+    token = token | bishop.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+
+    token = token | knight.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+
+    token = token | king.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+
+    # token = token | pawn.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+
+    return token
+
+
 def does_support_attacked(match, move):
     flag, priority = rook.does_support_attacked(match, move.srcx, move.srcy, move.dstx, move.dsty)
     if(flag):
@@ -89,6 +159,22 @@ def does_support_attacked(match, move):
         return True, priority
 
     return False, 0
+
+
+def supports(match, move, token):
+    token = rook.supports(match, move.srcx, move.srcy, move.dstx, move.dsty, token)
+
+    token = bishop.supports(match, move.srcx, move.srcy, move.dstx, move.dsty, token)
+
+    token = knight.supports(match, move.srcx, move.srcy, move.dstx, move.dsty, token)
+
+    token = king.supports(match, move.srcx, move.srcy, move.dstx, move.dsty, token)
+
+    token = pawn.supports(match, move.srcx, move.srcy, move.dstx, move.dsty, token)
+
+    token = touches(match, move, token)
+
+    return token
 
 
 def count_attacks(match, srcx, srcy, dstx, dsty):

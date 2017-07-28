@@ -35,6 +35,19 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
+def field_touches(match, color, fieldx, fieldy, fdlytouches, enmytouches):
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if(Match.color_of_piece(piece) == color):
+                fdlytouches.append(piece)
+            else:
+                enmytouches.append(piece)
+
+
 def list_field_touches(match, color, fieldx, fieldy):
     touches = []
     
@@ -94,6 +107,96 @@ def does_attack(match, srcx, srcy, dstx, dsty):
         return False, priority
     else:
         return True, priority
+
+
+def count_contacts(contacts):
+    pawncnt = 0
+    officercnt = 0
+
+    for contact in contacts:
+        if(contact == PIECES['wPw'] or contact == PIECES['bPw']):
+            pawncnt += 1
+        else:
+            officercnt += 1
+    return pawncnt, officercnt
+
+def touches(match, srcx, srcy, dstx, dsty):
+    token = 0x0
+
+    bishop = match.readfield(srcx, srcy)
+
+    if(bishop != PIECES['wBp'] and bishop != PIECES['wQu'] and bishop != PIECES['bBp'] and bishop != PIECES['bQu']):
+        return token
+
+    color = Match.color_of_piece(bishop)
+    opp_color = Match.oppcolor_of_piece(bishop)
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
+        if(x1 != rules.UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if(Match.color_of_piece(piece) == opp_color):
+                token = token | MV_IS_ATTACK
+
+                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                    token = token | ATTACKED_IS_KING
+                elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                    token = token | ATTACKED_IS_PAWN
+                else:
+                    token = token | ATTACKED_IS_OFFICER
+
+                match.writefield(srcx, srcy, PIECES['blk'])
+
+                fdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
+                match.writefield(srcx, srcy, piece)
+                
+                pawncnt, officercnt = count_contacts(fdlycontacts)
+                if(pawncnt > 0):
+                    token = token | ATT_IS_ADD_ATT_FROM_PAWN
+                if(officercnt > 0):
+                    token = token | ATT_IS_ADD_ATT_FROM_OFFICER
+
+                pawncnt, officercnt = count_contacts(enmycontacts)
+                if(pawncnt > 0):
+                    token = token | ATT_IS_SUPP_BY_PAWN
+                if(officercnt > 0):
+                    token = token | ATT_IS_SUPP_BY_OFFICER
+
+            else:
+                if(x1 == srcx and y1 == srcy):
+                    continue
+                piece = match.readfield(x1, y1)
+                if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                    continue
+
+                token = token | MV_IS_SUPPORT
+                if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                    token = token | SUPPORTED_IS_PAWN
+                else:
+                    token = token | SUPPORTED_IS_OFFICER
+
+                match.writefield(srcx, srcy, PIECES['blk'])
+
+                fdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
+                match.writefield(srcx, srcy, piece)
+
+                pawncnt, officercnt = count_contacts(fdlycontacts)
+                if(pawncnt > 0):
+                    token = token | SUPPORTED_IS_ADD_SUPP_BY_PAWN
+                if(officercnt > 0):
+                    token = token | SUPPORTED_IS_ADD_SUPP_BY_OFFICER
+
+                pawncnt, officercnt = count_contacts(enmycontacts)
+                if(pawncnt > 0):
+                    token = token | SUPPORTED_IS_ATT_FROM_PAWN
+                if(officercnt > 0):
+                    token = token | SUPPORTED_IS_ATT_FROM_OFFICER
+
+    return token
 
 
 def count_attacks(match, srcx, srcy, dstx, dsty):
@@ -182,6 +285,53 @@ def does_support_attacked(match, srcx, srcy, dstx, dsty):
         return False, priority
     else:
         return True, priority
+
+
+def supports(match, srcx, srcy, dstx, dsty, token):
+    bishop = match.readfield(srcx, srcy)
+
+    if(bishop != PIECES['wBp'] and bishop != PIECES['wQu'] and bishop != PIECES['bBp'] and bishop != PIECES['bQu']):
+        return token
+
+    color = Match.color_of_piece(bishop)
+    opp_color = Match.oppcolor_of_piece(bishop)
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
+        if(x1 != rules.UNDEF_X):
+            if(x1 == srcx and y1 == srcy):
+                continue
+            piece = match.readfield(x1, y1)
+            if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                continue
+            if( color == match.color_of_piece(piece) ):
+                if(rules.is_field_touched(match, opp_color, x1, y1)):
+                    token = token | SUPPORTS
+
+                    pin_dir = rules.pin_dir(match, x1, y1)
+                    if(pin_dir != rules.DIRS['undefined']):
+                        token = token | PINNED
+
+                    match.writefield(srcx, srcy, PIECES['blk'])
+                    friendlysupported = rules.is_field_touched(match, color, dstx, dsty)
+                    attacked = rules.is_field_touched(match, opp_color, dstx, dsty)
+                    match.writefield(srcx, srcy, bishop)
+                    if(attacked):
+                        token = token | ATTACKED
+
+                    if(friendlysupported):
+                        token = token | SUPPORTED
+
+                    if(PIECES_RANK[piece] > PIECES_RANK[bishop]):
+                        token = token | HIGHER
+                    elif(PIECES_RANK[piece] == PIECES_RANK[bishop]):
+                        token = token | EQUAL
+                    else:
+                        token = token | LOWER
+
+    return token
 
 
 def score_supports_of_attacked(match, srcx, srcy):

@@ -51,6 +51,18 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
+def field_touches(match, color, fieldx, fieldy, fdlytouches, enmytouches):
+    for i in range(8):
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if(Match.color_of_piece(piece) == color):
+                fdlytouches.append(piece)
+            else:
+                enmytouches.append(piece)
+
+
 def list_field_touches(match, color, fieldx, fieldy):
     touches = []
 
@@ -100,6 +112,90 @@ def does_attack(match, srcx, srcy, dstx, dsty):
         return False, priority
     else:
         return True, priority
+
+
+def count_contacts(contacts):
+    pawncnt = 0
+    officercnt = 0
+
+    for contact in contacts:
+        if(contact == PIECES['wPw'] or contact == PIECES['bPw']):
+            pawncnt += 1
+        else:
+            officercnt += 1
+    return pawncnt, officercnt
+
+def touches(match, srcx, srcy, dstx, dsty):
+    token = 0x0
+
+    king = match.readfield(srcx, srcy)
+
+    if(king != PIECES['wKg'] and king != PIECES['bKg']):
+        return token
+
+    color = Match.color_of_piece(king)
+    opp_color = Match.oppcolor_of_piece(king)
+
+    for i in range(8):
+        x1 = dstx + STEPS[i][0]
+        y1 = dsty + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if(match.color_of_piece(piece) == opp_color):
+                token = token | MV_IS_ATTACK
+
+                if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                    token = token | ATTACKED_IS_PAWN
+                else:
+                    token = token | ATTACKED_IS_OFFICER
+
+                match.writefield(srcx, srcy, PIECES['blk'])
+
+                fdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
+                match.writefield(srcx, srcy, piece)
+
+                pawncnt, officercnt = count_contacts(fdlycontacts)
+                if(pawncnt > 0):
+                    token = token | ATT_IS_ADD_ATT_FROM_PAWN
+                if(officercnt > 0):
+                    token = token | ATT_IS_ADD_ATT_FROM_OFFICER
+
+                pawncnt, officercnt = count_contacts(enmycontacts)
+                if(pawncnt > 0):
+                    token = token | ATT_IS_SUPP_BY_PAWN
+                if(officercnt > 0):
+                    token = token | ATT_IS_SUPP_BY_OFFICER
+            else:
+                if(x1 == srcx and y1 == srcy):
+                    continue
+                piece = match.readfield(x1, y1)
+
+                token = token | MV_IS_SUPPORT
+                if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                    token = token | SUPPORTED_IS_PAWN
+                else:
+                    token = token | SUPPORTED_IS_OFFICER
+
+                match.writefield(srcx, srcy, PIECES['blk'])
+
+                fdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
+                match.writefield(srcx, srcy, piece)
+
+                pawncnt, officercnt = count_contacts(fdlycontacts)
+                if(pawncnt > 0):
+                    token = token | SUPPORTED_IS_ADD_SUPP_BY_PAWN
+                if(officercnt > 0):
+                    token = token | SUPPORTED_IS_ADD_SUPP_BY_OFFICER
+
+                pawncnt, officercnt = count_contacts(enmycontacts)
+                if(pawncnt > 0):
+                    token = token | SUPPORTED_IS_ATT_FROM_PAWN
+                if(officercnt > 0):
+                    token = token | SUPPORTED_IS_ATT_FROM_OFFICER
+
+        return token
 
 
 def count_attacks(match, srcx, srcy, dstx, dsty):

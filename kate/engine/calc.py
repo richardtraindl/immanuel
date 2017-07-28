@@ -174,7 +174,8 @@ def generate_moves(match):
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         priority = rank_move(match, gmove)
-                        prio_moves.append([gmove, priority, piece_prio])
+                        token = analyze_move.touches(match, gmove)
+                        prio_moves.append([gmove, priority, piece_prio, token])
                         prio_cnts[priority-1] += 1
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
