@@ -267,6 +267,40 @@ def does_attacked_flee(match, move):
             return True, PRIO['prio3']
 
 
+def flees(match, move):
+    token = 0x0
+
+    piece = match.readfield(move.srcx, move.srcy)
+
+    color = Match.color_of_piece(piece)
+    opp_color = Match.oppcolor_of_piece(piece)
+
+    enmycontacts = rules.list_field_touches(match, opp_color, move.srcx, move.srcy)
+
+    if(len(enmycontacts) == 0):
+        return token
+    else:
+        token = token | MV_IS_FLEE
+
+        match.writefield(srcx, srcy, PIECES['blk'])
+        fdlycontacts, enmycontacts = rules.field_touches(match, color, move.dstx, move.dsty)
+        match.writefield(srcx, srcy, piece)
+
+        pawncnt, officercnt = count_contacts(fdlycontacts)
+        if(pawncnt > 0):
+            token = token | FIELD_IS_SUPP_BY_PAWN
+        if(officercnt > 0):
+            token = token | FIELD_IS_SUPP_BY_OFFICER
+
+        pawncnt, officercnt = count_contacts(enmycontacts)
+        if(pawncnt > 0):
+            token = token | FIELD_IS_ATT_FROM_PAWN
+        if(officercnt > 0):
+            token = token | FIELD_IS_ATT_FROM_OFFICER
+
+        return token
+
+
 def is_endgame_move(match, move):
     if(match.count > 60):
         if(pawn.is_running(match, move)):
