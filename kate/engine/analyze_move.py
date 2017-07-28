@@ -42,7 +42,7 @@ def captures(match, move):
         else:
             token = token | MV_IS_CAPTURE | CAPTURED_IS_OFFICER
     elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and move.srcx != move.dstx ):
-        token = token | MV_CAPTURES | CAPTURED_IS_PAWN
+        token = token | MV_IS_CAPTURE | CAPTURED_IS_PAWN
     else:
         return token
 
