@@ -27,7 +27,9 @@ def is_capture(match, move):
         return False, PRIO['undefined']
 
 
-def captures(match, move, token):
+def captures(match, move):
+    token = 0x0
+
     piece = match.readfield(move.srcx, move.srcy)
 
     color = Match.color_of_piece(piece)
@@ -72,7 +74,9 @@ def is_promotion(match, move):
         return True, PRIO['prio1']
 
 
-def promotes(match, move, token):
+def promotes(match, move):
+    token = 0x0
+
     if(move.prom_piece == PIECES['blk']):
         return token
     else:
@@ -88,7 +92,9 @@ def is_castling(match, move):
     return False, PRIO['undefined']
 
 
-def castles(match, move, token):
+def castles(match, move):
+    token = 0x0
+
     piece = match.readfield(move.srcx, move.srcy)
     if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
         if(move.srcx - move.dstx == 2 or move.srcx - move.dstx == -2):
@@ -266,6 +272,17 @@ def does_attacked_flee(match, move):
 
             return True, PRIO['prio3']
 
+
+def count_contacts(contacts):
+    pawncnt = 0
+    officercnt = 0
+
+    for contact in contacts:
+        if(contact == PIECES['wPw'] or contact == PIECES['bPw']):
+            pawncnt += 1
+        else:
+            officercnt += 1
+    return pawncnt, officercnt
 
 def flees(match, move):
     token = 0x0
