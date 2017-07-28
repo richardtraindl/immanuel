@@ -105,6 +105,24 @@ def rank_move(match, gmove):
     return priority
 
 
+def prioritize_move(match, gmove):
+    token = 0x0
+
+    token = token | captures(match, move)
+
+    token = token | promotes(match, move)
+
+    token = token | castles(match, gmove)
+
+    token = token | touches(match, move)
+
+    token = token | flees(match, gmove)
+
+    # token = token | endgame_move(match, gmove)
+
+    return token
+
+
 def generate_moves(match):
     color = match.next_color()
     prio_moves = []
