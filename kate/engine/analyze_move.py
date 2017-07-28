@@ -299,9 +299,9 @@ def flees(match, move):
     else:
         token = token | MV_IS_FLEE
 
-        match.writefield(srcx, srcy, PIECES['blk'])
+        match.writefield(move.srcx, move.srcy, PIECES['blk'])
         fdlycontacts, enmycontacts = rules.field_touches(match, color, move.dstx, move.dsty)
-        match.writefield(srcx, srcy, piece)
+        match.writefield(move.srcx, move.srcy, piece)
 
         pawncnt, officercnt = count_contacts(fdlycontacts)
         if(pawncnt > 0):
