@@ -41,7 +41,7 @@ def prnt_moves(msg, moves):
 def prnt_priorities(prio_moves, prio_cnts):
     for pmove in prio_moves:
         prnt_move(" ", pmove[0])
-        print(" prio:" + str(pmove[1]) + "/" + str(pmove[2]))
+        print(" prio:" + str(pmove[1]) + "/" + str(pmove[2] + "/" + hex(pmove[3]))
 
 
 def prnt_fmttime(msg, seconds):
@@ -175,7 +175,7 @@ def generate_moves(match):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         priority = rank_move(match, gmove)
                         token = analyze_move.touches(match, gmove)
-                        prio_moves.append([gmove, priority, piece_prio])
+                        prio_moves.append([gmove, priority, piece_prio, token])
                         prio_cnts[priority-1] += 1
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
