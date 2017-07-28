@@ -57,46 +57,46 @@ def read_steps(steps, dir_idx, step_idx):
     return stepx, stepy, prom_piece
 
 
-def rank_move(match, gmove):
+def rank_move(match, move):
     priority = PRIO['priolast']
 
-    capture, prio = is_capture(match, gmove)
+    capture, prio = is_capture(match, move)
     if(capture):
         priority = min(priority, prio)
         if(priority == PRIO['prio1']):
             return priority
 
-    promotion, prio = is_promotion(match, gmove) 
+    promotion, prio = is_promotion(match, move) 
     if(promotion):
         priority = min(priority, prio)
         if(priority == PRIO['prio1']):
             return priority
     
-    castling, prio = is_castling(match, gmove)
+    castling, prio = is_castling(match, move)
     if(castling):
         priority = min(priority, prio)
         if(priority == PRIO['prio1']):
             return priority
 
-    attack, prio = analyze_move.does_attack(match, gmove)
+    attack, prio = analyze_move.does_attack(match, move)
     if(attack):
         priority = min(priority, prio)
         if(priority == PRIO['prio1']):
             return priority
 
-    support, prio = analyze_move.does_support_attacked(match, gmove)
+    support, prio = analyze_move.does_support_attacked(match, move)
     if(support):
         priority = min(priority, prio)
         if(priority == PRIO['prio1']):
             return priority
 
-    flee, prio = does_attacked_flee(match, gmove)
+    flee, prio = does_attacked_flee(match, move)
     if(flee):
         priority = min(priority, prio)
         if(priority == PRIO['prio1']):
             return priority
 
-    endgame, prio = is_endgame_move(match, gmove)
+    endgame, prio = is_endgame_move(match, move)
     if(endgame):
         priority = min(priority, prio)
         if(priority == PRIO['prio1']):
@@ -105,20 +105,20 @@ def rank_move(match, gmove):
     return priority
 
 
-def prioritize_move(match, gmove):
+def prioritize_move(match, move):
     token = 0x0
 
     token = token | captures(match, move)
 
     token = token | promotes(match, move)
 
-    token = token | castles(match, gmove)
+    token = token | castles(match, move)
 
     token = token | touches(match, move)
 
-    token = token | flees(match, gmove)
+    token = token | flees(match, move)
 
-    # token = token | endgame_move(match, gmove)
+    # token = token | endgame_move(match, move)
 
     return token
 
