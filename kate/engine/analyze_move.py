@@ -3,6 +3,7 @@ from .move import *
 from .pieces import pawn, knight, bishop, rook, king
 from .cvalues import *
 from . import rules
+from random import randint
 
 
 def is_capture(match, move):
@@ -345,5 +346,8 @@ def progress(match, move):
             else:
                 return token
     else:
-        return token
+        if(randint(0, 2) == 0):
+            return token | MV_IS_PROGRESS
+        else:
+            return token
 

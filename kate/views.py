@@ -172,7 +172,6 @@ def resume(request, matchid, switch=0):
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread is None):
         flag, msg = interface.calc_move_for_immanuel(modelmatch)
-        print(str(msg))
         if(flag == False):
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch, msg)))
 
