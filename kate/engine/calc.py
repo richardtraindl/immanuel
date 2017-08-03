@@ -138,63 +138,58 @@ def rank_by_token(priomoves):
         piece = pmove[1]
 
         if(token & MV_IS_CASTLING > 0):
-            #count += 1
-            pmove[3] = min(PRIO['prio1'], pmove[3])
-            continue
+            count += 1
+            pmove[3] = min(PRIO['prio2'], pmove[3])
 
         if(token & MV_IS_PROMOTION > 0):
-            #count += 1
-            pmove[3] = min(PRIO['prio1'], pmove[3])
-            continue
+            count += 1
+            pmove[3] = min(PRIO['prio2'], pmove[3])
 
         if(token & MV_IS_CAPTURE > 0):
             count += 1
             if(token & CAPTURED_IS_SUPP_BY_PAWN == 0 and token & CAPTURED_IS_SUPP_BY_OFFICER == 0):
-                pmove[3] = min(PRIO['prio1'], pmove[3])
-                continue
+                pmove[3] = min(PRIO['prio2'], pmove[3])
             elif(token & MV_PIECE_IS_PAWN > 0):
-                pmove[3] = min(PRIO['prio1'], pmove[3])
-                continue
+                pmove[3] = min(PRIO['prio2'], pmove[3])
             elif(token & CAPTURED_IS_OFFICER > 0):
-                pmove[3] = min(PRIO['prio1'], pmove[3])
-                continue
+                pmove[3] = min(PRIO['prio2'], pmove[3])
             elif(token & CAPTURED_IS_SUPP_BY_PAWN == 0 and 
                  (token & CAPTURED_IS_ADD_ATT_FROM_PAWN > 0 or token & CAPTURED_IS_ADD_ATT_FROM_OFFICER > 0)):
-                pmove[3] = min(PRIO['prio1'], pmove[3])
-                continue
+                pmove[3] = min(PRIO['prio2'], pmove[3])
             else:
-                pmove[3] = min(PRIO['prio3'], pmove[3])
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_ATTACK > 0):
             count += 1
             if(token & ATTACKED_IS_KING > 0):
-                pmove[3] = min(PRIO['prio1'], pmove[3])
-                continue
+                pmove[3] = min(PRIO['prio2'], pmove[3])
             elif(token & ATT_IS_ADD_ATT_FROM_PAWN > 0 or token & ATT_IS_ADD_ATT_FROM_OFFICER > 0):
-                pmove[3] = min(PRIO['prio2'], pmove[3])
-            elif(token & ATT_IS_SUPP_BY_PAWN == 0 and token & ATT_IS_SUPP_BY_OFFICER == 0):
-                pmove[3] = min(PRIO['prio2'], pmove[3])
-            else:
                 pmove[3] = min(PRIO['prio3'], pmove[3])
+            elif(token & ATT_IS_SUPP_BY_PAWN == 0 and token & ATT_IS_SUPP_BY_OFFICER == 0):
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+            else:
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
             count += 1
             if(token & SUPPORTED_IS_ATT_FROM_PAWN > 0 or token & SUPPORTED_IS_ATT_FROM_OFFICER > 0):
-                pmove[3] = min(PRIO['prio2'], pmove[3])
-            else:
                 pmove[3] = min(PRIO['prio3'], pmove[3])
+            else:
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
             if(token & FIELD_IS_ATT_FROM_PAWN == 0 and token & FIELD_IS_ATT_FROM_OFFICER == 0):
                 count += 1
-                pmove[3] = min(PRIO['prio2'], pmove[3])
-            else:
                 pmove[3] = min(PRIO['prio3'], pmove[3])
+            else:
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
-        if(token & MV_IS_PROGRESS > 0 and pmove[3] == PRIO['undefined']):
+        if(token & MV_IS_PROGRESS > 0 and pmove[3] == PRIO['unrated']):
             pmove[3] = PRIO['progress']
 
-        if(count >= 3 and pmove[3] > PRIO['prio1']):
+        if(count == 2 and pmove[3] > PRIO['prio1']):
+            pmove[3] = pmove[3] - 1
+        elif(count > 2):
             pmove[3] = pmove[3] - 1
 
 
@@ -269,7 +264,7 @@ def generate_moves(match):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         # priority = rank_move(match, gmove)
                         token = prioritize_move(match, gmove)
-                        priomoves.append([gmove, piece, token, PRIO['undefined']])
+                        priomoves.append([gmove, piece, token, PRIO['unrated']])
                         #prio_moves.append([gmove, priority, piece_prio, token])
                         # prio_cnts[priority-1] += 1
                     elif(errmsg != rules.RETURN_CODES['king-error']):
