@@ -86,8 +86,9 @@ PRIO = {
     'prio1' : 1,
     'prio2' : 2,
     'prio3' : 3,
-    'progress' : 4,
-    'undefined' : 5 }
+    'prio4' : 4,
+    'unrated' : 5,
+    'progress' : 6 }
 
 
 MV_IS_CASTLING                     = 0x8000000000
