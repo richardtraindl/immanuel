@@ -355,7 +355,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_pr
     elif(depth <= counts[1][0]):
         return min( (prio_cnts[0] + prio_cnts[1] + 1), counts[1][1] )
     else:
-        if(lastmv_prio == PRIO['prio1'] and depth <= (counts[1][0] + 2)):
+        if(lastmv_prio <= PRIO['prio2'] and depth <= (counts[1][0] + 2)):
             return prio_cnts[0] + 1
         else:
             return 0
