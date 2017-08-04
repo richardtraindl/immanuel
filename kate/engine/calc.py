@@ -336,7 +336,7 @@ def select_maxcnt2(match, depth, prio_cnts, lastmv_prio):
             return 0
 
 
-def select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_prio):
+def select_maxcnt1(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_prio):
     if(len(progress_moves) > 0):
         prio_moves.insert(0, progress_moves[0])
         del progress_moves[0]
@@ -357,6 +357,30 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_pr
     else:
         if(lastmv_prio <= PRIO['prio2'] and depth <= (counts[1][0] + 2)):
             return prio_cnts[0] + 1
+        else:
+            return 0
+
+def select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_prio):
+    if(len(progress_moves) > 0):
+        prio_moves.insert(0, progress_moves[0])
+        del progress_moves[0]
+
+    if(match.level == LEVELS['blitz']):
+        counts = ([1, 200], [3, 16], [8, 4])
+    elif(match.level == LEVELS['low']):
+        counts = ([3, 12], [7, 8], [10, 4])
+    elif(match.level == LEVELS['medium']):
+        counts = ([3, 16], [8, 12], [12, 4])
+    else:
+        counts = ([2, 200], [10, 12], [12, 4])
+
+    if(depth <= counts[0][0]):
+        return counts[0][1]
+    elif(depth <= counts[1][0]):
+        return counts[1][1]
+    else:
+        if(lastmv_prio <= PRIO['prio2'] and depth <= counts[2][0]):
+            return max( counts, (prio_cnts[0] + prio_cnts[1] + 1))
         else:
             return 0
 
