@@ -183,21 +183,21 @@ def is_field_touched(match, color, srcx, srcy):
     return False
 
 
-def field_touches(match, color, srcx, srcy):
-    fdlytouches = []
+def field_touches(match, color, fieldx, fieldy):
+    frdlytouches = []
     enmytouches = []
 
-    rook.field_touches(match, color, srcx, srcy, fdlytouches, enmytouches)
+    rook.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
 
-    bishop.field_touches(match, color, srcx, srcy, fdlytouches, enmytouches)
+    bishop.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
 
-    knight.field_touches(match, color, srcx, srcy, fdlytouches, enmytouches)
+    knight.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
 
-    king.field_touches(match, color, srcx, srcy, fdlytouches, enmytouches)
+    king.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
 
-    pawn.field_touches(match, color, srcx, srcy, fdlytouches, enmytouches)
+    pawn.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
 
-    return fdlytouches, enmytouches
+    return frdlytouches, enmytouches
 
 
 def list_field_touches(match, color, srcx, srcy):

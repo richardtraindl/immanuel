@@ -48,22 +48,20 @@ def captures(match, move):
         return token
 
     match.writefield(move.srcx, move.srcy, PIECES['blk'])
-
     fdlytouches, enmytouches = rules.field_touches(match, color, move.dstx, move.dsty)
-
     match.writefield(move.srcx, move.srcy, piece)
 
     for friend in fdlytouches:
         if(friend == PIECES['wPw'] or friend == PIECES['bPw']):
-            token = token | CAPTURED_IS_ADD_ATT_FROM_PAWN
+            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
         else:
-            token = token | CAPTURED_IS_ADD_ATT_FROM_OFFICER
+            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
 
     for enmy in enmytouches:
         if(enmy == PIECES['wPw'] or enmy == PIECES['bPw']):
-            token = token | CAPTURED_IS_SUPP_BY_PAWN
+            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
         else:
-            token = token | CAPTURED_IS_SUPP_BY_OFFICER
+            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
 
     return token
 
@@ -300,21 +298,25 @@ def flees(match, move):
     else:
         token = token | MV_IS_FLEE
 
+        ###
         match.writefield(move.srcx, move.srcy, PIECES['blk'])
+
         fdlycontacts, enmycontacts = rules.field_touches(match, color, move.dstx, move.dsty)
+
         match.writefield(move.srcx, move.srcy, piece)
 
         pawncnt, officercnt = count_contacts(fdlycontacts)
         if(pawncnt > 0):
-            token = token | FIELD_IS_SUPP_BY_PAWN
+            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
         if(officercnt > 0):
-            token = token | FIELD_IS_SUPP_BY_OFFICER
+            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
 
         pawncnt, officercnt = count_contacts(enmycontacts)
         if(pawncnt > 0):
-            token = token | FIELD_IS_ATT_FROM_PAWN
+            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
         if(officercnt > 0):
-            token = token | FIELD_IS_ATT_FROM_OFFICER
+            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
+        ###
 
         return token
 
@@ -346,7 +348,7 @@ def progress(match, move):
             else:
                 return token
     else:
-        if(randint(0, 2) == 0):
+        if(randint(0, 5) == 0):
             return token | MV_IS_PROGRESS
         else:
             return token

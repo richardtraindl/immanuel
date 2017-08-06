@@ -147,14 +147,14 @@ def rank_by_token(priomoves):
 
         if(token & MV_IS_CAPTURE > 0):
             count += 1
-            if(token & CAPTURED_IS_SUPP_BY_PAWN == 0 and token & CAPTURED_IS_SUPP_BY_OFFICER == 0):
+            if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
                 pmove[3] = min(PRIO['prio2'], pmove[3])
             elif(token & MV_PIECE_IS_PAWN > 0):
                 pmove[3] = min(PRIO['prio2'], pmove[3])
             elif(token & CAPTURED_IS_OFFICER > 0):
                 pmove[3] = min(PRIO['prio2'], pmove[3])
-            elif(token & CAPTURED_IS_SUPP_BY_PAWN == 0 and 
-                 (token & CAPTURED_IS_ADD_ATT_FROM_PAWN > 0 or token & CAPTURED_IS_ADD_ATT_FROM_OFFICER > 0)):
+            elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and 
+                 (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
                 pmove[3] = min(PRIO['prio2'], pmove[3])
             else:
                 pmove[3] = min(PRIO['prio4'], pmove[3])
@@ -163,22 +163,28 @@ def rank_by_token(priomoves):
             count += 1
             if(token & ATTACKED_IS_KING > 0):
                 pmove[3] = min(PRIO['prio2'], pmove[3])
-            elif(token & ATT_IS_ADD_ATT_FROM_PAWN > 0 or token & ATT_IS_ADD_ATT_FROM_OFFICER > 0):
+            elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
                 pmove[3] = min(PRIO['prio3'], pmove[3])
-            elif(token & ATT_IS_SUPP_BY_PAWN == 0 and token & ATT_IS_SUPP_BY_OFFICER == 0):
+            elif(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 and token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0):
                 pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
             count += 1
+
             if(token & SUPPORTED_IS_ATT_FROM_PAWN > 0 or token & SUPPORTED_IS_ATT_FROM_OFFICER > 0):
-                pmove[3] = min(PRIO['prio3'], pmove[3])
+                if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+                    pmove[3] = min(PRIO['prio2'], pmove[3])
+                elif(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 and token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0):
+                    pmove[3] = min(PRIO['prio2'], pmove[3])
+                else:
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
-            if(token & FIELD_IS_ATT_FROM_PAWN == 0 and token & FIELD_IS_ATT_FROM_OFFICER == 0):
+            if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
                 count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
@@ -366,23 +372,22 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_pr
         del progress_moves[0]
 
     if(match.level == LEVELS['blitz']):
-        counts = ([1, 200], [3, 16], [8, 4])
+        counts = ([1, 16], [4, 12], [6, 4])
     elif(match.level == LEVELS['low']):
-        counts = ([3, 12], [7, 8], [10, 4])
+        counts = ([3, 16], [5, 12], [8, 4])
     elif(match.level == LEVELS['medium']):
-        counts = ([3, 16], [8, 12], [12, 4])
+        counts = ([3, 24], [5, 16], [8, 8])
     else:
-        counts = ([2, 200], [10, 12], [12, 4])
+        counts = ([2, 200], [5, 16], [10, 4])
 
     if(depth <= counts[0][0]):
         return counts[0][1]
     elif(depth <= counts[1][0]):
         return counts[1][1]
+    elif(lastmv_prio <= PRIO['prio2'] and depth <= counts[2][0]):
+        return min( counts[2][1], (prio_cnts[0] + prio_cnts[1]))
     else:
-        if(lastmv_prio <= PRIO['prio2'] and depth <= counts[2][0]):
-            return max( counts[2][0], (prio_cnts[0] + prio_cnts[1] + 1))
-        else:
-            return 0
+        return 0
 
 
 def calc_max(match, depth, alpha, beta, lastmv_prio, dbgcndts):
@@ -432,7 +437,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbgcndts):
 
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove)
-            print(" p:" + str(pmove[1]) + " r:" + str(pmove[2]), end="")
+            print(" p:" + str(pmove[3]) + " t:" + str(pmove[2]), end="")
 
             msg = "\nCURR SEARCH: "
             prnt_moves(msg, newcndts)
@@ -502,7 +507,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbgcndts):
 
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove)
-            print(" p:" + str(pmove[1]) + " r:" + str(pmove[2]), end="")
+            print(" p:" + str(pmove[3]) + " t:" + str(pmove[2]), end="")
 
             msg = "\nCURR SEARCH: "
             prnt_moves(msg, newcndts)

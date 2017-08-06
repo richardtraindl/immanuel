@@ -64,7 +64,7 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
-def field_touches(match, color, fieldx, fieldy, fdlytouches, enmytouches):
+def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches):
     if(color == COLORS['white']):
         STEPS = WPW_BACK_STEPS
     else:
@@ -75,8 +75,10 @@ def field_touches(match, color, fieldx, fieldy, fdlytouches, enmytouches):
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
+            if(piece != PIECES['wPw'] and piece != PIECES['bPw']):
+                continue
             if(Match.color_of_piece(piece) == color):
-                fdlytouches.append(piece)
+                frdlytouches.append(piece)
             else:
                 enmytouches.append(piece)
 
@@ -169,6 +171,26 @@ def touches(match, srcx, srcy, dstx, dsty):
     color = Match.color_of_piece(pawn)
     opp_color = Match.oppcolor_of_piece(pawn)
 
+    ###
+    match.writefield(srcx, srcy, PIECES['blk'])
+
+    frdlycontacts, enmycontacts = rules.field_touches(match, color, dstx, dsty)
+
+    match.writefield(srcx, srcy, pawn)
+
+    pawncnt, officercnt = count_contacts(frdlycontacts)
+    if(pawncnt > 0):
+        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
+    if(officercnt > 0):
+        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
+
+    pawncnt, officercnt = count_contacts(enmycontacts)
+    if(pawncnt > 0):
+        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
+    if(officercnt > 0):
+        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
+    ###
+
     if(color == COLORS['white']):
         STEPS = WPW_STEPS
     else:
@@ -189,21 +211,25 @@ def touches(match, srcx, srcy, dstx, dsty):
                 else:
                     token = token | ATTACKED_IS_OFFICER
 
+                ###
                 match.writefield(srcx, srcy, PIECES['blk'])
-                fdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
+                frdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
                 match.writefield(srcx, srcy, pawn)
 
-                pawncnt, officercnt = count_contacts(fdlycontacts)
+                pawncnt, officercnt = count_contacts(frdlycontacts)
                 if(pawncnt > 0):
-                    token = token | ATT_IS_ADD_ATT_FROM_PAWN
+                    token = token | ATTACKED_IS_ADD_ATT_FROM_PAWN
                 if(officercnt > 0):
-                    token = token | ATT_IS_ADD_ATT_FROM_OFFICER
+                    token = token | ATTACKED_IS_ADD_ATT_FROM_OFFICER
 
                 pawncnt, officercnt = count_contacts(enmycontacts)
                 if(pawncnt > 0):
-                    token = token | ATT_IS_SUPP_BY_PAWN
+                    token = token | ATTACKED_IS_SUPP_BY_PAWN
                 if(officercnt > 0):
-                    token = token | ATT_IS_SUPP_BY_OFFICER
+                    token = token | ATTACKED_IS_SUPP_BY_OFFICER
+                ###
             else:
                 if(x1 == srcx and y1 == srcy):
                     continue
@@ -217,11 +243,14 @@ def touches(match, srcx, srcy, dstx, dsty):
                 else:
                     token = token | SUPPORTED_IS_OFFICER
 
+                ###
                 match.writefield(srcx, srcy, PIECES['blk'])
-                fdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
+                frdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
                 match.writefield(srcx, srcy, pawn)
 
-                pawncnt, officercnt = count_contacts(fdlycontacts)
+                pawncnt, officercnt = count_contacts(frdlycontacts)
                 if(pawncnt > 0):
                     token = token | SUPPORTED_IS_ADD_SUPP_BY_PAWN
                 if(officercnt > 0):
@@ -232,6 +261,7 @@ def touches(match, srcx, srcy, dstx, dsty):
                     token = token | SUPPORTED_IS_ATT_FROM_PAWN
                 if(officercnt > 0):
                     token = token | SUPPORTED_IS_ATT_FROM_OFFICER
+                ###
 
     return token
 

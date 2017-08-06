@@ -35,15 +35,17 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
-def field_touches(match, color, fieldx, fieldy, fdlytouches, enmytouches):
+def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
+            if(piece != PIECES['wQu'] and piece != PIECES['bQu'] and piece != PIECES['wBp'] and piece != PIECES['bBp']):
+                continue
             if(Match.color_of_piece(piece) == color):
-                fdlytouches.append(piece)
+                frdlytouches.append(piece)
             else:
                 enmytouches.append(piece)
 
@@ -120,6 +122,7 @@ def count_contacts(contacts):
             officercnt += 1
     return pawncnt, officercnt
 
+
 def touches(match, srcx, srcy, dstx, dsty):
     token = 0x0
 
@@ -130,6 +133,26 @@ def touches(match, srcx, srcy, dstx, dsty):
 
     color = Match.color_of_piece(bishop)
     opp_color = Match.oppcolor_of_piece(bishop)
+
+    ###
+    match.writefield(srcx, srcy, PIECES['blk'])
+
+    frdlycontacts, enmycontacts = rules.field_touches(match, color, dstx, dsty)
+
+    match.writefield(srcx, srcy, bishop)
+
+    pawncnt, officercnt = count_contacts(frdlycontacts)
+    if(pawncnt > 0):
+        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
+    if(officercnt > 0):
+        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
+
+    pawncnt, officercnt = count_contacts(enmycontacts)
+    if(pawncnt > 0):
+        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
+    if(officercnt > 0):
+        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
+    ###
 
     for i in range(4):
         stepx = STEPS[i][0]
@@ -146,23 +169,26 @@ def touches(match, srcx, srcy, dstx, dsty):
                     token = token | ATTACKED_IS_PAWN
                 else:
                     token = token | ATTACKED_IS_OFFICER
-
-                match.writefield(srcx, srcy, PIECES['blk'])
-                fdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
-                match.writefield(srcx, srcy, bishop)
                 
-                pawncnt, officercnt = count_contacts(fdlycontacts)
+                ###
+                match.writefield(srcx, srcy, PIECES['blk'])
+
+                frdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
+                match.writefield(srcx, srcy, bishop)
+
+                pawncnt, officercnt = count_contacts(frdlycontacts)
                 if(pawncnt > 0):
-                    token = token | ATT_IS_ADD_ATT_FROM_PAWN
+                    token = token | ATTACKED_IS_ADD_ATT_FROM_PAWN
                 if(officercnt > 0):
-                    token = token | ATT_IS_ADD_ATT_FROM_OFFICER
+                    token = token | ATTACKED_IS_ADD_ATT_FROM_OFFICER
 
                 pawncnt, officercnt = count_contacts(enmycontacts)
                 if(pawncnt > 0):
-                    token = token | ATT_IS_SUPP_BY_PAWN
+                    token = token | ATTACKED_IS_SUPP_BY_PAWN
                 if(officercnt > 0):
-                    token = token | ATT_IS_SUPP_BY_OFFICER
-
+                    token = token | ATTACKED_IS_SUPP_BY_OFFICER
+                ###
             else:
                 if(x1 == srcx and y1 == srcy):
                     continue
@@ -176,11 +202,14 @@ def touches(match, srcx, srcy, dstx, dsty):
                 else:
                     token = token | SUPPORTED_IS_OFFICER
 
+                ###
                 match.writefield(srcx, srcy, PIECES['blk'])
-                fdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
+                frdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+
                 match.writefield(srcx, srcy, bishop)
 
-                pawncnt, officercnt = count_contacts(fdlycontacts)
+                pawncnt, officercnt = count_contacts(frdlycontacts)
                 if(pawncnt > 0):
                     token = token | SUPPORTED_IS_ADD_SUPP_BY_PAWN
                 if(officercnt > 0):
@@ -191,6 +220,7 @@ def touches(match, srcx, srcy, dstx, dsty):
                     token = token | SUPPORTED_IS_ATT_FROM_PAWN
                 if(officercnt > 0):
                     token = token | SUPPORTED_IS_ATT_FROM_OFFICER
+                ###
 
     return token
 
