@@ -396,7 +396,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_pr
         del progress_moves[0]
 
     if(match.level == LEVELS['blitz']):
-        counts = ([1, 16], [4, 12], [6, 4])
+        counts = ([2, 12], [4, 8], [6, 4])
     elif(match.level == LEVELS['low']):
         counts = ([3, 16], [5, 12], [8, 4])
     elif(match.level == LEVELS['medium']):
@@ -408,10 +408,13 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_pr
         return counts[0][1]
     elif(depth <= counts[1][0]):
         return counts[1][1]
-    elif(lastmv_prio <= PRIO['prio2'] and depth <= counts[2][0]):
-        return min( counts[2][1], (prio_cnts[0] + prio_cnts[1]))
+    elif(depth <= counts[2][0]):
+        return counts[2][1]
     else:
-        return 0
+        if(lastmv_prio <= PRIO['prio2'] and depth <= 10):
+            return min(2, (prio_cnts[0] + prio_cnts[1]))
+        else:
+            return 0
 
 
 def calc_max(match, depth, alpha, beta, lastmv_prio, dbgcndts):
