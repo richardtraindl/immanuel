@@ -189,16 +189,16 @@ def rank_by_token(priomoves):
                 # supporter is NOT attacked
                 if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
                     count += 1
-                    pmove[3] = min(PRIO['prio2'], pmove[3])
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
                 # supporter is pawn and attacked and supported
                 elif(token & MV_PIECE_IS_PAWN > 0 and (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
                     count += 1
-                    pmove[3] = min(PRIO['prio2'], pmove[3])
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
                 # supporter is officer and NOT attacked by pawn and supported
                 elif(token & MV_PIECE_IS_OFFICER > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and 
                      (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
                     count += 1
-                    pmove[3] = min(PRIO['prio2'], pmove[3])
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
                 else:
                     pmove[3] = min(PRIO['prio4'], pmove[3])
             else:
@@ -209,7 +209,7 @@ def rank_by_token(priomoves):
             # exile field is NOT attacked
             if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
                 count += 1
-                pmove[3] = min(PRIO['prio2'], pmove[3])
+                pmove[3] = min(PRIO['prio3'], pmove[3])
             # refugee is pawn and exile field is attacked and supported
             elif(token & MV_PIECE_IS_PAWN > 0 and (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
                 count += 1
@@ -225,7 +225,7 @@ def rank_by_token(priomoves):
         if(token & MV_IS_PROGRESS > 0 and pmove[3] == PRIO['unrated']):
             pmove[3] = PRIO['progress']
 
-        if(count >= 2 and pmove[3] > PRIO['prio1']):
+        if(count >= 2 and pmove[3] > PRIO['prio1'] and  pmove[3] != PRIO['progress']):
             pmove[3] = pmove[3] - 1
         # elif(count > 2):
         #    pmove[3] = pmove[3] - 1
