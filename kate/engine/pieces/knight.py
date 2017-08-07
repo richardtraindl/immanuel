@@ -54,6 +54,9 @@ def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
             piece = match.readfield(x1, y1)
             if(piece != PIECES['wKn'] and piece != PIECES['bKn']):
                 continue
+            pin_dir = rules.pin_dir(match, x1, y1)
+            if(pin_dir != rules.DIRS['undefined']):
+                continue
             if(Match.color_of_piece(piece) == color):
                 frdlytouches.append(piece)
             else:

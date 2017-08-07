@@ -13,7 +13,7 @@
                 Created on: &nbsp; {{ match.begin|fmtdate }} ,&nbsp;
                 Level: &nbsp; {{ match.level|matchlevel }}
             </h2>
-            <p style="font-size: 12px;">2017.08.04-1</p>
+            <p style="font-size: 12px;">2017.08.07-1</p>
         </div>
     </div>
 {% endblock %}
@@ -121,9 +121,9 @@
                     }
                 });
           {% if match.level == 0 %}
-            }, 10000);
-          {% else %}
             }, 20000);
+          {% else %}
+            }, 40000);
           {% endif %}
 
           {% if match.white_player_human and match.black_player_human %}
@@ -135,7 +135,7 @@
                         $('#comments').html(data);
                     }
                 });
-            }, 13000);
+            }, 23000);
           {% endif %}
         });
     </script>
