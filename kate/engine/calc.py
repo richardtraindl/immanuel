@@ -146,7 +146,7 @@ def rank_by_token(priomoves):
             pmove[3] = min(PRIO['prio1'], pmove[3])
 
         if(token & MV_IS_CAPTURE > 0):
-            # capturing piece is NOT attacked
+            # capturing piece is NOT enmy-attacked
             if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
                 # count += 1
                 pmove[3] = min(PRIO['prio1'], pmove[3])
@@ -158,7 +158,7 @@ def rank_by_token(priomoves):
             elif(token & CAPTURED_IS_OFFICER > 0):
                 #count += 1
                 pmove[3] = min(PRIO['prio1'], pmove[3])
-            # capturing piece is NOT attacked by pawn and supported
+            # capturing piece is NOT attacked by enmy-pawn and is frdly-supported
             elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and 
                  (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
                 #count += 1
