@@ -319,7 +319,10 @@ def score_attacks(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
-                score += ATTACKED_SCORES[piece]
+                pin_dir = rules.pin_dir(match, srcx, srcy)
+                direction = pw_dir(srcx, srcy, x1, y1, piece)
+                if(pin_dir == direction or pin_dir == rules.DIRS['undefined']):
+                    score += ATTACKED_SCORES[piece]
 
     return score
 

@@ -270,14 +270,11 @@ def score_attacks(match, srcx, srcy):
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                score += ATTACKED_SCORES[piece]
-                pin_dir = rules.pin_dir(match, x1, y1)
+                pin_dir = rules.pin_dir(match, srcx, srcy)
                 direction = rk_dir(srcx, srcy, x1, y1)
-                if(pin_dir == direction):
-                    if(piece == PIECES['wRk'] or piece == PIECES['bRk'] or piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                        score += ATTACKED_SCORES[piece] // 4
-                    else:
-                        score += ATTACKED_SCORES[piece] // 2
+                if(pin_dir == direction or pin_dir == rules.DIRS['undefined']):
+                    score += ATTACKED_SCORES[piece]
+
     return score
 
 

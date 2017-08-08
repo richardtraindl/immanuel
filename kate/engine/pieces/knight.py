@@ -134,6 +134,7 @@ def count_contacts(contacts):
             officercnt += 1
     return pawncnt, officercnt
 
+
 def touches(match, srcx, srcy, dstx, dsty):
     token = 0x0
 
@@ -275,7 +276,9 @@ def score_attacks(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                score += ATTACKED_SCORES[piece]
+                pin_dir = rules.pin_dir(match, srcx, srcy)
+                if(pin_dir == rules.DIRS['undefined']):
+                    score += ATTACKED_SCORES[piece]
 
     return score
 
