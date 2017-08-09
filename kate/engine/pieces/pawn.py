@@ -65,26 +65,24 @@ def is_field_touched(match, color, fieldx, fieldy):
 
 
 def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches):
-    if(color == COLORS['white']):
-        STEPS = WPW_BACK_STEPS
-    else:
-        STEPS = BPW_BACK_STEPS
-
-    for i in range(2):
-        x1 = fieldx + STEPS[i][0]
-        y1 = fieldy + STEPS[i][1]
+    PW_BACK_STEPS = [ [1, -1], [-1, -1], [1, 1], [-1, 1] ]
+    
+    for i in range(4):
+        x1 = fieldx + PW_BACK_STEPS[i][0]
+        y1 = fieldy + PW_BACK_STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(piece != PIECES['wPw'] and piece != PIECES['bPw']):
                 continue
             pin_dir = rules.pin_dir(match, x1, y1)
-            direction = pw_dir(fieldx, fieldy, x1, y1, piece)
-            if(pin_dir != direction and pin_dir != rules.DIRS['undefined']):
+            direction = pw_dir(x1, y1, fieldx, fieldy, piece)
+            if(direction == rules.DIRS['undefined']):
                 continue
-            if(Match.color_of_piece(piece) == color):
-                frdlytouches.append(piece)
-            else:
-                enmytouches.append(piece)
+            if(pin_dir == direction or pin_dir == rules.REVERSE_DIRS[direction] or     pin_dir == rules.DIRS['undefined']):
+                if(Match.color_of_piece(piece) == color):
+                    frdlytouches.append(piece)
+                else:
+                    enmytouches.append(piece)
 
 
 def list_field_touches(match, color, fieldx, fieldy):
