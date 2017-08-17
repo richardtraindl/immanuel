@@ -71,11 +71,11 @@ class Match:
         self.status = STATUS['open']
         self.count = 0
         self.score = 0
-        #self.white_player = ""
-        #self.white_player_human = True
+        self.white_player = ""
+        self.white_player_human = True
         self.elapsed_time_white = 0
-        #self.black_player = ""
-        #self.black_player_human = True
+        self.black_player = ""
+        self.black_player_human = True
         self.elapsed_time_black = 0
         self.level = LEVELS['blitz']
         self.board = [[0 for x in range(8)] for x in range(8)]

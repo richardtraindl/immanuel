@@ -21,11 +21,11 @@ def map_matches(src, dst, map_dir):
     dst.status = src.status
     dst.count = src.count
     dst.score = src.score
-    #dst.white_player = src.white_player
-    #dst.white_player_human = src.white_player_human
+    dst.white_player = src.white_player
+    dst.white_player_human = src.white_player_human
     dst.elapsed_time_white = src.elapsed_time_white
-    #dst.black_player = src.black_player
-    #dst.black_player_human = src.black_player_human
+    dst.black_player = src.black_player
+    dst.black_player_human = src.black_player_human
     dst.elapsed_time_black = src.elapsed_time_black
     dst.level = int(src.level)
     dst.fifty_moves_count = src.fifty_moves_count
