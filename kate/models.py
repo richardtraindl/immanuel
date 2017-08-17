@@ -61,6 +61,17 @@ class Match(models.Model):
         return self.board[idx:idx+3]
 
 
+    def next_color_human(self):
+        if(self.count % 2 == 0 ):
+            return self.white_player_human
+        else:
+            return self.black_player_human
+
+
+    def is_immanuel(self):
+        return (self.white_player_human == False or self.black_player_human == False)
+
+
     @classmethod
     def remove_outdated_threads(cls):
         with cls._matches_thread_lock:
