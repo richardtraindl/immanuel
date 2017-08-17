@@ -150,17 +150,6 @@ class Match:
             return COLORS['black']
 
 
-    def next_color_human(self):
-        if(self.count % 2 == 0 ):
-            return self.white_player_human
-        else:
-            return self.black_player_human
-
-
-    def is_immanuel(self):
-        return (self.white_player_human == False or self.black_player_human == False)
-
-
     def is_last_move_capture(self):
         if(len(self.move_list) > 0):
             move = self.move_list[-1]
