@@ -1,3 +1,4 @@
+import os
 from .match import *
 from .move import *
 from .helper import *
@@ -63,8 +64,12 @@ def prnt_generator(generator):
 
 
 def write_searchmoves(match, debug_candidates, path):
-    fobject = open(path + "/data/searchmoves.dat","w")
-    
+    os.makedirs(path + "/data", exist_ok=True)
+    try:
+        fobject = open(path + "/data/searchmoves.dat","w")
+    except FileNotFoundError:
+        return
+
     fobject.write(str(match.id) + "\n")
     fobject.write(str(match.status) + "\n")
     fobject.write(str(match.count) + "\n")
@@ -131,8 +136,11 @@ def write_searchmoves(match, debug_candidates, path):
 
 
 def read_searchmoves(path):
-    fobject = open(path + "/data/searchmoves.dat","r")
-   
+    try:
+        fobject = open(path + "/data/searchmoves.dat","r")
+    except FileNotFoundError:
+        return
+
     lines = fobject.read().splitlines() 
     match = Match()    
     match.id = lines[0].rstrip('\n')
