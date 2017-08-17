@@ -129,25 +129,28 @@ def do_move(request, matchid, switch=0):
     context = RequestContext(request)
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-        form = DoMoveForm(request.POST)
-        if(form.is_valid()):
-            srcx,srcy = coord_to_index(form.move_src)
-            dstx,dsty = coord_to_index(form.move_dst)
-            prom_piece = PIECES[form.prom_piece]
-            valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-            if(valid):
-                interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-                interface.calc_move_for_immanuel(modelmatch)
-                status = interface.game_status(modelmatch)
-                if(status != STATUS['open']):
-                    if(status == STATUS['winner_white']):
-                        msg = RETURN_CODES['winner_white']    
-                    elif(status == STATUS['winner_black']):
-                        msg = RETURN_CODES['winner_black']
-                    else:
-                        msg = RETURN_CODES['draw']
+        if(modelmatch.next_color_human() == False):
+            msg = RETURN_CODES['wrong-color']
         else:
-            msg= RETURN_CODES['format-error']
+            form = DoMoveForm(request.POST)
+            if(form.is_valid()):
+                srcx,srcy = coord_to_index(form.move_src)
+                dstx,dsty = coord_to_index(form.move_dst)
+                prom_piece = PIECES[form.prom_piece]
+                valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+                if(valid):
+                    interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+                    interface.calc_move_for_immanuel(modelmatch)
+                    status = interface.game_status(modelmatch)
+                    if(status != STATUS['open']):
+                        if(status == STATUS['winner_white']):
+                            msg = RETURN_CODES['winner_white']    
+                        elif(status == STATUS['winner_black']):
+                            msg = RETURN_CODES['winner_black']
+                        else:
+                            msg = RETURN_CODES['draw']
+            else:
+                msg= RETURN_CODES['format-error']
 
         return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
     else:
