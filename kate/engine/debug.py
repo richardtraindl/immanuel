@@ -2,6 +2,7 @@ import os
 from .match import *
 from .move import *
 from .helper import *
+from .cvalues import *
 
 
 def prnt_moves(match):
@@ -220,3 +221,9 @@ def read_searchmoves(path):
     fobject.close()
 
     return match, debug_candidates
+
+
+def prnt_token_text(token):
+    for key in TOKEN_TEXT:
+        print(key)
+
