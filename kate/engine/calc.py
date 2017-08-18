@@ -41,7 +41,7 @@ def prnt_moves(msg, moves):
 def prnt_priorities(prio_moves, prio_cnts):
     for pmove in prio_moves:
         prnt_move(" ", pmove[0])
-        print(" piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + " prio:" + str(pmove[3]))
+        print(" piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + " prio:" + str(pmove[3]) + " " + token_to_text(pmove[2]))
 
 
 def prnt_fmttime(msg, seconds):
