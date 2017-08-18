@@ -423,25 +423,14 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
-            # supported is attacked
-            if(token & SUPPORTED_IS_ATT_FROM_PAWN > 0 or token & SUPPORTED_IS_ATT_FROM_OFFICER > 0):
-                # supporter is NOT attacked
-                if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
-                    count += 1
-                    pmove[3] = min(PRIO['prio3'], pmove[3])
-                # supporter is pawn and attacked and supported
-                elif(token & MV_PIECE_IS_PAWN > 0 and (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
-                    count += 1
-                    pmove[3] = min(PRIO['prio3'], pmove[3])
-                # supporter is officer and NOT attacked by pawn and supported
-                elif(token & MV_PIECE_IS_OFFICER > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and 
-                     (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
-                    count += 1
-                    pmove[3] = min(PRIO['prio3'], pmove[3])
-                else:
-                    pmove[3] = min(PRIO['prio4'], pmove[3])
+            # supported is attacked and (supporter is NOT touched by enemy or supporter is touched by friend)
+            if(token & SUPPORTED_IS_ATT_FROM_PAWN > 0 or token & SUPPORTED_IS_ATT_FROM_OFFICER > 0 and 
+               ((token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0) or 
+                token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
+                count += 1                
+                pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
-                # supported is NOT attacked
+                count += 1
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
