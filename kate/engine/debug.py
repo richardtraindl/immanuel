@@ -227,7 +227,7 @@ def token_to_text(token):
     tokentext = ""
     for key in TOKEN_TEXT:
         if(token & key > 0):
-            tokentext += TOKEN_TEXT[key] + ";"
+            tokentext += "\n" + TOKEN_TEXT[key]
 
     return tokentext
 
