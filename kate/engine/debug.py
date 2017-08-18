@@ -226,7 +226,7 @@ def read_searchmoves(path):
 def prnt_token_text(token):
     for key in TOKEN_TEXT:
         if(token & key > 0):
-            print(TOKEN_TEXT[key], end="")
+            print(TOKEN_TEXT[key] + ";", end="")
 
 
 
