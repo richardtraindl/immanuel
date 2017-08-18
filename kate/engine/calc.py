@@ -10,7 +10,7 @@ from .helper import *
 from .cvalues import *
 from .rules import is_move_valid, RETURN_CODES, is_field_touched
 from .pieces import pawn, rook, bishop, knight, queen, king
-from .debug import prnt_attributes
+from .debug import prnt_attributes, token_to_text
 
 
 def prnt_move(msg, move):
