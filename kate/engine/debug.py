@@ -223,10 +223,12 @@ def read_searchmoves(path):
     return match, debug_candidates
 
 
-def prnt_token_text(token):
+def token_to_text(token):
+    tokentext = ""
     for key in TOKEN_TEXT:
         if(token & key > 0):
-            print(TOKEN_TEXT[key] + ";", end="")
+            tokentext += TOKEN_TEXT[key] + ";"
 
+    return tokentext
 
 
