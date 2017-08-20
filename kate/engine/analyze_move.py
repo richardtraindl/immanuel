@@ -390,6 +390,96 @@ def rank_moves(priomoves):
         piece = pmove[1]
 
         if(token & MV_IS_CASTLING > 0):
+            count += 1
+            pmove[3] = min(PRIO['prio3'], pmove[3])
+
+        if(token & MV_IS_PROMOTION > 0):
+            #count += 1
+            pmove[3] = min(PRIO['prio1'], pmove[3])
+
+        if(token & MV_IS_CAPTURE > 0):
+            # capturing piece is pawn or captured piece if officer
+            if(token & MV_PIECE_IS_PAWN > 0 or token & CAPTURED_IS_PAWN == 0):
+                #count += 1
+                pmove[3] = min(PRIO['prio1'], pmove[3])
+            # field is NOT enemy-touched
+            elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+                #count += 1
+                pmove[3] = min(PRIO['prio1'], pmove[3])
+            # field is friendldy-touched
+            elif(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0):
+                #count += 1
+                pmove[3] = min(PRIO['prio1'], pmove[3])
+            else:
+                count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+
+        if(token & MV_IS_ATTACK > 0):
+            # performes a check
+            if(token & ATTACKED_IS_KING > 0):
+                #count += 1
+                pmove[3] = min(PRIO['prio1'], pmove[3])
+            # attacker is NOT touched by enemy
+            elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+                #count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+            # attacker is touched by friend
+            elif(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0):
+                #count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+            else:
+                count += 1
+                pmove[3] = min(PRIO['prio4'], pmove[3])
+
+        if(token & MV_IS_SUPPORT > 0):
+            # supported is attacked
+            if(token & SUPPORTED_IS_ATT_FROM_PAWN > 0 or token & SUPPORTED_IS_ATT_FROM_OFFICER > 0):
+                # supporter is NOT touched by enemy
+                if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+                    count += 1
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
+                # supporter is touched by friend
+                elif(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0):
+                    count += 1
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
+                else:
+                    count += 1
+                    pmove[3] = min(PRIO['prio4'], pmove[3])
+            else:
+                # supported is NOT attacked
+                count += 1
+                pmove[3] = min(PRIO['prio4'], pmove[3])
+
+        if(token & MV_IS_FLEE > 0):
+            # exile-field is NOT attacked
+            if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+                count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+            # exile-field is touched by friend and (refugee is pawn or exile-field is NOT touched by enemy-pawn)
+            elif(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0 and 
+                 (token & MV_PIECE_IS_PAWN > 0 or token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0)):
+                count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+            else:
+                # exile-field is attacked
+                pmove[3] = min(PRIO['prio4'], pmove[3])
+
+        if(token & MV_IS_PROGRESS > 0 and pmove[3] == PRIO['unrated']):
+            pmove[3] = PRIO['progress']
+
+        if(count >= 2 and pmove[3] != PRIO['prio1'] and pmove[3] != PRIO['progress']):
+            pmove[3] -= 1
+        # elif(count > 2):
+        #    pmove[3] = pmove[3] - 1
+
+
+def rank_moves2(priomoves):
+    for pmove in priomoves:
+        count = 0
+        token = pmove[2]
+        piece = pmove[1]
+
+        if(token & MV_IS_CASTLING > 0):
             #count += 1
             pmove[3] = min(PRIO['prio1'], pmove[3])
 
@@ -398,46 +488,81 @@ def rank_moves(priomoves):
             pmove[3] = min(PRIO['prio1'], pmove[3])
 
         if(token & MV_IS_CAPTURE > 0):
-            # captured piece is lower than capturing piece and field is NOT friendldy-touched and field is enemy-touched
-            if(token & MV_PIECE_IS_PAWN == 0 and token & CAPTURED_IS_PAWN > 0 and 
-               token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER == 0 and 
-               (token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER > 0)):
-                count += 1
-                pmove[3] = min(PRIO['prio4'], pmove[3])
-            else:
+            # capturing piece is NOT enmy-attacked
+            if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+                # count += 1
+                pmove[3] = min(PRIO['prio1'], pmove[3])
+            # capturing piece is pawn
+            elif(token & MV_PIECE_IS_PAWN > 0):
                 #count += 1
                 pmove[3] = min(PRIO['prio1'], pmove[3])
+            # captured piece is officer
+            elif(token & CAPTURED_IS_OFFICER > 0):
+                #count += 1
+                pmove[3] = min(PRIO['prio1'], pmove[3])
+            # capturing piece is NOT attacked by enmy-pawn and is frdly-supported
+            elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and 
+                 (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
+                #count += 1
+                pmove[3] = min(PRIO['prio1'], pmove[3])
+            else:
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_ATTACK > 0):
             # performes a check
             if(token & ATTACKED_IS_KING > 0):
                 #count += 1
                 pmove[3] = min(PRIO['prio1'], pmove[3])
-            # attacker is NOT touched by enemy or attacker is touched by friend
-            elif((token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0) or
-                 (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
-                #count += 1
-                pmove[3] = min(PRIO['prio1'], pmove[3])
-            else:
+            # attacker is NOT attacked
+            elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
                 count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+            # attacker is pawn and is attacked as well as supported
+            elif(token & MV_PIECE_IS_PAWN > 0 and (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
+                count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+            # attacker is officer and is NOT attacked by pawn as well supported 
+            elif(token & MV_PIECE_IS_OFFICER > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and 
+                 (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
+                count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+            else:
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
-            # supported is attacked and (supporter is NOT touched by enemy or supporter is touched by friend)
-            if(token & SUPPORTED_IS_ATT_FROM_PAWN > 0 or token & SUPPORTED_IS_ATT_FROM_OFFICER > 0 and 
-               ((token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0) or 
-                token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
-                count += 1                
-                pmove[3] = min(PRIO['prio3'], pmove[3])
+            # supported is attacked
+            if(token & SUPPORTED_IS_ATT_FROM_PAWN > 0 or token & SUPPORTED_IS_ATT_FROM_OFFICER > 0):
+                # supporter is NOT attacked
+                if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+                    count += 1
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
+                # supporter is pawn and attacked and supported
+                elif(token & MV_PIECE_IS_PAWN > 0 and (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
+                    count += 1
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
+                # supporter is officer and NOT attacked by pawn and supported
+                elif(token & MV_PIECE_IS_OFFICER > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and 
+                     (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
+                    count += 1
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
+                else:
+                    pmove[3] = min(PRIO['prio4'], pmove[3])
             else:
-                count += 1
+                # supported is NOT attacked
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
-            # exile-field is NOT attacked or (exile-field is touched by friend and refugee is pawn or exile-field is NOT touched by enemy-pawn)
-            if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0 or
-               ((token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0) and 
-                (token & MV_PIECE_IS_PAWN > 0 or token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0))):
+            # exile field is NOT attacked
+            if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+                count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+            # refugee is pawn and exile field is attacked and supported
+            elif(token & MV_PIECE_IS_PAWN > 0 and (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
+                count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
+            # refugee is officer and exile field is NOT attacked by pawn and supported
+            elif(token & MV_PIECE_IS_OFFICER > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and 
+                 (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
                 count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
@@ -450,4 +575,3 @@ def rank_moves(priomoves):
             pmove[3] = pmove[3] - 1
         # elif(count > 2):
         #    pmove[3] = pmove[3] - 1
-

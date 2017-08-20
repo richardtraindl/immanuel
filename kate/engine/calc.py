@@ -169,13 +169,13 @@ def rate(color, newmove, newscore, currcndts, cndtscore, newcndts):
 
 def select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_prio):
     if(match.level == LEVELS['blitz']):
-        counts = ([1, 12], [4, 8], [6, 2])
+        counts = ([1, 12], [2, 12], [10, 4])
     elif(match.level == LEVELS['low']):
-        counts = ([2, 16], [6, 12], [10, 6])
+        counts = ([2, 12], [4, 12], [10, 4])
     elif(match.level == LEVELS['medium']):
-        counts = ([2, 24], [6, 16], [10, 6])
+        counts = ([2, 16], [5, 12], [10, 4])
     else:
-        counts = ([2, 200], [6, 24], [10, 6])
+        counts = ([3, 200], [6, 12], [10, 4])
 
     if(depth <= counts[1][0]):
         if(len(progress_moves) > 0):
@@ -202,6 +202,8 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbgcndts):
     prio_moves, prio_cnts, progress_moves = generate_moves(match)
 
     maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_prio)
+
+    #dbgcndts[depth-1] += 1
 
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
@@ -269,6 +271,8 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbgcndts):
 
     maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_prio)
 
+    #dbgcndts[depth-1] += 1
+
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
 
@@ -327,7 +331,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbgcndts):
 
 def calc_move(match):
     currcndts = []
-    dbgcndts = []
+    dbgcndts = [] # [0] * 20
     start = time.time()
 
     gmove = retrieve_move(match)
@@ -341,6 +345,9 @@ def calc_move(match):
 
     msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, currcndts)
+    
+    #for i in range(20):
+        #print(str(i + 1) + ": " + str(dbgcndts[i]))
 
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
