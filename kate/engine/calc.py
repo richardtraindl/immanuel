@@ -61,7 +61,6 @@ def generate_moves(match):
     color = match.next_color()
     priomoves = []
     priocnts = [0] * 7
-    progressmoves = []
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -140,13 +139,9 @@ def generate_moves(match):
         priomoves.sort(key=itemgetter(3))
 
         for pmove in priomoves:
-            if(pmove[3] == PRIO['progress']):
-                progressmoves.append(pmove)
-                priomoves.remove(pmove)
-            else:
-                priocnts[pmove[3]-1] += 1
+            priocnts[pmove[3]-1] += 1
 
-    return priomoves, priocnts, progressmoves
+    return priomoves, priocnts
 
 
 def rate(color, newmove, newscore, currcndts, cndtscore, newcndts):
@@ -167,20 +162,15 @@ def rate(color, newmove, newscore, currcndts, cndtscore, newcndts):
         return newscore
 
 
-def select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_prio):
+def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     if(match.level == LEVELS['blitz']):
-        counts = ([1, 12], [2, 12], [10, 4])
+        counts = ([1, 12], [2, 12], [10, 3])
     elif(match.level == LEVELS['low']):
         counts = ([2, 12], [4, 12], [10, 4])
     elif(match.level == LEVELS['medium']):
         counts = ([2, 16], [5, 12], [10, 4])
     else:
         counts = ([3, 200], [6, 12], [10, 4])
-
-    if(depth <= counts[1][0]):
-        if(len(progress_moves) > 0):
-            prio_moves.insert(0, progress_moves[0])
-            del progress_moves[0]
 
     if(depth <= counts[0][0]):
         return counts[0][1]
@@ -193,17 +183,18 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_pr
             return 0
 
 
-def calc_max(match, depth, alpha, beta, lastmv_prio, dbgcndts):
+def calc_max(match, depth, alpha, beta, lastmv_prio, dbginfo):
     color = match.next_color()
     currcndts = []
     maxscore = -200000
     count = 0
 
-    prio_moves, prio_cnts, progress_moves = generate_moves(match)
+    prio_moves, prio_cnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_prio)
+    maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio)
 
-    #dbgcndts[depth-1] += 1
+    dbgcounts = dbginfo[0]
+    dbgcounts[depth-1] += 1
 
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
@@ -217,7 +208,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbgcndts):
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcndts = calc_min(match, depth + 1, maxscore, beta, pmove[3], dbgcndts)
+        newscore, newcndts = calc_min(match, depth + 1, maxscore, beta, pmove[3], dbginfo)
 
         score = rate(color, newmove, newscore, currcndts, maxscore, newcndts)
 
@@ -232,7 +223,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbgcndts):
                     else:
                         break
 
-            dbgcndts.append(threadmoves)
+            dbginfo[1].append(threadmoves)
 
             count += 1
 
@@ -261,18 +252,19 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbgcndts):
     return maxscore, currcndts
 
 
-def calc_min(match, depth, alpha, beta, lastmv_prio, dbgcndts):
+def calc_min(match, depth, alpha, beta, lastmv_prio, dbginfo):
     color = match.next_color()
     currcndts = []
     minscore = 200000
     count = 0
 
-    prio_moves, prio_cnts, progress_moves = generate_moves(match)
+    prio_moves, prio_cnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, progress_moves, lastmv_prio)
+    maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio)
 
-    #dbgcndts[depth-1] += 1
-
+    dbgcounts = dbginfo[0]
+    dbgcounts[depth-1] += 1
+    
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
 
@@ -285,7 +277,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbgcndts):
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcndts = calc_max(match, depth + 1, alpha, minscore, pmove[3], dbgcndts)
+        newscore, newcndts = calc_max(match, depth + 1, alpha, minscore, pmove[3], dbginfo)
 
         score = rate(color, newmove, newscore, currcndts, minscore, newcndts)
 
@@ -302,7 +294,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbgcndts):
                     else:
                         break
 
-            dbgcndts.append(threadmoves)
+            dbginfo[1].append(threadmoves)
 
             count += 1
 
@@ -331,26 +323,31 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbgcndts):
 
 def calc_move(match):
     currcndts = []
-    dbgcndts = [] # [0] * 20
+    dbgcounts = [0] * 20
+    dbgcndts = []    
+    dbginfo = []
     start = time.time()
+
+    dbginfo.append(dbgcounts)
+    dbginfo.append(dbgcndts)
 
     gmove = retrieve_move(match)
     if(gmove):
         currcndts.append(gmove)
         score = match.score
     elif(match.next_color() == COLORS['white']):
-        score, currcndts = calc_max(match, 1, -200000, 200000, None, dbgcndts)
+        score, currcndts = calc_max(match, 1, -200000, 200000, None, dbginfo)
     else:
-        score, currcndts = calc_min(match, 1, -200000, 200000, None, dbgcndts)
+        score, currcndts = calc_min(match, 1, -200000, 200000, None, dbginfo)
 
     msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, currcndts)
     
-    #for i in range(20):
-        #print(str(i + 1) + ": " + str(dbgcndts[i]))
+    for i in range(20):
+        print(str(i + 1) + ": " + str(dbgcounts[i]))
 
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
     prnt_attributes(match)
-    return currcndts, dbgcndts
+    return currcndts, dbginfo
 
