@@ -431,8 +431,8 @@ def rank_moves(priomoves):
         if(token & MV_IS_ATTACK > 0):
             # performes a check
             if(token & ATTACKED_IS_KING > 0):
-                #count += 1
-                pmove[3] = min(PRIO['prio1'], pmove[3])
+                count += 1
+                pmove[3] = min(PRIO['prio2'], pmove[3])
             # attacker is NOT touched by enemy
             elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
                 #count += 1
