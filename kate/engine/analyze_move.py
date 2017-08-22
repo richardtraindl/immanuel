@@ -435,11 +435,11 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio2'], pmove[3])
             # attacker is NOT touched by enemy
             elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
-                #count += 1
+                count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
             # attacker is touched by friend
             elif(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0):
-                #count += 1
+                count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
                 count += 1
