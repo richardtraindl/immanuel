@@ -13,35 +13,36 @@ from .pieces import pawn, rook, bishop, knight, queen, king
 from .debug import prnt_attributes, token_to_text
 
 
-def prnt_move(msg, move):
+def prnt_move(headmsg, move, tailmsg):
     if(move == None):
         print("no move.....")
     else:
-        print(msg + 
+        print(headmsg + 
             index_to_coord(move.srcx, move.srcy) + "-" +
             index_to_coord(move.dstx, move.dsty), end="")
         if(move.prom_piece != PIECES['blk']):
             print(reverse_lookup(PIECES, move.prom_piece), end="")
+        print(tailmsg, end="")
 
 
 def prnt_moves(msg, moves):
     print(msg, end=" ")
 
     if(len(moves) == 0):
-        print("no move.....", end="")
+        print("no move.....")
     else:
         for move in moves: # [:9]
             if(move):
-                prnt_move("[", move)
-                print("] ", end="")
+                prnt_move("[", move, "] ")
             else:
                 break
+        print("")
 
 
 def prnt_priorities(prio_moves, prio_cnts):
     for pmove in prio_moves:
-        prnt_move(" ", pmove[0])
-        print(" piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + " prio:" + str(pmove[3]) + " " + token_to_text(pmove[2]))
+        prnt_move(" ", pmove[0], "")
+        print(" piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + " prio:" + str(pmove[3]))
 
 
 def prnt_fmttime(msg, seconds):
@@ -164,7 +165,7 @@ def rate(color, newmove, newscore, currcndts, cndtscore, newcndts):
 
 def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     if(match.level == LEVELS['blitz']):
-        counts = ([1, 12], [2, 12], [10, 3])
+        counts = ([2, 12], [4, 8], [7, 3])
     elif(match.level == LEVELS['low']):
         counts = ([2, 12], [4, 12], [10, 4])
     elif(match.level == LEVELS['medium']):
@@ -228,20 +229,17 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbginfo):
 
             count += 1
 
-            print("\n____________________________________________________________")
-
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, newmove)
-            print(" p:" + str(pmove[3]) + " t:" + hex(pmove[2]), end="")
+            prnt_move(msg, newmove, "")
+            print(" p:" + str(pmove[3]) + " t:" + hex(pmove[2]) + " " + token_to_text(pmove[2]))
 
-            msg = "\nCURR SEARCH: "
-            prnt_moves(msg, newcndts)
+            prnt_move("CURR SEARCH: [", newmove, "]")
+            prnt_moves("", newcndts)
 
-            msg = "\nCANDIDATES:  "
-            prnt_moves(msg, currcndts)
-            print(" newscore: " + str(newscore) + " / score: " + str(score) + " / maxscore: " + str(maxscore))
-            
-            print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+            prnt_moves("CANDIDATES: ", currcndts)
+            print("newscore: " + str(newscore) + " / score: " + str(score) + " / maxscore: " + str(maxscore))
+
+            print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         matchmove.undo_move(match)
 
@@ -299,20 +297,17 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbginfo):
 
             count += 1
 
-            print("\n____________________________________________________________")
-
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, newmove)
-            print(" p:" + str(pmove[3]) + " t:" + hex(pmove[2]), end="")
+            prnt_move(msg, newmove, "")
+            print(" p:" + str(pmove[3]) + " t:" + hex(pmove[2]) + " " + token_to_text(pmove[2]))
 
-            msg = "\nCURR SEARCH: "
-            prnt_moves(msg, newcndts)
+            prnt_move("CURR SEARCH: [", newmove, "]")
+            prnt_moves("", newcndts)
 
-            msg = "\nCANDIDATES:  "
-            prnt_moves(msg, currcndts)
-            print(" newscore: " + str(newscore) + " / score: " + str(score) + " / minscore: " + str(minscore))
+            prnt_moves("CANDIDATES: ", currcndts)
+            print("newscore: " + str(newscore) + " / score: " + str(score) + " / minscore: " + str(minscore))
 
-            print("\n––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+            print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         if(score < minscore):
             minscore = score
@@ -341,7 +336,7 @@ def calc_move(match):
     else:
         score, currcndts = calc_min(match, 1, -200000, 200000, None, dbginfo)
 
-    msg = "\nresult: " + str(score) + " match.id: " + str(match.id) + " "
+    msg = "result: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, currcndts)
     
     for i in range(20):
