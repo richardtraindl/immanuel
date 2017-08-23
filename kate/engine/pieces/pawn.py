@@ -206,10 +206,12 @@ def touches(match, srcx, srcy, dstx, dsty):
             if(match.color_of_piece(piece) == opp_color):
                 token = token | MV_IS_ATTACK
 
-                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    token = token | ATTACKED_IS_KING
-                elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                     token = token | ATTACKED_IS_PAWN
+                elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                    token = token | ATTACKED_IS_KING
+                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                    token = token | ATTACKED_IS_QUEEN
                 else:
                     token = token | ATTACKED_IS_OFFICER
 
@@ -240,8 +242,10 @@ def touches(match, srcx, srcy, dstx, dsty):
                     continue
 
                 token = token | MV_IS_SUPPORT
-                if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                     token = token | SUPPORTED_IS_PAWN
+                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                    token = token | SUPPORTED_IS_QUEEN
                 else:
                     token = token | SUPPORTED_IS_OFFICER
 
