@@ -211,7 +211,7 @@ def touches(match, srcx, srcy, dstx, dsty):
                     continue
 
                 token = token | MV_IS_SUPPORT
-                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                     token = token | SUPPORTED_IS_PAWN
                 elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                     token = token | SUPPORTED_IS_QUEEN

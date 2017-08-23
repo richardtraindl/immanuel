@@ -165,7 +165,7 @@ def rate(color, newmove, newscore, currcndts, cndtscore, newcndts):
 
 def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     if(match.level == LEVELS['blitz']):
-        counts = ([2, 12], [4, 8], [7, 3])
+        counts = ([2, 12], [3, 12], [6, 3])
     elif(match.level == LEVELS['low']):
         counts = ([2, 12], [4, 12], [10, 4])
     elif(match.level == LEVELS['medium']):
