@@ -162,6 +162,8 @@ def touches(match, srcx, srcy, dstx, dsty):
 
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                     token = token | ATTACKED_IS_PAWN
+                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                    token = token | ATTACKED_IS_QUEEN
                 else:
                     token = token | ATTACKED_IS_OFFICER
 
@@ -192,6 +194,8 @@ def touches(match, srcx, srcy, dstx, dsty):
                 token = token | MV_IS_SUPPORT
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                     token = token | SUPPORTED_IS_PAWN
+                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                    token = token | SUPPORTED_IS_QUEEN
                 else:
                     token = token | SUPPORTED_IS_OFFICER
 
