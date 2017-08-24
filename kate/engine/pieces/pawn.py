@@ -1,6 +1,7 @@
 from .. match import *
 from .. import rules
 from .. cvalues import *
+from .generic_piece import contacts_to_token
 
 
 WHITE_1N_X = 0
@@ -180,17 +181,7 @@ def touches(match, srcx, srcy, dstx, dsty):
 
     match.writefield(srcx, srcy, pawn)
 
-    pawncnt, officercnt = count_contacts(frdlycontacts)
-    if(pawncnt > 0):
-        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
-    if(officercnt > 0):
-        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
-
-    pawncnt, officercnt = count_contacts(enmycontacts)
-    if(pawncnt > 0):
-        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
-    if(officercnt > 0):
-        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
+    token = token | contacts_to_token(frdlycontacts, enmycontacts, "FIELDTOUCHES")
     ###
 
     if(color == COLORS['white']):
@@ -222,17 +213,7 @@ def touches(match, srcx, srcy, dstx, dsty):
 
                 match.writefield(srcx, srcy, pawn)
 
-                pawncnt, officercnt = count_contacts(frdlycontacts)
-                if(pawncnt > 0):
-                    token = token | ATTACKED_IS_ADD_ATT_FROM_PAWN
-                if(officercnt > 0):
-                    token = token | ATTACKED_IS_ADD_ATT_FROM_OFFICER
-
-                pawncnt, officercnt = count_contacts(enmycontacts)
-                if(pawncnt > 0):
-                    token = token | ATTACKED_IS_SUPP_BY_PAWN
-                if(officercnt > 0):
-                    token = token | ATTACKED_IS_SUPP_BY_OFFICER
+                token = token | contacts_to_token(frdlycontacts, enmycontacts, "ATTACKTOUCHES")
                 ###
             else:
                 if(x1 == srcx and y1 == srcy):
@@ -256,17 +237,7 @@ def touches(match, srcx, srcy, dstx, dsty):
 
                 match.writefield(srcx, srcy, pawn)
 
-                pawncnt, officercnt = count_contacts(frdlycontacts)
-                if(pawncnt > 0):
-                    token = token | SUPPORTED_IS_ADD_SUPP_BY_PAWN
-                if(officercnt > 0):
-                    token = token | SUPPORTED_IS_ADD_SUPP_BY_OFFICER
-
-                pawncnt, officercnt = count_contacts(enmycontacts)
-                if(pawncnt > 0):
-                    token = token | SUPPORTED_IS_ATT_FROM_PAWN
-                if(officercnt > 0):
-                    token = token | SUPPORTED_IS_ATT_FROM_OFFICER
+                token = token | contacts_to_token(frdlycontacts, enmycontacts, "SUPPORTTOUCHES")
                 ###
 
     return token
