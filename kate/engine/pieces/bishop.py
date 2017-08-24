@@ -1,6 +1,7 @@
 from .. match import *
 from .. import rules
 from .. cvalues import *
+from .generic_piece import contacts_to_token
 
 
 NEAST_X = 1
@@ -115,18 +116,6 @@ def does_attack(match, srcx, srcy, dstx, dsty):
         return True, priority
 
 
-def count_contacts(contacts):
-    pawncnt = 0
-    officercnt = 0
-
-    for contact in contacts:
-        if(contact == PIECES['wPw'] or contact == PIECES['bPw']):
-            pawncnt += 1
-        else:
-            officercnt += 1
-    return pawncnt, officercnt
-
-
 def touches(match, srcx, srcy, dstx, dsty):
     token = 0x0
 
@@ -145,17 +134,7 @@ def touches(match, srcx, srcy, dstx, dsty):
 
     match.writefield(srcx, srcy, bishop)
 
-    pawncnt, officercnt = count_contacts(frdlycontacts)
-    if(pawncnt > 0):
-        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
-    if(officercnt > 0):
-        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
-
-    pawncnt, officercnt = count_contacts(enmycontacts)
-    if(pawncnt > 0):
-        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
-    if(officercnt > 0):
-        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
+    token = token | contacts_to_token(frdlycontacts, enmycontacts)
     ###
 
     for i in range(4):
