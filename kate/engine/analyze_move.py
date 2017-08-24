@@ -338,10 +338,41 @@ def is_endgame_move(match, move):
         return False, PRIO['undefined']
 
 
+def evaluate_openings_progress(match):
+    count = 0
+
+    if(len(match.move_list) <= 1):
+        return count
+    else:
+        for y in range(0, 8, 1):
+            for x in range(0, 8, 1):
+                piece = match.readfield(x, y)
+                if(Match.color_of_piece(piece) == COLORS['undefined']):
+                    continue
+
+                    idx = 0
+                    for move in match.move_list:
+                        x1 = move.dstx
+                        y1 = move.dsty
+                        idx += 1
+                        for innermove in match.move_list[idx:]:
+                            if(innermove.srcx == x1 and innermove.srcy == y1):
+                                count += 1
+                                break
+
+        print("evaluate_openings_progress - count: " + str(count))
+        return count
+
+
 def progress(match, move):
     token = 0x0
 
-    if(match.count > 60):
+    if(match.count < 20):
+        if(evaluate_openings_progress(match) < 3):
+            return token | MV_IS_PROGRESS
+        else:
+            return token
+    elif(match.count > 60):
         if(pawn.is_running(match, move)):
             return token | MV_IS_PROGRESS
         else:
@@ -351,6 +382,8 @@ def progress(match, move):
             else:
                 return token
     else:
+        # between 20 and 60
+        move = match.move_list[-1]
         if(randint(0, 5) == 0):
             return token | MV_IS_PROGRESS
         else:

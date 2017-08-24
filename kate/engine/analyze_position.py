@@ -27,6 +27,7 @@ def evaluate_contacts(match):
                 continue
 
             supported += analyze_move.score_supports_of_attacked(match, x, y)
+
             attacked += analyze_move.score_attacks(match, x, y)
 
     return (supported + attacked)
