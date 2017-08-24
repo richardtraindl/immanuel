@@ -49,13 +49,11 @@ def contacts_to_token(frdlycontacts, enmycontacts, mode):
         if(enmyofficercnt > 0 or enmyqueencnt > 0):
             token = token | ATTACKED_IS_SUPP_BY_OFFICER
     elif(mode == "SUPPORTTOUCHES"):
-        pawncnt, officercnt = count_contacts(frdlycontacts)
         if(frdlypawncnt > 0):
             token = token | SUPPORTED_IS_ADD_SUPP_BY_PAWN
         if(frdlyofficercnt > 0 or frdlyqueencnt > 0):
             token = token | SUPPORTED_IS_ADD_SUPP_BY_OFFICER
 
-        pawncnt, officercnt = count_contacts(enmycontacts)
         if(enmypawncnt > 0):
             token = token | SUPPORTED_IS_ATT_FROM_PAWN
         if(enmyofficercnt > 0 or enmyqueencnt > 0):
