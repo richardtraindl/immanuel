@@ -18,7 +18,9 @@ def count_contacts(contacts):
     return pawncnt, officercnt, queencnt
 
 
-def contacts_to_token(token, frdlycontacts, enmycontacts):
+def contacts_to_token(frdlycontacts, enmycontacts):
+    token = 0x0
+
     pawncnt, officercnt, queencnt = count_contacts(frdlycontacts)
     if(pawncnt > 0):
         token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
