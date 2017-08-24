@@ -396,13 +396,28 @@ def captured_is_equal_or_higher(token):
     else:
         return False
 
-def attacker_is_equal_or_lower(token):
-    if(token & MV_PIECE_IS_PAWN > 0):
+def dstfield_is_attacked(token):
+    if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER > 0 or token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_QUEEN > 0): 
         return True
-    elif(token & MV_PIECE_IS_OFFICER > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0):
+    else:
+        return False
+
+def dstfield_is_supported(token):
+    if(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_QUEEN > 0):
         return True
-    elif(token & MV_PIECE_IS_QUEEN and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER > 0):
-        return True
+    else:
+        return False
+
+def dstfield_is_attacked_and_supported_by_lower_equal(token):
+    if(dstfield_is_attacked(token) and dstfield_is_supported(token)):
+        if(token & MV_PIECE_IS_PAWN > 0):
+            return True
+        elif(token & MV_PIECE_IS_OFFICER > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0):
+            return True
+        elif(token & MV_PIECE_IS_QUEEN and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER > 0):
+            return True
+        else:
+            return False
     else:
         return False
 
@@ -426,12 +441,11 @@ def rank_moves(priomoves):
                 #count += 1
                 pmove[3] = min(PRIO['prio1'], pmove[3])
             # field is NOT enemy-touched
-            elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+            elif(dstfield_is_attacked(token) == False):
                 #count += 1
                 pmove[3] = min(PRIO['prio1'], pmove[3])
-            # field is NOT touched by enemy-pawn and field is friendly-touched
-            elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and 
-                 (token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0)):
+            # field is NOT touched by lower enemy and field is friendly-touched
+            elif(dstfield_is_attacked_and_supported_by_lower_equal(token)):
                 #count += 1
                 pmove[3] = min(PRIO['prio1'], pmove[3])
             else:
@@ -444,13 +458,14 @@ def rank_moves(priomoves):
                 count += 1
                 pmove[3] = min(PRIO['prio2'], pmove[3])
             # attacker is NOT touched by enemy
-            elif(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+            elif(dstfield_is_attacked(token) == False):
                 count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
-            # attacker is touched by friend
-            elif(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0):
+            # attacker is NOT touched by lower enemy and field is friendly-touched
+            elif(dstfield_is_attacked_and_supported_by_lower_equal(token)):
                 count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
+            # attacker is NOT save
             else:
                 count += 1
                 pmove[3] = min(PRIO['prio4'], pmove[3])
@@ -459,13 +474,14 @@ def rank_moves(priomoves):
             # supported is attacked
             if(token & SUPPORTED_IS_ATT_FROM_PAWN > 0 or token & SUPPORTED_IS_ATT_FROM_OFFICER > 0):
                 # supporter is NOT touched by enemy
-                if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+                if(dstfield_is_attacked(token) == False):
                     count += 1
                     pmove[3] = min(PRIO['prio3'], pmove[3])
-                # supporter is touched by friend
-                elif(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0):
+                # supporter is NOT touched by lower enemy and field is friendly-touched
+                elif(dstfield_is_attacked_and_supported_by_lower_equal(token)):
                     count += 1
                     pmove[3] = min(PRIO['prio3'], pmove[3])
+                # supporter is NOT save
                 else:
                     count += 1
                     pmove[3] = min(PRIO['prio4'], pmove[3])
@@ -476,16 +492,15 @@ def rank_moves(priomoves):
 
         if(token & MV_IS_FLEE > 0):
             # exile-field is NOT attacked
-            if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+            if(dstfield_is_attacked(token) == False):
                 count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
-            # exile-field is touched by friend and (refugee is pawn or exile-field is NOT touched by enemy-pawn)
-            elif(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0 and 
-                 (token & MV_PIECE_IS_PAWN > 0 or token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0)):
+            # exile-field is NOT touched by lower enemy and field is friendly-touched
+            elif(dstfield_is_attacked_and_supported_by_lower_equal(token)):
                 count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
-                # exile-field is attacked
+                # exile-field is attacked and not properly supported
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_PROGRESS > 0 and pmove[3] > PRIO['prio2']):
