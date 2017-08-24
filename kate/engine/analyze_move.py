@@ -389,9 +389,19 @@ def analyze_move(match, move):
 def captured_is_equal_or_higher(token):
     if(token & MV_PIECE_IS_PAWN > 0):
         return True
-    elif(token & MV_PIECE_IS_OFFICER > 0 and (token & CAPTURED_IS_OFFICER > 0 or token & CAPTURED_IS_QUEEN > 0)):
+    elif(token & MV_PIECE_IS_OFFICER > 0 and token & CAPTURED_IS_PAWN == 0):
         return True
-    elif(token & MV_PIECE_IS_QUEEN and token & CAPTURED_IS_QUEEN > 0):
+    elif(token & MV_PIECE_IS_QUEEN and token & CAPTURED_IS_PAWN == 0 and token & CAPTURED_IS_OFFICER == 0):
+        return True
+    else:
+        return False
+
+def attacker_is_equal_or_lower(token):
+    if(token & MV_PIECE_IS_PAWN > 0):
+        return True
+    elif(token & MV_PIECE_IS_OFFICER > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0):
+        return True
+    elif(token & MV_PIECE_IS_QUEEN and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER > 0):
         return True
     else:
         return False
