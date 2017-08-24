@@ -116,18 +116,6 @@ def does_attack(match, srcx, srcy, dstx, dsty):
         return True, priority
 
 
-def count_contacts(contacts):
-    pawncnt = 0
-    officercnt = 0
-
-    for contact in contacts:
-        if(contact == PIECES['wPw'] or contact == PIECES['bPw']):
-            pawncnt += 1
-        else:
-            officercnt += 1
-    return pawncnt, officercnt
-
-
 def touches(match, srcx, srcy, dstx, dsty):
     token = 0x0
 
