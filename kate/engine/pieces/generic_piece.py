@@ -17,3 +17,23 @@ def count_contacts(contacts):
             officercnt += 1
     return pawncnt, officercnt, queencnt
 
+
+def contacts_to_token(token, frdlycontacts, enmycontacts):
+    pawncnt, officercnt, queencnt = count_contacts(frdlycontacts)
+    if(pawncnt > 0):
+        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
+    if(officercnt > 0):
+        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
+    if(queencnt > 0):
+        token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_QUEEN
+
+    pawncnt, officercnt, queencnt = count_contacts(enmycontacts)
+    if(pawncnt > 0):
+        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
+    if(officercnt > 0):
+        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
+    if(queencnt > 0):
+        token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_QUEEN
+
+    return token
+
