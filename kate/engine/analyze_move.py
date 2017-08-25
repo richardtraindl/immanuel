@@ -368,6 +368,7 @@ def progress(match, move):
     token = 0x0
 
     if(match.count < 20):
+        value = evaluate_developments(match)
         if(evaluate_openings_progress(match) < 3):
             return token | MV_IS_PROGRESS
         else:
