@@ -168,7 +168,8 @@ def evaluate_position(match, movecnt):
             value += evaluate_developments(match, COLORS['black'])
 
         if(match.count > 50):
-            value += evaluate_endgame(match)
+            value += evaluate_endgame(match, COLORS['white'])
+            value += evaluate_endgame(match, COLORS['black'])
 
         return value
 
