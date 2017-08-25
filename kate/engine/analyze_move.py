@@ -3,6 +3,7 @@ from .move import *
 from .pieces import pawn, knight, bishop, rook, king
 from .cvalues import *
 from . import rules
+from .analyze_position import evaluate_contacts, evaluate_developments, evaluate_endgame
 from random import randint
 
 
@@ -367,28 +368,34 @@ def evaluate_openings_progress(match):
 def progress(match, move):
     token = 0x0
 
-    if(match.count < 20):
-        value = evaluate_developments(match)
-        if(evaluate_openings_progress(match) < 3):
-            return token | MV_IS_PROGRESS
-        else:
-            return token
-    elif(match.count > 60):
-        if(pawn.is_running(match, move)):
-            return token | MV_IS_PROGRESS
-        else:
-            piece = match.readfield(move.srcx, move.srcy)
-            if(piece == PIECES['wPw'] or piece == PIECES['bPw'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                return token | MV_IS_PROGRESS
-            else:
-                return token
+    oldvalue = match.score
+
+    oldvalue += evaluate_contacts(match)
+
+    if(match.count < 40):
+        oldvalue += evaluate_developments(match)
+    if(match.count > 60):
+        oldvalue += evaluate_endgame(match)
+
+    ###
+    piece = match.readfield(move.srcx, move.srcy)
+    match.writefield(move.srcx, move.srcy, PIECES['blk'])
+
+    newvalue = match.score
+
+    newvalue += evaluate_contacts(match)
+
+    if(match.count < 40):
+        newvalue += evaluate_developments(match)
+    if(match.count > 60):
+        newvalue += evaluate_endgame(match)
+
+    match.writefield(move.srcx, move.srcy, piece)
+
+    if(newvalue > oldvalue):
+        return token | MV_IS_PROGRESS
     else:
-        # between 20 and 60
-        move = match.move_list[-1]
-        if(randint(0, 5) == 0):
-            return token | MV_IS_PROGRESS
-        else:
-            return token
+        return token
 
 
 def analyze_move(match, move):
