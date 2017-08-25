@@ -115,11 +115,12 @@ def evaluate_developments(match):
         developed_blacks = SCORES[PIECES['bPw']] // 4
         
     excludedpieces = [ PIECES['wKg'], PIECES['bKg'], PIECES['wQu'], PIECES['bQu'] ]
-    movecnt = evaluate_movecnt(match, excludedpieces)
-    
-    movecnt = (movecnt * 10) // 5
+    whitemovecnt = evaluate_movecnt(match, COLORS['white'], excludedpieces)
+    whitemovecnt = (whitemovecnt * SCORES[PIECES['bPw']] // 4)
+    blackmovecnt = evaluate_movecnt(match, COLORS['black'], excludedpieces)    
+    blackmovecnt = (blackmovecnt * SCORES[PIECES['wPw']] // 4)
 
-    return developed_whites + developed_blacks + movecnt
+    return developed_whites + developed_blacks + whitemovecnt + blackmovecnt
 
 
 def evaluate_endgame(match):
