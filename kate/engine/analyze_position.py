@@ -129,24 +129,24 @@ def evaluate_developments(match, color):
         return developed_blacks + lackmovecnt
 
 
-def evaluate_endgame(match):
-    running = 0
+def evaluate_endgame(match, color):
+    value = 0
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
-            if(piece == PIECES['wPw']):
-                if(is_running):
-                    running += REVERSED_SCORES[piece] // 2
+            if(Match.color_of_pice(piece) == color and piece == PIECES['wPw']):
+                if(is_running(match, x, y)):
+                    value += REVERSED_SCORES[piece] // 2
                     if(y >= 4):
-                        running += REVERSED_SCORES[piece]
-            elif(piece == PIECES['bPw']):
-                if(is_running):
-                    running += REVERSED_SCORES[piece] // 2
+                        value += REVERSED_SCORES[piece]
+            elif(Match.color_of_pice(piece) == color and piece == PIECES['bPw']):
+                if(is_running((match, x, y)):
+                    value += REVERSED_SCORES[piece] // 2
                     if(y <= 3):
-                        running += REVERSED_SCORES[piece]
+                        value += REVERSED_SCORES[piece]
 
-    return running
+    return value
 
 
 def evaluate_position(match, movecnt):
