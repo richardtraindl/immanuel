@@ -34,12 +34,8 @@ def evaluate_contacts(match):
 
 
 def evaluate_piece_moves(match, srcx, srcy, excludedpieces):
-    color = match.next_color()
     piece = match.readfield(srcx, srcy)
     movecnt = 0
-
-    if(Match.color_of_piece(piece) != color):
-        return movecnt
 
     for expiece in excludedpieces:
         if(piece == expiece):
@@ -49,27 +45,22 @@ def evaluate_piece_moves(match, srcx, srcy, excludedpieces):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 8
         stepcnt = 1
-        value = 1                
     elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 8
         stepcnt = 7
-        value = 1
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
         dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
         dircnt = 4
         stepcnt = 7
-        value = 2
     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
         dirs = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
         dircnt = 4
         stepcnt = 7
-        value = 2
     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
         dirs =  [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
         dircnt = 8
         stepcnt = 1
-        value = 2
     else:
         return movecnt
 
@@ -81,13 +72,13 @@ def evaluate_piece_moves(match, srcx, srcy, excludedpieces):
         for i in range(stepcnt):
             dstx += stepx
             dsty += stepy
-            flag,errcode = is_move_valid(match, srcx, srcy, dstx, dsty, PIECES['blk'])
+            flag, errcode = is_move_valid(match, srcx, srcy, dstx, dsty, PIECES['blk'])
             if(flag):
-                movecnt += value
+                movecnt += 1
             elif(errcode == RETURN_CODES['out-of-bounds']):
                 break
 
-    return (movecnt)
+    return movecnt
 
 
 def evaluate_movecnt(match, excludedpieces):
