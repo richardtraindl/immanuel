@@ -356,8 +356,8 @@ def score_supports_of_attacked(match, srcx, srcy):
     return score
 
 
-def is_running(match, move):
-    piece = match.readfield(move.srcx, move.srcy)
+def is_running(match, srcx, srcy):
+    piece = match.readfield(srcx, srcy)
     if(piece == PIECES['wPw']):
         stepx = 0
         stepy = 1
