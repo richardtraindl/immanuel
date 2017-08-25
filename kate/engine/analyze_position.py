@@ -121,7 +121,7 @@ def evaluate_developments(match, color):
         blackmovecnt = evaluate_movecnt(match, COLORS['black'], excludedpieces)    
         blackmovecnt = (blackmovecnt * SCORES[PIECES['wPw']] // 4)
 
-        return developed_blacks + lackmovecnt
+        return developed_blacks + blackmovecnt
 
 
 def evaluate_endgame(match, color):
@@ -136,7 +136,7 @@ def evaluate_endgame(match, color):
                     if(y >= 4):
                         value += REVERSED_SCORES[piece]
             elif(Match.color_of_pice(piece) == color and piece == PIECES['bPw']):
-                if(is_running((match, x, y)):
+                if(is_running(match, x, y)):
                     value += REVERSED_SCORES[piece] // 2
                     if(y <= 3):
                         value += REVERSED_SCORES[piece]
