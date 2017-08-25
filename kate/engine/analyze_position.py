@@ -81,16 +81,15 @@ def evaluate_piece_moves(match, srcx, srcy, excludedpieces):
     return movecnt
 
 
-def evaluate_movecnt(match, excludedpieces):
+def evaluate_movecnt(match, color, excludedpieces):
     movecnt = 0
 
     for y1 in range(8):
         for x1 in range(8):
-            count = evaluate_piece_moves(match, x1, y1, excludedpieces)
-            if(match.next_color() == COLORS['white']):
+            piece = match.readfield(x1, y1)
+            if(Match.color_of_piece(piece) == color):
+                count = evaluate_piece_moves(match, x1, y1, excludedpieces)
                 movecnt += count
-            else:
-                movecnt += (count * -1)
 
     return movecnt
 
