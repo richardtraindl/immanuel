@@ -14,21 +14,16 @@ Y_6 = 5
 Y_7 = 6
 
 
-def evaluate_contacts(match):
+def evaluate_contacts(match, color):
     supported = 0
     attacked = 0
-
-    color = match.next_color()
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
-            if(Match.color_of_piece(piece) == COLORS['undefined']):
-                continue
-
-            supported += analyze_move.score_supports_of_attacked(match, x, y)
-
-            attacked += analyze_move.score_attacks(match, x, y)
+            if(Match.color_of_piece(piece) == color):
+                supported += analyze_move.score_supports_of_attacked(match, x, y)
+                attacked += analyze_move.score_attacks(match, x, y)
 
     return (supported + attacked)
 
@@ -161,7 +156,8 @@ def evaluate_position(match, movecnt):
     else:
         value = match.score
 
-        value += evaluate_contacts(match)
+        value += evaluate_contacts(match, COLORS['white'])
+        value += evaluate_contacts(match, COLORS['black'])
 
         if(match.count < 40):
             value += evaluate_developments(match, COLORS['white'])
