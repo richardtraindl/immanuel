@@ -1,4 +1,5 @@
 from .match import *
+from .matchmove import do_move, undo_move
 from .move import *
 from .pieces import pawn, knight, bishop, rook, king
 from .cvalues import *
@@ -367,32 +368,36 @@ def evaluate_openings_progress(match):
 
 def progress(match, move):
     token = 0x0
-
-    oldvalue = match.score
-
-    oldvalue += evaluate_contacts(match)
-
-    if(match.count < 40):
-        oldvalue += evaluate_developments(match)
-    if(match.count > 60):
-        oldvalue += evaluate_endgame(match)
+    piece = match.readfield(move.srcx, move.srcy)
+    color = Match.color_of_piece(piece)
 
     ###
-    piece = match.readfield(move.srcx, move.srcy)
-    match.writefield(move.srcx, move.srcy, PIECES['blk'])
+    oldvalue = match.score
+
+    oldvalue += evaluate_contacts(match, color)
+
+    if(match.count < 40):
+        oldvalue += evaluate_developments(match, color)
+    elif(match.count > 60):
+        oldvalue += evaluate_endgame(match, color)
+    ###
+    
+    ###
+    do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
     newvalue = match.score
 
-    newvalue += evaluate_contacts(match)
+    newvalue += evaluate_contacts(match, color)
 
     if(match.count < 40):
-        newvalue += evaluate_developments(match)
-    if(match.count > 60):
-        newvalue += evaluate_endgame(match)
+        newvalue += evaluate_developments(match, color)
+    elif(match.count > 60):
+        newvalue += evaluate_endgame(match, color)
 
-    match.writefield(move.srcx, move.srcy, piece)
+    undo_move(match)
+    ###
 
-    if(newvalue > oldvalue):
+    if((newvalue > oldvalue and color == COLORS['white']) or (newvalue < oldvalue and color == COLORS['black'])):
         return token | MV_IS_PROGRESS
     else:
         return token
