@@ -552,5 +552,5 @@ def rank_moves(priomoves):
         if(token & MV_IS_PROGRESS > 0 and pmove[3] > PRIO['prio2']):
             pmove[3] = PRIO['prio2']
 
-        if(count >= 2 and pmove[3] != PRIO['prio1']):
+        if(count >= 2 and pmove[3] > PRIO['prio2']):
             pmove[3] -= 1
