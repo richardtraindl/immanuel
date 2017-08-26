@@ -67,17 +67,17 @@ TEMPLATES = [
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'kate.sqlite',
-    }
-}
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': 'kate.sqlite',
+#    }
+#}
 
-#DATABASES = {}
+DATABASES = {}
 
-#import dj_database_url
-#DATABASES['default'] = dj_database_url.config()
+import dj_database_url
+DATABASES['default'] = dj_database_url.config()
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
