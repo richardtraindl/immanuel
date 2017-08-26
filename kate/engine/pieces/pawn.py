@@ -371,8 +371,8 @@ def is_running(match, srcx, srcy):
 
     STARTS = [0, 1, -1]
     for i in range(3):
-        x1 = move.dstx + STARTS[i]
-        y1 = move.dsty
+        x1 = srcx + STARTS[i]
+        y1 = srcy
         while( x1 != rules.UNDEF_X and rules.is_inbounds(x1, y1) ):
             x1, y1 = rules.search(match, x1, y1, stepx , stepy)
             if(x1 != rules.UNDEF_X):
