@@ -397,7 +397,7 @@ def progress(match, move):
     undo_move(match)
     ###
 
-    if((newvalue > oldvalue and color == COLORS['white']) or (newvalue < oldvalue and color == COLORS['black'])):
+    if((newvalue - oldvalue >= SUPPORTED_SCORES['wRk'] and color == COLORS['white']) or (newvalue - oldvalue <= SUPPORTED_SCORES['bRk'] and color == COLORS['black'])):
         return token | MV_IS_PROGRESS
     else:
         return token
