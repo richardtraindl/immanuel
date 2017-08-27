@@ -1,7 +1,7 @@
 from .match import *
 from .rules import RETURN_CODES, is_move_valid, game_status
 from . import analyze_move
-from .pieces.pawn import is_running 
+from .pieces import pawn, knight, bishop, rook, king 
 from .cvalues import *
 
 
@@ -42,7 +42,39 @@ H7 = [7, 6]
 H6 = [7, 5]
 
 
-def evaluate_contacts(match, color):
+def score_attacks(match, srcx, srcy):
+    score = 0
+
+    score += rook.score_attacks(match, srcx, srcy)
+
+    score += knight.score_attacks(match, srcx, srcy)
+
+    score += bishop.score_attacks(match, srcx, srcy)
+
+    score += king.score_attacks(match, srcx, srcy)
+
+    score += pawn.score_attacks(match, srcx, srcy)
+
+    return score
+
+
+def score_supports_of_attacked(match, srcx, srcy):
+    score = 0
+    
+    score += rook.score_supports_of_attacked(match, srcx, srcy)
+
+    score += bishop.score_supports_of_attacked(match, srcx, srcy)
+
+    score += knight.score_supports_of_attacked(match, srcx, srcy)
+
+    score += king.score_supports_of_attacked(match, srcx, srcy)
+
+    score += pawn.score_supports_of_attacked(match, srcx, srcy)
+
+    return score
+
+
+def score_contacts(match, color):
     supported = 0
     attacked = 0
 
@@ -50,13 +82,13 @@ def evaluate_contacts(match, color):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
             if(Match.color_of_piece(piece) == color):
-                supported += analyze_move.score_supports_of_attacked(match, x, y)
-                attacked += analyze_move.score_attacks(match, x, y)
+                supported += score_supports_of_attacked(match, x, y)
+                attacked += score_attacks(match, x, y)
 
     return (supported + attacked)
 
 
-def evaluate_piece_moves(match, srcx, srcy, excludedpieces):
+def count_piece_moves(match, srcx, srcy, excludedpieces):
     piece = match.readfield(srcx, srcy)
     movecnt = 0
 
@@ -103,21 +135,20 @@ def evaluate_piece_moves(match, srcx, srcy, excludedpieces):
 
     return movecnt
 
-
-def evaluate_movecnt(match, color, excludedpieces):
+def count_all_moves(match, color, excludedpieces):
     movecnt = 0
 
     for y1 in range(8):
         for x1 in range(8):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == color):
-                count = evaluate_piece_moves(match, x1, y1, excludedpieces)
+                count = count_piece_moves(match, x1, y1, excludedpieces)
                 movecnt += count
 
     return movecnt
 
 
-def evaluate_developments(match, color):
+def score_development(match, color):
     value = 0
 
     if(color == COLORS['white']):
@@ -147,7 +178,7 @@ def evaluate_developments(match, color):
                 value = SCORES[PIECES['bPw']] // 4
 
         excludedpieces = [ PIECES['wKg'], PIECES['wQu']]
-        movecnt = evaluate_movecnt(match, COLORS['white'], excludedpieces)
+        movecnt = count_all_moves(match, COLORS['white'], excludedpieces)
         
         value += (movecnt * SCORES[PIECES['bPw']] // 4)
 
@@ -180,14 +211,14 @@ def evaluate_developments(match, color):
                 value = SCORES[PIECES['wPw']] // 4
 
         excludedpieces = [ PIECES['bKg'], PIECES['bQu'] ]
-        movecnt = evaluate_movecnt(match, COLORS['black'], excludedpieces)    
+        movecnt = count_all_moves(match, COLORS['black'], excludedpieces)    
         
         value += (movecnt * SCORES[PIECES['wPw']] // 4)
 
         return value
 
 
-def evaluate_endgame(match, color):
+def score_endgame(match, color):
     value = 0
 
     for y in range(0, 8, 1):
@@ -207,7 +238,7 @@ def evaluate_endgame(match, color):
     return value
 
 
-def evaluate_position(match, movecnt):
+def score_position(match, movecnt):
     status = game_status(match)
     if(movecnt == 0 and status != STATUS['open']):
         if(status == STATUS['winner_black']):
@@ -219,16 +250,17 @@ def evaluate_position(match, movecnt):
     else:
         value = match.score
 
-        value += evaluate_contacts(match, COLORS['white'])
-        value += evaluate_contacts(match, COLORS['black'])
+        value += score_contacts(match, COLORS['white'])
+        value += score_contacts(match, COLORS['black'])
 
         if(match.count < 40):
-            value += evaluate_developments(match, COLORS['white'])
-            value += evaluate_developments(match, COLORS['black'])
+            value += score_development(match, COLORS['white'])
+            value += score_development(match, COLORS['black'])
 
         if(match.count > 50):
-            value += evaluate_endgame(match, COLORS['white'])
-            value += evaluate_endgame(match, COLORS['black'])
+            value += score_endgame(match, COLORS['white'])
+            value += score_endgame(match, COLORS['black'])
 
         return value
+
 

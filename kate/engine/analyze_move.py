@@ -1,10 +1,10 @@
 from .match import *
 from .matchmove import do_move, undo_move
 from .move import *
-from .pieces import pawn, knight, bishop, rook, king
+from .pieces import pawn, knight, bishop, rook, king, generic_piece
 from .cvalues import *
 from . import rules
-from .analyze_position import evaluate_contacts, evaluate_developments, evaluate_endgame
+from .analyze_position import score_contacts, score_development, score_endgame
 from random import randint
 
 
@@ -84,50 +84,6 @@ def touches(match, move):
     return token
 
 
-def score_attacks(match, srcx, srcy):
-    score = 0
-
-    score += rook.score_attacks(match, srcx, srcy)
-
-    score += knight.score_attacks(match, srcx, srcy)
-
-    score += bishop.score_attacks(match, srcx, srcy)
-
-    score += king.score_attacks(match, srcx, srcy)
-
-    score += pawn.score_attacks(match, srcx, srcy)
-
-    return score
-
-
-def score_supports_of_attacked(match, srcx, srcy):
-    score = 0
-    
-    score += rook.score_supports_of_attacked(match, srcx, srcy)
-
-    score += bishop.score_supports_of_attacked(match, srcx, srcy)
-
-    score += knight.score_supports_of_attacked(match, srcx, srcy)
-
-    score += king.score_supports_of_attacked(match, srcx, srcy)
-
-    score += pawn.score_supports_of_attacked(match, srcx, srcy)
-
-    return score
-
-
-def count_contacts(contacts):
-    pawncnt = 0
-    officercnt = 0
-
-    for contact in contacts:
-        if(contact == PIECES['wPw'] or contact == PIECES['bPw']):
-            pawncnt += 1
-        else:
-            officercnt += 1
-    return pawncnt, officercnt
-
-
 def flees(match, move):
     token = 0x0
 
@@ -150,16 +106,16 @@ def flees(match, move):
 
         match.writefield(move.srcx, move.srcy, piece)
 
-        pawncnt, officercnt = count_contacts(fdlycontacts)
+        pawncnt, officercnt, queencnt = generic_piece.count_contacts(fdlycontacts)
         if(pawncnt > 0):
             token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
-        if(officercnt > 0):
+        if(officercnt + queencnt > 0):
             token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
 
-        pawncnt, officercnt = count_contacts(enmycontacts)
+        pawncnt, officercnt, queencnt = generic_piece.count_contacts(enmycontacts)
         if(pawncnt > 0):
             token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
-        if(officercnt > 0):
+        if(officercnt + queencnt > 0):
             token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
         ###
 
@@ -172,23 +128,23 @@ def progress(match, move):
     color = Match.color_of_piece(piece)
 
     ###
-    oldvalue = evaluate_contacts(match, color)
+    oldvalue = score_contacts(match, color)
 
     if(match.count < 40):
-        oldvalue += evaluate_developments(match, color)
+        oldvalue += score_development(match, color)
     elif(match.count > 60):
-        oldvalue += evaluate_endgame(match, color)
+        oldvalue += score_endgame(match, color)
     ###
     
     ###
     do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
-    newvalue = evaluate_contacts(match, color)
+    newvalue = score_contacts(match, color)
 
     if(match.count < 40):
-        newvalue += evaluate_developments(match, color)
+        newvalue += score_development(match, color)
     elif(match.count > 60):
-        newvalue += evaluate_endgame(match, color)
+        newvalue += score_endgame(match, color)
 
     undo_move(match)
     ###
