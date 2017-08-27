@@ -106,52 +106,6 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
  
  
-def does_attack(match, srcx, srcy, dstx, dsty):
-    priority = PRIO['undefined']
-
-    pawn = match.readfield(srcx, srcy)
-
-    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
-        return False, 0
-
-    color = Match.color_of_piece(pawn)
-    opp_color = Match.oppcolor_of_piece(pawn)
-
-    if(color == COLORS['white']):
-        STEPS = WPW_STEPS
-    else:
-        STEPS = BPW_STEPS
-
-    for i in range(2):
-        x1 = dstx + STEPS[i][0]
-        y1 = dsty + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == opp_color):
-                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    return True, PRIO['prio2']
-                else:
-                    pin_dir = rules.pin_dir(match, x1, y1)
-                    if(pin_dir != rules.DIRS['undefined']):
-                        priority = min(priority, PRIO['prio3'])
-                    else:
-                        match.writefield(srcx, srcy, PIECES['blk'])
-                        friendlysupported = rules.is_field_touched(match, color, dstx, dsty)
-                        attacked = rules.is_field_touched(match, opp_color, dstx, dsty)
-                        match.writefield(srcx, srcy, pawn)
-                        if(not attacked):
-                            priority = min(priority, PRIO['prio3'])
-                        elif(friendlysupported):
-                            priority = min(priority, PRIO['prio3'])
-                        else:
-                            priority = min(priority, PRIO['prio4'])
-
-    if(priority == PRIO['undefined']):
-        return False, 0
-    else:
-        return True, priority 
-
-
 def touches(match, srcx, srcy, dstx, dsty):
     token = 0x0
 
@@ -232,33 +186,6 @@ def touches(match, srcx, srcy, dstx, dsty):
     return token
 
 
-def count_attacks(match, srcx, srcy, dstx, dsty):
-    count = 0
-
-    pawn = match.readfield(srcx, srcy)
-
-    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
-        return count
-
-    color = Match.color_of_piece(pawn)
-    opp_color = Match.oppcolor_of_piece(pawn)
-
-    if(color == COLORS['white']):
-        STEPS = WPW_STEPS
-    else:
-        STEPS = BPW_STEPS
-
-    for i in range(2):
-        x1 = dstx + STEPS[i][0]
-        y1 = dsty + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == opp_color):
-                count += 1
-
-    return count
-
-
 def score_attacks(match, srcx, srcy):
     score = 0
 
@@ -287,43 +214,6 @@ def score_attacks(match, srcx, srcy):
                     score += ATTACKED_SCORES[piece]
 
     return score
-
-
-def does_support_attacked(match, srcx, srcy, dstx, dsty):
-    priority = PRIO['undefined']
-
-    pawn = match.readfield(srcx, srcy)
-
-    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
-        return False, priority
-
-    color = Match.color_of_piece(pawn)
-    opp_color = Match.oppcolor_of_piece(pawn)
-
-    if(color == COLORS['white']):
-        STEPS = WPW_STEPS
-    else:
-        STEPS = BPW_STEPS
-
-    for i in range(2):
-        x1 = dstx + STEPS[i][0]
-        y1 = dsty + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-            if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                continue
-            if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_touched(match, opp_color, x1, y1)):
-                    pin_dir = rules.pin_dir(match, x1, y1)
-                    if(pin_dir != rules.DIRS['undefined']):
-                        return True, PRIO['prio3']
-                    else:
-                        return True, PRIO['prio4']
-
-    if(priority == PRIO['undefined']):
-        return False, priority
-    else:
-        return True, priority
 
 
 def score_supports_of_attacked(match, srcx, srcy):

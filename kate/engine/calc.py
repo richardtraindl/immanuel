@@ -195,8 +195,8 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbginfo):
 
     maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio)
 
-    dbgcounts = dbginfo[0]
-    dbgcounts[depth-1] += 1
+    #dbgcounts = dbginfo[0]
+    #dbgcounts[depth-1] += 1
 
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
@@ -207,6 +207,12 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbginfo):
 
     for pmove in prio_moves[:maxcnt]:
         newmove = pmove[0]
+
+        if(depth == 1):
+            count += 1
+            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
+            prnt_move(msg, newmove, "")
+            print("   prio: " + str(pmove[3]) + "   token: " + hex(pmove[2]) + " " + token_to_text(pmove[2]))
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
@@ -226,12 +232,6 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbginfo):
                         break
 
             dbginfo[1].append(threadmoves)
-
-            count += 1
-
-            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, newmove, "")
-            print(" p:" + str(pmove[3]) + " t:" + hex(pmove[2]) + " " + token_to_text(pmove[2]))
 
             prnt_move("CURR SEARCH: [", newmove, "]")
             prnt_moves("", newcndts)
@@ -261,8 +261,8 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbginfo):
 
     maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio)
 
-    dbgcounts = dbginfo[0]
-    dbgcounts[depth-1] += 1
+    #dbgcounts = dbginfo[0]
+    #dbgcounts[depth-1] += 1
     
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
@@ -273,6 +273,12 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbginfo):
 
     for pmove in prio_moves[:maxcnt]:
         newmove = pmove[0]
+        
+        if(depth == 1):
+            count += 1
+            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
+            prnt_move(msg, newmove, "")
+            print("   prio: " + str(pmove[3]) + "   token: " + hex(pmove[2]) + " " + token_to_text(pmove[2]))
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
@@ -294,12 +300,6 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbginfo):
                         break
 
             dbginfo[1].append(threadmoves)
-
-            count += 1
-
-            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, newmove, "")
-            print(" p:" + str(pmove[3]) + " t:" + hex(pmove[2]) + " " + token_to_text(pmove[2]))
 
             prnt_move("CURR SEARCH: [", newmove, "]")
             prnt_moves("", newcndts)
@@ -339,8 +339,8 @@ def calc_move(match):
     msg = "result: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, currcndts)
     
-    for i in range(20):
-        print(str(i + 1) + ": " + str(dbgcounts[i]))
+    #for i in range(20):
+    #    print(str(i + 1) + ": " + str(dbgcounts[i]))
 
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)

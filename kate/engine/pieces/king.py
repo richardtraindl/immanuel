@@ -82,41 +82,6 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
 
-def does_attack(match, srcx, srcy, dstx, dsty):
-    priority = PRIO['undefined']
-
-    king = match.readfield(srcx, srcy)
-
-    if(king != PIECES['wKg'] and king != PIECES['bKg']):
-        return False, priority
-
-    color = Match.color_of_piece(king) 
-    opp_color = Match.oppcolor_of_piece(king)
-
-    for i in range(8):
-        x1 = dstx + STEPS[i][0]
-        y1 = dsty + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == opp_color):
-                pin_dir = rules.pin_dir(match, x1, y1)
-                if(pin_dir != rules.DIRS['undefined']):
-                    return True, PRIO['prio3']
-                else:
-                    match.writefield(srcx, srcy, PIECES['blk'])
-                    enemysupported = rules.is_field_touched(match, opp_color, x1, y1)
-                    match.writefield(srcx, srcy, king)
-                    if(not enemysupported):
-                        priority = min(priority, PRIO['prio3'])
-                    else:
-                        priority = min(priority, PRIO['prio4'])
-
-    if(priority == PRIO['undefined']):
-        return False, priority
-    else:
-        return True, priority
-
-
 def touches(match, srcx, srcy, dstx, dsty):
     token = 0x0
 
@@ -188,27 +153,6 @@ def touches(match, srcx, srcy, dstx, dsty):
     return token
 
 
-def count_attacks(match, srcx, srcy, dstx, dsty):
-    count = 0
-
-    king = match.readfield(srcx, srcy)
-
-    if(king != PIECES['wKg'] and king != PIECES['bKg']):
-        return count
-
-    color = Match.color_of_piece(king)
-    opp_color = Match.oppcolor_of_piece(king)
-    for i in range(8):
-        x1 = dstx + STEPS[i][0]
-        y1 = dsty + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == opp_color):
-                count += 1
-
-    return count
-
-
 def score_attacks(match, srcx, srcy):
     score = 0
 
@@ -229,40 +173,6 @@ def score_attacks(match, srcx, srcy):
                 score += ATTACKED_SCORES[piece]
 
     return score
-
-
-def does_support_attacked(match, srcx, srcy, dstx, dsty):
-    priority = PRIO['undefined']
-
-    king = match.readfield(srcx, srcy)
-
-    if(king != PIECES['wKg'] and king != PIECES['bKg']):
-        return False, priority
-
-    color = Match.color_of_piece(king)
-    opp_color = Match.oppcolor_of_piece(king)
-
-    for i in range(8):
-        x1 = dstx + STEPS[i][0]
-        y1 = dsty + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            if(x1 == srcx and y1 == srcy):
-                continue
-            piece = match.readfield(x1, y1)
-            if(piece == PIECES['blk']):
-                continue
-            if( color == Match.color_of_piece(piece) ):
-                if(rules.is_field_touched(match, opp_color, x1, y1)):
-                    pin_dir = rules.pin_dir(match, x1, y1)
-                    if(pin_dir != rules.DIRS['undefined']):
-                        return True, PRIO['prio3']
-                    else:
-                        priority = min(priority, PRIO['prio4'])
-
-    if(priority == PRIO['undefined']):
-        return False, priority
-    else:
-        return True, priority
 
 
 def score_supports_of_attacked(match, srcx, srcy):

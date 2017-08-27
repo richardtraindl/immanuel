@@ -5,13 +5,41 @@ from .pieces.pawn import is_running
 from .cvalues import *
 
 
-X_F = 5
-X_G = 6
-X_H = 7
-Y_2 = 1
-Y_3 = 2
-Y_6 = 5
-Y_7 = 6
+A1 = [0, 0]
+B1 = [1, 0]
+C1 = [2, 0]
+D1 = [3, 0]
+F1 = [5, 0]
+G1 = [6, 0]
+H1 = [7, 0]
+A2 = [0, 1]
+A3 = [0, 2]
+B2 = [1, 1]
+B3 = [1, 2]
+C2 = [2, 1]
+F2 = [5, 1]
+G2 = [6, 1]
+G3 = [6, 2]
+H2 = [7, 1]
+H3 = [7, 2]
+
+A8 = [0, 7]
+B8 = [1, 7]
+C8 = [2, 7]
+D8 = [3, 7]
+F8 = [5, 7]
+G8 = [6, 7]
+H8 = [7, 7]
+A7 = [0, 6]
+A6 = [0, 5]
+B7 = [1, 6]
+B6 = [1, 5]
+C7 = [2, 6]
+F7 = [5, 6]
+G7 = [6, 6]
+G6 = [6, 5]
+H7 = [7, 6]
+H6 = [7, 5]
 
 
 def evaluate_contacts(match, color):
@@ -90,38 +118,73 @@ def evaluate_movecnt(match, color, excludedpieces):
 
 
 def evaluate_developments(match, color):
-    developed_whites = 0
-    developed_blacks = 0
+    value = 0
 
     if(color == COLORS['white']):
-        if(match.wKg_first_movecnt > 0 and (match.wKg_first_movecnt == match.wRk_a1_first_movecnt or match.wKg_first_movecnt == match.wRk_h1_first_movecnt)):
-            if(match.readfield(X_F, Y_2) == PIECES['wPw'] and 
-               (match.readfield(X_G, Y_2) == PIECES['wPw'] or match.readfield(X_G, Y_3) == PIECES['wPw']) and
-               (match.readfield(X_H, Y_2) == PIECES['wPw'] or match.readfield(X_H, Y_3) == PIECES['wPw'])):
-                developed_whites = SCORES[PIECES['bPw']] // 4
-        else:
-            developed_whites = SCORES[PIECES['wPw']] // 4
+        if(match.readfield(F1[0], F1[1]) == PIECES['wKg'] or 
+           match.readfield(G1[0], G1[1]) == PIECES['wKg'] or 
+           match.readfield(H1[0], H1[1]) == PIECES['wKg'] and 
+           match.readfield(H1[0], H1[1]) != PIECES['wRk'] and
+           match.readfield(G1[0], G1[1]) != PIECES['wRk']):
+            if((match.readfield(G2[0], G2[1]) == PIECES['wPw'] or
+                match.readfield(G3[0], G3[1]) == PIECES['wPw']) and
+               (match.readfield(H2[0], H2[1]) == PIECES['wPw'] or
+                match.readfield(H3[0], H3[1]) == PIECES['wPw'])):
+                value = SCORES[PIECES['bPw']] // 4
+
+        elif(match.readfield(D1[0], D1[1]) == PIECES['wKg'] or
+             match.readfield(C1[0], C1[1]) == PIECES['wKg'] or
+             match.readfield(B1[0], B1[1]) == PIECES['wKg'] or
+             match.readfield(A1[0], A1[1]) == PIECES['wKg'] and
+             match.readfield(A1[0], A1[1]) != PIECES['wRk'] and
+             match.readfield(B1[0], B1[1]) != PIECES['wRk'] and
+             match.readfield(C1[0], C1[1]) != PIECES['wRk']):
+            if(match.readfield(C2[0], C2[1]) == PIECES['wPw'] and 
+               (match.readfield(B2[0], B2[1]) == PIECES['wPw'] or
+                match.readfield(B3[0], B3[1]) == PIECES['wPw']) and 
+               (match.readfield(A2[0], A2[1]) == PIECES['wPw'] or
+                match.readfield(A3[0], A3[1]) == PIECES['wPw'])):
+                value = SCORES[PIECES['bPw']] // 4
 
         excludedpieces = [ PIECES['wKg'], PIECES['wQu']]
-        whitemovecnt = evaluate_movecnt(match, COLORS['white'], excludedpieces)
-        whitemovecnt = (whitemovecnt * SCORES[PIECES['bPw']] // 4)
+        movecnt = evaluate_movecnt(match, COLORS['white'], excludedpieces)
+        
+        value += (movecnt * SCORES[PIECES['bPw']] // 4)
 
-        return developed_whites + whitemovecnt
-            
+        return value
+
     else:
-        if(match.bKg_first_movecnt > 0 and (match.bKg_first_movecnt == match.bRk_a8_first_movecnt or match.bKg_first_movecnt == match.bRk_h8_first_movecnt)):
-            if(match.readfield(X_F, Y_7) == PIECES['bPw'] and 
-               (match.readfield(X_G, Y_7) == PIECES['bPw'] or match.readfield(X_G, Y_6) == PIECES['bPw']) and
-               (match.readfield(X_H, Y_7) == PIECES['bPw'] or match.readfield(X_H, Y_6) == PIECES['bPw'])):
-                developed_blacks = SCORES[PIECES['wPw']] // 4
-        else:
-            developed_blacks = SCORES[PIECES['bPw']] // 4
+        if(match.readfield(F8[0], F8[1]) == PIECES['bKg'] or 
+           match.readfield(G8[0], G8[1]) == PIECES['bKg'] or 
+           match.readfield(H8[0], H8[1]) == PIECES['bKg'] and 
+           match.readfield(H8[0], H8[1]) != PIECES['bRk'] and
+           match.readfield(G8[0], G8[1]) != PIECES['bRk']):
+            if((match.readfield(G7[0], G7[1]) == PIECES['bPw'] or
+                match.readfield(G6[0], G6[1]) == PIECES['bPw']) and
+               (match.readfield(H7[0], H7[1]) == PIECES['bPw'] or
+                match.readfield(H6[0], H6[1]) == PIECES['bPw'])):
+                value = SCORES[PIECES['wPw']] // 4
+
+        elif(match.readfield(D8[0], D8[1]) == PIECES['bKg'] or
+             match.readfield(C8[0], C8[1]) == PIECES['bKg'] or
+             match.readfield(B8[0], B8[1]) == PIECES['bKg'] or
+             match.readfield(A8[0], A8[1]) == PIECES['bKg'] and
+             match.readfield(A8[0], A8[1]) != PIECES['bRk'] and
+             match.readfield(B8[0], B8[1]) != PIECES['bRk'] and
+             match.readfield(C8[0], C8[1]) != PIECES['bRk']):
+            if(match.readfield(C7[0], C7[1]) == PIECES['bPw'] and 
+               (match.readfield(B7[0], B7[1]) == PIECES['bPw'] or
+                match.readfield(B6[0], B6[1]) == PIECES['bPw']) and 
+               (match.readfield(A7[0], A7[1]) == PIECES['bPw'] or
+                match.readfield(A6[0], A6[1]) == PIECES['bPw'])):
+                value = SCORES[PIECES['wPw']] // 4
 
         excludedpieces = [ PIECES['bKg'], PIECES['bQu'] ]
-        blackmovecnt = evaluate_movecnt(match, COLORS['black'], excludedpieces)    
-        blackmovecnt = (blackmovecnt * SCORES[PIECES['wPw']] // 4)
+        movecnt = evaluate_movecnt(match, COLORS['black'], excludedpieces)    
+        
+        value += (movecnt * SCORES[PIECES['wPw']] // 4)
 
-        return developed_blacks + blackmovecnt
+        return value
 
 
 def evaluate_endgame(match, color):
