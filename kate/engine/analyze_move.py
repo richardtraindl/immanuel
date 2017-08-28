@@ -248,7 +248,7 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio1'], pmove[3])
             else:
                 count += 1
-                pmove[3] = min(PRIO['prio4'], pmove[3])
+                pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_ATTACK > 0):
             # performes a check
@@ -266,7 +266,7 @@ def rank_moves(priomoves):
             # attacker is NOT save
             else:
                 count += 1
-                pmove[3] = min(PRIO['prio4'], pmove[3])
+                pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
             # supported is attacked
@@ -282,11 +282,11 @@ def rank_moves(priomoves):
                 # supporter is NOT save
                 else:
                     count += 1
-                    pmove[3] = min(PRIO['prio4'], pmove[3])
+                    pmove[3] = min(PRIO['prio5'], pmove[3])
             else:
                 # supported is NOT attacked
                 count += 1
-                pmove[3] = min(PRIO['prio4'], pmove[3])
+                pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
             # exile-field is NOT attacked
@@ -299,11 +299,10 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
                 # exile-field is attacked and not properly supported
-                pmove[3] = min(PRIO['prio4'], pmove[3])
+                pmove[3] = min(PRIO['prio5'], pmove[3])
 
-        if(token & MV_IS_PROGRESS > 0 and pmove[3] > PRIO['prio2']):
-            pmove[3] = PRIO['prio2']
+        if(token & MV_IS_PROGRESS > 0):
+            pmove[3] = min(PRIO['prio3'], pmove[3])
 
-        if(count >= 2 and pmove[3] > PRIO['prio2']):
-            pmove[3] -= 1
+        pmove[3] = max((pmove[3] - count * 5), PRIO['prio2'])
 
