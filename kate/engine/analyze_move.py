@@ -304,5 +304,7 @@ def rank_moves(priomoves):
         if(token & MV_IS_PROGRESS > 0):
             pmove[3] = min(PRIO['prio3'], pmove[3])
 
-        pmove[3] = max((pmove[3] - count * 10), PRIO['prio2'])
+        if(count > 1 and pmove[3] > PRIO['prio2']):
+            pmove[3] -= 10
+
 
