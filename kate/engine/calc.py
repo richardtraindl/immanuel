@@ -140,7 +140,7 @@ def generate_moves(match):
         priomoves.sort(key=itemgetter(3))
 
         for pmove in priomoves:
-            priocnts[pmove[3]-1] += 1
+            priocnts[PRIO_INDICES[pmove[3]]] += 1
 
     return priomoves, priocnts
 
