@@ -93,6 +93,18 @@ PRIO = {
     'prio9' : 90,
     'unrated' : 100 }
 
+PRIO_INDICES = {
+    PRIO['prio1'] : 0,
+    PRIO['prio2'] : 1,
+    PRIO['prio3'] : 2,
+    PRIO['prio4'] : 3,
+    PRIO['prio5'] : 4,
+    PRIO['prio6'] : 5,
+    PRIO['prio7'] : 6,
+    PRIO['prio8'] : 7,
+    PRIO['prio9'] : 8,
+    PRIO['unrated'] : 9 }
+
 
 MV_IS_CASTLING                         = 0x8000000000
 MV_IS_PROMOTION                        = 0x4000000000
