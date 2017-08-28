@@ -82,16 +82,16 @@ SUPPORTED_SCORES = {
 
 
 PRIO = {
-    'prio1' : 10,
-    'prio2' : 20,
-    'prio3' : 30,
-    'prio4' : 40,
-    'prio5' : 50,
-    'prio6' : 60,
-    'prio7' : 70,
-    'prio8' : 80,
-    'prio9' : 90,
-    'unrated' : 100 }
+    'prio1' : 1,
+    'prio2' : 2,
+    'prio3' : 3,
+    'prio4' : 4,
+    'prio5' : 5,
+    'prio6' : 6,
+    'prio7' : 7,
+    'prio8' : 8,
+    'prio9' : 9,
+    'unrated' : 10 }
 
 PRIO_INDICES = {
     PRIO['prio1'] : 0,
