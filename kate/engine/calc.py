@@ -61,7 +61,7 @@ def read_steps(steps, dir_idx, step_idx):
 def generate_moves(match):
     color = match.next_color()
     priomoves = []
-    priocnts = [0] * 7
+    priocnts = [0] * 10
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
