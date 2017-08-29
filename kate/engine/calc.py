@@ -44,6 +44,9 @@ def prnt_priorities(prio_moves, prio_cnts):
         prnt_move(" ", pmove[0], "")
         print(" piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + " prio:" + str(pmove[3]))
 
+    for i in range(10):
+        print(str(i + 1) + ": " + str(prio_cnts[i]))
+
 
 def prnt_fmttime(msg, seconds):
     minute, sec = divmod(seconds, 60)
@@ -174,15 +177,13 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
         counts = ([3, 200], [6, 12], [10, 4])
 
     if(depth <= counts[0][0]):
-        return counts[0][1]
+        return (prio_cnts[0] + prio_cnts[1] + prio_cnts[2] + prio_cnts[3])
     elif(depth <= counts[1][0]):
-        return counts[1][1]
+        return (prio_cnts[0] + prio_cnts[1] + prio_cnts[2] + prio_cnts[3])
+    elif(depth <= counts[2][0]):
+        return min(counts[2][1], prio_cnts[0])
     else:
-        if(lastmv_prio == PRIO['prio1'] and depth <= counts[2][0]):
-            #return min(counts[2][1], prio_cnts[0])
-            return prio_cnts[0]
-        else:
-            return 0
+        return 0
 
 
 def calc_max(match, depth, alpha, beta, lastmv_prio, dbginfo):
