@@ -127,24 +127,19 @@ def progress(match, move):
     piece = match.readfield(move.srcx, move.srcy)
     color = Match.color_of_piece(piece)
 
+    if(match.count > 60):
+        if(score_endgame(match, color) > 0):
+            return token | MV_IS_PROGRESS
+
     ###
     oldvalue = score_contacts(match, color)
+    oldvalue += score_development(match, color)
 
-    if(match.count < 40):
-        oldvalue += score_development(match, color)
-    elif(match.count > 60):
-        oldvalue += score_endgame(match, color)
-    ###
-    
     ###
     do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
     newvalue = score_contacts(match, color)
-
-    if(match.count < 40):
-        newvalue += score_development(match, color)
-    elif(match.count > 60):
-        newvalue += score_endgame(match, color)
+    newvalue += score_development(match, color)
 
     undo_move(match)
     ###
