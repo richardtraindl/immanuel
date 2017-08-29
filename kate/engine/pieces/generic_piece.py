@@ -24,20 +24,34 @@ def contacts_to_token(frdlycontacts, enmycontacts, mode):
     frdlypawncnt, frdlyofficercnt, frdlyqueencnt = count_contacts(frdlycontacts)
     enmypawncnt, enmyofficercnt, enmyqueencnt = count_contacts(enmycontacts)
 
-    if(mode == "FIELDTOUCHES"):
+    if(mode == "SRCFIELDTOUCHES"):
         if(frdlypawncnt > 0):
-            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
+            token = token | SRCFIELD_IS_FRDLYTOUCHED_BY_PAWN
         if(frdlyofficercnt > 0):
-            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
+            token = token | SRCFIELD_IS_FRDLYTOUCHED_BY_OFFICER
         if(frdlyqueencnt > 0):
-            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_QUEEN
+            token = token | SRCFIELD_IS_FRDLYTOUCHED_BY_QUEEN
         
         if(enmypawncnt > 0):
-            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
+            token = token | SRCFIELD_IS_ENMYTOUCHED_BY_PAWN
         if(enmyofficercnt > 0):
-            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
+            token = token | SRCFIELD_IS_ENMYTOUCHED_BY_OFFICER
         if(enmyqueencnt > 0):
-            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_QUEEN
+            token = token | SRCFIELD_IS_ENMYTOUCHED_BY_QUEEN
+    elif(mode == "DSTFIELDTOUCHES"):
+        if(frdlypawncnt > 0):
+            token = token | DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
+        if(frdlyofficercnt > 0):
+            token = token | DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
+        if(frdlyqueencnt > 0):
+            token = token | DSTFIELD_IS_FRDLYTOUCHED_BY_QUEEN
+        
+        if(enmypawncnt > 0):
+            token = token | DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
+        if(enmyofficercnt > 0):
+            token = token | DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
+        if(enmyqueencnt > 0):
+            token = token | DSTFIELD_IS_ENMYTOUCHED_BY_QUEEN
     elif(mode == "ATTACKTOUCHES"):
         if(frdlypawncnt > 0):
             token = token | ATTACKED_IS_ADD_ATT_FROM_PAWN

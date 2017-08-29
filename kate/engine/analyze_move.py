@@ -35,15 +35,15 @@ def captures(match, move):
 
     for friend in fdlytouches:
         if(friend == PIECES['wPw'] or friend == PIECES['bPw']):
-            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
+            token = token | DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
         else:
-            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
+            token = token | DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
 
     for enmy in enmytouches:
         if(enmy == PIECES['wPw'] or enmy == PIECES['bPw']):
-            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
+            token = token | DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
         else:
-            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
+            token = token | DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
 
     return token
 
@@ -108,15 +108,15 @@ def flees(match, move):
 
         pawncnt, officercnt, queencnt = generic_piece.count_contacts(fdlycontacts)
         if(pawncnt > 0):
-            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
+            token = token | DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN
         if(officercnt + queencnt > 0):
-            token = token | MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
+            token = token | DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER
 
         pawncnt, officercnt, queencnt = generic_piece.count_contacts(enmycontacts)
         if(pawncnt > 0):
-            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
+            token = token | DSTFIELD_IS_ENMYTOUCHED_BY_PAWN
         if(officercnt + queencnt > 0):
-            token = token | MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
+            token = token | DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER
         ###
 
         return token
@@ -156,13 +156,13 @@ def analyze_move(match, move):
     piece = match.readfield(move.srcx, move.srcy)
 
     if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        token = token | MV_PIECE_IS_PAWN
+        token = token | PIECE_IS_PAWN
     elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        token = token | MV_PIECE_IS_QUEEN
+        token = token | PIECE_IS_QUEEN
     elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        token = token | MV_PIECE_IS_KING
+        token = token | PIECE_IS_KING
     else:
-        token = token | MV_PIECE_IS_OFFICER
+        token = token | PIECE_IS_OFFICER
 
     token = token | captures(match, move)
 
@@ -179,44 +179,60 @@ def analyze_move(match, move):
     return token
 
 
+def piece_is_equal_lower_than_enemy_on_srcfield(token):
+    if(token & PIECE_IS_PAWN > 0):
+        return True
+    elif(token & PIECE_IS_OFFICER > 0 and token & SRCFIELD_IS_ENMYTOUCHED_BY_PAWN == 0):
+        return True
+    elif(token & PIECE_IS_QUEEN > 0 and token & SRCFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & SRCFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+        return True
+    else:
+        return False
+
 def piece_is_equal_lower_than_enemy_on_dstfield(token):
-    if(token & MV_PIECE_IS_PAWN > 0):
+    if(token & PIECE_IS_PAWN > 0):
         return True
-    elif(token & MV_PIECE_IS_OFFICER > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0):
+    elif(token & PIECE_IS_OFFICER > 0 and token & DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0):
         return True
-    elif(token & MV_PIECE_IS_QUEEN > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
+    elif(token & PIECE_IS_QUEEN > 0 and token & DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
         return True
     else:
         return False
 
 def captured_is_equal_or_higher(token):
-    if(token & MV_PIECE_IS_PAWN > 0):
+    if(token & PIECE_IS_PAWN > 0):
         return True
-    elif(token & MV_PIECE_IS_OFFICER > 0 and token & CAPTURED_IS_PAWN == 0):
+    elif(token & PIECE_IS_OFFICER > 0 and token & CAPTURED_IS_PAWN == 0):
         return True
-    elif(token & MV_PIECE_IS_QUEEN > 0 and token & CAPTURED_IS_QUEEN > 0):
+    elif(token & PIECE_IS_QUEEN > 0 and token & CAPTURED_IS_QUEEN > 0):
         return True
     else:
         return False
 
 def attacked_is_equal_or_higher(token):
-    if(token & MV_PIECE_IS_PAWN > 0):
+    if(token & PIECE_IS_PAWN > 0):
         return True
-    elif(token & MV_PIECE_IS_OFFICER > 0 and token & ATTACKED_IS_PAWN == 0):
+    elif(token & PIECE_IS_OFFICER > 0 and token & ATTACKED_IS_PAWN == 0):
         return True
-    elif(token & MV_PIECE_IS_QUEEN > 0 and token & ATTACKED_IS_QUEEN > 0):
+    elif(token & PIECE_IS_QUEEN > 0 and token & ATTACKED_IS_QUEEN > 0):
         return True
     else:
         return False
 
 def dstfield_is_attacked(token):
-    if(token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER > 0 or token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_QUEEN > 0): 
+    if(token & DSTFIELD_IS_ENMYTOUCHED_BY_PAWN > 0 or token & DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER > 0 or token & DSTFIELD_IS_ENMYTOUCHED_BY_QUEEN > 0): 
+        return True
+    else:
+        return False
+
+def srcfield_is_supported(token):
+    if(token & SRCFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & SRCFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0 or token & SRCFIELD_IS_FRDLYTOUCHED_BY_QUEEN > 0):
         return True
     else:
         return False
 
 def dstfield_is_supported(token):
-    if(token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0 or token & MV_DSTFIELD_IS_FRDLYTOUCHED_BY_QUEEN > 0):
+    if(token & DSTFIELD_IS_FRDLYTOUCHED_BY_PAWN > 0 or token & DSTFIELD_IS_FRDLYTOUCHED_BY_OFFICER > 0 or token & DSTFIELD_IS_FRDLYTOUCHED_BY_QUEEN > 0):
         return True
     else:
         return False
@@ -260,11 +276,11 @@ def rank_moves(priomoves):
             # attacker is NOT touched by enemy
             elif(dstfield_is_attacked(token) == False):
                 count += 1
-                pmove[3] = min(PRIO['prio4'], pmove[3])
+                pmove[3] = min(PRIO['prio3'], pmove[3])
             # attacker is NOT touched by lower enemy and field is friendly-touched
             elif(piece_is_equal_lower_than_enemy_on_dstfield(token) and dstfield_is_supported(token)):
                 count += 1
-                pmove[3] = min(PRIO['prio4'], pmove[3])
+                pmove[3] = min(PRIO['prio3'], pmove[3])
             # attacker is NOT save
             else:
                 count += 1
@@ -291,8 +307,11 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
+            if(piece_is_equal_lower_than_enemy_on_srcfield(token) and srcfield_is_supported(token)):
+                count += 1
+                pmove[3] = min(PRIO['prio3'], pmove[3])
             # exile-field is NOT attacked
-            if(dstfield_is_attacked(token) == False):
+            elif(dstfield_is_attacked(token) == False):
                 count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
             # exile-field is NOT touched by lower enemy and field is friendly-touched

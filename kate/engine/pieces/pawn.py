@@ -118,13 +118,17 @@ def touches(match, srcx, srcy, dstx, dsty):
     opp_color = Match.oppcolor_of_piece(pawn)
 
     ###
+    frdlycontacts, enmycontacts = rules.field_touches(match, color, srcx, srcy)
+
+    token = token | contacts_to_token(frdlycontacts, enmycontacts, "SRCFIELDTOUCHES")
+    ###
     match.writefield(srcx, srcy, PIECES['blk'])
 
     frdlycontacts, enmycontacts = rules.field_touches(match, color, dstx, dsty)
 
     match.writefield(srcx, srcy, pawn)
 
-    token = token | contacts_to_token(frdlycontacts, enmycontacts, "FIELDTOUCHES")
+    token = token | contacts_to_token(frdlycontacts, enmycontacts, "DSTFIELDTOUCHES")
     ###
 
     if(color == COLORS['white']):

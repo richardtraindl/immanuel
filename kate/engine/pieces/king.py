@@ -100,7 +100,7 @@ def touches(match, srcx, srcy, dstx, dsty):
 
     match.writefield(srcx, srcy, king)
 
-    token = token | contacts_to_token(frdlycontacts, enmycontacts, "FIELDTOUCHES")
+    token = token | contacts_to_token(frdlycontacts, enmycontacts, "DSTFIELDTOUCHES")
     ###
 
     for i in range(8):
