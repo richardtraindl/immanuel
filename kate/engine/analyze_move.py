@@ -189,7 +189,7 @@ def piece_is_equal_lower_than_enemy_on_dstfield(token):
         return True
     elif(token & MV_PIECE_IS_OFFICER > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0):
         return True
-    elif(token & MV_PIECE_IS_QUEEN > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_QUEEN > 0):
+    elif(token & MV_PIECE_IS_QUEEN > 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_PAWN == 0 and token & MV_DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER == 0):
         return True
     else:
         return False
