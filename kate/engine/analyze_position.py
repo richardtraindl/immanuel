@@ -225,12 +225,12 @@ def score_endgame(match, color):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
             if(Match.color_of_piece(piece) == color and piece == PIECES['wPw']):
-                if(is_running(match, x, y)):
+                if(pawn.is_running(match, x, y)):
                     value += REVERSED_SCORES[piece] // 2
                     if(y >= 4):
                         value += REVERSED_SCORES[piece]
             elif(Match.color_of_piece(piece) == color and piece == PIECES['bPw']):
-                if(is_running(match, x, y)):
+                if(pawn.is_running(match, x, y)):
                     value += REVERSED_SCORES[piece] // 2
                     if(y <= 3):
                         value += REVERSED_SCORES[piece]
