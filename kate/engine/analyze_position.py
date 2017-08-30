@@ -177,10 +177,9 @@ def score_development(match, color):
                 match.readfield(A3[0], A3[1]) == PIECES['wPw'])):
                 value = SCORES[PIECES['bPw']] // 4
 
-        excludedpieces = [ PIECES['wKg'], PIECES['wQu']]
-        movecnt = count_all_moves(match, COLORS['white'], excludedpieces)
-        
-        value += (movecnt * SCORES[PIECES['bPw']] // 4)
+        #excludedpieces = [ PIECES['wKg'], PIECES['wQu']]
+        #movecnt = count_all_moves(match, COLORS['white'], excludedpieces)
+        #value += (movecnt * SCORES[PIECES['bPw']] // 4)
 
         return value
 
@@ -210,10 +209,9 @@ def score_development(match, color):
                 match.readfield(A6[0], A6[1]) == PIECES['bPw'])):
                 value = SCORES[PIECES['wPw']] // 4
 
-        excludedpieces = [ PIECES['bKg'], PIECES['bQu'] ]
-        movecnt = count_all_moves(match, COLORS['black'], excludedpieces)    
-        
-        value += (movecnt * SCORES[PIECES['wPw']] // 4)
+        #excludedpieces = [ PIECES['bKg'], PIECES['bQu'] ]
+        #movecnt = count_all_moves(match, COLORS['black'], excludedpieces)    
+        #value += (movecnt * SCORES[PIECES['wPw']] // 4)
 
         return value
 
