@@ -179,7 +179,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     if(depth <= counts[0][0]):
         return (prio_cnts[0] + prio_cnts[1] + prio_cnts[2] + prio_cnts[3])
     elif(depth <= counts[1][0]):
-        return min(counts[1][1], prio_cnts[0])
+        return prio_cnts[0]
     else:
         return 0
 
