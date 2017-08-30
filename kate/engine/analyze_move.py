@@ -307,14 +307,12 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
-            if(piece_is_equal_lower_than_enemy_on_srcfield(token) and srcfield_is_supported(token)):
+            if(dstfield_is_attacked(token) == False):
                 count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
-            # exile-field is NOT attacked
-            elif(dstfield_is_attacked(token) == False):
+            elif(piece_is_equal_lower_than_enemy_on_srcfield(token) and srcfield_is_supported(token) == False):
                 count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
-            # exile-field is NOT touched by lower enemy and field is friendly-touched
             elif(piece_is_equal_lower_than_enemy_on_dstfield(token) and dstfield_is_supported(token)):
                 count += 1
                 pmove[3] = min(PRIO['prio3'], pmove[3])
