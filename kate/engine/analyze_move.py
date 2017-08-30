@@ -219,6 +219,13 @@ def attacked_is_equal_or_higher(token):
     else:
         return False
 
+def attacked_is_supported(token):        
+    if(token & ATTACKED_IS_SUPP_BY_PAWN > 0 or 
+       token & ATTACKED_IS_SUPP_BY_OFFICER > 0):
+        return True
+    else:
+        return False
+
 def dstfield_is_attacked(token):
     if(token & DSTFIELD_IS_ENMYTOUCHED_BY_PAWN > 0 or token & DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER > 0 or token & DSTFIELD_IS_ENMYTOUCHED_BY_QUEEN > 0): 
         return True
@@ -269,22 +276,24 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_ATTACK > 0):
-            # performes a check
             if(token & ATTACKED_IS_KING > 0):
                 #count += 1
-                pmove[3] = min(PRIO['prio1'], pmove[3])
-            # attacker is NOT touched by enemy
-            elif(dstfield_is_attacked(token) == False):
-                count += 1
-                pmove[3] = min(PRIO['prio3'], pmove[3])
-            # attacker is NOT touched by lower enemy and field is friendly-touched
-            elif(piece_is_equal_lower_than_enemy_on_dstfield(token) and dstfield_is_supported(token)):
-                count += 1
-                pmove[3] = min(PRIO['prio3'], pmove[3])
-            # attacker is NOT save
+                prio = PRIO['prio1']
             else:
-                count += 1
-                pmove[3] = min(PRIO['prio5'], pmove[3])
+                if(attacked_is_supported(token) == False):
+                    prio = PRIO['prio3']
+                else:
+                    prio = PRIO['prio4']
+
+                if(piece_is_equal_lower_than_enemy_on_dstfield(token) and dstfield_is_supported(token)):
+                    count += 1
+                    pmove[3] = min(prio, pmove[3])
+                elif(dstfield_is_attacked(token) == False):
+                    count += 1
+                    pmove[3] = min(prio, pmove[3])
+                else:
+                    count += 1
+                    pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
             # supported is attacked
@@ -325,5 +334,6 @@ def rank_moves(priomoves):
 
         #if(count > 1 and pmove[3] > PRIO['prio2']):
             #pmove[3] -= PRIO['prio1']
+
 
 
