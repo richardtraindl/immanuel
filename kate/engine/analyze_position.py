@@ -148,7 +148,71 @@ def count_all_moves(match, color, excludedpieces):
     return movecnt
 
 
+def is_king_defended_by_pawns(match, color):
+    if(color == COLORS['white']):
+        y = 1
+        Kg_x = match.wKg_x
+        Kg_y = match.wKg_y
+        pawn = PIECES['wPw']
+    else:
+        y= 6
+        Kg_x = match.bKg_x
+        Kg_y = match.bKg_y
+        pawn = PIECES['bPw']
+    
+    count = 0
+    for x in range(8):
+        if(x == Kg_x or x - 1 == Kg_x or x + 1 == Kg_x):
+            if(match.readfield(x, y) == pawn):
+                count += 1
+
+    if(count >= 2):
+        return True
+    else:
+        return False
+    
 def score_development(match, color):
+    value = 0
+    
+    firstpiece = PIECES['blk']
+    lastpiece = PIECES['blk']
+    if(color == COLORS['white']):
+        y = 0
+        Kg_x = match.wKg_x
+        Kg_y = match.wKg_y
+    else:
+        y= 7
+        Kg_x = match.bKg_x
+        Kg_y = match.bKg_y
+    
+    for x in range(8):
+        piece = match.readfield(x, y)
+        if(piece != PIECES['blk']):
+            continue
+        elif(Match.color_of_piece(piece) == color):
+            if(firstpiece == PIECES['blk']):
+                firstpiece = piece
+            lastpiece = piece
+        else:
+            break
+
+    if(color == COLORS['white'] and Match.color_of_piece(firstpiece) == COLORS['white'] and Match.color_of_piece(lastpiece) == COLORS['white']):
+        if(firstpiece == PIECES['wKg'] or lastpiece == PIECES['wKg']):
+            if(is_king_defended_by_pawns(match, color)):
+                value = SCORES[PIECES['bPw']] // 4
+    elif(color == COLORS['black'] and Match.color_of_piece(firstpiece) == COLORS['black'] and Match.color_of_piece(lastpiece) == COLORS['black']):
+        if(firstpiece == PIECES['bKg'] or lastpiece == PIECES['bKg']):
+            if(is_king_defended_by_pawns(match, color)):
+                value = SCORES[PIECES['wPw']] // 4
+    elif(color == COLORS['white'] and (Match.color_of_piece(firstpiece) == COLORS['black'] or Match.color_of_piece(lastpiece) == COLORS['black'])):
+        value = SCORES[PIECES['wPw']] // 4
+    elif(color == COLORS['black'] and (Match.color_of_piece(firstpiece) == COLORS['white'] or Match.color_of_piece(lastpiece) == COLORS['white'])):
+        value = SCORES[PIECES['bPw']] // 4
+        
+    return value
+
+
+def score_development2(match, color):
     value = 0
 
     if(color == COLORS['white']):
