@@ -279,19 +279,18 @@ def rank_moves(priomoves):
         if(token & MV_IS_ATTACK > 0):
             if(token & ATTACKED_IS_KING > 0):
                 #count += 1
-                prio = PRIO['prio1']
-            else:
-                if(attacked_is_supported(token) == False):
-                    prio = PRIO['prio3']
+                pmove[3] = min(PRIO['prio1'], pmove[3])
+            elif(dstfield_is_attacked(token) == False):
+                if(attacked_is_supported(token) == False or attacked_is_equal_or_higher(token)):
+                    #count += 1
+                    pmove[3] = min(PRIO['prio1'], pmove[3])
                 else:
-                    prio = PRIO['prio4']
-
+                    count += 1
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
+            else:
                 if(piece_is_equal_lower_than_enemy_on_dstfield(token) and dstfield_is_supported(token)):
                     count += 1
-                    pmove[3] = min(prio, pmove[3])
-                elif(dstfield_is_attacked(token) == False):
-                    count += 1
-                    pmove[3] = min(prio, pmove[3])
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
                 else:
                     count += 1
                     pmove[3] = min(PRIO['prio5'], pmove[3])
