@@ -317,8 +317,8 @@ def is_white_ep_move_ok(match, srcx, srcy, dstx, dsty):
     piece = match.readfield(dstx, dsty)
     opp_piece = match.readfield(move.dstx, move.dsty)
     if(piece == PIECES['blk'] and opp_piece == PIECES['bPw'] and 
-       srcy == 4 and move.srcx == move.dstx and move.dstx == dstx and 
-       move.srcy - 2 == move.dsty):
+       move.srcy - move.dsty == 2 and move.dsty == srcy and move.dstx == dstx and 
+       move.dsty - dsty == -1):
         return True
     else:
         return False
@@ -333,8 +333,8 @@ def is_black_ep_move_ok(match, srcx, srcy, dstx, dsty):
     piece = match.readfield(dstx, dsty)
     opp_piece = match.readfield(move.dstx, move.dsty)
     if(piece == PIECES['blk'] and opp_piece == PIECES['wPw'] and 
-       srcy == 3 and move.srcx == move.dstx and move.dstx == dstx and 
-       move.srcy + 2 == move.dsty):
+       move.srcy - move.dsty == -2 and move.dsty == srcy and move.dstx == dstx and 
+       move.dsty - dsty == 1):
         return True
     else:
         return False

@@ -166,7 +166,7 @@ def is_king_defended_by_pawns(match, color):
     else:
         return False
     
-def score_development(match, color):
+def score_opening(match, color):
     value = 0
     
     firstpiece = PIECES['blk']
