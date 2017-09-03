@@ -130,20 +130,33 @@ def progress(match, move):
     if(match.count > 60):
         if(score_endgame(match, color) > 0):
             return token | MV_IS_PROGRESS
+        else:
+            return token
+    elif(match.count > 40):
+        ###
+        oldvalue = score_contacts(match, color)
+        #oldvalue += score_development(match, color)
+        ###
+        do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
-    ###
-    oldvalue = score_contacts(match, color)
-    oldvalue += score_development(match, color)
+        newvalue = score_contacts(match, color)
+        #newvalue += score_development(match, color)
 
-    ###
-    do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
+        undo_move(match)
+        ###
+    else:
+        ###
+        #oldvalue = score_contacts(match, color)
+        oldvalue = score_development(match, color)
+        ###
+        do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
-    newvalue = score_contacts(match, color)
-    newvalue += score_development(match, color)
+        #newvalue = score_contacts(match, color)
+        newvalue = score_development(match, color)
 
-    undo_move(match)
-    ###
-
+        undo_move(match)
+        ###
+        
     if((newvalue - oldvalue >= SUPPORTED_SCORES[PIECES['wQu']] and color == COLORS['white']) or 
        (newvalue - oldvalue <= SUPPORTED_SCORES[PIECES['bQu']] and color == COLORS['black'])):
         return token | MV_IS_PROGRESS
