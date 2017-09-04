@@ -4,7 +4,7 @@ from .move import *
 from .pieces import pawn, knight, bishop, rook, king, generic_piece
 from .cvalues import *
 from . import rules
-from .analyze_position import score_contacts, score_development, score_endgame
+from .analyze_position import score_contacts, score_opening, score_endgame
 from random import randint
 
 
@@ -135,24 +135,24 @@ def progress(match, move):
     elif(match.count > 40):
         ###
         oldvalue = score_contacts(match, color)
-        #oldvalue += score_development(match, color)
+        #oldvalue += score_opening(match, color)
         ###
         do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
         newvalue = score_contacts(match, color)
-        #newvalue += score_development(match, color)
+        #newvalue += score_opening(match, color)
 
         undo_move(match)
         ###
     else:
         ###
         #oldvalue = score_contacts(match, color)
-        oldvalue = score_development(match, color)
+        oldvalue = score_opening(match, color)
         ###
         do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
         #newvalue = score_contacts(match, color)
-        newvalue = score_development(match, color)
+        newvalue = score_opening(match, color)
 
         undo_move(match)
         ###
@@ -193,8 +193,8 @@ def analyze_move(match, move):
     return token
 
 
-def piece_is_equal_lower_than_enemy_on_srcfield(token):
-    if(token & PIECE_IS_PAWN > 0):
+def piece_is_higher_equal_than_enemy_on_srcfield(token):
+    if(token & PIECE_IS_PAWN > 0 and token & SRCFIELD_IS_ENMYTOUCHED_BY_PAWN > 0):
         return True
     elif(token & PIECE_IS_OFFICER > 0 and token & SRCFIELD_IS_ENMYTOUCHED_BY_PAWN == 0):
         return True
@@ -273,15 +273,12 @@ def rank_moves(priomoves):
             pmove[3] = min(PRIO['prio1'], pmove[3])
 
         if(token & MV_IS_CAPTURE > 0):
-            # captured is equal or higher
             if(captured_is_equal_or_higher(token)):
                 #count += 1
                 pmove[3] = min(PRIO['prio1'], pmove[3])
-            # field is NOT enemy-touched
             elif(dstfield_is_attacked(token) == False):
                 #count += 1
                 pmove[3] = min(PRIO['prio1'], pmove[3])
-            # field is NOT touched by lower enemy and field is friendly-touched
             elif(piece_is_equal_lower_than_enemy_on_dstfield(token) and dstfield_is_supported(token)):
                 #count += 1
                 pmove[3] = min(PRIO['prio1'], pmove[3])
@@ -295,8 +292,8 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio1'], pmove[3])
             elif(dstfield_is_attacked(token) == False):
                 if(attacked_is_supported(token) == False or attacked_is_equal_or_higher(token)):
-                    #count += 1
-                    pmove[3] = min(PRIO['prio1'], pmove[3])
+                    count += 1
+                    pmove[3] = min(PRIO['prio2'], pmove[3])
                 else:
                     count += 1
                     pmove[3] = min(PRIO['prio3'], pmove[3])
@@ -309,38 +306,37 @@ def rank_moves(priomoves):
                     pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
-            # supported is attacked
-            if(token & SUPPORTED_IS_ATT_FROM_PAWN > 0 or token & SUPPORTED_IS_ATT_FROM_OFFICER > 0):
-                # supporter is NOT touched by enemy
-                if(dstfield_is_attacked(token) == False):
+            if(dstfield_is_attacked(token) == False or 
+               (piece_is_equal_lower_than_enemy_on_dstfield(token) and dstfield_is_supported(token))):
+                # supported is attacked
+                if(token & SUPPORTED_IS_ATT_FROM_PAWN > 0 or token & SUPPORTED_IS_ATT_FROM_OFFICER > 0):
                     count += 1
-                    pmove[3] = min(PRIO['prio3'], pmove[3])
-                # supporter is NOT touched by lower enemy and field is friendly-touched
-                elif(piece_is_equal_lower_than_enemy_on_dstfield(token) and dstfield_is_supported(token)):
-                    count += 1
-                    pmove[3] = min(PRIO['prio3'], pmove[3])
-                # supporter is NOT save
+                    pmove[3] = min(PRIO['prio2'], pmove[3])
                 else:
                     count += 1
-                    pmove[3] = min(PRIO['prio5'], pmove[3])
+                    pmove[3] = min(PRIO['prio4'], pmove[3])
+            # supporter is NOT save
             else:
-                # supported is NOT attacked
                 count += 1
                 pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
-            if(dstfield_is_attacked(token) == False):
-                count += 1
-                pmove[3] = min(PRIO['prio3'], pmove[3])
-            elif(piece_is_equal_lower_than_enemy_on_srcfield(token) and srcfield_is_supported(token) == False):
-                count += 1
-                pmove[3] = min(PRIO['prio3'], pmove[3])
-            elif(piece_is_equal_lower_than_enemy_on_dstfield(token) and dstfield_is_supported(token)):
-                count += 1
-                pmove[3] = min(PRIO['prio3'], pmove[3])
+            if(srcfield_is_supported(token) == False):
+                if(dstfield_is_attacked(token) == False):
+                    count += 1
+                    pmove[3] = min(PRIO['prio2'], pmove[3])
+                elif(piece_is_equal_lower_than_enemy_on_dstfield(token) and dstfield_is_supported(token)):
+                    count += 1
+                    pmove[3] = min(PRIO['prio2'], pmove[3])
+                else:
+                    # exile-field is attacked and not properly supported
+                    pmove[3] = min(PRIO['prio4'], pmove[3])
             else:
-                # exile-field is attacked and not properly supported
-                pmove[3] = min(PRIO['prio5'], pmove[3])
+                if(piece_is_higher_equal_than_enemy_on_srcfield(token) == False):
+                    count += 1
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
+                else:
+                    pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_PROGRESS > 0):
             pmove[3] = min(PRIO['prio4'], pmove[3])
