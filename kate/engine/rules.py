@@ -248,7 +248,7 @@ def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
     elif(piece == PIECES['bPw']):
         if(pawn.is_black_ep_move_ok(match, srcx, srcy, dstx, dsty)):
             pawnenmy = match.readfield(dstx, srcy)
-            print("pawnenmy " + str(pawnenmy))
+            # print("pawnenmy " + str(pawnenmy))
             match.writefield(dstx, srcy, PIECES['blk'])
 
     match.writefield(srcx, srcy, PIECES['blk'])
