@@ -43,16 +43,15 @@ def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
-            if(piece != PIECES['wQu'] and piece != PIECES['bQu'] and piece != PIECES['wBp'] and piece != PIECES['bBp']):
-                continue
-            pin_dir = rules.pin_dir(match, x1, y1)
-            direction = bp_dir(fieldx, fieldy, x1, y1)
-            if(pin_dir != direction and pin_dir != rules.DIRS['undefined']):
-                continue
-            if(Match.color_of_piece(piece) == color):
-                frdlytouches.append(piece)
-            else:
-                enmytouches.append(piece)
+            if(piece == PIECES['wQu'] or piece == PIECES['bQu'] or piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                pin_dir = rules.pin_dir(match, x1, y1)
+                direction = bp_dir(fieldx, fieldy, x1, y1)
+                if(pin_dir != direction and pin_dir != rules.DIRS['undefined']):
+                    continue
+                if(Match.color_of_piece(piece) == color):
+                    frdlytouches.append(piece)
+                else:
+                    enmytouches.append(piece)
 
 
 def list_field_touches(match, color, fieldx, fieldy):

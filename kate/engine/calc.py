@@ -44,7 +44,7 @@ def prnt_priorities(prio_moves, prio_cnts):
         prnt_move(" ", pmove[0], "")
         print(" piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + " prio:" + str(pmove[3]))
 
-    for i in range(10):
+    for i in range(6):
         print(str(i + 1) + ": " + str(prio_cnts[i]))
 
 
@@ -64,7 +64,7 @@ def read_steps(steps, dir_idx, step_idx):
 def generate_moves(match):
     color = match.next_color()
     priomoves = []
-    priocnts = [0] * 10
+    priocnts = [0] * 6
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -132,7 +132,7 @@ def generate_moves(match):
         kg_attacked = rules.is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked):
-        for i in range(7):
+        for i in range(4):
             priocnts[i]= 0
         priocnts[0] = len(priomoves)
 
@@ -170,28 +170,27 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     sum_moves = len(prio_moves)
 
     if(sum_moves <= 10):
-        add_dpth = 2
-    elif(sum_moves <= 20):
         add_dpth = 1
     else:
         add_dpth = 0
 
     if(match.level == LEVELS['blitz']):
         cnts = 12
-        dpth = 2 + add_dpth
+        dpth = 3 + add_dpth
     elif(match.level == LEVELS['low']):
         cnts = 16
-        dpth = 3 + add_dpth
+        dpth = 4 + add_dpth
     elif(match.level == LEVELS['medium']):
         cnts = 20
-        dpth = 4 + add_dpth
+        dpth = 5 + add_dpth
     else:
         cnts = 24
-        dpth = 5 + add_dpth
+        dpth = 6 + add_dpth
 
     if(depth <= dpth):
         return min(cnts, sum_moves)
-    elif(lastmv_prio == PRIO['prio1'] and depth <= 10):
+    elif(lastmv_prio == PRIO['prio1'] and depth <= dpth + 2):
+        print(str(depth) + " ", end="")
         return prio_cnts[0]
     else:
         return 0

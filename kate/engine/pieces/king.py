@@ -58,12 +58,11 @@ def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if(piece != PIECES['wKg'] and piece != PIECES['bKg']):
-                continue
-            if(Match.color_of_piece(piece) == color):
-                frdlytouches.append(piece)
-            else:
-                enmytouches.append(piece)
+            if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                if(Match.color_of_piece(piece) == color):
+                    frdlytouches.append(piece)
+                else:
+                    enmytouches.append(piece)
 
 
 def list_field_touches(match, color, fieldx, fieldy):
