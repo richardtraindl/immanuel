@@ -84,6 +84,20 @@ def touches(match, move):
     return token
 
 
+"""def forks(match, move):
+    token = 0x0
+
+    piece = match.readfield(move.srcx, move.srcy)
+
+    enmycontacts = rules.forks(match, piece, move.dstx, move.dsty)
+
+    if(len(enmycontacts) > 1):
+        token = token | MV_IS_FORK
+
+    return token
+"""
+
+
 def flees(match, move):
     token = 0x0
 
@@ -241,6 +255,54 @@ def piece_is_lower_than_enemy_on_srcfield(token):
         else:
             return True
 
+def piece_is_lower_equal_than_enemy_on_srcfield(token):
+    if(token & PIECE_IS_KING > 0):
+        return False
+    elif(token & PIECE_IS_QUEEN > 0):
+        if(token & SRCFIELD_IS_ENMYTOUCHED_BY_QUEEN > 0):
+            return True
+        else:
+            return False
+    elif(token & PIECE_IS_OFFICER > 0):
+        if(token & SRCFIELD_IS_ENMYTOUCHED_BY_PAWN > 0):
+            return False
+        else:
+            return True
+    else: # token & PIECE_IS_PAWN > 0
+        return True
+
+def piece_is_lower_than_enemy_on_dstfield(token):
+    if(token & PIECE_IS_KING > 0):
+        return False
+    elif(token & PIECE_IS_QUEEN > 0):
+        return False
+    elif(token & PIECE_IS_OFFICER > 0):
+        if(token & DSTFIELD_IS_ENMYTOUCHED_BY_PAWN > 0 or token & DSTFIELD_IS_ENMYTOUCHED_BY_OFFICER > 0):
+            return False
+        else:
+            return True
+    else: # token & PIECE_IS_PAWN > 0
+        if(token & DSTFIELD_IS_ENMYTOUCHED_BY_PAWN > 0):
+            return False
+        else:
+            return True
+
+def piece_is_lower_equal_than_enemy_on_dstfield(token):
+    if(token & PIECE_IS_KING > 0):
+        return False
+    elif(token & PIECE_IS_QUEEN > 0):
+        if(token & DSTFIELD_IS_ENMYTOUCHED_BY_QUEEN > 0):
+            return True
+        else:
+            return False
+    elif(token & PIECE_IS_OFFICER > 0):
+        if(token & DSTFIELD_IS_ENMYTOUCHED_BY_PAWN > 0):
+            return False
+        else:
+            return True
+    else: # token & PIECE_IS_PAWN > 0
+        return True
+
 """def attacked_is_supported(token):        
     if(token & ATTACKED_IS_SUPP_BY_PAWN > 0 or 
        token & ATTACKED_IS_SUPP_BY_OFFICER > 0):
@@ -328,12 +390,16 @@ def rank_moves(priomoves):
                     pmove[3] = min(PRIO['prio3'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
-            if(srcfield_is_supported(token) and piece_is_lower_than_enemy_on_srcfield(token)):
-                pmove[3] = min(PRIO['prio3'], pmove[3])
-            elif(dstfield_is_attacked(token) and dstfield_is_supported(token) == False):
-                pmove[3] = min(PRIO['prio4'], pmove[3])
+            if(srcfield_is_supported(token) == False or 
+               (srcfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_srcfield(token) == False)):
+                if(dstfield_is_attacked(token) == False):
+                    pmove[3] = min(PRIO['prio1'], pmove[3])
+                elif(dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)):
+                    pmove[3] = min(PRIO['prio1'], pmove[3])
+                else:
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
-                pmove[3] = min(PRIO['prio1'], pmove[3])
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_PROGRESS > 0):
             pmove[3] = min(PRIO['prio3'], pmove[3])

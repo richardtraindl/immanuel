@@ -247,7 +247,7 @@ def score_position(match, movecnt):
     else:
         value = match.score
 
-        value += score_contacts(match, COLORS['white'])
+        """value += score_contacts(match, COLORS['white'])
         value += score_contacts(match, COLORS['black'])
 
         if(match.count < 40):
@@ -256,7 +256,7 @@ def score_position(match, movecnt):
 
         if(match.count > 50):
             value += score_endgame(match, COLORS['white'])
-            value += score_endgame(match, COLORS['black'])
+            value += score_endgame(match, COLORS['black'])"""
 
         return value
 

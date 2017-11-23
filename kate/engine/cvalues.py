@@ -101,9 +101,10 @@ MV_IS_CASTLING                         = 0x800000000000
 MV_IS_PROMOTION                        = 0x400000000000
 MV_IS_CAPTURE                          = 0x200000000000
 MV_IS_ATTACK                           = 0x100000000000
-MV_IS_SUPPORT                          = 0x080000000000
-MV_IS_FLEE                             = 0x040000000000
-MV_IS_PROGRESS                         = 0x020000000000
+# MV_IS_FORK                             = 0x080000000000
+MV_IS_SUPPORT                          = 0x040000000000
+MV_IS_FLEE                             = 0x020000000000
+MV_IS_PROGRESS                         = 0x010000000000
 
 PIECE_IS_PAWN                          = 0x008000000000
 PIECE_IS_OFFICER                       = 0x004000000000

@@ -226,6 +226,28 @@ def list_field_touches(match, color, srcx, srcy):
     return touches
 
 
+"""
+def forks(match, piece, dstx, dsty):
+    enmytouches = []
+
+    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+        king.forks(match, piece, dstx, dsty, enmytouches)
+    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):    
+        rook.forks(match, piece, dstx, dsty, enmytouches)
+        bishop.forks(match, piece, dstx, dsty, enmytouches)
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+        rook.forks(match, piece, dstx, dsty, enmytouches)
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+        bishop.forks(match, piece, dstx, dsty, enmytouches)
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+        knight.forks(match, piece, dstx, dsty, enmytouches)
+    elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+        pawn.forks(match, piece, dstx, dsty, enmytouches)
+
+    return enmytouches
+"""
+
+
 def is_king_attacked(match, x1, y1):
     king = match.readfield(x1, y1)
 

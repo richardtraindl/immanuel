@@ -169,7 +169,7 @@ def rate(color, newmove, newscore, currcndts, cndtscore, newcndts):
 def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     sum_moves = len(prio_moves)
 
-    if(sum_moves <= 10):
+    if(sum_moves <= 8):
         add_dpth = 1
     else:
         add_dpth = 0
@@ -190,7 +190,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     if(depth <= dpth):
         return min(cnts, sum_moves)
     elif(lastmv_prio == PRIO['prio1'] and depth <= dpth + 2):
-        print(str(depth) + " ", end="")
+        # print(str(depth) + " ", end="")
         return prio_cnts[0]
     else:
         return 0
