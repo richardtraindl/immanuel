@@ -358,7 +358,7 @@ def rank_moves(priomoves):
         piece = pmove[1]
 
         if(token & MV_IS_CASTLING > 0):
-            pmove[3] = min(PRIO['prio2'], pmove[3])
+            pmove[3] = min(PRIO['prio3'], pmove[3])
 
         if(token & MV_IS_PROMOTION > 0):
             pmove[3] = min(PRIO['prio1'], pmove[3])
@@ -367,40 +367,46 @@ def rank_moves(priomoves):
             if(captured_is_lower_than_piece(token) == False or dstfield_is_attacked(token) == False):
                 pmove[3] = min(PRIO['prio1'], pmove[3])
             else:
-                pmove[3] = min(PRIO['prio3'], pmove[3])
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_ATTACK > 0):
             if(token & ATTACKED_IS_KING > 0):
                 pmove[3] = min(PRIO['prio1'], pmove[3])
             elif(dstfield_is_supported(token) or dstfield_is_attacked(token) == False or attacked_is_lower_than_piece(token) == False):
-                pmove[3] = min(PRIO['prio2'], pmove[3])
-            else:
                 pmove[3] = min(PRIO['prio3'], pmove[3])
+            else:
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
             if(supported_is_attacked(token)):
                 if(supported_is_add_supported(token) == False and (dstfield_is_attacked(token) == False or dstfield_is_supported(token)) ):
                     pmove[3] = min(PRIO['prio1'], pmove[3])
                 else:
-                    pmove[3] = min(PRIO['prio3'], pmove[3])
+                    pmove[3] = min(PRIO['prio4'], pmove[3])
             else:
                 if(supported_is_add_supported(token) == False and (dstfield_is_attacked(token) == False or dstfield_is_supported(token))):
-                    pmove[3] = min(PRIO['prio2'], pmove[3])
-                else:
                     pmove[3] = min(PRIO['prio3'], pmove[3])
+                else:
+                    pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
             if(srcfield_is_supported(token) == False or 
                (srcfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_srcfield(token) == False)):
                 if(dstfield_is_attacked(token) == False):
-                    pmove[3] = min(PRIO['prio1'], pmove[3])
+                    #if(token & PIECE_IS_QUEEN > 0):
+                    pmove[3] = min(PRIO['prio2'], pmove[3])
+                    #else:
+                    #    pmove[3] = min(PRIO['prio1'], pmove[3])
                 elif(dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)):
-                    pmove[3] = min(PRIO['prio1'], pmove[3])
+                    #if(token & PIECE_IS_QUEEN > 0):
+                    pmove[3] = min(PRIO['prio2'], pmove[3])
+                    #else:
+                    #    pmove[3] = min(PRIO['prio1'], pmove[3])
                 else:
-                    pmove[3] = min(PRIO['prio3'], pmove[3])
+                    pmove[3] = min(PRIO['prio4'], pmove[3])
             else:
-                pmove[3] = min(PRIO['prio4'], pmove[3])
+                pmove[3] = min(PRIO['prio5'], pmove[3])
 
         if(token & MV_IS_PROGRESS > 0):
-            pmove[3] = min(PRIO['prio3'], pmove[3])
+            pmove[3] = min(PRIO['prio4'], pmove[3])
 
