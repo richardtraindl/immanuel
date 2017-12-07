@@ -103,6 +103,7 @@ MV_IS_CASTLING                         = 0x800000000000
 MV_IS_PROMOTION                        = 0x400000000000
 MV_IS_CAPTURE                          = 0x200000000000
 MV_IS_ATTACK                           = 0x100000000000
+MV_IS_FORK_DEFENSE                     = 0x080000000000
 # MV_IS_FORK                             = 0x080000000000
 MV_IS_SUPPORT                          = 0x040000000000
 MV_IS_FLEE                             = 0x020000000000
@@ -159,6 +160,8 @@ TOKEN_TEXT = {
     MV_IS_PROMOTION : "MV_IS_PROM",
     MV_IS_CAPTURE : "MV_IS_CAPT",
     MV_IS_ATTACK : "MV_IS_ATT",
+    MV_IS_FORK_DEFENSE : "MV_IS_FORK_DEFENSE",
+    #MV_IS_FORK : "MV_IS_FORK",
     MV_IS_SUPPORT : "MV_IS_SUPP",
     MV_IS_FLEE : "MV_IS_FLEE",
     MV_IS_PROGRESS : "MV_IS_PROGR",

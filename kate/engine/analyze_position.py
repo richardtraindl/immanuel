@@ -247,10 +247,10 @@ def score_position(match, movecnt):
     else:
         value = match.score
 
-        """value += score_contacts(match, COLORS['white'])
+        value += score_contacts(match, COLORS['white'])
         value += score_contacts(match, COLORS['black'])
 
-        if(match.count < 40):
+        """if(match.count < 40):
             value += score_opening(match, COLORS['white'])
             value += score_opening(match, COLORS['black'])
 

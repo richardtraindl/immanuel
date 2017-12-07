@@ -106,7 +106,11 @@ def touches(match, srcx, srcy, dstx, dsty):
         x1 = dstx + STEPS[i][0]
         y1 = dsty + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
+            if(x1 == srcx and y1 == srcy):
+                continue
+
             piece = match.readfield(x1, y1)
+
             if(match.color_of_piece(piece) == opp_color):
                 token = token | MV_IS_ATTACK
 
@@ -127,10 +131,6 @@ def touches(match, srcx, srcy, dstx, dsty):
                 token = token | contacts_to_token(frdlycontacts, enmycontacts, "ATTACKTOUCHES")
                 ###
             else:
-                if(x1 == srcx and y1 == srcy):
-                    continue
-                piece = match.readfield(x1, y1)
-
                 token = token | MV_IS_SUPPORT
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                     token = token | SUPPORTED_IS_PAWN
@@ -199,6 +199,18 @@ def score_supports_of_attacked(match, srcx, srcy):
                     score += SUPPORTED_SCORES[piece]
 
     return score 
+
+
+def defends_forked_field(match, piece, srcx, srcy, dstx, dsty):
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
+        if(x1 != rules.UNDEF_X):
+            if(rules.is_field_forked(match, piece, srcx, srcy, x1, y1)):
+                return True
+
+    return False
 
 
 def kg_dir(srcx, srcy, dstx, dsty):

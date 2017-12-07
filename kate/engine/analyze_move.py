@@ -84,18 +84,15 @@ def touches(match, move):
     return token
 
 
-"""def forks(match, move):
+def defends_fork(match, move):
     token = 0x0
 
     piece = match.readfield(move.srcx, move.srcy)
 
-    enmycontacts = rules.forks(match, piece, move.dstx, move.dsty)
-
-    if(len(enmycontacts) > 1):
-        token = token | MV_IS_FORK
+    if(rules.defends_forked_field(match, piece, move.srcx, move.srcy, move.dstx, move.dsty)):
+        token = token | MV_IS_FORK_DEFENSE
 
     return token
-"""
 
 
 def flees(match, move):
@@ -199,6 +196,8 @@ def analyze_move(match, move):
     token = token | castles(match, move)
 
     token = token | touches(match, move)
+
+    token = token | defends_fork(match, move)
 
     token = token | flees(match, move)
 
@@ -376,6 +375,9 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
                 pmove[3] = min(PRIO['prio4'], pmove[3])
+
+        if(token & MV_IS_FORK_DEFENSE > 0):
+            pmove[3] = min(PRIO['prio2'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
             if(supported_is_attacked(token)):
