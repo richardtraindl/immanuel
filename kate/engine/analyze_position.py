@@ -170,8 +170,10 @@ def score_opening(match):
     value = 0
 
     whiterate = SCORES[PIECES['bPw']] / 10
+
     blackrate = SCORES[PIECES['wPw']] / 10
 
+    # white position
     y = 0
     for x in range(8):
         piece = match.readfield(x, y)
@@ -191,6 +193,7 @@ def score_opening(match):
     if(piece == PIECES['wPw']):
         value += whiterate
 
+    # black position
     y = 7
     for x in range(8):
         piece = match.readfield(x, y)
@@ -229,75 +232,29 @@ def score_opening(match):
     movecnt = count_all_moves(match, COLORS['black'], excludedpieces)    
     value += (movecnt * SUPPORTED_SCORES[PIECES['bPw']])
 
-    if(value > 100 or value < -100):
-        print("*" + str(value) + "*", end="")
-    return value
-
-def score_opening2(match, color):
-    value = 0
-    
-    firstpiece = PIECES['blk']
-    lastpiece = PIECES['blk']
-    if(color == COLORS['white']):
-        y = 0
-        Kg_x = match.wKg_x
-        Kg_y = match.wKg_y
-    else:
-        y= 7
-        Kg_x = match.bKg_x
-        Kg_y = match.bKg_y
-    
-    for x in range(8):
-        piece = match.readfield(x, y)
-        if(piece != PIECES['blk']):
-            continue
-        elif(Match.color_of_piece(piece) == color):
-            if(firstpiece == PIECES['blk']):
-                firstpiece = piece
-            lastpiece = piece
-        else:
-            break
-
-    if(color == COLORS['white'] and Match.color_of_piece(firstpiece) == COLORS['white'] and Match.color_of_piece(lastpiece) == COLORS['white']):
-        if(firstpiece == PIECES['wKg'] or lastpiece == PIECES['wKg']):
-            if(is_king_defended_by_pawns(match, color)):
-                value = SUPPORTED_SCORES[PIECES['wRk']]
-    elif(color == COLORS['black'] and Match.color_of_piece(firstpiece) == COLORS['black'] and Match.color_of_piece(lastpiece) == COLORS['black']):
-        if(firstpiece == PIECES['bKg'] or lastpiece == PIECES['bKg']):
-            if(is_king_defended_by_pawns(match, color)):
-                value = SUPPORTED_SCORES[PIECES['bRk']]
-    elif(color == COLORS['white'] and (Match.color_of_piece(firstpiece) == COLORS['black'] or Match.color_of_piece(lastpiece) == COLORS['black'])):
-        value = SUPPORTED_SCORES[PIECES['wRk']]
-    elif(color == COLORS['black'] and (Match.color_of_piece(firstpiece) == COLORS['white'] or Match.color_of_piece(lastpiece) == COLORS['white'])):
-        value = SUPPORTED_SCORES[PIECES['bRk']]
-        
-    excludedpieces = [ PIECES['wKg'], PIECES['wQu']]
-    movecnt = count_all_moves(match, COLORS['white'], excludedpieces)
-    value += (movecnt * SUPPORTED_SCORES[PIECES['wPw']])
-
-    excludedpieces = [ PIECES['bKg'], PIECES['bQu'] ]
-    movecnt = count_all_moves(match, COLORS['black'], excludedpieces)    
-    value += (movecnt * SUPPORTED_SCORES[PIECES['bPw']])
-
     return value
 
 
-def score_endgame(match, color):
+def score_endgame(match):
     value = 0
+
+    whiterate = SCORES[PIECES['bPw']] / 10
+    whitesteprate = (SCORES[PIECES['bPw']] / 100)
+
+    blackrate = SCORES[PIECES['wPw']] / 10
+    blacksteprate = (SCORES[PIECES['wPw']] / 100)
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
-            if(Match.color_of_piece(piece) == color and piece == PIECES['wPw']):
+            if(piece == PIECES['wPw']):
                 if(pawn.is_running(match, x, y)):
-                    value += SUPPORTED_SCORES[PIECES['wPw']]
-                    if(y >= 4):
-                        value += SUPPORTED_SCORES[PIECES['wPw']]
-            elif(Match.color_of_piece(piece) == color and piece == PIECES['bPw']):
+                    value += whiterate
+                    value += whitesteprate * y
+            elif(piece == PIECES['bPw']):
                 if(pawn.is_running(match, x, y)):
-                    value += SUPPORTED_SCORES[PIECES['bPw']]
-                    if(y <= 3):
-                        value += SUPPORTED_SCORES[PIECES['bPw']]
+                    value += blackrate
+                    value += blacksteprate * (7 - y)
 
     return value
 
@@ -315,14 +272,14 @@ def score_position(match, movecnt):
         value = match.score
 
         value += score_contacts(match, COLORS['white'])
+
         value += score_contacts(match, COLORS['black'])
 
-        if(match.count < 20):
+        if(match.count < 30):
             value += score_opening(match)
 
-        """if(match.count > 50):
-            value += score_endgame(match, COLORS['white'])
-            value += score_endgame(match, COLORS['black'])"""
+        if(match.count >= 30):
+            value += score_endgame(match)
 
         return value
 
