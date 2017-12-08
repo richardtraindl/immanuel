@@ -165,8 +165,75 @@ def is_king_defended_by_pawns(match, color):
         return True
     else:
         return False
-    
-def score_opening(match, color):
+
+def score_opening(match):
+    value = 0
+
+    whiterate = SCORES[PIECES['bPw']] / 10
+    blackrate = SCORES[PIECES['wPw']] / 10
+
+    y = 0
+    for x in range(8):
+        piece = match.readfield(x, y)
+        if(piece == PIECES['wKn'] or piece == PIECES['wBp']):
+            value += blackrate
+
+    for y in range(2, 4):
+        for x in range(2, 5):
+            piece = match.readfield(x, y)
+            if(piece == PIECES['wPw']):
+                value += whiterate
+
+    piece = match.readfield(1, 2)
+    if(piece == PIECES['wPw']):
+        value += whiterate
+    piece = match.readfield(6, 2)
+    if(piece == PIECES['wPw']):
+        value += whiterate
+
+    y = 7
+    for x in range(8):
+        piece = match.readfield(x, y)
+        if(piece == PIECES['bKn'] or piece == PIECES['bBp']):
+            value += whiterate
+
+    for y in range(5, 3, -1):
+        for x in range(2, 5):
+            piece = match.readfield(x, y)
+            if(piece == PIECES['bPw']):
+                value += blackrate
+
+    piece = match.readfield(1, 5)
+    if(piece == PIECES['bPw']):
+        value += blackrate
+    piece = match.readfield(6, 5)
+    if(piece == PIECES['bPw']):
+        value += blackrate
+
+
+    if(is_king_defended_by_pawns(match, COLORS['white'])):
+        value += whiterate
+    else:
+        value += blackrate
+
+    if(is_king_defended_by_pawns(match, COLORS['black'])):
+        value += blackrate
+    else:
+        value += whiterate
+        
+    excludedpieces = [ PIECES['wKg'], PIECES['wQu']]
+    movecnt = count_all_moves(match, COLORS['white'], excludedpieces)
+    value += (movecnt * SUPPORTED_SCORES[PIECES['wPw']])
+
+    excludedpieces = [ PIECES['bKg'], PIECES['bQu'] ]
+    movecnt = count_all_moves(match, COLORS['black'], excludedpieces)    
+    value += (movecnt * SUPPORTED_SCORES[PIECES['bPw']])
+
+    if(value > 100 or value < -100):
+        print("*" + str(value) + "*", end="")
+    return value
+
+def score_opening2(match, color):
     value = 0
     
     firstpiece = PIECES['blk']
@@ -250,11 +317,10 @@ def score_position(match, movecnt):
         value += score_contacts(match, COLORS['white'])
         value += score_contacts(match, COLORS['black'])
 
-        """if(match.count < 40):
-            value += score_opening(match, COLORS['white'])
-            value += score_opening(match, COLORS['black'])
+        if(match.count < 20):
+            value += score_opening(match)
 
-        if(match.count > 50):
+        """if(match.count > 50):
             value += score_endgame(match, COLORS['white'])
             value += score_endgame(match, COLORS['black'])"""
 

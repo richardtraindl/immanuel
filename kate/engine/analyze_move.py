@@ -146,24 +146,22 @@ def progress(match, move):
     elif(match.count > 40):
         ###
         oldvalue = score_contacts(match, color)
-        #oldvalue += score_opening(match, color)
         ###
         do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
         newvalue = score_contacts(match, color)
-        #newvalue += score_opening(match, color)
 
         undo_move(match)
         ###
     else:
         ###
         #oldvalue = score_contacts(match, color)
-        oldvalue = score_opening(match, color)
+        oldvalue = score_opening(match)
         ###
         do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
         #newvalue = score_contacts(match, color)
-        newvalue = score_opening(match, color)
+        newvalue = score_opening(match)
 
         undo_move(match)
         ###
