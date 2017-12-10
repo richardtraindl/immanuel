@@ -139,7 +139,7 @@ def progress(match, move):
     color = Match.color_of_piece(piece)
 
     if(match.count > 60):
-        if(score_endgame(match, color) > 0):
+        if(score_endgame(match) > 0):
             return token | MV_IS_PROGRESS
         else:
             return token
@@ -368,7 +368,8 @@ def rank_moves(priomoves):
 
         if(token & MV_IS_ATTACK > 0):
             if(token & ATTACKED_IS_KING > 0):
-                pmove[3] = min(PRIO['prio1'], pmove[3])
+                pmove[3] = min(PRIO['prio2'], pmove[3])
+                # pmove[3] = min(PRIO['prio1'], pmove[3])
             elif(dstfield_is_supported(token) or dstfield_is_attacked(token) == False or attacked_is_lower_than_piece(token) == False):
                 pmove[3] = min(PRIO['prio3'], pmove[3])
             else:

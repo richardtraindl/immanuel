@@ -42,7 +42,7 @@ def prnt_moves(msg, moves):
 def prnt_priorities(prio_moves, prio_cnts):
     for pmove in prio_moves:
         prnt_move(" ", pmove[0], "")
-        print(" piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + " prio:" + str(pmove[3]))
+        print("piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + " prio:" + str(pmove[3]) + " \ntoken: " + hex(pmove[2]) + " " + token_to_text(pmove[2]))
 
     for i in range(6):
         print(str(i + 1) + ": " + str(prio_cnts[i]))
@@ -148,57 +148,50 @@ def generate_moves(match):
     return priomoves, priocnts
 
 
-def rate(color, newmove, newscore, currcndts, cndtscore, newcndts):
-    if( (color == COLORS["white"] and cndtscore > newscore) or (color == COLORS["black"] and cndtscore < newscore) ):
-        return cndtscore
+def rate(color, newscore, newmove, newcandidates, score, candidates):
+    if( (color == COLORS["white"] and score >= newscore) or (color == COLORS["black"] and score <= newscore) ):
+        return score
     else:
-        del currcndts[:]
-        currcndts.append(newmove)
+        del candidates[:]
+        candidates.append(newmove)
 
-        if(len(newcndts) > 0):
-            for cand in newcndts[:9]:
-                if(cand):
-                    currcndts.append(cand)
+        if(len(newcandidates) > 0):
+            for newcandidate in newcandidates[:12]:
+                if(newcandidate):
+                    candidates.append(newcandidate)
                 else:
                     break
 
-        currcndts.append(None)
+        candidates.append(None)
         return newscore
 
 
 def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
-    sum_moves = len(prio_moves)
-
-    if(sum_moves <= 8):
-        add_dpth = 1
-    else:
-        add_dpth = 0
-
     if(match.level == LEVELS['blitz']):
-        cnts = 12
-        dpth = 3 + add_dpth
-    elif(match.level == LEVELS['low']):
         cnts = 16
-        dpth = 4 + add_dpth
-    elif(match.level == LEVELS['medium']):
+        dpth = 2
+    elif(match.level == LEVELS['low']):
         cnts = 20
-        dpth = 5 + add_dpth
-    else:
+        dpth = 3
+    elif(match.level == LEVELS['medium']):
         cnts = 24
-        dpth = 6 + add_dpth
+        dpth = 4
+    else:
+        cnts = 28
+        dpth = 6
 
     if(depth <= dpth):
-        return min(cnts, sum_moves)
-    elif(lastmv_prio == PRIO['prio1'] and depth <= dpth + 3):
-        return prio_cnts[0] + min(2, prio_cnts[1])
+        return cnts
+    elif(lastmv_prio == PRIO['prio1'] and depth <= dpth + 6): # dpth + 4
+        return prio_cnts[0] # + min(2, prio_cnts[1])
     else:
         return 0
 
 
-def calc_max(match, depth, alpha, beta, lastmv_prio, dbginfo):
+def calc_max(match, depth, alpha, beta, lastmv_prio): # , dbginfo
     color = match.next_color()
-    currcndts = []
-    maxscore = -200000
+    candidates = []
+    maxscore = SCORES[PIECES['wKg']] * 2
     count = 0
 
     prio_moves, prio_cnts = generate_moves(match)
@@ -212,8 +205,8 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbginfo):
         prnt_priorities(prio_moves, prio_cnts)
 
     if(len(prio_moves) == 0 or maxcnt == 0):
-        currcndts.append(None)
-        return score_position(match, len(prio_moves)), currcndts
+        candidates.append(None)
+        return score_position(match, len(prio_moves)), candidates
 
     for pmove in prio_moves[:maxcnt]:
         newmove = pmove[0]
@@ -222,31 +215,31 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbginfo):
             count += 1
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   prio: " + str(pmove[3]) + "   token: " + hex(pmove[2]) + " " + token_to_text(pmove[2]))
+            print("   prio: " + str(pmove[3]))
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcndts = calc_min(match, depth + 1, maxscore, beta, pmove[3], dbginfo)
+        newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, pmove[3]) # , dbginfo
 
-        score = rate(color, newmove, newscore, currcndts, maxscore, newcndts)
+        score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
         if(depth == 1):
-            threadmoves = []
+            """threadmoves = []
             threadmoves.append(newmove)
 
-            if(len(newcndts) > 0):
-                for ncand in newcndts: # [:9]
-                    if(ncand):
-                        threadmoves.append(ncand)
+            if(len(newcandidates) > 0):
+                for newcandidate in newcandidates: # [:9]
+                    if(newcandidate):
+                        threadmoves.append(newcandidate)
                     else:
                         break
 
-            dbginfo[1].append(threadmoves)
+            dbginfo[1].append(threadmoves)"""
 
             prnt_move("CURR SEARCH: [", newmove, "]")
-            prnt_moves("", newcndts)
+            prnt_moves("", newcandidates)
 
-            prnt_moves("CANDIDATES: ", currcndts)
+            prnt_moves("CANDIDATES: ", candidates)
             print("newscore: " + str(newscore) + " / score: " + str(score) + " / maxscore: " + str(maxscore))
 
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
@@ -256,15 +249,15 @@ def calc_max(match, depth, alpha, beta, lastmv_prio, dbginfo):
         if(score > maxscore):
             maxscore = score
             if(maxscore > beta):
-                return maxscore, currcndts
+                return maxscore, candidates
 
-    return maxscore, currcndts
+    return maxscore, candidates
 
 
-def calc_min(match, depth, alpha, beta, lastmv_prio, dbginfo):
+def calc_min(match, depth, alpha, beta, lastmv_prio): # , dbginfo
     color = match.next_color()
-    currcndts = []
-    minscore = 200000
+    candidates = []
+    minscore = SCORES[PIECES['bKg']] * 2
     count = 0
 
     prio_moves, prio_cnts = generate_moves(match)
@@ -278,8 +271,8 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbginfo):
         prnt_priorities(prio_moves, prio_cnts)
 
     if(len(prio_moves) == 0 or maxcnt == 0):
-        currcndts.append(None)
-        return score_position(match, len(prio_moves)), currcndts
+        candidates.append(None)
+        return score_position(match, len(prio_moves)), candidates
 
     for pmove in prio_moves[:maxcnt]:
         newmove = pmove[0]
@@ -288,33 +281,33 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbginfo):
             count += 1
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   prio: " + str(pmove[3]) + "   token: " + hex(pmove[2]) + " " + token_to_text(pmove[2]))
+            print("   prio: " + str(pmove[3]))
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcndts = calc_max(match, depth + 1, alpha, minscore, pmove[3], dbginfo)
+        newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, pmove[3]) # , dbginfo
 
-        score = rate(color, newmove, newscore, currcndts, minscore, newcndts)
+        score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
 
         matchmove.undo_move(match)
 
         if(depth == 1):
-            threadmoves = []
+            """threadmoves = []
             threadmoves.append(newmove)
 
-            if(len(newcndts) > 0):
-                for ncand in newcndts: # [:9]
-                    if(ncand):
-                        threadmoves.append(ncand)
+            if(len(newcandidates) > 0):
+                for newcandidate in newcandidates: # [:9]
+                    if(newcandidate):
+                        threadmoves.append(newcandidate)
                     else:
                         break
 
-            dbginfo[1].append(threadmoves)
+            dbginfo[1].append(threadmoves)"""
 
             prnt_move("CURR SEARCH: [", newmove, "]")
-            prnt_moves("", newcndts)
+            prnt_moves("", newcandidates)
 
-            prnt_moves("CANDIDATES: ", currcndts)
+            prnt_moves("CANDIDATES: ", candidates)
             print("newscore: " + str(newscore) + " / score: " + str(score) + " / minscore: " + str(minscore))
 
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
@@ -322,32 +315,32 @@ def calc_min(match, depth, alpha, beta, lastmv_prio, dbginfo):
         if(score < minscore):
             minscore = score
             if(minscore < alpha):
-                return minscore, currcndts
+                return minscore, candidates
 
-    return minscore, currcndts
+    return minscore, candidates
 
 
 def calc_move(match):
-    currcndts = []
-    dbgcounts = [0] * 20
-    dbgcndts = []    
-    dbginfo = []
+    candidates = []
+    #dbgcounts = [0] * 20
+    #dbgcndts = []    
+    #dbginfo = []
     start = time.time()
 
-    dbginfo.append(dbgcounts)
-    dbginfo.append(dbgcndts)
+    #dbginfo.append(dbgcounts)
+    #dbginfo.append(dbgcndts)
 
     gmove = retrieve_move(match)
     if(gmove):
-        currcndts.append(gmove)
+        candidates.append(gmove)
         score = match.score
     elif(match.next_color() == COLORS['white']):
-        score, currcndts = calc_max(match, 1, -200000, 200000, None, dbginfo)
+        score, candidates = calc_max(match, 1, SCORES[PIECES['bKg']] * 2, SCORES[PIECES['bKg']] * 2, None) # , dbginfo
     else:
-        score, currcndts = calc_min(match, 1, -200000, 200000, None, dbginfo)
+        score, candidates = calc_min(match, 1, SCORES[PIECES['wKg']] * 2, SCORES[PIECES['bKg']] * 2, None) # , dbginfo
 
     msg = "result: " + str(score) + " match.id: " + str(match.id) + " "
-    prnt_moves(msg, currcndts)
+    prnt_moves(msg, candidates)
     
     #for i in range(20):
     #    print(str(i + 1) + ": " + str(dbgcounts[i]))
@@ -355,5 +348,5 @@ def calc_move(match):
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
     prnt_attributes(match)
-    return currcndts, dbginfo
+    return candidates # , dbginfo
 
