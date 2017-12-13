@@ -168,7 +168,7 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 
 def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     if(match.level == LEVELS['blitz']):
-        cnts = 16
+        cnts = 8
         dpth = 2
     elif(match.level == LEVELS['low']):
         cnts = 20
@@ -182,13 +182,13 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
 
     if(depth <= dpth):
         return cnts
-    elif(lastmv_prio == PRIO['prio1'] and depth <= dpth + 6): # dpth + 4
-        return prio_cnts[0] # + min(2, prio_cnts[1])
+    elif(lastmv_prio == PRIO['prio1'] and depth <= dpth + 4):
+        return min(4, prio_cnts[0])
     else:
         return 0
 
 
-def calc_max(match, depth, alpha, beta, lastmv_prio): # , dbginfo
+def calc_max(match, depth, alpha, beta, lastmv_prio):
     color = match.next_color()
     candidates = []
     maxscore = SCORES[PIECES['wKg']] * 2
@@ -197,9 +197,6 @@ def calc_max(match, depth, alpha, beta, lastmv_prio): # , dbginfo
     prio_moves, prio_cnts = generate_moves(match)
 
     maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio)
-
-    #dbgcounts = dbginfo[0]
-    #dbgcounts[depth-1] += 1
 
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
@@ -216,6 +213,8 @@ def calc_max(match, depth, alpha, beta, lastmv_prio): # , dbginfo
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
             print("   prio: " + str(pmove[3]))
+        elif(depth == 2):
+            print(".", end="")
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
@@ -224,19 +223,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio): # , dbginfo
         score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
         if(depth == 1):
-            """threadmoves = []
-            threadmoves.append(newmove)
-
-            if(len(newcandidates) > 0):
-                for newcandidate in newcandidates: # [:9]
-                    if(newcandidate):
-                        threadmoves.append(newcandidate)
-                    else:
-                        break
-
-            dbginfo[1].append(threadmoves)"""
-
-            prnt_move("CURR SEARCH: [", newmove, "]")
+            prnt_move("\nCURR SEARCH: [", newmove, "]")
             prnt_moves("", newcandidates)
 
             prnt_moves("CANDIDATES: ", candidates)
@@ -254,7 +241,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio): # , dbginfo
     return maxscore, candidates
 
 
-def calc_min(match, depth, alpha, beta, lastmv_prio): # , dbginfo
+def calc_min(match, depth, alpha, beta, lastmv_prio):
     color = match.next_color()
     candidates = []
     minscore = SCORES[PIECES['bKg']] * 2
@@ -264,9 +251,6 @@ def calc_min(match, depth, alpha, beta, lastmv_prio): # , dbginfo
 
     maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio)
 
-    #dbgcounts = dbginfo[0]
-    #dbgcounts[depth-1] += 1
-    
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
 
@@ -282,6 +266,8 @@ def calc_min(match, depth, alpha, beta, lastmv_prio): # , dbginfo
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
             print("   prio: " + str(pmove[3]))
+        elif(depth == 2):
+            print(".", end="")
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
@@ -292,19 +278,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio): # , dbginfo
         matchmove.undo_move(match)
 
         if(depth == 1):
-            """threadmoves = []
-            threadmoves.append(newmove)
-
-            if(len(newcandidates) > 0):
-                for newcandidate in newcandidates: # [:9]
-                    if(newcandidate):
-                        threadmoves.append(newcandidate)
-                    else:
-                        break
-
-            dbginfo[1].append(threadmoves)"""
-
-            prnt_move("CURR SEARCH: [", newmove, "]")
+            prnt_move("\nCURR SEARCH: [", newmove, "]")
             prnt_moves("", newcandidates)
 
             prnt_moves("CANDIDATES: ", candidates)
@@ -322,13 +296,8 @@ def calc_min(match, depth, alpha, beta, lastmv_prio): # , dbginfo
 
 def calc_move(match):
     candidates = []
-    #dbgcounts = [0] * 20
-    #dbgcndts = []    
-    #dbginfo = []
-    start = time.time()
 
-    #dbginfo.append(dbgcounts)
-    #dbginfo.append(dbgcndts)
+    start = time.time()
 
     gmove = retrieve_move(match)
     if(gmove):
@@ -342,11 +311,8 @@ def calc_move(match):
     msg = "result: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, candidates)
     
-    #for i in range(20):
-    #    print(str(i + 1) + ": " + str(dbgcounts[i]))
-
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
     prnt_attributes(match)
-    return candidates # , dbginfo
+    return candidates
 

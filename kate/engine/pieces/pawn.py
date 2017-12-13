@@ -120,6 +120,8 @@ def touches(match, srcx, srcy, dstx, dsty):
     frdlycontacts, enmycontacts = rules.field_touches(match, color, srcx, srcy)
 
     token = token | contacts_to_token(frdlycontacts, enmycontacts, "SRCFIELDTOUCHES")
+    del frdlycontacts[:]
+    del enmycontacts[:]
     ###
     match.writefield(srcx, srcy, PIECES['blk'])
 
@@ -128,6 +130,8 @@ def touches(match, srcx, srcy, dstx, dsty):
     match.writefield(srcx, srcy, pawn)
 
     token = token | contacts_to_token(frdlycontacts, enmycontacts, "DSTFIELDTOUCHES")
+    del frdlycontacts[:]
+    del enmycontacts[:]
     ###
 
     if(color == COLORS['white']):
@@ -146,15 +150,18 @@ def touches(match, srcx, srcy, dstx, dsty):
 
             if(match.color_of_piece(piece) == opp_color):
                 token = token | MV_IS_ATTACK
-
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                    token = token | ATTACKED_IS_PAWN
-                elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    token = token | ATTACKED_IS_KING
+                    token = token | ATTACKED_IS_PW
+                elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+                    token = token | ATTACKED_IS_KN
+                elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                    token = token | ATTACKED_IS_BP
+                elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+                    token = token | ATTACKED_IS_RK
                 elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    token = token | ATTACKED_IS_QUEEN
-                else:
-                    token = token | ATTACKED_IS_OFFICER
+                    token = token | ATTACKED_IS_QU
+                elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                    token = token | ATTACKED_IS_KG
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
@@ -171,11 +178,15 @@ def touches(match, srcx, srcy, dstx, dsty):
 
                 token = token | MV_IS_SUPPORT
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                    token = token | SUPPORTED_IS_PAWN
+                    token = token | SUPPORTED_IS_PW
+                elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+                    token = token | SUPPORTED_IS_KN
+                elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                    token = token | SUPPORTED_IS_BP
+                elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+                    token = token | SUPPORTED_IS_RK
                 elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    token = token | SUPPORTED_IS_QUEEN
-                else:
-                    token = token | SUPPORTED_IS_OFFICER
+                    token = token | SUPPORTED_IS_QU
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])

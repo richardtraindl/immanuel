@@ -5,7 +5,7 @@ from .helper import *
 from .cvalues import *
 
 
-def prnt_moves(match):
+def prnt_minutes(match):
     count = 1
     print("------------------------------------------------------")
     for move in match.move_list[1:]:
@@ -227,7 +227,7 @@ def token_to_text(token):
     tokentext = ""
     for key in TOKEN_TEXT:
         if(token & key > 0):
-            tokentext += "\n" + TOKEN_TEXT[key]
+            tokentext += " | " + TOKEN_TEXT[key]
 
     return tokentext
 
