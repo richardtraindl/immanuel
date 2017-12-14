@@ -182,8 +182,17 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
 
     if(depth <= dpth):
         return cnts
-    elif(lastmv_prio == PRIO['prio1'] and depth <= dpth + 4):
-        return min(4, prio_cnts[0])
+    elif(lastmv_prio == PRIO['prio1'] and depth <= dpth + 6):
+        if(prio_cnts[2] > 0):
+            idx = prio_cnts[0] + prio_cnts[1] + prio_cnts[2] - 1 
+            prio_moves.insert(0, prio_moves.pop(idx))
+            return min(4, prio_cnts[0] + 1)
+        elif(prio_cnts[3] > 0):
+            idx = prio_cnts[0] + prio_cnts[1] + + prio_cnts[2] +  prio_cnts[3] - 1
+            prio_moves.insert(0, prio_moves.pop(idx))
+            return min(4, prio_cnts[0] + 1)
+        else:
+            return min(4, prio_cnts[0])
     else:
         return 0
 
