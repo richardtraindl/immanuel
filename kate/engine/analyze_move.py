@@ -275,13 +275,7 @@ def piece_is_lower_equal_than_captured(token):
         else:
             return False
     else: # MV_PIECE_IS_PW
-        if(token & CAPTURED_IS_QU > 0 or 
-           token & CAPTURED_IS_RK > 0 or 
-           token & CAPTURED_IS_BP > 0 or 
-           token & CAPTURED_IS_KN > 0):
-            return True
-        else:
-            return False
+        return False
 
 def piece_is_lower_equal_than_attacked(token):
     if(token & ATTACKED_IS_KG == 0 and 
