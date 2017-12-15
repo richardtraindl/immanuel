@@ -189,8 +189,8 @@ def is_rook_over_king(match, color):
                 return True
         elif(match.readfield(x, y) == rook):
             rcnt += 1
-
-    if(rcnt == 2 and kcnt == 1):
+            
+    if(kcnt == 0 or (kcnt == 1 and rcnt == 2)):            
         return False
     else:
         return True
