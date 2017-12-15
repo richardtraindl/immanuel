@@ -446,7 +446,7 @@ def rank_moves(priomoves):
             pmove[3] = min(PRIO['prio2'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
-            if(token & SUPPORTED_IS_ATTACKED > 0):
+            if(token & SUPPORTED_IS_ATTACKED > 0 and token & SUPPORTED_IS_ADD_SUPPORTED == 0):
                 if( (dstfield_is_attacked(token) == False or 
                      (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token))) ): 
                     pmove[3] = min(PRIO['prio1'], pmove[3])
