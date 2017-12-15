@@ -67,21 +67,25 @@ SUPPORTED_SCORES = {
 
 PRIO = {
     'prio1' : 1,
-    'prio2' : 2,
-    'prio3' : 3,
-    'prio4' : 4,
-    'prio5' : 5,
-    'unrated' : 6,
-    'last' : 7 }
+    'prio1qu' : 2,
+    'prio2' : 3,
+    'prio2qu' : 4,
+    'prio3' : 5,
+    'prio3qu' : 6,
+    'prio4' : 7,
+    'prio4qu' : 8,
+    'last' : 9 }
 
 PRIO_INDICES = {
     PRIO['prio1'] : 0,
-    PRIO['prio2' ] : 1,
-    PRIO['prio3'] : 2,
-    PRIO['prio4'] : 3,
-    PRIO['prio5'] : 4,
-    PRIO['unrated'] : 5,
-    PRIO['last'] : 6 }
+    PRIO['prio1qu'] : 1,
+    PRIO['prio2' ] : 2,
+    PRIO['prio2qu' ] : 3,
+    PRIO['prio3'] : 4,
+    PRIO['prio3qu'] : 5,
+    PRIO['prio4'] : 6,
+    PRIO['prio4qu'] : 7,
+    PRIO['last'] : 8 }
 
 
 MV_IS_CASTLING                         = 0x80000000000000000000

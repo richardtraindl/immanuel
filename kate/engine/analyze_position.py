@@ -166,6 +166,35 @@ def is_king_defended_by_pawns(match, color):
     else:
         return False
 
+def is_rook_over_king(match, color):
+    if(color == COLORS['white']):
+        y = 0
+        Kg_x = match.wKg_x
+        Kg_y = match.wKg_y
+        king = PIECES['wKg']
+        rook = PIECES['wRk']
+    else:
+        y= 7
+        Kg_x = match.bKg_x
+        Kg_y = match.bKg_y
+        king = PIECES['bKg']
+        rook = PIECES['bRk']
+
+    kcnt = 0
+    rcnt = 0
+    for x in range(8):
+        if(match.readfield(x, y) == king):
+            kcnt += 1
+            if(rcnt == 0 or rcnt == 2):
+                return True
+        elif(match.readfield(x, y) == rook):
+            rcnt += 1
+
+    if(rcnt == 2 and kcnt == 1):
+        return False
+    else:
+        return True
+
 def score_opening(match):
     value = 0
 
@@ -214,16 +243,29 @@ def score_opening(match):
         value += blackrate
 
 
+    # white king
     if(is_king_defended_by_pawns(match, COLORS['white'])):
         value += whiterate
     else:
         value += blackrate
 
+    if(is_rook_over_king(match, COLORS['white'])):
+        value += whiterate
+    else:
+        value += blackrate
+
+    # black king
     if(is_king_defended_by_pawns(match, COLORS['black'])):
         value += blackrate
     else:
         value += whiterate
-        
+
+    if(is_rook_over_king(match, COLORS['black'])):
+        value += blackrate
+    else:
+        value += whiterate
+
+
     excludedpieces = [ PIECES['wKg'], PIECES['wQu']]
     movecnt = count_all_moves(match, COLORS['white'], excludedpieces)
     value += (movecnt * SUPPORTED_SCORES[PIECES['wPw']])
@@ -271,9 +313,9 @@ def score_position(match, movecnt):
     else:
         value = match.score
 
-        value += score_contacts(match, COLORS['white'])
+        """value += score_contacts(match, COLORS['white'])
 
-        value += score_contacts(match, COLORS['black'])
+        value += score_contacts(match, COLORS['black'])"""
 
         if(match.count < 30):
             value += score_opening(match)

@@ -64,7 +64,7 @@ def read_steps(steps, dir_idx, step_idx):
 def generate_moves(match):
     color = match.next_color()
     priomoves = []
-    priocnts = [0] * 6
+    priocnts = [0] * len(PRIO)
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -122,7 +122,7 @@ def generate_moves(match):
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         token = analyze_move.analyze_move(match, gmove)
-                        priomoves.append([gmove, piece, token, PRIO['unrated']])
+                        priomoves.append([gmove, piece, token, PRIO['last']])
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
 
@@ -132,12 +132,15 @@ def generate_moves(match):
         kg_attacked = rules.is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked):
-        for i in range(4):
+        for i in range(len(PRIO)):
             priocnts[i]= 0
         priocnts[0] = len(priomoves)
 
         for pmove in priomoves:
-            pmove[3] = PRIO['prio1']
+            if(pmove[1] == PIECES['wQu'] or pmove[1] == PIECES['bQu']):
+                pmove[3] = PRIO['prio1qu']
+            else:
+                pmove[3] = PRIO['prio1']
     else:
         rank_moves(priomoves)
         priomoves.sort(key=itemgetter(3))
@@ -168,7 +171,7 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 
 def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     if(match.level == LEVELS['blitz']):
-        cnts = 8
+        cnts = 12
         dpth = 2
     elif(match.level == LEVELS['low']):
         cnts = 20
@@ -182,17 +185,26 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
 
     if(depth <= dpth):
         return cnts
-    elif(lastmv_prio == PRIO['prio1'] and depth <= dpth + 6):
-        if(prio_cnts[2] > 0):
-            idx = prio_cnts[0] + prio_cnts[1] + prio_cnts[2] - 1 
+    elif((lastmv_prio == PRIO['prio1'] or lastmv_prio == PRIO['prio1qu']) and 
+         depth <= dpth + 6):
+        if(prio_cnts[PRIO_INDICES[PRIO['prio3']]] > 0):
+            idx = (prio_cnts[PRIO_INDICES[PRIO['prio1']]] + 
+                   prio_cnts[PRIO_INDICES[PRIO['prio1qu']]] + 
+                   prio_cnts[PRIO_INDICES[PRIO['prio2']]] + 
+                   prio_cnts[PRIO_INDICES[PRIO['prio2qu']]] + 1)
             prio_moves.insert(0, prio_moves.pop(idx))
-            return min(4, prio_cnts[0] + 1)
-        elif(prio_cnts[3] > 0):
-            idx = prio_cnts[0] + prio_cnts[1] + + prio_cnts[2] +  prio_cnts[3] - 1
+            return min(8, prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1qu']]] + 1)
+        elif(prio_cnts[PRIO_INDICES[PRIO['prio4']]] > 0):
+            idx = (prio_cnts[PRIO_INDICES[PRIO['prio1']]] + 
+                   prio_cnts[PRIO_INDICES[PRIO['prio1qu']]] + 
+                   prio_cnts[PRIO_INDICES[PRIO['prio2']]] + 
+                   prio_cnts[PRIO_INDICES[PRIO['prio2qu']]] + 
+                   prio_cnts[PRIO_INDICES[PRIO['prio3']]] + 
+                   prio_cnts[PRIO_INDICES[PRIO['prio3qu']]] + 1)
             prio_moves.insert(0, prio_moves.pop(idx))
-            return min(4, prio_cnts[0] + 1)
+            return min(8, prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1qu']]] + 1)
         else:
-            return min(4, prio_cnts[0])
+            return min(8, prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1qu']]])
     else:
         return 0
 

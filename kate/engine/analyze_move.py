@@ -442,17 +442,18 @@ def rank_moves(priomoves):
                 else:
                     pmove[3] = min(PRIO['prio2'], pmove[3])
             else:
-                pmove[3] = min(PRIO['prio3'], pmove[3])
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
             if(token & SUPPORTED_IS_ATTACKED > 0 and token & SUPPORTED_IS_ADD_SUPPORTED == 0):
-                if( (dstfield_is_attacked(token) == False or 
-                     (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token))) ): 
+                if( (dstfield_is_attacked(token) == False or dstfield_is_supported(token)) and 
+                    piece_is_lower_equal_than_enemy_on_dstfield(token) ): 
                     pmove[3] = min(PRIO['prio1'], pmove[3])
                 else:
-                    pmove[3] = min(PRIO['prio4'], pmove[3])
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
-                if(token & SUPPORTED_IS_ADD_SUPPORTED > 0 == False and (dstfield_is_attacked(token) == False or dstfield_is_supported(token))):
+                if(token & SUPPORTED_IS_ADD_SUPPORTED == 0 and 
+                   (dstfield_is_attacked(token) == False or dstfield_is_supported(token))):
                     pmove[3] = min(PRIO['prio3'], pmove[3])
                 else:
                     pmove[3] = min(PRIO['prio4'], pmove[3])
@@ -461,20 +462,17 @@ def rank_moves(priomoves):
             if(srcfield_is_supported(token) == False or 
                (srcfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_srcfield(token) == False)):
                 if(dstfield_is_attacked(token) == False):
-                    #if(token & PIECE_IS_QUEEN > 0):
-                    pmove[3] = min(PRIO['prio2'], pmove[3])
-                    #else:
-                    #    pmove[3] = min(PRIO['prio1'], pmove[3])
+                    pmove[3] = min(PRIO['prio1'], pmove[3])
                 elif(dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)):
-                    #if(token & PIECE_IS_QUEEN > 0):
-                    pmove[3] = min(PRIO['prio2'], pmove[3])
-                    #else:
-                    #    pmove[3] = min(PRIO['prio1'], pmove[3])
+                    pmove[3] = min(PRIO['prio1'], pmove[3])
                 else:
                     pmove[3] = min(PRIO['prio4'], pmove[3])
             else:
-                pmove[3] = min(PRIO['prio5'], pmove[3])
+                pmove[3] = min(PRIO['last'], pmove[3])
 
         if(token & MV_IS_PROGRESS > 0):
-            pmove[3] = min(PRIO['prio4'], pmove[3])
+            pmove[3] = min(PRIO['prio3'], pmove[3])
+
+        if(token & MV_PIECE_IS_QU > 0 and pmove[3] != PRIO['last']):
+            pmove[3] += 1
 
