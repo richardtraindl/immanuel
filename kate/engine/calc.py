@@ -1,5 +1,6 @@
 import time
 from operator import itemgetter
+import random
 from .match import *
 from .move import *
 from . import matchmove
@@ -138,7 +139,7 @@ def generate_moves(match):
 
         for pmove in priomoves:
             if(pmove[1] == PIECES['wQu'] or pmove[1] == PIECES['bQu']):
-                pmove[3] = PRIO['prio1qu']
+                pmove[3] = PRIO['prio1b']
             else:
                 pmove[3] = PRIO['prio1']
     else:
@@ -185,26 +186,24 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
 
     if(depth <= dpth):
         return cnts
-    elif((lastmv_prio == PRIO['prio1'] or lastmv_prio == PRIO['prio1qu']) and 
-         depth <= dpth + 6):
-        if(prio_cnts[PRIO_INDICES[PRIO['prio3']]] > 0):
-            idx = (prio_cnts[PRIO_INDICES[PRIO['prio1']]] + 
-                   prio_cnts[PRIO_INDICES[PRIO['prio1qu']]] + 
-                   prio_cnts[PRIO_INDICES[PRIO['prio2']]] + 
-                   prio_cnts[PRIO_INDICES[PRIO['prio2qu']]] + 1)
+    elif((lastmv_prio == PRIO['prio1'] or lastmv_prio == PRIO['prio1b']) and depth <= dpth + 6):
+        mvcnt = len(prio_moves)
+
+        prio1_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1b']]]
+
+        remaining_mvcnt = mvcnt - prio1_mvcnt
+        
+        addcnt = 0
+        if(remaining_mvcnt > 1):
+            addcnt += 1
+            idx = random.randint(prio1_mvcnt, mvcnt - 1)
             prio_moves.insert(0, prio_moves.pop(idx))
-            return min(8, prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1qu']]] + 1)
-        elif(prio_cnts[PRIO_INDICES[PRIO['prio4']]] > 0):
-            idx = (prio_cnts[PRIO_INDICES[PRIO['prio1']]] + 
-                   prio_cnts[PRIO_INDICES[PRIO['prio1qu']]] + 
-                   prio_cnts[PRIO_INDICES[PRIO['prio2']]] + 
-                   prio_cnts[PRIO_INDICES[PRIO['prio2qu']]] + 
-                   prio_cnts[PRIO_INDICES[PRIO['prio3']]] + 
-                   prio_cnts[PRIO_INDICES[PRIO['prio3qu']]] + 1)
+        if(remaining_mvcnt > 2):
+            addcnt += 1
+            idx = random.randint(prio1_mvcnt + 1, mvcnt - 1)
             prio_moves.insert(0, prio_moves.pop(idx))
-            return min(8, prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1qu']]] + 1)
-        else:
-            return min(8, prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1qu']]])
+
+        return min(8, prio1_mvcnt + addcnt)
     else:
         return 0
 
