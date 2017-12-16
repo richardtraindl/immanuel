@@ -22,7 +22,7 @@ def prnt_move(headmsg, move, tailmsg):
             index_to_coord(move.srcx, move.srcy) + "-" +
             index_to_coord(move.dstx, move.dsty), end="")
         if(move.prom_piece != PIECES['blk']):
-            print(reverse_lookup(PIECES, move.prom_piece), end="")
+            print(" " + reverse_lookup(PIECES, move.prom_piece), end="")
         print(tailmsg, end="")
 
 
@@ -42,10 +42,12 @@ def prnt_moves(msg, moves):
 
 def prnt_priorities(prio_moves, prio_cnts):
     for pmove in prio_moves:
-        prnt_move(" ", pmove[0], "")
-        print("piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + " prio:" + str(pmove[3]) + " \ntoken: " + hex(pmove[2]) + " " + token_to_text(pmove[2]))
+        prnt_move("\n ", pmove[0], "")
+        print("piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + 
+               " " + reverse_lookup(PRIO, pmove[3]) + 
+               " \ntoken: " + hex(pmove[2]) + " " + token_to_text(pmove[2]))
 
-    for i in range(6):
+    for i in range(len(prio_cnts)):
         print(str(i + 1) + ": " + str(prio_cnts[i]))
 
 
@@ -225,6 +227,12 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
         candidates.append(None)
         return score_position(match, len(prio_moves)), candidates
 
+    if(len(prio_moves) == 1):
+        pmove = prio_moves[0]
+        candidates.append(pmove[0])
+        candidates.append(None)
+        return score_position(match, len(prio_moves)), candidates
+
     for pmove in prio_moves[:maxcnt]:
         newmove = pmove[0]
 
@@ -275,6 +283,12 @@ def calc_min(match, depth, alpha, beta, lastmv_prio):
         prnt_priorities(prio_moves, prio_cnts)
 
     if(len(prio_moves) == 0 or maxcnt == 0):
+        candidates.append(None)
+        return score_position(match, len(prio_moves)), candidates
+
+    if(len(prio_moves) == 1):
+        pmove = prio_moves[0]
+        candidates.append(pmove[0])
         candidates.append(None)
         return score_position(match, len(prio_moves)), candidates
 
