@@ -1,7 +1,8 @@
 from .match import *
 from .matchmove import do_move, undo_move
 from .move import *
-from .pieces import pawn, knight, bishop, rook, king, generic_piece
+from .pieces import pawn, knight, bishop, rook, king
+from .pieces.generic_piece import contacts_to_token
 from .cvalues import *
 from . import rules
 from .analyze_position import score_contacts, score_opening, score_endgame
@@ -31,40 +32,6 @@ def captures(match, move):
 
     elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and move.srcx != move.dstx ):
         token = token | MV_IS_CAPTURE | CAPTURED_IS_PW
-    else:
-        return token
-
-    match.writefield(move.srcx, move.srcy, PIECES['blk'])
-    fdlytouches, enmytouches = rules.field_touches(match, color, move.dstx, move.dsty)
-    match.writefield(move.srcx, move.srcy, piece)
-
-    for friend in fdlytouches:
-        if(friend == PIECES['wPw'] or friend == PIECES['bPw']):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_PW
-        elif(friend == PIECES['wKn'] or friend == PIECES['bKn']):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_KN
-        elif(friend == PIECES['wBp'] or friend == PIECES['bBp']):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_BP
-        elif(friend == PIECES['wRk'] or friend == PIECES['bRk']):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_RK
-        elif(friend == PIECES['wQu'] or friend == PIECES['bQu']):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_QU
-        else:
-            token = token | DSTFLD_IS_FRDL_TOU_BY_KG
-
-    for enmy in enmytouches:
-        if(enmy == PIECES['wPw'] or enmy == PIECES['bPw']):
-            token = token | DSTFLD_IS_ENM_TOU_BY_PW
-        elif(enmy == PIECES['wKn'] or enmy == PIECES['bKn']):
-            token = token | DSTFLD_IS_ENM_TOU_BY_KN
-        elif(enmy == PIECES['wBp'] or enmy == PIECES['bBp']):
-            token = token | DSTFLD_IS_ENM_TOU_BY_BP
-        elif(enmy == PIECES['wRk'] or enmy == PIECES['bRk']):
-            token = token | DSTFLD_IS_ENM_TOU_BY_RK
-        elif(enmy == PIECES['wQu'] or enmy == PIECES['bQu']):
-            token = token | DSTFLD_IS_ENM_TOU_BY_QU
-        else:
-            token = token | DSTFLD_IS_ENM_TOU_BY_KG
 
     return token
 
@@ -89,18 +56,18 @@ def castles(match, move):
     return token
 
 
-def touches(match, move):
+def attacks_and_supports(match, move, attacked, supported):
     token = 0x0
 
-    token = token | rook.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+    token = token | rook.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
 
-    token = token | bishop.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+    token = token | bishop.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
 
-    token = token | knight.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+    token = token | knight.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
 
-    token = token | king.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+    token = token | king.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
 
-    token = token | pawn.touches(match, move.srcx, move.srcy, move.dstx, move.dsty)
+    token = token | pawn.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
 
     return token
 
@@ -126,48 +93,10 @@ def flees(match, move):
 
     enmycontacts = rules.list_field_touches(match, opp_color, move.srcx, move.srcy)
 
-    if(len(enmycontacts) == 0):
-        return token
-    else:
+    if(len(enmycontacts) > 0):
         token = token | MV_IS_FLEE
 
-        ###
-        match.writefield(move.srcx, move.srcy, PIECES['blk'])
-
-        fdlycontacts, enmycontacts = rules.field_touches(match, color, move.dstx, move.dsty)
-
-        match.writefield(move.srcx, move.srcy, piece)
-
-        pawncnt, knightcnt, bishopcnt, rookcnt, queencnt, kingcnt = generic_piece.count_contacts(fdlycontacts)
-        if(pawncnt > 0):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_PW
-        if(knightcnt > 0):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_KN
-        if(bishopcnt > 0):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_BP
-        if(rookcnt > 0):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_RK
-        if(queencnt > 0):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_QU
-        if(kingcnt > 0):
-            token = token | DSTFLD_IS_FRDL_TOU_BY_KG
-
-        pawncnt, knightcnt, bishopcnt, rookcnt, queencnt, kingcnt = generic_piece.count_contacts(enmycontacts)
-        if(pawncnt > 0):
-            token = token | DSTFLD_IS_ENM_TOU_BY_PW
-        if(knightcnt > 0):
-            token = token | DSTFLD_IS_ENM_TOU_BY_KN
-        if(bishopcnt > 0):
-            token = token | DSTFLD_IS_ENM_TOU_BY_BP
-        if(rookcnt > 0):
-            token = token | DSTFLD_IS_ENM_TOU_BY_RK
-        if(queencnt > 0):
-            token = token | DSTFLD_IS_ENM_TOU_BY_QU
-        if(kingcnt > 0):
-            token = token | DSTFLD_IS_ENM_TOU_BY_KG
-        ###
-
-        return token
+    return token
 
 
 def progress(match, move):
@@ -211,10 +140,16 @@ def progress(match, move):
 
 
 def analyze_move(match, move):
+    tokens = [0] * 3
     token = 0x0
+    attacked = []
+    supported = []
 
     piece = match.readfield(move.srcx, move.srcy)
+    
+    color = Match.color_of_piece(piece)
 
+    ###
     if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
         token = token | MV_PIECE_IS_PW
     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
@@ -227,6 +162,25 @@ def analyze_move(match, move):
         token = token | MV_PIECE_IS_QU
     elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
         token = token | MV_PIECE_IS_KG
+    ###
+
+    ###
+    match.writefield(move.srcx, move.srcy, PIECES['blk'])
+
+    frdlycontacts, enmycontacts = rules.field_touches(match, color, move.srcx, move.srcy)
+
+    token = token | contacts_to_token(frdlycontacts, enmycontacts, "SRCFIELDTOUCHES")
+    frdlycontacts.clear()
+    enmycontacts.clear()
+
+    frdlycontacts, enmycontacts = rules.field_touches(match, color, move.dstx, move.dsty)
+
+    match.writefield(move.srcx, move.srcy, piece)
+
+    token = token | contacts_to_token(frdlycontacts, enmycontacts, "DSTFIELDTOUCHES")
+    frdlycontacts.clear()
+    enmycontacts.clear()
+    ###
 
     token = token | captures(match, move)
 
@@ -234,7 +188,7 @@ def analyze_move(match, move):
 
     token = token | castles(match, move)
 
-    token = token | touches(match, move)
+    token = token | attacks_and_supports(match, move, attacked, supported)
 
     token = token | defends_fork(match, move)
 
@@ -242,7 +196,10 @@ def analyze_move(match, move):
 
     token = token | progress(match, move)
 
-    return token
+    tokens[0] = token
+    tokens[1] = attacked
+    tokens[2] = supported
+    return tokens
 
 
 def piece_is_lower_equal_than_captured(token):
@@ -418,7 +375,11 @@ def dstfield_is_supported(token):
 
 def rank_moves(priomoves):
     for pmove in priomoves:
-        token = pmove[2]
+        tokens = pmove[2]
+        token = tokens[0]
+        attacked = tokens[1]
+        supported = tokens[2]
+
         piece = pmove[1]
 
         if(token & MV_IS_CASTLING > 0):
@@ -434,6 +395,7 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_ATTACK > 0):
+            ATTACKED_IS_SUPPORTED = 0x0
             if( token & ATTACKED_IS_SUPPORTED == 0 and 
                 (dstfield_is_attacked(token) == False or 
                  (dstfield_is_supported(token) and piece_is_lower_equal_than_attacked(token))) ):
@@ -445,6 +407,8 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
+            SUPPORTED_IS_ATTACKED = 0x0
+            SUPPORTED_IS_ADD_SUPPORTED = 0x0
             if(token & SUPPORTED_IS_ATTACKED > 0 and token & SUPPORTED_IS_ADD_SUPPORTED == 0):
                 if( (dstfield_is_attacked(token) == False or dstfield_is_supported(token)) and 
                     piece_is_lower_equal_than_enemy_on_dstfield(token) ): 

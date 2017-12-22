@@ -86,7 +86,16 @@ def contacts_to_token(frdlycontacts, enmycontacts, mode):
             token = token | DSTFLD_IS_ENM_TOU_BY_QU
         if(enmy_kg_cnt > 0):
             token = token | DSTFLD_IS_ENM_TOU_BY_KG
-    elif(mode == "ATTACKTOUCHES"):
+
+    return token
+
+"""def contacts_to_cnts(frdlycontacts, enmycontacts, mode):
+    att_att = 0x0
+    att_supp = 0x0
+    supp_supp = 0x0
+    supp_att = 0x0
+
+    if(mode == "ATTACKTOUCHES"):
         if(frdl_pw_cnt + frdl_kn_cnt + frdl_bp_cnt + frdl_rk_cnt + frdl_qu_cnt + frdl_kg_cnt > 0):
             token = token | ATTACKED_IS_ADD_ATTACKED
 
@@ -105,5 +114,22 @@ def contacts_to_token(frdlycontacts, enmycontacts, mode):
         elif(sum_enmy > 1):
             token = token | SUPPORTED_IS_ATTACKED | SUPPORTED_IS_ADD_ATTACKED
 
-    return token
+    return att_att, att_supp, supp_supp, supp_att"""
 
+
+class clTouch:
+    def __init__(self, piece, fieldx, fieldy):
+        self.piece = piece
+        self.fieldx = fieldx
+        self.fieldy = fieldy
+        self.attacker = []
+        self.supporter = []
+        
+""" def add_touch(self, touches, piece, x1, y1):
+        touch = touches[-1:]
+        
+        if(mode == "a"):
+            touch[3].append([piece, x1, y1])
+        else:
+            touch[4].append([piece, x1, y1])
+"""

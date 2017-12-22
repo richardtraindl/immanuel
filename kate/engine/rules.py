@@ -200,6 +200,20 @@ def field_touches(match, color, fieldx, fieldy):
     return frdlytouches, enmytouches
 
 
+def field_touches_beyond(match, color, ctouch):
+    rook.field_color_touches_beyond(match, color, ctouch)
+
+    bishop.field_color_touches_beyond(match, color, ctouch)
+
+    knight.field_color_touches_beyond(match, color, ctouch)
+
+    king.field_color_touches_beyond(match, color, ctouch)
+
+    pawn.field_color_touches_beyond(match, color, ctouch)
+
+    return
+
+
 def list_field_touches(match, color, fieldx, fieldy):
     touches = []
 
@@ -260,8 +274,8 @@ def is_field_forked(match, piece, srcx, srcy, forkx, forky):
                 match.writefield(srcx, srcy, piece)
                 return True
 
-    del frdlytouches[:]
-    del enmytouches[:]
+    frdlytouches.clear()
+    enmytouches.clear()
     bishop.field_color_touches(match, color, forkx, forky, frdlytouches, enmytouches)
     if(len(frdlytouches) > 1):
         for enmy in enmytouches:
@@ -269,8 +283,8 @@ def is_field_forked(match, piece, srcx, srcy, forkx, forky):
                 match.writefield(srcx, srcy, piece)
                 return True
 
-    del frdlytouches[:]
-    del enmytouches[:]
+    frdlytouches.clear()
+    enmytouches.clear()
     knight.field_color_touches(match, color, forkx, forky, frdlytouches, enmytouches)
     if(len(frdlytouches) > 1):
         for enmy in enmytouches:
@@ -278,8 +292,8 @@ def is_field_forked(match, piece, srcx, srcy, forkx, forky):
                 match.writefield(srcx, srcy, piece)
                 return True
 
-    del frdlytouches[:]
-    del enmytouches[:]
+    frdlytouches.clear()
+    enmytouches.clear()
     pawn.field_color_touches(match, color, forkx, forky, frdlytouches, enmytouches)
     if(len(frdlytouches) > 1):
         for enmy in enmytouches:
@@ -287,8 +301,8 @@ def is_field_forked(match, piece, srcx, srcy, forkx, forky):
                 match.writefield(srcx, srcy, piece)
                 return True
 
-    del frdlytouches[:]
-    del enmytouches[:]
+    frdlytouches.clear()
+    enmytouches.clear()
     king.field_color_touches(match, color, forkx, forky, frdlytouches, enmytouches)
     if(len(frdlytouches) > 1):
         for enmy in enmytouches:

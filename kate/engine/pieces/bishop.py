@@ -1,7 +1,7 @@
 from .. match import *
 from .. import rules
 from .. cvalues import *
-from .generic_piece import contacts_to_token
+from .generic_piece import clTouch
 
 
 NEAST_X = 1
@@ -54,6 +54,24 @@ def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
                     enmytouches.append(piece)
 
 
+def field_color_touches_beyond(match, color, ctouch):
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, ctouch.fieldx, ctouch.fieldy, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if(piece == PIECES['wQu'] or piece == PIECES['bQu'] or piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                pin_dir = rules.pin_dir(match, x1, y1)
+                direction = bp_dir(ctouch.fieldx, ctouch.fieldy, x1, y1)
+                if(pin_dir != direction and pin_dir != rules.DIRS['undefined']):
+                    continue
+                if(Match.color_of_piece(piece) == color):
+                    ctouch.supporter.append([piece, x1, y1])
+                else:
+                    ctouch.attacker.append([piece, x1, y1])
+
+
 def list_field_touches(match, color, fieldx, fieldy):
     touches = []
     
@@ -70,7 +88,7 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
   
-def touches(match, srcx, srcy, dstx, dsty):
+def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
     token = 0x0
 
     bishop = match.readfield(srcx, srcy)
@@ -80,26 +98,6 @@ def touches(match, srcx, srcy, dstx, dsty):
 
     color = Match.color_of_piece(bishop)
     opp_color = Match.oppcolor_of_piece(bishop)
-
-    ###
-    frdlycontacts, enmycontacts = rules.field_touches(match, color, srcx, srcy)
-
-    token = token | contacts_to_token(frdlycontacts, enmycontacts, "SRCFIELDTOUCHES")
-    del frdlycontacts[:]
-    del enmycontacts[:]
-    ###
-    
-    
-    match.writefield(srcx, srcy, PIECES['blk'])
-
-    frdlycontacts, enmycontacts = rules.field_touches(match, color, dstx, dsty)
-
-    match.writefield(srcx, srcy, bishop)
-
-    token = token | contacts_to_token(frdlycontacts, enmycontacts, "DSTFIELDTOUCHES")
-    del frdlycontacts[:]
-    del enmycontacts[:]
-    ###
 
     for i in range(4):
         stepx = STEPS[i][0]
@@ -112,6 +110,9 @@ def touches(match, srcx, srcy, dstx, dsty):
             piece = match.readfield(x1, y1)
             
             if(Match.color_of_piece(piece) == opp_color):
+                ctouch = clTouch(piece, x1, y1)
+                attacked.append(ctouch)
+
                 token = token | MV_IS_ATTACK
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                     token = token | ATTACKED_IS_PW
@@ -129,15 +130,16 @@ def touches(match, srcx, srcy, dstx, dsty):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                frdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+                rules.field_touches_beyond(match, opp_color, ctouch)
 
                 match.writefield(srcx, srcy, bishop)
-
-                token = token | contacts_to_token(frdlycontacts, enmycontacts, "ATTACKTOUCHES")
                 ###
             else:
                 if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     continue
+
+                ctouch = clTouch(piece, x1, y1)
+                supported.append(ctouch)
 
                 token = token | MV_IS_SUPPORT
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
@@ -154,14 +156,12 @@ def touches(match, srcx, srcy, dstx, dsty):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                frdlycontacts, enmycontacts = rules.field_touches(match, color, x1, y1)
+                rules.field_touches_beyond(match, color, ctouch)
 
                 match.writefield(srcx, srcy, bishop)
-
-                token = token | contacts_to_token(frdlycontacts, enmycontacts, "SUPPORTTOUCHES")
                 ###
 
-    return token
+    return token 
 
 
 def score_attacks(match, srcx, srcy):

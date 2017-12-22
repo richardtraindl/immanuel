@@ -1,6 +1,5 @@
 from .match import *
 from .rules import RETURN_CODES, game_status, is_move_inbounds
-from . import analyze_move
 from .pieces import pawn, knight, bishop, rook, king 
 from .cvalues import *
 

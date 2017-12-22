@@ -42,10 +42,11 @@ def prnt_moves(msg, moves):
 
 def prnt_priorities(prio_moves, prio_cnts):
     for pmove in prio_moves:
-        prnt_move("\n ", pmove[0], "")
-        print("piece:" + str(pmove[1]) + " token:" + hex(pmove[2]) + 
+        tokens = pmove[2]
+        prnt_move("\n ", pmove[0], "")        
+        print("piece:" + str(pmove[1]) + " token:" + hex(tokens[0]) + 
                " " + reverse_lookup(PRIO, pmove[3]) + 
-               " \ntoken: " + hex(pmove[2]) + " " + token_to_text(pmove[2]))
+               " \ntoken: " + hex(tokens[0]) + " " + token_to_text(tokens[0]))
 
     for i in range(len(prio_cnts)):
         print(str(i + 1) + ": " + str(prio_cnts[i]))
@@ -124,8 +125,8 @@ def generate_moves(match):
                     flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
-                        token = analyze_move.analyze_move(match, gmove)
-                        priomoves.append([gmove, piece, token, PRIO['last']])
+                        tokens = analyze_move(match, gmove)
+                        priomoves.append([gmove, piece, tokens, PRIO['last']])
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
 
