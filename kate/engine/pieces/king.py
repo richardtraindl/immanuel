@@ -1,7 +1,7 @@
 from .. match import *
 from .. import rules
 from .. cvalues import *
-from .generic_piece import clTouch
+from .generic_piece import cTouch
 
 
 STEP_1N_X = 0
@@ -73,9 +73,9 @@ def field_color_touches_beyond(match, color, ctouch):
             piece = match.readfield(x1, y1)
             if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 if(Match.color_of_piece(piece) == color):
-                    ctouch.supporter.append([piece, x1, y1])
+                    ctouch.supporter_beyond.append([piece, x1, y1])
                 else:
-                    ctouch.attacker.append([piece, x1, y1])
+                    ctouch.attacker_beyond.append([piece, x1, y1])
 
 
 def list_field_touches(match, color, fieldx, fieldy):
@@ -115,7 +115,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
             piece = match.readfield(x1, y1)
 
             if(match.color_of_piece(piece) == opp_color):
-                ctouch = clTouch(piece, x1, y1)
+                ctouch = cTouch(piece, x1, y1)
                 attacked.append(ctouch)
 
                 token = token | MV_IS_ATTACK
@@ -138,7 +138,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 match.writefield(srcx, srcy, king)
                 ###
             else:
-                ctouch = clTouch(piece, x1, y1)
+                ctouch = cTouch(piece, x1, y1)
                 supported.append(ctouch)
 
                 token = token | MV_IS_SUPPORT

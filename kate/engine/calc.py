@@ -174,28 +174,26 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 
 
 def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
+    mvcnt = len(prio_moves)
+    prio1_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1b']]]
+    remaining_mvcnt = mvcnt - prio1_mvcnt
+
     if(match.level == LEVELS['blitz']):
         cnts = 12
         dpth = 2
     elif(match.level == LEVELS['low']):
-        cnts = 20
+        cnts = 16
         dpth = 3
     elif(match.level == LEVELS['medium']):
-        cnts = 24
+        cnts = 20
         dpth = 4
     else:
-        cnts = 28
+        cnts = 24
         dpth = 6
 
     if(depth <= dpth):
-        return cnts
+        return max(cnts, prio1_mvcnt)
     elif((lastmv_prio == PRIO['prio1'] or lastmv_prio == PRIO['prio1b']) and depth <= dpth + 6):
-        mvcnt = len(prio_moves)
-
-        prio1_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1b']]]
-
-        remaining_mvcnt = mvcnt - prio1_mvcnt
-        
         addcnt = 0
         if(remaining_mvcnt > 1):
             addcnt += 1

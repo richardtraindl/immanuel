@@ -1,7 +1,7 @@
 from .. match import *
 from .. import rules
 from .. cvalues import *
-from .generic_piece import clTouch
+from .generic_piece import cTouch
 
 
 STEP_2N1E_X = 1
@@ -74,11 +74,11 @@ def field_color_touches_beyond(match, color, ctouch):
                 if(pin_dir != rules.DIRS['undefined']):
                     continue
                 if(Match.color_of_piece(piece) == color):
-                    ctouch = clTouch(piece, x1, y1)
-                    ctouch.supporter.append([piece, x1, y1])
+                    ctouch = cTouch(piece, x1, y1)
+                    ctouch.supporter_beyond.append([piece, x1, y1])
                 else:
-                    ctouch = clTouch(piece, x1, y1)
-                    ctouch.attacker.append([piece, x1, y1])
+                    ctouch = cTouch(piece, x1, y1)
+                    ctouch.attacker_beyond.append([piece, x1, y1])
 
 
 def list_field_touches(match, color, fieldx, fieldy):
@@ -89,6 +89,11 @@ def list_field_touches(match, color, fieldx, fieldy):
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
+
+            pin_dir = rules.pin_dir(match, x1, y1)
+            if(pin_dir != rules.DIRS['undefined']):
+                continue
+
             if( (color == COLORS['white'] and piece == PIECES['wKn']) or
                 (color == COLORS['black'] and piece == PIECES['bKn']) ):
                 touches.append([piece, x1, y1])
@@ -117,7 +122,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
             piece = match.readfield(x1, y1)
 
             if(match.color_of_piece(piece) == opp_color):
-                ctouch = clTouch(piece, x1, y1)
+                ctouch = cTouch(piece, x1, y1)
                 attacked.append(ctouch)
 
                 token = token | MV_IS_ATTACK
@@ -146,7 +151,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     continue
 
-                ctouch = clTouch(piece, x1, y1)
+                ctouch = cTouch(piece, x1, y1)
                 supported.append(ctouch)
 
                 token = token | MV_IS_SUPPORT

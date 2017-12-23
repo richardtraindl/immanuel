@@ -92,8 +92,19 @@ def flees(match, move):
     opp_color = Match.oppcolor_of_piece(piece)
 
     enmycontacts = rules.list_field_touches(match, opp_color, move.srcx, move.srcy)
+    old_cnt = len(enmycontacts)
+    enmycontacts.clear()
 
-    if(len(enmycontacts) > 0):
+    ###
+    do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
+
+    enmycontacts = rules.list_field_touches(match, opp_color, move.dstx, move.dsty)
+    new_cnt = len(enmycontacts)
+
+    undo_move(match)
+    ###
+
+    if(new_cnt < old_cnt):
         token = token | MV_IS_FLEE
 
     return token
@@ -373,14 +384,36 @@ def dstfield_is_supported(token):
     else:
         return False
 
+def is_attacked_supported(attacked):
+    for ctouch in attacked:
+        if(len(ctouch.supporter_beyond) > 0):
+            return True
+    return False
+
+def is_supported_attacked(supported):
+    for ctouch in supported:
+        if(len(ctouch.attacker_beyond) > 0):
+            return True
+    return False
+
+def is_supported_add_supported(supported):
+    for ctouch in supported:
+        if(len(ctouch.supporter_beyond) > 1):
+            return True
+    return False
+
 def rank_moves(priomoves):
+    fleecnt = 0
+
     for pmove in priomoves:
+        gmove = pmove[0]
+        piece = pmove[1]
         tokens = pmove[2]
         token = tokens[0]
         attacked = tokens[1]
         supported = tokens[2]
-
-        piece = pmove[1]
+        
+        flee_list = []
 
         if(token & MV_IS_CASTLING > 0):
             pmove[3] = min(PRIO['prio3'], pmove[3])
@@ -395,29 +428,29 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_ATTACK > 0):
-            ATTACKED_IS_SUPPORTED = 0x0
-            if( token & ATTACKED_IS_SUPPORTED == 0 and 
-                (dstfield_is_attacked(token) == False or 
-                 (dstfield_is_supported(token) and piece_is_lower_equal_than_attacked(token))) ):
+            if( (dstfield_is_attacked(token) == False or dstfield_is_supported(token)) and 
+                (is_attacked_supported(attacked) == False or piece_is_lower_equal_than_attacked(token)) ):
                 if(token & ATTACKED_IS_KG > 0):
                     pmove[3] = min(PRIO['prio1'], pmove[3])
                 else:
                     pmove[3] = min(PRIO['prio2'], pmove[3])
             else:
-                pmove[3] = min(PRIO['prio4'], pmove[3])
+                if(token & ATTACKED_IS_KG > 0):
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
+                else:
+                    pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
-            SUPPORTED_IS_ATTACKED = 0x0
             SUPPORTED_IS_ADD_SUPPORTED = 0x0
-            if(token & SUPPORTED_IS_ATTACKED > 0 and token & SUPPORTED_IS_ADD_SUPPORTED == 0):
+            if(is_supported_attacked(supported) and is_supported_add_supported(supported) == False):
                 if( (dstfield_is_attacked(token) == False or dstfield_is_supported(token)) and 
                     piece_is_lower_equal_than_enemy_on_dstfield(token) ): 
                     pmove[3] = min(PRIO['prio1'], pmove[3])
                 else:
                     pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
-                if(token & SUPPORTED_IS_ADD_SUPPORTED == 0 and 
-                   (dstfield_is_attacked(token) == False or dstfield_is_supported(token))):
+                if( is_supported_add_supported(supported) == False and 
+                    (dstfield_is_attacked(token) == False or dstfield_is_supported(token)) ):
                     pmove[3] = min(PRIO['prio3'], pmove[3])
                 else:
                     pmove[3] = min(PRIO['prio4'], pmove[3])
@@ -426,8 +459,12 @@ def rank_moves(priomoves):
             if(srcfield_is_supported(token) == False or 
                (srcfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_srcfield(token) == False)):
                 if(dstfield_is_attacked(token) == False):
+                    if(pmove[3] != PRIO['prio1']):
+                        flee_list.append(pmove)
                     pmove[3] = min(PRIO['prio1'], pmove[3])
                 elif(dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)):
+                    if(pmove[3] != PRIO['prio1']):
+                        flee_list.append(pmove)
                     pmove[3] = min(PRIO['prio1'], pmove[3])
                 else:
                     pmove[3] = min(PRIO['prio4'], pmove[3])
@@ -439,4 +476,10 @@ def rank_moves(priomoves):
 
         if(token & MV_PIECE_IS_QU > 0 and pmove[3] != PRIO['last']):
             pmove[3] += 1
+    
+    fleecnt = 0
+    for pmove in flee_list:
+        fleecnt += 1
+        if(fleecnt > 2):
+            pmove[3] = PRIO['prio3']
 

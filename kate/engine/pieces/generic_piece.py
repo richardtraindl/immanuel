@@ -117,13 +117,13 @@ def contacts_to_token(frdlycontacts, enmycontacts, mode):
     return att_att, att_supp, supp_supp, supp_att"""
 
 
-class clTouch:
+class cTouch:
     def __init__(self, piece, fieldx, fieldy):
         self.piece = piece
         self.fieldx = fieldx
         self.fieldy = fieldy
-        self.attacker = []
-        self.supporter = []
+        self.attacker_beyond = []
+        self.supporter_beyond = []
         
 """ def add_touch(self, touches, piece, x1, y1):
         touch = touches[-1:]
