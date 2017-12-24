@@ -436,7 +436,7 @@ def rank_moves(priomoves):
                     pmove[3] = min(PRIO['prio2'], pmove[3])
             else:
                 if(token & ATTACKED_IS_KG > 0):
-                    pmove[3] = min(PRIO['prio3'], pmove[3])
+                    pmove[3] = min(PRIO['prio2'], pmove[3])
                 else:
                     pmove[3] = min(PRIO['prio4'], pmove[3])
 

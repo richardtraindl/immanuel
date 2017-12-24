@@ -180,20 +180,20 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
 
     if(match.level == LEVELS['blitz']):
         cnts = 12
-        dpth = 2
+        dpth = 3
     elif(match.level == LEVELS['low']):
         cnts = 16
-        dpth = 3
+        dpth = 4
     elif(match.level == LEVELS['medium']):
         cnts = 20
-        dpth = 4
+        dpth = 5
     else:
         cnts = 24
         dpth = 6
 
     if(depth <= dpth):
         return max(cnts, prio1_mvcnt)
-    elif((lastmv_prio == PRIO['prio1'] or lastmv_prio == PRIO['prio1b']) and depth <= dpth + 6):
+    elif((lastmv_prio == PRIO['prio1'] or lastmv_prio == PRIO['prio1b']) and depth <= dpth + 5):
         addcnt = 0
         if(remaining_mvcnt > 1):
             addcnt += 1
@@ -239,7 +239,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
             count += 1
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   prio: " + str(pmove[3]))
+            print("   " + reverse_lookup(PRIO, pmove[3]))            
         elif(depth == 2):
             print(".", end="")
 
@@ -298,7 +298,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio):
             count += 1
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   prio: " + str(pmove[3]))
+            print("   " + reverse_lookup(PRIO, pmove[3]))
         elif(depth == 2):
             print(".", end="")
 
