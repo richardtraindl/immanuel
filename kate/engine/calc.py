@@ -159,15 +159,15 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
     if( (color == COLORS["white"] and score >= newscore) or (color == COLORS["black"] and score <= newscore) ):
         return score
     else:
-        del candidates[:]
+        candidates.clear()
         candidates.append(newmove)
 
-        if(len(newcandidates) > 0):
-            for newcandidate in newcandidates[:12]:
-                if(newcandidate):
-                    candidates.append(newcandidate)
-                else:
-                    break
+        #if(len(newcandidates) > 0):
+        for newcandidate in newcandidates[:12]:
+            if(newcandidate):
+                candidates.append(newcandidate)
+            else:
+                break
 
         candidates.append(None)
         return newscore
