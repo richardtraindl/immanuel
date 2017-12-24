@@ -478,8 +478,8 @@ def rank_moves(priomoves):
             pmove[3] += 1
     
     fleecnt = 0
-    for pmove in flee_list:
+    for fleemove in flee_list:
         fleecnt += 1
         if(fleecnt > 2):
-            pmove[3] = PRIO['prio3']
+            fleemove[3] = PRIO['prio3']
 
