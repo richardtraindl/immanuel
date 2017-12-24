@@ -265,13 +265,13 @@ def score_opening(match):
         value += whiterate
 
 
-    excludedpieces = [ PIECES['wKg'], PIECES['wQu']]
+    """excludedpieces = [ PIECES['wKg'], PIECES['wQu']]
     movecnt = count_all_moves(match, COLORS['white'], excludedpieces)
     value += (movecnt * SUPPORTED_SCORES[PIECES['wPw']])
 
     excludedpieces = [ PIECES['bKg'], PIECES['bQu'] ]
     movecnt = count_all_moves(match, COLORS['black'], excludedpieces)    
-    value += (movecnt * SUPPORTED_SCORES[PIECES['bPw']])
+    value += (movecnt * SUPPORTED_SCORES[PIECES['bPw']])"""
 
     return value
 
@@ -316,7 +316,7 @@ def score_position(match, movecnt):
 
         value += score_contacts(match, COLORS['black'])"""
 
-        if(match.count < 20):
+        if(match.count < 30):
             value += score_opening(match)
 
         if(match.count >= 30):
