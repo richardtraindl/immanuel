@@ -197,9 +197,9 @@ def is_rook_over_king(match, color):
 def score_opening(match):
     value = 0
 
-    whiterate = SCORES[PIECES['bPw']] / 10
+    whiterate = SCORES[PIECES['bPw']] / 20
 
-    blackrate = SCORES[PIECES['wPw']] / 10
+    blackrate = SCORES[PIECES['wPw']] / 20
 
     # white position
     y = 0
@@ -212,7 +212,7 @@ def score_opening(match):
         for x in range(2, 5):
             piece = match.readfield(x, y)
             if(piece == PIECES['wPw']):
-                value += whiterate
+                value += whiterate + 1
 
     piece = match.readfield(1, 2)
     if(piece == PIECES['wPw']):
@@ -232,7 +232,7 @@ def score_opening(match):
         for x in range(2, 5):
             piece = match.readfield(x, y)
             if(piece == PIECES['bPw']):
-                value += blackrate
+                value += blackrate - 1
 
     piece = match.readfield(1, 5)
     if(piece == PIECES['bPw']):
@@ -249,7 +249,7 @@ def score_opening(match):
         value += blackrate
 
     if(is_rook_over_king(match, COLORS['white'])):
-        value += whiterate
+        value += whiterate + 2
     else:
         value += blackrate
 
@@ -260,7 +260,7 @@ def score_opening(match):
         value += whiterate
 
     if(is_rook_over_king(match, COLORS['black'])):
-        value += blackrate
+        value += blackrate - 2
     else:
         value += whiterate
 
@@ -279,10 +279,10 @@ def score_opening(match):
 def score_endgame(match):
     value = 0
 
-    whiterate = SCORES[PIECES['bPw']] / 10
+    whiterate = SCORES[PIECES['bPw']] / 20
     whitesteprate = (SCORES[PIECES['bPw']] / 100)
 
-    blackrate = SCORES[PIECES['wPw']] / 10
+    blackrate = SCORES[PIECES['wPw']] / 20
     blacksteprate = (SCORES[PIECES['wPw']] / 100)
 
     for y in range(0, 8, 1):
@@ -316,12 +316,11 @@ def score_position(match, movecnt):
 
         value += score_contacts(match, COLORS['black'])"""
 
-        """if(match.count < 30):
+        if(match.count < 30):
             value += score_opening(match)
 
         if(match.count >= 30):
-            value += score_endgame(match)"""
+            value += score_endgame(match)
 
         return value
-
 

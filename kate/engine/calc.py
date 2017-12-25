@@ -176,55 +176,43 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     mvcnt = len(prio_moves)
     prio1_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1b']]]
-    remaining_mvcnt = mvcnt - prio1_mvcnt
+    prio2_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio2']]] + prio_cnts[PRIO_INDICES[PRIO['prio2b']]]
+    prio3_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio3']]] + prio_cnts[PRIO_INDICES[PRIO['prio3b']]]
+    prio4_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio4']]] + prio_cnts[PRIO_INDICES[PRIO['prio4b']]]
 
     if(match.level == LEVELS['blitz']):
         cnts = 12
         dpth = 3
         max_dpth = 7
     elif(match.level == LEVELS['low']):
-        cnts = 16
+        cnts = 12
         dpth = 3
         max_dpth = 9
     elif(match.level == LEVELS['medium']):
-        cnts = 20
+        cnts = 16
         dpth = 5
         max_dpth = 9
     else:
-        cnts = 24
+        cnts = 20
         dpth = 5
-        max_dpth = 11
-
-        """if(depth <= 3):
-            return max(12, prio1_mvcnt)
-        elif(depth <= 7 and (lastmv_prio == PRIO['prio1'] or lastmv_prio == PRIO['prio1b'])):
-            addcnt = 0
-            if(remaining_mvcnt > 1):
-                addcnt += 1
-                idx = random.randint(prio1_mvcnt, mvcnt - 1)
-                prio_moves.insert(0, prio_moves.pop(idx))
-            if(remaining_mvcnt > 2):
-                addcnt += 1
-                idx = random.randint(prio1_mvcnt + 1, mvcnt - 1)
-                prio_moves.insert(0, prio_moves.pop(idx))
-            return min(6, prio1_mvcnt + addcnt)
-        else:
-            return 0"""
+        max_dpth = 9
 
     if(depth <= dpth):
         return max(cnts, prio1_mvcnt)
     elif(depth <= max_dpth and (lastmv_prio == PRIO['prio1'] or lastmv_prio == PRIO['prio1b'])):
         addcnt = 0
-        if(lastmv_prio == PRIO['prio1'] or lastmv_prio == PRIO['prio1b']):
-            if(remaining_mvcnt > 1):
-                addcnt += 1
-                idx = random.randint(prio1_mvcnt, mvcnt - 1)
-                prio_moves.insert(0, prio_moves.pop(idx))
-            if(remaining_mvcnt > 2):
-                addcnt += 1
-                idx = random.randint(prio1_mvcnt + 1, mvcnt - 1)
-                prio_moves.insert(0, prio_moves.pop(idx))
-
+        if(prio2_mvcnt + prio3_mvcnt > 0):
+            addcnt += 1
+            idx = random.randint(prio1_mvcnt, (prio1_mvcnt + prio2_mvcnt + prio3_mvcnt - 1))
+            prio_moves.insert(0, prio_moves.pop(idx))
+        elif(prio4_mvcnt > 0):
+            addcnt += 1
+            idx = random.randint(prio1_mvcnt, (prio1_mvcnt + prio4_mvcnt - 1))
+            prio_moves.insert(0, prio_moves.pop(idx))
+        elif(prio_cnts[PRIO_INDICES[PRIO['last']]] > 0):
+            addcnt += 1
+            idx = random.randint(prio1_mvcnt, (mvcnt - 1))
+            prio_moves.insert(0, prio_moves.pop(idx))
         return min(8, prio1_mvcnt + addcnt)
     else:
         return 0

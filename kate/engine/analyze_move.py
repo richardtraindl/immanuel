@@ -474,9 +474,12 @@ def rank_moves(priomoves):
         if(token & MV_IS_PROGRESS > 0):
             pmove[3] = min(PRIO['prio3'], pmove[3])
 
+        if(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
+            pmove[3] = min(PRIO['prio4'], pmove[3])
+
         if(token & MV_PIECE_IS_QU > 0 and pmove[3] != PRIO['last']):
             pmove[3] += 1
-    
+
     fleecnt = 0
     for fleemove in flee_list:
         fleecnt += 1
