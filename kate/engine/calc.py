@@ -49,7 +49,7 @@ def prnt_priorities(prio_moves, prio_cnts):
                " \ntoken: " + hex(tokens[0]) + " " + token_to_text(tokens[0]))
 
     for i in range(len(prio_cnts)):
-        print(str(i + 1) + ": " + str(prio_cnts[i]))
+        print(reverse_lookup(PRIO, (i + 1))  + ": " + str(prio_cnts[i]))
 
 
 def prnt_fmttime(msg, seconds):
