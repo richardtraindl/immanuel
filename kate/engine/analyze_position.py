@@ -316,11 +316,11 @@ def score_position(match, movecnt):
 
         value += score_contacts(match, COLORS['black'])"""
 
-        if(match.count < 30):
+        """if(match.count < 30):
             value += score_opening(match)
 
         if(match.count >= 30):
-            value += score_endgame(match)
+            value += score_endgame(match)"""
 
         return value
 
