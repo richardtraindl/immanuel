@@ -1,6 +1,7 @@
 import time
 from operator import itemgetter
 import random
+import gc
 from .match import *
 from .move import *
 from . import matchmove
@@ -244,8 +245,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
             print("   " + reverse_lookup(PRIO, pmove[3]))            
-        elif(depth == 2):
-            print(".", end="")
+            gc.collect()
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
@@ -303,8 +303,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
             print("   " + reverse_lookup(PRIO, pmove[3]))
-        elif(depth == 2):
-            print(".", end="")
+            gc.collect()
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
