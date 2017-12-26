@@ -83,6 +83,18 @@ def defends_fork(match, move):
     return token
 
 
+def disclosures(match, move):
+    token = 0x0
+
+    piece = match.readfield(move.srcx, move.srcy)
+    color = Match.color_of_piece(piece)
+
+    if(rules.disclosures_field(match, color, move.srcx, move.srcy, move.dstx, move.dsty)):
+        token = token | MV_IS_DISCLOSURE
+
+    return token
+
+
 def flees(match, move):
     token = 0x0
 
@@ -202,6 +214,8 @@ def analyze_move(match, move):
     token = token | attacks_and_supports(match, move, attacked, supported)
 
     token = token | defends_fork(match, move)
+    
+    token = token | disclosures(match, move)
 
     token = token | flees(match, move)
 
@@ -412,6 +426,13 @@ def is_supported_attacked(supported):
             return True
     return False
 
+def is_supported_lower_equal_than_attacker(supported):
+    for ctouch in supported:
+        for attacker_beyond in ctouch.attacker_beyond:
+            if(PIECES_RANK[ctouch.piece] <= PIECES_RANK[attacker_beyond[0]]):
+                return True
+    return False
+
 def is_supported_add_supported(supported):
     for ctouch in supported:
         if(len(ctouch.supporter_beyond) > 1):
@@ -460,12 +481,18 @@ def rank_moves(priomoves):
         if(token & MV_IS_SUPPORT > 0):
             if(dstfield_is_attacked(token) == False or 
                (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)) ):
-                if(is_supported_attacked(supported) and is_supported_add_supported(supported) == False):
+                if(is_supported_attacked(supported) and is_supported_add_supported(supported) == False and is_supported_lower_equal_than_attacker(supported)):
                     pmove[3] = min(PRIO['prio1'], pmove[3])
                 else:
                     pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
                 pmove[3] = min(PRIO['prio4'], pmove[3])
+
+        if(token & MV_IS_FORK_DEFENSE > 0):
+            pmove[3] = min(PRIO['prio1'], pmove[3])
+            
+        if(token & MV_IS_DISCLOSURE > 0):
+            pmove[3] = min(PRIO['prio2'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
             if(srcfield_is_supported(token) == False or 

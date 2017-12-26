@@ -94,9 +94,10 @@ MV_IS_CAPTURE                          = 0x2000000000000000
 MV_IS_ATTACK                           = 0x1000000000000000
 MV_IS_FORK                             = 0x0800000000000000
 MV_IS_FORK_DEFENSE                     = 0x0400000000000000
-MV_IS_SUPPORT                          = 0x0200000000000000
-MV_IS_FLEE                             = 0x0100000000000000
-MV_IS_PROGRESS                         = 0x0080000000000000
+MV_IS_DISCLOSURE                       = 0x0200000000000000
+MV_IS_SUPPORT                          = 0x0100000000000000
+MV_IS_FLEE                             = 0x0080000000000000
+MV_IS_PROGRESS                         = 0x0040000000000000
 
 MV_PIECE_IS_PW                         = 0x0008000000000000
 MV_PIECE_IS_KN                         = 0x0004000000000000

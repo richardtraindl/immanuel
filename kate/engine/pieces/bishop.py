@@ -170,6 +170,37 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
     return token 
 
 
+def are_opponents_linked(match, direction, color, srcx, srcy):
+    first = PIECES['blk']
+    second = PIECES['blk']
+    
+    for j in range(0, 4, 2):
+        for i in range(0, 2, 1):
+            stepx = STEPS[j+i][0]
+            stepy = STEPS[j+i][1]
+            x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
+            if(x1 != rules.UNDEF_X):
+                piece = match.readfield(x1, y1)
+                if(piece != PIECES['blk']):
+                    if(first == PIECES['blk']):
+                        first = piece
+                    else:
+                        second = piece
+                    continue
+                
+        if(Match.color_of_piece(first) != Match.color_of_piece(second) and 
+           first != PIECES['blk'] and second != PIECES['blk']):
+            if(Match.color_of_piece(first) == color):
+                piece = first
+            else:
+                piece = second
+            if(piece == PIECES['wBp'] or piece == PIECES['bBp'] or 
+               piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                return True
+
+    return False
+
+
 def score_attacks(match, srcx, srcy):
     score = 0
 

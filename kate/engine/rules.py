@@ -314,6 +314,22 @@ def is_field_forked(match, piece, srcx, srcy, forkx, forky):
     return False
 
 
+def disclosures_field(match, color, srcx, srcy, dstx, dsty):
+
+    direction = rook.rk_dir(srcx, srcy, dstx, dsty)
+
+    if(direction == DIRS['undefined']):
+        direction = bishop.bp_dir(srcx, srcy, dstx, dsty)
+
+    if(rook.are_opponents_linked(match, direction, color, srcx, srcy)):
+        return True
+
+    if(bishop.are_opponents_linked(match, direction, color, srcx, srcy)):
+        return True
+
+    return False
+
+
 def is_king_attacked(match, x1, y1):
     king = match.readfield(x1, y1)
 

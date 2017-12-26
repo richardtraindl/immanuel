@@ -89,33 +89,6 @@ def contacts_to_token(frdlycontacts, enmycontacts, mode):
 
     return token
 
-"""def contacts_to_cnts(frdlycontacts, enmycontacts, mode):
-    att_att = 0x0
-    att_supp = 0x0
-    supp_supp = 0x0
-    supp_att = 0x0
-
-    if(mode == "ATTACKTOUCHES"):
-        if(frdl_pw_cnt + frdl_kn_cnt + frdl_bp_cnt + frdl_rk_cnt + frdl_qu_cnt + frdl_kg_cnt > 0):
-            token = token | ATTACKED_IS_ADD_ATTACKED
-
-        sum_enmy = enmy_pw_cnt + enmy_kn_cnt + enmy_bp_cnt + enmy_rk_cnt + enmy_qu_cnt + enmy_kg_cnt
-        if(sum_enmy == 1):
-            token = token | ATTACKED_IS_SUPPORTED
-        elif(sum_enmy > 1):
-            token = token | ATTACKED_IS_SUPPORTED | ATTACKED_IS_ADD_SUPPORTED
-    elif(mode == "SUPPORTTOUCHES"):
-        if(frdl_pw_cnt + frdl_kn_cnt + frdl_bp_cnt + frdl_rk_cnt + frdl_qu_cnt + frdl_kg_cnt > 0):
-            token = token | SUPPORTED_IS_ADD_SUPPORTED
-
-        sum_enmy = enmy_pw_cnt + enmy_kn_cnt + enmy_bp_cnt + enmy_rk_cnt + enmy_qu_cnt + enmy_kg_cnt
-        if(sum_enmy == 1):
-            token = token | SUPPORTED_IS_ATTACKED
-        elif(sum_enmy > 1):
-            token = token | SUPPORTED_IS_ATTACKED | SUPPORTED_IS_ADD_ATTACKED
-
-    return att_att, att_supp, supp_supp, supp_att"""
-
 
 class cTouch:
     def __init__(self, piece, fieldx, fieldy):
@@ -125,11 +98,3 @@ class cTouch:
         self.attacker_beyond = []
         self.supporter_beyond = []
         
-""" def add_touch(self, touches, piece, x1, y1):
-        touch = touches[-1:]
-        
-        if(mode == "a"):
-            touch[3].append([piece, x1, y1])
-        else:
-            touch[4].append([piece, x1, y1])
-"""
