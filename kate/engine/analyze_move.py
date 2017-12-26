@@ -214,13 +214,6 @@ def analyze_move(match, move):
 
 
 def piece_is_lower_equal_than_captured(token):
-    if(token & CAPTURED_IS_QU == 0 and 
-       token & CAPTURED_IS_RK == 0 and
-       token & CAPTURED_IS_BP == 0 and
-       token & CAPTURED_IS_KN == 0 and
-       token & CAPTURED_IS_PW == 0):
-        return False
-
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):
@@ -243,17 +236,16 @@ def piece_is_lower_equal_than_captured(token):
         else:
             return False
     else: # MV_PIECE_IS_PW
-        return True
+        if(token & CAPTURED_IS_QU > 0 or
+           token & CAPTURED_IS_RK > 0 or
+           token & CAPTURED_IS_BP > 0 or
+           token & CAPTURED_IS_KN > 0 or
+           token & CAPTURED_IS_PW > 0):
+            return True
+        else:
+            return False
 
 def piece_is_lower_equal_than_attacked(token):
-    if(token & ATTACKED_IS_KG == 0 and 
-       token & ATTACKED_IS_QU == 0 and
-       token & ATTACKED_IS_RK == 0 and
-       token & ATTACKED_IS_BP == 0 and
-       token & ATTACKED_IS_KN == 0 and
-       token & ATTACKED_IS_PW == 0):
-        return False
-
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):
@@ -279,77 +271,101 @@ def piece_is_lower_equal_than_attacked(token):
         else:
             return False
     else: # MV_PIECE_IS_PW
-        return True
+        if(token & ATTACKED_IS_KG > 0 or 
+           token & ATTACKED_IS_QU > 0 or
+           token & ATTACKED_IS_RK > 0 or
+           token & ATTACKED_IS_BP > 0 or
+           token & ATTACKED_IS_KN > 0 or
+           token & ATTACKED_IS_PW > 0):
+            return True
+        else:
+            return False
 
 def piece_is_lower_equal_than_enemy_on_srcfield(token):
-    if(token & SRCFLD_IS_ENM_TOU_BY_KG == 0 and 
-       token & SRCFLD_IS_ENM_TOU_BY_QU == 0 and 
-       token & SRCFLD_IS_ENM_TOU_BY_RK == 0 and
-       token & SRCFLD_IS_ENM_TOU_BY_BP == 0 and
-       token & SRCFLD_IS_ENM_TOU_BY_KN == 0 and
-       token & SRCFLD_IS_ENM_TOU_BY_PW == 0):
-        return False
-
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):
-        if(token & SRCFLD_IS_ENM_TOU_BY_QU > 0):
+        if(token & SRCFLD_IS_ENM_TOU_BY_QU > 0 and 
+           token & SRCFLD_IS_ENM_TOU_BY_RK == 0 and
+           token & SRCFLD_IS_ENM_TOU_BY_BP == 0 and
+           token & SRCFLD_IS_ENM_TOU_BY_KN == 0 and
+           token & SRCFLD_IS_ENM_TOU_BY_PW == 0):
             return True
         else:
             return False
     elif(token & MV_PIECE_IS_RK > 0):
-        if(token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_RK > 0):
+        if((token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
+            token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
+            token & SRCFLD_IS_ENM_TOU_BY_RK > 0) and
+           token & SRCFLD_IS_ENM_TOU_BY_BP == 0 and
+           token & SRCFLD_IS_ENM_TOU_BY_KN == 0 and
+           token & SRCFLD_IS_ENM_TOU_BY_PW == 0):
             return True
         else:
             return False
     elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if(token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_RK > 0 or
-           token & SRCFLD_IS_ENM_TOU_BY_BP > 0 or
-           token & SRCFLD_IS_ENM_TOU_BY_KN > 0):
+        if((token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
+            token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
+            token & SRCFLD_IS_ENM_TOU_BY_RK > 0 or
+            token & SRCFLD_IS_ENM_TOU_BY_BP > 0 or
+            token & SRCFLD_IS_ENM_TOU_BY_KN > 0) and 
+           token & SRCFLD_IS_ENM_TOU_BY_PW == 0):
             return True
         else:
             return False
     else: # MV_PIECE_IS_PW
-        return True
+        if(token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
+           token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
+           token & SRCFLD_IS_ENM_TOU_BY_RK > 0 or 
+           token & SRCFLD_IS_ENM_TOU_BY_BP > 0 or 
+           token & SRCFLD_IS_ENM_TOU_BY_KN > 0 or
+           token & SRCFLD_IS_ENM_TOU_BY_PW > 0):
+            return True
+        else:
+            return False
 
 def piece_is_lower_equal_than_enemy_on_dstfield(token):
-    if(token & DSTFLD_IS_ENM_TOU_BY_KG == 0 and 
-       token & DSTFLD_IS_ENM_TOU_BY_QU == 0 and 
-       token & DSTFLD_IS_ENM_TOU_BY_RK == 0 and
-       token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and
-       token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and
-       token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-        return False
-
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):
-        if(token & DSTFLD_IS_ENM_TOU_BY_QU > 0):
+        if(token & DSTFLD_IS_ENM_TOU_BY_QU > 0 and 
+           token & DSTFLD_IS_ENM_TOU_BY_RK == 0 and
+           token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and
+           token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and
+           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
             return True
         else:
             return False
     elif(token & MV_PIECE_IS_RK > 0):
-        if(token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_RK > 0):
+        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
+            token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
+            token & DSTFLD_IS_ENM_TOU_BY_RK > 0) and
+           token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and
+           token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and
+           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
             return True
         else:
             return False
     elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if(token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_KN > 0):
+        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
+            token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
+            token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
+            token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
+            token & DSTFLD_IS_ENM_TOU_BY_KN > 0) and 
+           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
             return True
         else:
             return False
     else: # MV_PIECE_IS_PW
-        return True
+        if(token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
+           token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
+           token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or 
+           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or 
+           token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or
+           token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
+            return True
+        else:
+            return False
 
 def srcfield_is_supported(token):
     if(token & SRCFLD_IS_FRDL_TOU_BY_PW > 0 or 
@@ -422,47 +438,40 @@ def rank_moves(priomoves):
             pmove[3] = min(PRIO['prio1'], pmove[3])
 
         if(token & MV_IS_CAPTURE > 0):
-            if(piece_is_lower_equal_than_captured(token) or dstfield_is_attacked(token) == False):
+            if(piece_is_lower_equal_than_captured(token) or 
+               dstfield_is_attacked(token) == False or
+               (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token))):
                 pmove[3] = min(PRIO['prio1'], pmove[3])
             else:
                 pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_ATTACK > 0):
-            if( (dstfield_is_attacked(token) == False or dstfield_is_supported(token)) and 
-                (is_attacked_supported(attacked) == False or piece_is_lower_equal_than_attacked(token)) ):
+            if(dstfield_is_attacked(token) == False or 
+               (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)) ):
                 if(token & ATTACKED_IS_KG > 0):
                     pmove[3] = min(PRIO['prio1'], pmove[3])
-                else:
+                elif(is_attacked_supported(attacked) == False or piece_is_lower_equal_than_attacked(token)):
                     pmove[3] = min(PRIO['prio2'], pmove[3])
+                else:
+                    pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
-                if(token & ATTACKED_IS_KG > 0):
-                    pmove[3] = min(PRIO['prio2'], pmove[3])
-                else:
-                    pmove[3] = min(PRIO['prio4'], pmove[3])
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_SUPPORT > 0):
-            SUPPORTED_IS_ADD_SUPPORTED = 0x0
-            if(is_supported_attacked(supported) and is_supported_add_supported(supported) == False):
-                if( (dstfield_is_attacked(token) == False or dstfield_is_supported(token)) and 
-                    piece_is_lower_equal_than_enemy_on_dstfield(token) ): 
+            if(dstfield_is_attacked(token) == False or 
+               (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)) ):
+                if(is_supported_attacked(supported) and is_supported_add_supported(supported) == False):
                     pmove[3] = min(PRIO['prio1'], pmove[3])
                 else:
                     pmove[3] = min(PRIO['prio3'], pmove[3])
             else:
-                if( is_supported_add_supported(supported) == False and 
-                    (dstfield_is_attacked(token) == False or dstfield_is_supported(token)) ):
-                    pmove[3] = min(PRIO['prio3'], pmove[3])
-                else:
-                    pmove[3] = min(PRIO['prio4'], pmove[3])
+                pmove[3] = min(PRIO['prio4'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
             if(srcfield_is_supported(token) == False or 
                (srcfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_srcfield(token) == False)):
-                if(dstfield_is_attacked(token) == False):
-                    if(pmove[3] != PRIO['prio1']):
-                        flee_list.append(pmove)
-                    pmove[3] = min(PRIO['prio1'], pmove[3])
-                elif(dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)):
+                if(dstfield_is_attacked(token) == False or
+                   (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)) ):
                     if(pmove[3] != PRIO['prio1']):
                         flee_list.append(pmove)
                     pmove[3] = min(PRIO['prio1'], pmove[3])

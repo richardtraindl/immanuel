@@ -183,7 +183,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
 
     if(match.level == LEVELS['blitz']):
         cnts = 12
-        dpth = 3
+        dpth = 2
         max_dpth = 7
     elif(match.level == LEVELS['low']):
         cnts = 12
@@ -191,7 +191,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
         max_dpth = 9
     elif(match.level == LEVELS['medium']):
         cnts = 16
-        dpth = 5
+        dpth = 4
         max_dpth = 9
     else:
         cnts = 20
