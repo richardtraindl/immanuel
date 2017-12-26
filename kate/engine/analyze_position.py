@@ -179,20 +179,38 @@ def is_rook_over_king(match, color):
         king = PIECES['bKg']
         rook = PIECES['bRk']
 
-    kcnt = 0
-    rcnt = 0
-    for x in range(8):
-        if(match.readfield(x, y) == king):
-            kcnt += 1
-            if(rcnt == 0 or rcnt == 2):
-                return True
-        elif(match.readfield(x, y) == rook):
-            rcnt += 1
-            
-    if(kcnt == 0 or (kcnt == 1 and rcnt == 2)):            
-        return False
-    else:
+    rleftcnt = 0
+    rrightcnt = 0
+    pleftcnt = 0
+    prightcnt = 0
+    if(Kg_x > 0):
+        for x in range(0, Kg_x, 1):
+            piece = match.readfield(x, y)
+
+            if(piece == PIECES['blk']):
+                continue
+            elif(piece == rook):
+                rleftcnt += 1
+            else:
+                pleftcnt += 1
+
+    if(Kg_x < 7):
+        for x in range(Kg_x + 1, 8, 1):
+            piece = match.readfield(x, y)
+
+            if(piece == PIECES['blk']):
+                continue
+            elif(piece == rook):
+                rrightcnt += 1
+            else:
+                prightcnt += 1
+
+    if(rleftcnt == 2 or rrightcnt == 2 or 
+       ((pleftcnt == 0 or prightcnt == 0) and 
+        (Kg_x == 0 or Kg_x == 1 or Kg_x == 2 or Kg_x == 5 or Kg_x == 6 or Kg_x == 7)) ):
         return True
+    else:
+        return False
 
 def score_opening(match):
     value = 0

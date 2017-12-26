@@ -1,7 +1,7 @@
 import time
 from operator import itemgetter
 import random
-import gc
+#import gc
 from .match import *
 from .move import *
 from . import matchmove
@@ -184,7 +184,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     if(match.level == LEVELS['blitz']):
         cnts = 12
         dpth = 3
-        max_dpth = 5
+        max_dpth = 7
     elif(match.level == LEVELS['low']):
         cnts = 12
         dpth = 3
@@ -196,7 +196,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     else:
         cnts = 20
         dpth = 5
-        max_dpth = 9
+        max_dpth = 11
 
     if(depth <= dpth):
         return max(cnts, prio1_mvcnt)
@@ -215,6 +215,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
             idx = random.randint(prio1_mvcnt, (mvcnt - 1))
             prio_moves.insert(0, prio_moves.pop(idx))
         return min(8, prio1_mvcnt + addcnt)
+        # return prio1_mvcnt
     else:
         return 0
 
@@ -244,8 +245,8 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
             count += 1
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   " + reverse_lookup(PRIO, pmove[3]))            
-            gc.collect()
+            print("   " + reverse_lookup(PRIO, pmove[3]))
+            #gc.collect()
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
@@ -303,7 +304,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
             print("   " + reverse_lookup(PRIO, pmove[3]))
-            gc.collect()
+            #gc.collect()
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
