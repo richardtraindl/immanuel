@@ -29,10 +29,9 @@ def is_field_touched(match, color, fieldx, fieldy):
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
-            if( (color == COLORS['white'] and (piece == PIECES['wQu'] or piece == PIECES['wRk'])) or
-                (color == COLORS['black'] and (piece == PIECES['bQu'] or piece == PIECES['bRk'])) ):
+            if( (color == COLORS['white'] and piece == PIECES['wRk']) or
+                (color == COLORS['black'] and piece == PIECES['bRk']) ):
                 return True
-
     return False
 
 
@@ -255,17 +254,30 @@ def score_supports_of_attacked(match, srcx, srcy):
     return score 
 
 
-def defends_forked_field(match, piece, srcx, srcy, dstx, dsty):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
         if(x1 != rules.UNDEF_X):
-            if(rules.is_field_forked(match, piece, srcx, srcy, x1, y1)):
+            if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
                 return True
-
     return False
- 
+
+
+def count_attacks(match, color, fieldx, fieldy):
+    count = 0
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if(match.color_of_piece(piece) == color):
+                count += 1
+    return count
+
 
 def rk_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS

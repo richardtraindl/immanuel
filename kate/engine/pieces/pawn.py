@@ -274,7 +274,7 @@ def score_supports_of_attacked(match, srcx, srcy):
     return score
 
 
-def defends_forked_field(match, piece, srcx, srcy, dstx, dsty):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
     color = Match.color_of_piece(piece)
 
     if(color == COLORS['white']):
@@ -286,10 +286,28 @@ def defends_forked_field(match, piece, srcx, srcy, dstx, dsty):
         x1 = dstx + STEPS[i][0]
         y1 = dsty + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
-            if(rules.is_field_forked(match, piece, srcx, srcy, x1, y1)):
+            if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
                 return True
 
     return False
+
+
+def count_attacks(match, color, fieldx, fieldy):
+    count = 0
+
+    if(color == COLORS['white']):
+        STEPS = WPW_STEPS
+    else:
+        STEPS = BPW_STEPS
+
+    for i in range(2):
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if(match.color_of_piece(piece) == color):
+                count += 1
+    return count
 
 
 def is_running(match, srcx, srcy):

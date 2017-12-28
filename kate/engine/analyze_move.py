@@ -77,7 +77,7 @@ def defends_fork(match, move):
 
     piece = match.readfield(move.srcx, move.srcy)
 
-    if(rules.defends_forked_field(match, piece, move.srcx, move.srcy, move.dstx, move.dsty)):
+    if(rules.defends_fork_field(match, piece, move.srcx, move.srcy, move.dstx, move.dsty)):
         token = token | MV_IS_FORK_DEFENSE
 
     return token

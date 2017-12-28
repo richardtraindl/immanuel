@@ -165,6 +165,9 @@ def pin_dir(match, scrx, srcy):
 
 
 def is_field_touched(match, color, srcx, srcy):
+    if(queen.is_field_touched(match, color, srcx, srcy)):
+        return True
+
     if(rook.is_field_touched(match, color, srcx, srcy)):
         return True
 
@@ -240,26 +243,66 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
 
-def defends_forked_field(match, piece, srcx, srcy, dstx, dsty):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
     if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        flag1 = rook.defends_forked_field(match, piece, srcx, srcy, dstx, dsty)
-        flag2 = bishop.defends_forked_field(match, piece, srcx, srcy, dstx, dsty)
-        return flag1 or flag2
+        return queen.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        return rook.defends_forked_field(match, piece, srcx, srcy, dstx, dsty)
+        return rook.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        return bishop.defends_forked_field(match, piece, srcx, srcy, dstx, dsty)
+        return bishop.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        return knight.defends_forked_field(match, piece, srcx, srcy, dstx, dsty)
+        return knight.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
     elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        return king.defends_forked_field(match, piece, srcx, srcy, dstx, dsty)
+        return king.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
     elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        return pawn.defends_forked_field(match, piece, srcx, srcy, dstx, dsty)
+        return pawn.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
     else:
         return False
 
 
-def is_field_forked(match, piece, srcx, srcy, forkx, forky):
+def is_fork_field(match, piece, srcx, srcy, forkx, forky):
+    color = Match.color_of_piece(piece)
+    opp_color = Match.oppcolor_of_piece(piece)
+    
+    if(is_field_touched(match, color, forkx, forky) == True):
+        return False
+
+    match.writefield(srcx, srcy, PIECES['blk'])
+    if(queen.is_field_touched(match, opp_color, forkx, forky)):
+        if(queen.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    if(rook.is_field_touched(match, opp_color, forkx, forky)):
+        if(rook.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    if(bishop.is_field_touched(match, opp_color, forkx, forky)):
+        if(bishop.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    if(knight.is_field_touched(match, opp_color, forkx, forky)):
+        if(knight.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    if(pawn.is_field_touched(match, opp_color, forkx, forky)):
+        if(pawn.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    if(king.is_field_touched(match, opp_color, forkx, forky)):
+        if(king.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    match.writefield(srcx, srcy, piece)
+    return False
+
+
+def is_fork_field2(match, piece, srcx, srcy, forkx, forky):
     frdlytouches = []
     enmytouches = []
 
