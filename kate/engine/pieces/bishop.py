@@ -172,8 +172,8 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 def are_opponents_linked(match, direction, color, srcx, srcy):
     for j in range(0, 4, 2):
         first = PIECES['blk']
-        second = PIECES['blk']     
-      
+        second = PIECES['blk']
+
         for i in range(0, 2, 1):
             stepx = STEPS[j+i][0]
             stepy = STEPS[j+i][1]
@@ -265,6 +265,7 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
                 return True
 
     return False
+
 
 def count_attacks(match, color, fieldx, fieldy):
     count = 0
