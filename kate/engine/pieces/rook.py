@@ -170,10 +170,10 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
 
 def are_opponents_linked(match, direction, color, srcx, srcy):
-    first = PIECES['blk']
-    second = PIECES['blk']
-    
     for j in range(0, 4, 2):
+        first = PIECES['blk']
+        second = PIECES['blk']
+
         for i in range(0, 2, 1):
             stepx = STEPS[j+i][0]
             stepy = STEPS[j+i][1]
