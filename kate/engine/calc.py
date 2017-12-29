@@ -137,29 +137,22 @@ def generate_moves(match):
         kg_attacked = rules.is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked):
-        capture_moves = []
-        silent_moves = []
-
-        for i in range(len(PRIO)):
-            priocnts[i]= 0
-        priocnts[0] = len(priomoves)
-
         for pmove in priomoves:
-            if(pmove[1] == PIECES['wQu'] or pmove[1] == PIECES['bQu']):
-                pmove[3] = PRIO['prio1b']
-            else:
-                pmove[3] = PRIO['prio1']
-            
-            # sort priomoves: captures first!
+            # sort captures first!
             gmove = pmove[0]
             if(match.readfield(gmove.dstx, gmove.dsty) == PIECES['blk']):
-                silent_moves.append(pmove)
+                if(pmove[1] == PIECES['wQu'] or pmove[1] == PIECES['bQu']):
+                    pmove[3] = PRIO['prio1c']
+                else:
+                    pmove[3] = PRIO['prio1b']
             else:
-                capture_moves.append(pmove)
+                pmove[3] = PRIO['prio1a']
 
-        priomoves.clear()
-        priomoves.extend(capture_moves)
-        priomoves.extend(silent_moves)
+            priomoves.sort(key=itemgetter(3))
+
+            for i in range(len(PRIO)):
+                priocnts[i] = 0
+            priocnts[0] = len(priomoves)
     else:
         rank_moves(priomoves)
         priomoves.sort(key=itemgetter(3))
@@ -190,10 +183,10 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 
 def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
     mvcnt = len(prio_moves)
-    prio1_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio1']]] + prio_cnts[PRIO_INDICES[PRIO['prio1b']]]
-    prio2_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio2']]] + prio_cnts[PRIO_INDICES[PRIO['prio2b']]]
-    prio3_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio3']]] + prio_cnts[PRIO_INDICES[PRIO['prio3b']]]
-    prio4_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio4']]] + prio_cnts[PRIO_INDICES[PRIO['prio4b']]]
+    prio1_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio1a']]] + prio_cnts[PRIO_INDICES[PRIO['prio1b']]] + prio_cnts[PRIO_INDICES[PRIO['prio1c']]]
+    prio2_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio2a']]] + prio_cnts[PRIO_INDICES[PRIO['prio2b']]] + prio_cnts[PRIO_INDICES[PRIO['prio2c']]]
+    prio3_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio3a']]] + prio_cnts[PRIO_INDICES[PRIO['prio3b']]] + prio_cnts[PRIO_INDICES[PRIO['prio3c']]]
+    prio4_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio4a']]] + prio_cnts[PRIO_INDICES[PRIO['prio4b']]] + prio_cnts[PRIO_INDICES[PRIO['prio4c']]]
 
     if(match.level == LEVELS['blitz']):
         cnts = 12
@@ -214,7 +207,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
 
     if(depth <= dpth):
         return max(cnts, prio1_mvcnt)
-    elif(depth <= max_dpth and (lastmv_prio == PRIO['prio1'] or lastmv_prio == PRIO['prio1b'])):
+    elif(depth <= max_dpth and (lastmv_prio == PRIO['prio1a'] or lastmv_prio == PRIO['prio1b'] or lastmv_prio == PRIO['prio1c'])):
         addcnt = 0
         if(prio2_mvcnt + prio3_mvcnt > 0):
             addcnt += 1
