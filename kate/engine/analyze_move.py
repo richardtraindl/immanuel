@@ -538,7 +538,7 @@ def rank_moves(priomoves):
                 pmove[3] = min(PRIO['prio3b'], pmove[3])
             
         if(token & MV_IS_DISCLOSURE > 0):
-            pmove[3] = min(PRIO['prio2'], pmove[3])
+            pmove[3] = min(PRIO['prio2b'], pmove[3])
 
         if(token & MV_IS_FLEE > 0):
             if(srcfield_is_supported(token) == False or 
