@@ -561,7 +561,7 @@ def rank_moves(priomoves):
     fleecnt = 0
     for fleemove in flee_list:
         fleecnt += 1
-        if(fleecnt > 2):
+        if(fleecnt > 1):
             pmove = fleemove[0]
-            pmove[3] = fleemove[1]
+            pmove[3] = min(PRIO['prio2'], fleemove[1])
 
