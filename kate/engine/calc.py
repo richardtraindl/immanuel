@@ -137,6 +137,9 @@ def generate_moves(match):
         kg_attacked = rules.is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked):
+        capture_moves = []
+        silent_moves = []
+
         for i in range(len(PRIO)):
             priocnts[i]= 0
         priocnts[0] = len(priomoves)
@@ -146,6 +149,17 @@ def generate_moves(match):
                 pmove[3] = PRIO['prio1b']
             else:
                 pmove[3] = PRIO['prio1']
+            
+            # sort priomoves: captures first!
+            gmove = pmove[0]
+            if(match.readfield(gmove.dstx, gmove.dsty) == PIECES['blk']):
+                silent_moves.append(pmove)
+            else:
+                capture_moves.append(pmove)
+
+        priomoves.clear()
+        priomoves.extend(capture_moves)
+        priomoves.extend(silent_moves)
     else:
         rank_moves(priomoves)
         priomoves.sort(key=itemgetter(3))
@@ -163,12 +177,12 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         candidates.clear()
         candidates.append(newmove)
 
-        #if(len(newcandidates) > 0):
-        for newcandidate in newcandidates[:12]:
-            if(newcandidate):
-                candidates.append(newcandidate)
-            else:
-                break
+        if(len(newcandidates) > 0):
+            for newcandidate in newcandidates[:12]:
+                if(newcandidate):
+                    candidates.append(newcandidate)
+                else:
+                    break
 
         candidates.append(None)
         return newscore
@@ -183,12 +197,12 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
 
     if(match.level == LEVELS['blitz']):
         cnts = 12
-        dpth = 2
-        max_dpth = 5
+        dpth = 3
+        max_dpth = 7
     elif(match.level == LEVELS['low']):
         cnts = 12
         dpth = 3
-        max_dpth = 7
+        max_dpth = 9
     elif(match.level == LEVELS['medium']):
         cnts = 16
         dpth = 4
@@ -214,7 +228,7 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
             addcnt += 1
             idx = random.randint(prio1_mvcnt, (mvcnt - 1))
             prio_moves.insert(0, prio_moves.pop(idx))
-        return min(8, prio1_mvcnt + addcnt)
+        return prio1_mvcnt + addcnt
         # return prio1_mvcnt
     else:
         return 0
@@ -233,6 +247,12 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
 
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
+        if(len(prio_moves) == 1):
+            pmove = prio_moves[0]
+            newmove = pmove[0]
+            candidates.append(newmove)
+            candidates.append(None)
+            return score_position(match, len(prio_moves)), candidates
 
     if(len(prio_moves) == 0 or maxcnt == 0):
         candidates.append(None)
@@ -250,12 +270,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        if(len(prio_moves) > 1):
-            newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, pmove[3]) # , dbginfo
-        else:
-            newscore = score_position(match, len(prio_moves))
-            newcandidates.append(newmove)
-            newcandidates.append(None)
+        newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, pmove[3]) # , dbginfo
 
         score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
@@ -291,6 +306,12 @@ def calc_min(match, depth, alpha, beta, lastmv_prio):
 
     if(depth == 1):
         prnt_priorities(prio_moves, prio_cnts)
+        if(len(prio_moves) == 1):
+            pmove = prio_moves[0]
+            newmove = pmove[0]
+            candidates.append(newmove)
+            candidates.append(None)
+            return score_position(match, len(prio_moves)), candidates
 
     if(len(prio_moves) == 0 or maxcnt == 0):
         candidates.append(None)
@@ -308,12 +329,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio):
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        if(len(prio_moves) > 1):
-            newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, pmove[3]) # , dbginfo
-        else:
-            newscore = score_position(match, len(prio_moves))
-            newcandidates.append(newmove)
-            newcandidates.append(None)
+        newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, pmove[3]) # , dbginfo
 
         score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
 
