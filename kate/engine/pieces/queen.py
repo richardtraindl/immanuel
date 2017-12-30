@@ -33,7 +33,7 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
     for i in range(8):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
+        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
                 return True

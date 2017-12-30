@@ -250,19 +250,25 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
         candidates.append(None)
         return score_position(match, len(priomoves)), candidates
 
-    for pmove in priomoves[:maxcnt]:
-        newmove = pmove.gmove
+    for priomove in priomoves[:maxcnt]:
+        newmove = priomove.gmove
 
         if(depth == 1):
             count += 1
+
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   " + reverse_lookup(PRIO, pmove.prio))
+            print("   " + reverse_lookup(PRIO, priomove.prio))
+
+            token = priomove.tokens[0]
+            print("token:" + hex(token) + 
+                  " " + reverse_lookup(PRIO, priomove.prio) + 
+                  " \ntoken: " + hex(token) + " " + token_to_text(token))
             #gc.collect()
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, pmove.prio) # , dbginfo
+        newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, priomove.prio) # , dbginfo
 
         score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
@@ -313,9 +319,15 @@ def calc_min(match, depth, alpha, beta, lastmv_prio):
         
         if(depth == 1):
             count += 1
+
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
             print("   " + reverse_lookup(PRIO, priomove.prio))
+
+            token = priomove.tokens[0]
+            print("token:" + hex(token) + 
+                  " " + reverse_lookup(PRIO, priomove.prio) + 
+                  " \ntoken: " + hex(token) + " " + token_to_text(token))
             #gc.collect()
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)

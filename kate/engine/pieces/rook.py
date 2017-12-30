@@ -169,33 +169,47 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
     return token 
 
 
-def are_opponents_linked(match, direction, color, srcx, srcy):
+def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked):
+    first = [0] * 3
+    second = [0] * 3
+
     for j in range(0, 4, 2):
-        first = PIECES['blk']
-        second = PIECES['blk']
+        first[0] = PIECES['blk']
+        second[0] = PIECES['blk']
 
         for i in range(0, 2, 1):
             stepx = STEPS[j+i][0]
             stepy = STEPS[j+i][1]
+            if(excluded_dir == rk_dir(srcx, srcy, (srcx + stepx), (srcy + stepy))):
+                break
             x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
             if(x1 != rules.UNDEF_X):
                 piece = match.readfield(x1, y1)
-                if(piece != PIECES['blk']):
-                    if(first == PIECES['blk']):
-                        first = piece
-                    else:
-                        second = piece
+                if(first[0] == PIECES['blk']):
+                    first[0] = piece
+                    first[1] = x1
+                    first[2] = y1
                     continue
-                
-        if(Match.color_of_piece(first) != Match.color_of_piece(second) and 
-           first != PIECES['blk'] and second != PIECES['blk']):
-            if(Match.color_of_piece(first) == color):
-                piece = first
-            else:
-                piece = second
-            if(piece == PIECES['wRk'] or piece == PIECES['bRk'] or 
-               piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                return True
+                elif(second[0] == PIECES['blk']):
+                    second[0] = piece
+                    second[1] = x1
+                    second[2] = y1
+                    if(Match.color_of_piece(first[0]) != Match.color_of_piece(second[0]) and 
+                       first[0] != PIECES['blk'] and second[0] != PIECES['blk']):
+                        if(Match.color_of_piece(first[0]) == color):
+                            if(first[0] == PIECES['wRk'] or first[0] == PIECES['bRk'] or 
+                               first[0] == PIECES['wQu'] or first[0] == PIECES['bQu']):
+                                disclosed_attacked.append(second)
+                                return True
+                        else:
+                            if(second[0] == PIECES['wRk'] or second[0] == PIECES['bRk'] or 
+                               second[0] == PIECES['wQu'] or second[0] == PIECES['bQu']):
+                                disclosed_attacked.append(first)
+                                return True
+                    else:
+                        break
+                else:
+                    break
 
     return False
 
@@ -258,7 +272,7 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
+        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
                 return True

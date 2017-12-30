@@ -84,15 +84,26 @@ def defends_fork(match, move):
     return token
 
 
-def disclosures(match, move):
+def disclosures(match, move, disclosed_attacked):
     token = 0x0
-
+    
     piece = match.readfield(move.srcx, move.srcy)
-    color = Match.color_of_piece(piece)
 
-    if(rules.disclosures_field(match, color, move.srcx, move.srcy, move.dstx, move.dsty)):
+    color = Match.color_of_piece(piece)
+    
+    excluded_dir = rook.rk_dir(move.srcx, move.srcy, move.dstx, move.dsty)
+    if(excluded_dir == rules.DIRS['undefined']):
+        excluded_dir = bishop.bp_dir(move.srcx, move.srcy, move.dstx, move.dsty)
+
+    do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
+
+    if(rook.disclosures_field(match, color, excluded_dir, move.srcx, move.srcy, disclosed_attacked)):
         token = token | MV_IS_DISCLOSURE
 
+    if(bishop.disclosures_field(match, color, excluded_dir, move.srcx, move.srcy, disclosed_attacked)):
+        token = token | MV_IS_DISCLOSURE
+
+    undo_move(match)
     return token
 
 
@@ -128,8 +139,20 @@ def progress(match, move):
     piece = match.readfield(move.srcx, move.srcy)
     color = Match.color_of_piece(piece)
 
+    value = match.score
+
+    value += score_contacts(match, COLORS['white'])
+
+    value += score_contacts(match, COLORS['black'])
+
+    if((value >= (SCORES[PIECES['bPw']] / 2) and color == COLORS['white']) or 
+       (value <= (SCORES[PIECES['wPw']] / 2) and color == COLORS['black'])):
+        return token | MV_IS_PROGRESS
+    else:
+        return token
+
     ###
-    oldvalue = match.score
+    """oldvalue = match.score
 
     oldvalue += score_contacts(match, COLORS['white'])
 
@@ -163,14 +186,15 @@ def progress(match, move):
        (newvalue - oldvalue <= (SCORES[PIECES['wPw']] / 2) and color == COLORS['black'])):
         return token | MV_IS_PROGRESS
     else:
-        return token
+        return token"""
 
 
 def analyze_move(match, move):
-    tokens = [0] * 3
+    tokens = [0] * 4
     token = 0x0
     attacked = []
     supported = []
+    disclosed_attacked = []
 
     piece = match.readfield(move.srcx, move.srcy)
     
@@ -219,7 +243,7 @@ def analyze_move(match, move):
 
     token = token | defends_fork(match, move)
     
-    # token = token | disclosures(match, move)
+    token = token | disclosures(match, move, disclosed_attacked)
 
     token = token | flees(match, move)
 
@@ -228,6 +252,7 @@ def analyze_move(match, move):
     tokens[0] = token
     tokens[1] = attacked
     tokens[2] = supported
+    tokens[3] = disclosed_attacked
     return tokens
 
 
@@ -484,6 +509,14 @@ def is_supported_add_supported(supported):
             return True
     return False
 
+def highest_disclosed_attacked(disclosed_attacked):
+    piece = PIECES['blk']
+
+    for attacked in disclosed_attacked:
+        if(PIECES_RANK[attacked[0]] > PIECES_RANK[piece]):
+            piece = attacked[0]
+    return piece
+
 class PrioMove:
     def __init__(self, gmove=None, piece=None, tokens=None, prio=None):
         self.gmove = gmove
@@ -580,5 +613,5 @@ def rank_moves(priomoves):
         fleecnt += 1
         if(fleecnt > 1):
             priomove = fleemove[0]
-            priomove.prio = min(PRIO['prio2b'], fleemove[1])
+            priomove.prio = fleemove[1]
 
