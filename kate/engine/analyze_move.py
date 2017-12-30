@@ -1,12 +1,13 @@
+from random import randint
 from .match import *
 from .matchmove import do_move, undo_move
 from .move import *
 from .pieces import pawn, knight, bishop, rook, king
 from .pieces.generic_piece import contacts_to_token
+from .calc import *
 from .cvalues import *
 from . import rules
 from .analyze_position import score_contacts, score_opening, score_endgame
-from random import randint
 
 
 def captures(match, move):
@@ -127,36 +128,39 @@ def progress(match, move):
     piece = match.readfield(move.srcx, move.srcy)
     color = Match.color_of_piece(piece)
 
-    if(match.count > 60):
-        if(score_endgame(match) > 0):
-            return token | MV_IS_PROGRESS
-        else:
-            return token
-    elif(match.count > 40):
-        ###
-        oldvalue = score_contacts(match, color)
-        ###
-        do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
+    ###
+    oldvalue = match.score
 
-        newvalue = score_contacts(match, color)
+    oldvalue += score_contacts(match, COLORS['white'])
 
-        undo_move(match)
-        ###
-    else:
-        ###
-        #oldvalue = score_contacts(match, color)
-        oldvalue = score_opening(match)
-        ###
-        do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
+    oldvalue += score_contacts(match, COLORS['black'])
 
-        #newvalue = score_contacts(match, color)
-        newvalue = score_opening(match)
+    if(match.count < 30):
+        oldvalue += score_opening(match)
 
-        undo_move(match)
-        ###
-        
-    if((newvalue - oldvalue >= SUPPORTED_SCORES[PIECES['wQu']] and color == COLORS['white']) or 
-       (newvalue - oldvalue <= SUPPORTED_SCORES[PIECES['bQu']] and color == COLORS['black'])):
+    if(match.count >= 30):
+        oldvalue += score_endgame(match)
+    ###
+
+    do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
+
+    newvalue = match.score
+
+    newvalue += score_contacts(match, COLORS['white'])
+
+    newvalue += score_contacts(match, COLORS['black'])
+
+    if(match.count < 30):
+        newvalue += score_opening(match)
+
+    if(match.count >= 30):
+        newvalue += score_endgame(match)
+
+    undo_move(match)
+    ###
+
+    if((newvalue - oldvalue >= (SCORES[PIECES['bPw']] / 2) and color == COLORS['white']) or 
+       (newvalue - oldvalue <= (SCORES[PIECES['wPw']] / 2) and color == COLORS['black'])):
         return token | MV_IS_PROGRESS
     else:
         return token
@@ -215,11 +219,11 @@ def analyze_move(match, move):
 
     token = token | defends_fork(match, move)
     
-    token = token | disclosures(match, move)
+    # token = token | disclosures(match, move)
 
     token = token | flees(match, move)
 
-    token = token | progress(match, move)
+    # token = token | progress(match, move)
 
     tokens[0] = token
     tokens[1] = attacked
@@ -382,12 +386,12 @@ def piece_is_lower_equal_than_enemy_on_dstfield(token):
         else:
             return False
 
-def piece_and_enemy_on_dstfield_are_fairy_equal(token):
+def piece_is_lower_fairy_equal_than_enemy_on_dstfield(token):
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):
         if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0) and 
+            token & DSTFLD_IS_ENM_TOU_BY_QU > 0) and
            token & DSTFLD_IS_ENM_TOU_BY_RK == 0 and
            token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and
            token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and
@@ -395,10 +399,10 @@ def piece_and_enemy_on_dstfield_are_fairy_equal(token):
             return True
         else:
             return False
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0 or token & MV_PIECE_IS_RK > 0):
-        if(token & DSTFLD_IS_ENM_TOU_BY_KG == 0 and 
-           token & DSTFLD_IS_ENM_TOU_BY_QU == 0 and
-           (token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
+    elif(token & MV_PIECE_IS_RK > 0 or token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
+        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
+            token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
+            token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
             token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
             token & DSTFLD_IS_ENM_TOU_BY_KN > 0) and
            token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
@@ -406,11 +410,11 @@ def piece_and_enemy_on_dstfield_are_fairy_equal(token):
         else:
             return False
     else: # MV_PIECE_IS_PW
-        if(token & DSTFLD_IS_ENM_TOU_BY_KG == 0 and  
-           token & DSTFLD_IS_ENM_TOU_BY_QU == 0 and 
-           token & DSTFLD_IS_ENM_TOU_BY_RK == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and 
-           token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and 
+        if(token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
+           token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
+           token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or 
+           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or 
+           token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or
            token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
             return True
         else:
@@ -480,92 +484,101 @@ def is_supported_add_supported(supported):
             return True
     return False
 
+class PrioMove:
+    def __init__(self, gmove=None, piece=None, tokens=None, prio=None):
+        self.gmove = gmove
+        self.piece = piece
+        self.tokens = tokens
+        self.prio = prio
+
 def rank_moves(priomoves):
     fleecnt = 0
     flee_list = []
 
-    for pmove in priomoves:
-        gmove = pmove[0]
-        piece = pmove[1]
-        tokens = pmove[2]
-        token = tokens[0]
-        attacked = tokens[1]
-        supported = tokens[2]
+    for priomove in priomoves:
+        token = priomove.tokens[0]
+        attacked = priomove.tokens[1]
+        supported = priomove.tokens[2]
 
         if(token & MV_IS_CASTLING > 0):
-            pmove[3] = min(PRIO['prio3a'], pmove[3])
+            priomove.prio = min(PRIO['prio3a'], priomove.prio)
 
         if(token & MV_IS_PROMOTION > 0):
-            pmove[3] = min(PRIO['prio1a'], pmove[3])
+            priomove.prio = min(PRIO['prio1a'], priomove.prio)
 
         if(token & MV_IS_CAPTURE > 0):
-            if(piece_is_lower_equal_than_captured(token) or dstfield_is_attacked(token) == False):
-                pmove[3] = min(PRIO['prio1a'], pmove[3])
-            elif(dstfield_is_supported(token) and 
-                 (piece_is_lower_equal_than_enemy_on_dstfield(token) or
-                  piece_and_enemy_on_dstfield_are_fairy_equal(token)) ):
-                pmove[3] = min(PRIO['prio1a'], pmove[3])
+            if(piece_is_lower_fairy_equal_than_enemy_on_dstfield(token) or 
+               dstfield_is_attacked(token) == False or
+               (dstfield_is_supported(token) and piece_is_lower_equal_than_captured(token)) ):
+                priomove.prio = min(PRIO['prio1a'], priomove.prio)
+            elif(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
+                priomove.prio = min(PRIO['prio2a'], priomove.prio)
             else:
-                pmove[3] = min(PRIO['prio3a'], pmove[3])
+                priomove.prio = min(PRIO['prio3a'], priomove.prio)
 
         if(token & MV_IS_ATTACK > 0):
             if(dstfield_is_attacked(token) == False or 
-               (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)) ):
+               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)) ):
                 if(token & ATTACKED_IS_KG > 0):
-                    pmove[3] = min(PRIO['prio1b'], pmove[3])
-                elif(is_attacked_supported(attacked) == False or piece_is_lower_equal_than_attacked(token)):
-                    pmove[3] = min(PRIO['prio2b'], pmove[3])
+                    priomove.prio = min(PRIO['prio1b'], priomove.prio)
                 else:
-                    pmove[3] = min(PRIO['prio3b'], pmove[3])
+                    priomove.prio = min(PRIO['prio2b'], priomove.prio)
             else:
-                pmove[3] = min(PRIO['prio4b'], pmove[3])
+                if(token & ATTACKED_IS_KG > 0):
+                    priomove.prio = min(PRIO['prio2b'], priomove.prio)
+                else:
+                    priomove.prio = min(PRIO['prio3b'], priomove.prio)
 
         if(token & MV_IS_SUPPORT > 0):
-            if(dstfield_is_attacked(token) == False or 
-               (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)) ):
-                if(is_supported_attacked(supported) and is_supported_add_supported(supported) == False and is_supported_lower_equal_than_attacker(supported)):
-                    pmove[3] = min(PRIO['prio1b'], pmove[3])
+            if(is_supported_attacked(supported)):
+                if(dstfield_is_attacked(token) == False or
+                   (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)) ):
+                    if(is_supported_add_supported(supported) == False and 
+                       is_supported_lower_equal_than_attacker(supported)):
+                        priomove.prio = min(PRIO['prio1c'], priomove.prio)
+                    else:
+                        priomove.prio = min(PRIO['prio2c'], priomove.prio)
                 else:
-                    pmove[3] = min(PRIO['prio3b'], pmove[3])
+                    priomove.prio = min(PRIO['prio3c'], priomove.prio)
             else:
-                pmove[3] = min(PRIO['prio4b'], pmove[3])
+                priomove.prio = min(PRIO['prio3c'], priomove.prio)
 
         if(token & MV_IS_FORK_DEFENSE > 0):
             if(dstfield_is_attacked(token) == False or 
-               (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)) ):
-                pmove[3] = min(PRIO['prio1b'], pmove[3])
+               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)) ):
+                priomove.prio = min(PRIO['prio1c'], priomove.prio)
             else:
-                pmove[3] = min(PRIO['prio3b'], pmove[3])
-            
+                priomove.prio = min(PRIO['prio3c'], priomove.prio)
+
         if(token & MV_IS_DISCLOSURE > 0):
-            pmove[3] = min(PRIO['prio2b'], pmove[3])
+            priomove.prio = min(PRIO['prio1b'], priomove.prio)
 
         if(token & MV_IS_FLEE > 0):
             if(srcfield_is_supported(token) == False or 
                (srcfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_srcfield(token) == False)):
                 if(dstfield_is_attacked(token) == False or
                    (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)) ):
-                    if(pmove[3] != PRIO['prio1b']):
-                        flee_list.append([pmove, pmove[3]])
-                    pmove[3] = min(PRIO['prio1b'], pmove[3])
+                    if(priomove.prio != PRIO['prio1b']):
+                        flee_list.append([priomove, priomove.prio])
+                    priomove.prio = min(PRIO['prio1b'], priomove.prio)
                 else:
-                    pmove[3] = min(PRIO['prio4b'], pmove[3])
+                    priomove.prio = min(PRIO['prio4b'], priomove.prio)
             else:
-                pmove[3] = min(PRIO['last'], pmove[3])
+                priomove.prio = min(PRIO['last'], priomove.prio)
 
         if(token & MV_IS_PROGRESS > 0):
-            pmove[3] = min(PRIO['prio3c'], pmove[3])
+            priomove.prio = min(PRIO['prio2b'], priomove.prio)
 
         if(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
-            pmove[3] = min(PRIO['prio4c'], pmove[3])
+            priomove.prio = min(PRIO['prio4a'], priomove.prio)
 
-        if(token & MV_PIECE_IS_QU > 0 and pmove[3] != PRIO['last']):
-            pmove[3] += 1
+        if(token & MV_PIECE_IS_QU > 0 and priomove.prio != PRIO['last']):
+            priomove.prio += 1
 
     fleecnt = 0
     for fleemove in flee_list:
         fleecnt += 1
         if(fleecnt > 1):
-            pmove = fleemove[0]
-            pmove[3] = min(PRIO['prio2b'], fleemove[1])
+            priomove = fleemove[0]
+            priomove.prio = min(PRIO['prio2b'], fleemove[1])
 

@@ -1,5 +1,5 @@
 import time
-from operator import itemgetter
+from operator import attrgetter
 import random
 #import gc
 from .match import *
@@ -41,16 +41,16 @@ def prnt_moves(msg, moves):
         print("")
 
 
-def prnt_priorities(prio_moves, prio_cnts):
-    for pmove in prio_moves:
-        tokens = pmove[2]
-        prnt_move("\n ", pmove[0], "")        
-        print("piece:" + str(pmove[1]) + " token:" + hex(tokens[0]) + 
-               " " + reverse_lookup(PRIO, pmove[3]) + 
-               " \ntoken: " + hex(tokens[0]) + " " + token_to_text(tokens[0]))
+def prnt_priorities(priomoves, priocnts):
+    for priomove in priomoves:
+        token = priomove.tokens[0]
+        prnt_move("\n ", priomove.gmove, "")        
+        print("piece:" + str(priomove.piece) + " token:" + hex(token) + 
+               " " + reverse_lookup(PRIO, priomove.prio) + 
+               " \ntoken: " + hex(token) + " " + token_to_text(token))
 
-    for i in range(len(prio_cnts)):
-        print(reverse_lookup(PRIO, (i + 1))  + ": " + str(prio_cnts[i]))
+    for i in range(len(priocnts)):
+        print(reverse_lookup(PRIO, (i + 1))  + ": " + str(priocnts[i]))
 
 
 def prnt_fmttime(msg, seconds):
@@ -64,7 +64,6 @@ def read_steps(steps, dir_idx, step_idx):
     stepy = steps[dir_idx][step_idx][1]
     prom_piece = steps[dir_idx][step_idx][2]
     return stepx, stepy, prom_piece
-
 
 def generate_moves(match):
     color = match.next_color()
@@ -127,7 +126,8 @@ def generate_moves(match):
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         tokens = analyze_move(match, gmove)
-                        priomoves.append([gmove, piece, tokens, PRIO['last']])
+                        priomove = PrioMove(gmove, piece, tokens, PRIO['last'])
+                        priomoves.append(priomove)
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
 
@@ -137,28 +137,28 @@ def generate_moves(match):
         kg_attacked = rules.is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked):
-        for pmove in priomoves:
+        for priomove in priomoves:
             # sort captures first!
-            gmove = pmove[0]
+            gmove = priomove.gmove
             if(match.readfield(gmove.dstx, gmove.dsty) == PIECES['blk']):
-                if(pmove[1] == PIECES['wQu'] or pmove[1] == PIECES['bQu']):
-                    pmove[3] = PRIO['prio1c']
+                if(priomove.piece == PIECES['wQu'] or priomove.piece == PIECES['bQu']):
+                    priomove.prio = PRIO['prio1c']
                 else:
-                    pmove[3] = PRIO['prio1b']
+                    priomove.prio = PRIO['prio1b']
             else:
-                pmove[3] = PRIO['prio1a']
+                priomove.prio = PRIO['prio1a']
 
-            priomoves.sort(key=itemgetter(3))
+            priomoves.sort(key=attrgetter('prio'))
 
             for i in range(len(PRIO)):
                 priocnts[i] = 0
             priocnts[0] = len(priomoves)
     else:
         rank_moves(priomoves)
-        priomoves.sort(key=itemgetter(3))
+        priomoves.sort(key=attrgetter('prio'))
 
-        for pmove in priomoves:
-            priocnts[PRIO_INDICES[pmove[3]]] += 1
+        for priomove in priomoves:
+            priocnts[PRIO_INDICES[priomove.prio]] += 1
 
     return priomoves, priocnts
 
@@ -234,36 +234,35 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
     maxscore = SCORES[PIECES['wKg']] * 2
     count = 0
 
-    prio_moves, prio_cnts = generate_moves(match)
+    priomoves, priocnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio)
+    maxcnt = select_maxcnt(match, depth, priomoves, priocnts, lastmv_prio)
 
     if(depth == 1):
-        prnt_priorities(prio_moves, prio_cnts)
-        if(len(prio_moves) == 1):
-            pmove = prio_moves[0]
-            newmove = pmove[0]
-            candidates.append(newmove)
+        prnt_priorities(priomoves, priocnts)
+        if(len(priomoves) == 1):
+            pmove = priomoves[0]
+            candidates.append(pmove.gmove)
             candidates.append(None)
-            return score_position(match, len(prio_moves)), candidates
+            return score_position(match, len(priomoves)), candidates
 
-    if(len(prio_moves) == 0 or maxcnt == 0):
+    if(len(priomoves) == 0 or maxcnt == 0):
         candidates.append(None)
-        return score_position(match, len(prio_moves)), candidates
+        return score_position(match, len(priomoves)), candidates
 
-    for pmove in prio_moves[:maxcnt]:
-        newmove = pmove[0]
+    for pmove in priomoves[:maxcnt]:
+        newmove = pmove.gmove
 
         if(depth == 1):
             count += 1
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   " + reverse_lookup(PRIO, pmove[3]))
+            print("   " + reverse_lookup(PRIO, pmove.prio))
             #gc.collect()
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, pmove[3]) # , dbginfo
+        newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, pmove.prio) # , dbginfo
 
         score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
@@ -293,36 +292,35 @@ def calc_min(match, depth, alpha, beta, lastmv_prio):
     minscore = SCORES[PIECES['bKg']] * 2
     count = 0
 
-    prio_moves, prio_cnts = generate_moves(match)
+    priomoves, priocnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio)
+    maxcnt = select_maxcnt(match, depth, priomoves, priocnts, lastmv_prio)
 
     if(depth == 1):
-        prnt_priorities(prio_moves, prio_cnts)
-        if(len(prio_moves) == 1):
-            pmove = prio_moves[0]
-            newmove = pmove[0]
-            candidates.append(newmove)
+        prnt_priorities(priomoves, priocnts)
+        if(len(priomoves) == 1):
+            pmove = priomoves[0]
+            candidates.append(pmove.gmove)
             candidates.append(None)
-            return score_position(match, len(prio_moves)), candidates
+            return score_position(match, len(priomoves)), candidates
 
-    if(len(prio_moves) == 0 or maxcnt == 0):
+    if(len(priomoves) == 0 or maxcnt == 0):
         candidates.append(None)
-        return score_position(match, len(prio_moves)), candidates
+        return score_position(match, len(priomoves)), candidates
 
-    for pmove in prio_moves[:maxcnt]:
-        newmove = pmove[0]
+    for priomove in priomoves[:maxcnt]:
+        newmove = priomove.gmove
         
         if(depth == 1):
             count += 1
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   " + reverse_lookup(PRIO, pmove[3]))
+            print("   " + reverse_lookup(PRIO, priomove.prio))
             #gc.collect()
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, pmove[3]) # , dbginfo
+        newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, priomove.prio) # , dbginfo
 
         score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
 
