@@ -104,6 +104,16 @@ def disclosures(match, move, disclosed_attacked):
         token = token | MV_IS_DISCLOSURE
 
     undo_move(match)
+
+    ###
+    match.writefield(move.srcx, move.srcy, PIECES['blk'])
+
+    for ctouch in disclosed_attacked:
+        rules.field_touches_beyond(match, color, ctouch)
+
+    match.writefield(move.srcx, move.srcy, piece)
+    ###
+
     return token
 
 
@@ -509,12 +519,18 @@ def is_supported_add_supported(supported):
             return True
     return False
 
+def is_disclosed_attacked_supported(disclosed_attacked):
+    for ctouch in disclosed_attacked:
+        if(len(ctouch.supporter_beyond) == 0):
+            return False
+    return True
+
 def highest_disclosed_attacked(disclosed_attacked):
     piece = PIECES['blk']
 
-    for attacked in disclosed_attacked:
-        if(PIECES_RANK[attacked[0]] > PIECES_RANK[piece]):
-            piece = attacked[0]
+    for ctouch in disclosed_attacked:
+        if(PIECES_RANK[ctouch.piece] > PIECES_RANK[piece]):
+            piece = ctouch.piece
     return piece
 
 class PrioMove:
@@ -532,6 +548,7 @@ def rank_moves(priomoves):
         token = priomove.tokens[0]
         attacked = priomove.tokens[1]
         supported = priomove.tokens[2]
+        disclosed_attacked = priomove.tokens[3]
 
         if(token & MV_IS_CASTLING > 0):
             priomove.prio = min(PRIO['prio3a'], priomove.prio)
@@ -540,9 +557,9 @@ def rank_moves(priomoves):
             priomove.prio = min(PRIO['prio1a'], priomove.prio)
 
         if(token & MV_IS_CAPTURE > 0):
-            if(piece_is_lower_fairy_equal_than_enemy_on_dstfield(token) or 
-               dstfield_is_attacked(token) == False or
-               (dstfield_is_supported(token) and piece_is_lower_equal_than_captured(token)) ):
+            if(piece_is_lower_equal_than_captured(token) or 
+               dstfield_is_attacked(token) == False or 
+               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)) ):
                 priomove.prio = min(PRIO['prio1a'], priomove.prio)
             elif(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
                 priomove.prio = min(PRIO['prio2a'], priomove.prio)
@@ -554,8 +571,10 @@ def rank_moves(priomoves):
                (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)) ):
                 if(token & ATTACKED_IS_KG > 0):
                     priomove.prio = min(PRIO['prio1b'], priomove.prio)
-                else:
+                elif(is_attacked_supported(attacked) == False):
                     priomove.prio = min(PRIO['prio2b'], priomove.prio)
+                else:
+                    priomove.prio = min(PRIO['prio3b'], priomove.prio)
             else:
                 if(token & ATTACKED_IS_KG > 0):
                     priomove.prio = min(PRIO['prio2b'], priomove.prio)
@@ -584,7 +603,10 @@ def rank_moves(priomoves):
                 priomove.prio = min(PRIO['prio3c'], priomove.prio)
 
         if(token & MV_IS_DISCLOSURE > 0):
-            priomove.prio = min(PRIO['prio1b'], priomove.prio)
+            if(is_disclosed_attacked_supported(disclosed_attacked) == False):
+                priomove.prio = min(PRIO['prio1b'], priomove.prio)
+            else:
+                priomove.prio = min(PRIO['prio2b'], priomove.prio)
 
         if(token & MV_IS_FLEE > 0):
             if(srcfield_is_supported(token) == False or 

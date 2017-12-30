@@ -170,12 +170,9 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
 
 def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked):
-    first = [0] * 3
-    second = [0] * 3
-
     for j in range(0, 4, 2):
-        first[0] = PIECES['blk']
-        second[0] = PIECES['blk']
+        first = cTouch(PIECES['blk'], 0, 0)
+        second = cTouch(PIECES['blk'], 0, 0)
 
         for i in range(0, 2, 1):
             stepx = STEPS[j+i][0]
@@ -185,25 +182,25 @@ def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked
             x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
             if(x1 != rules.UNDEF_X):
                 piece = match.readfield(x1, y1)
-                if(first[0] == PIECES['blk']):
-                    first[0] = piece
-                    first[1] = x1
-                    first[2] = y1
+                if(first.piece == PIECES['blk']):
+                    first.piece = piece
+                    first.fieldx = x1
+                    first.fieldy = y1
                     continue
-                elif(second[0] == PIECES['blk']):
-                    second[0] = piece
-                    second[1] = x1
-                    second[2] = y1
-                    if(Match.color_of_piece(first[0]) != Match.color_of_piece(second[0]) and 
-                       first[0] != PIECES['blk'] and second[0] != PIECES['blk']):
-                        if(Match.color_of_piece(first[0]) == color):
-                            if(first[0] == PIECES['wRk'] or first[0] == PIECES['bRk'] or 
-                               first[0] == PIECES['wQu'] or first[0] == PIECES['bQu']):
+                elif(second.piece == PIECES['blk']):
+                    second.piece = piece
+                    second.fieldx = x1
+                    second.fieldy = y1
+                    if(Match.color_of_piece(first.piece) != Match.color_of_piece(second.piece) and 
+                       first.piece != PIECES['blk'] and second.piece != PIECES['blk']):
+                        if(Match.color_of_piece(first.piece) == color):
+                            if(first.piece == PIECES['wRk'] or first.piece == PIECES['bRk'] or 
+                               first.piece == PIECES['wQu'] or first.piece == PIECES['bQu']):
                                 disclosed_attacked.append(second)
                                 return True
                         else:
-                            if(second[0] == PIECES['wRk'] or second[0] == PIECES['bRk'] or 
-                               second[0] == PIECES['wQu'] or second[0] == PIECES['bQu']):
+                            if(second.piece == PIECES['wRk'] or second.piece == PIECES['bRk'] or 
+                               second.piece == PIECES['wQu'] or second.piece == PIECES['bQu']):
                                 disclosed_attacked.append(first)
                                 return True
                     else:
@@ -289,7 +286,10 @@ def count_attacks(match, color, fieldx, fieldy):
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == color):
-                count += 1
+                if(rules.is_field_touched(match, color, x1, y1)):
+                    continue
+                else:
+                    count += 1
     return count
 
 

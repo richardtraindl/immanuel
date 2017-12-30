@@ -306,7 +306,10 @@ def count_attacks(match, color, fieldx, fieldy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == color):
-                count += 1
+                if(rules.is_field_touched(match, color, x1, y1)):
+                    continue
+                else:
+                    count += 1
     return count
 
 
