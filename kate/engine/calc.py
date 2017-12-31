@@ -181,21 +181,28 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         return newscore
 
 
-def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
-    mvcnt = len(prio_moves)
-    prio1_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio1a']]] + prio_cnts[PRIO_INDICES[PRIO['prio1b']]] + prio_cnts[PRIO_INDICES[PRIO['prio1c']]]
-    prio2_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio2a']]] + prio_cnts[PRIO_INDICES[PRIO['prio2b']]] + prio_cnts[PRIO_INDICES[PRIO['prio2c']]]
-    prio3_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio3a']]] + prio_cnts[PRIO_INDICES[PRIO['prio3b']]] + prio_cnts[PRIO_INDICES[PRIO['prio3c']]]
-    prio4_mvcnt = prio_cnts[PRIO_INDICES[PRIO['prio4a']]] + prio_cnts[PRIO_INDICES[PRIO['prio4b']]] + prio_cnts[PRIO_INDICES[PRIO['prio4c']]]
+def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
+    mvcnt = len(priomoves)
+    prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]]
+    prio2_mvcnt = priocnts[PRIO_INDICES[PRIO['prio2a']]] + priocnts[PRIO_INDICES[PRIO['prio2b']]] + priocnts[PRIO_INDICES[PRIO['prio2c']]]
+    prio3_mvcnt = priocnts[PRIO_INDICES[PRIO['prio3a']]] + priocnts[PRIO_INDICES[PRIO['prio3b']]] + priocnts[PRIO_INDICES[PRIO['prio3c']]]
+    prio4_mvcnt = priocnts[PRIO_INDICES[PRIO['prio4a']]] + priocnts[PRIO_INDICES[PRIO['prio4b']]] + priocnts[PRIO_INDICES[PRIO['prio4c']]]
+    
+    if(last_priomove):
+        last_prio = last_priomove.prio
+        token = last_priomove.tokens[0]
+    else:
+        last_prio = PRIO['last']
+        token = 0x0
 
     if(match.level == LEVELS['blitz']):
         cnts = 12
         dpth = 3
-        max_dpth = 7
+        max_dpth = 5
     elif(match.level == LEVELS['low']):
         cnts = 12
         dpth = 3
-        max_dpth = 9
+        max_dpth = 7
     elif(match.level == LEVELS['medium']):
         cnts = 16
         dpth = 4
@@ -207,27 +214,27 @@ def select_maxcnt(match, depth, prio_moves, prio_cnts, lastmv_prio):
 
     if(depth <= dpth):
         return max(cnts, prio1_mvcnt)
-    elif(depth <= max_dpth and (lastmv_prio == PRIO['prio1a'] or lastmv_prio == PRIO['prio1b'] or lastmv_prio == PRIO['prio1c'])):
+    elif( (depth <= max_dpth and (last_prio == PRIO['prio1a'] or last_prio == PRIO['prio1b'] or last_prio == PRIO['prio1c'])) or
+          (depth <= max_dpth + 4 and last_prio == PRIO['prio1a']) ):
         addcnt = 0
         if(prio2_mvcnt + prio3_mvcnt > 0):
             addcnt += 1
             idx = random.randint(prio1_mvcnt, (prio1_mvcnt + prio2_mvcnt + prio3_mvcnt - 1))
-            prio_moves.insert(0, prio_moves.pop(idx))
+            priomoves.insert(0, priomoves.pop(idx))
         elif(prio4_mvcnt > 0):
             addcnt += 1
             idx = random.randint(prio1_mvcnt, (prio1_mvcnt + prio4_mvcnt - 1))
-            prio_moves.insert(0, prio_moves.pop(idx))
-        elif(prio_cnts[PRIO_INDICES[PRIO['last']]] > 0):
+            priomoves.insert(0, priomoves.pop(idx))
+        elif(priocnts[PRIO_INDICES[PRIO['last']]] > 0):
             addcnt += 1
             idx = random.randint(prio1_mvcnt, (mvcnt - 1))
-            prio_moves.insert(0, prio_moves.pop(idx))
+            priomoves.insert(0, priomoves.pop(idx))
         return prio1_mvcnt + addcnt
-        # return prio1_mvcnt
     else:
         return 0
 
 
-def calc_max(match, depth, alpha, beta, lastmv_prio):
+def calc_max(match, depth, alpha, beta, last_priomove):
     color = match.next_color()
     candidates = []
     newcandidates = []
@@ -236,7 +243,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
 
     priomoves, priocnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, priomoves, priocnts, lastmv_prio)
+    maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):
         prnt_priorities(priomoves, priocnts)
@@ -268,7 +275,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, priomove.prio) # , dbginfo
+        newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, priomove) # , dbginfo
 
         score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
@@ -291,7 +298,7 @@ def calc_max(match, depth, alpha, beta, lastmv_prio):
     return maxscore, candidates
 
 
-def calc_min(match, depth, alpha, beta, lastmv_prio):
+def calc_min(match, depth, alpha, beta, last_priomove):
     color = match.next_color()
     candidates = []
     newcandidates = []
@@ -300,7 +307,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio):
 
     priomoves, priocnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, priomoves, priocnts, lastmv_prio)
+    maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):
         prnt_priorities(priomoves, priocnts)
@@ -332,7 +339,7 @@ def calc_min(match, depth, alpha, beta, lastmv_prio):
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, priomove.prio) # , dbginfo
+        newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, priomove) # , dbginfo
 
         score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
 
