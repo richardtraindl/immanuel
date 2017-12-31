@@ -33,7 +33,7 @@ def prnt_moves(msg, moves):
     if(len(moves) == 0):
         print("no move.....")
     else:
-        for move in moves: # [:9]
+        for move in moves:
             if(move):
                 prnt_move("[", move, "] ")
             else:
@@ -145,8 +145,9 @@ def generate_moves(match):
 
     if(kg_attacked):
         for priomove in priomoves:
+            priomove.prio = PRIO['prio1a']
             # sort captures first!
-            gmove = priomove.gmove
+            """gmove = priomove.gmove            
             if(match.readfield(gmove.dstx, gmove.dsty) == PIECES['blk']):
                 if(priomove.piece == PIECES['wQu'] or priomove.piece == PIECES['bQu']):
                     priomove.prio = PRIO['prio1c']
@@ -155,7 +156,7 @@ def generate_moves(match):
             else:
                 priomove.prio = PRIO['prio1a']
 
-            priomoves.sort(key=attrgetter('prio'))
+            priomoves.sort(key=attrgetter('prio'))"""
 
             for i in range(len(PRIO)):
                 priocnts[i] = 0
@@ -178,7 +179,7 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         candidates.append(newmove)
 
         if(len(newcandidates) > 0):
-            for newcandidate in newcandidates[:12]:
+            for newcandidate in newcandidates: # [:12]
                 if(newcandidate):
                     candidates.append(newcandidate)
                 else:
