@@ -191,10 +191,7 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
     prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]]
-    prio2_mvcnt = priocnts[PRIO_INDICES[PRIO['prio2a']]] + priocnts[PRIO_INDICES[PRIO['prio2b']]] + priocnts[PRIO_INDICES[PRIO['prio2c']]]
-    prio3_mvcnt = priocnts[PRIO_INDICES[PRIO['prio3a']]] + priocnts[PRIO_INDICES[PRIO['prio3b']]] + priocnts[PRIO_INDICES[PRIO['prio3c']]]
-    prio4_mvcnt = priocnts[PRIO_INDICES[PRIO['prio4a']]] + priocnts[PRIO_INDICES[PRIO['prio4b']]] + priocnts[PRIO_INDICES[PRIO['prio4c']]]
-    
+
     if(last_priomove):
         last_prio = last_priomove.prio
         token = last_priomove.tokens[0]
@@ -227,14 +224,14 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
             addcnt += 1
             idx = random.randint(prio1_mvcnt, (mvcnt - 1))
             priomoves.insert(0, priomoves.pop(idx))
-        return min(8, prio1_mvcnt + addcnt)
+        return prio1_mvcnt + addcnt
     elif(depth <= max_dpth + 4 and last_prio == PRIO['prio1a']):
         addcnt = 0
         if(mvcnt > priocnts[PRIO_INDICES[PRIO['prio1a']]]):
             addcnt += 1
             idx = random.randint(priocnts[PRIO_INDICES[PRIO['prio1a']]], (mvcnt - 1))
             priomoves.insert(0, priomoves.pop(idx))
-        return min(4, priocnts[PRIO_INDICES[PRIO['prio1a']]] + addcnt)
+        return priocnts[PRIO_INDICES[PRIO['prio1a']]] + addcnt
     else:
         return 0
 
