@@ -50,7 +50,9 @@ def count_attacks(match, color, fieldx, fieldy):
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == color):
-                if(rules.is_field_touched(match, color, x1, y1)):
+                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                    count += 1
+                elif(rules.is_field_touched(match, color, x1, y1)):
                     continue
                 else:
                     count += 1

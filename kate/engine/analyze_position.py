@@ -297,11 +297,11 @@ def score_opening(match):
 def score_endgame(match):
     value = 0
 
-    whiterate = SCORES[PIECES['bPw']] / 20
-    whitesteprate = (SCORES[PIECES['bPw']] / 100)
+    whiterate = SCORES[PIECES['bPw']] / 5
+    whitesteprate = (SCORES[PIECES['bPw']] / 20)
 
-    blackrate = SCORES[PIECES['wPw']] / 20
-    blacksteprate = (SCORES[PIECES['wPw']] / 100)
+    blackrate = SCORES[PIECES['wPw']] / 5
+    blacksteprate = (SCORES[PIECES['wPw']] / 20)
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
