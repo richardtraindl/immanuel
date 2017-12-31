@@ -1,7 +1,7 @@
 import time
 from operator import attrgetter
 import random
-#import gc
+import gc
 from .match import *
 from .move import *
 from . import matchmove
@@ -274,7 +274,7 @@ def calc_max(match, depth, alpha, beta, last_priomove):
             print("token:" + hex(token) + 
                   " " + reverse_lookup(PRIO, priomove.prio) + 
                   " \ntoken: " + hex(token) + " " + token_to_text(token))
-            #gc.collect()
+            gc.collect()
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
@@ -338,7 +338,7 @@ def calc_min(match, depth, alpha, beta, last_priomove):
             print("token:" + hex(token) + 
                   " " + reverse_lookup(PRIO, priomove.prio) + 
                   " \ntoken: " + hex(token) + " " + token_to_text(token))
-            #gc.collect()
+            gc.collect()
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
