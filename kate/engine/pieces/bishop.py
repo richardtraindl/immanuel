@@ -98,9 +98,6 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
     bishop = match.readfield(srcx, srcy)
 
-    if(bishop != PIECES['wBp'] and bishop != PIECES['wQu'] and bishop != PIECES['bBp'] and bishop != PIECES['bQu']):
-        return token
-
     color = Match.color_of_piece(bishop)
     opp_color = Match.oppcolor_of_piece(bishop)
 

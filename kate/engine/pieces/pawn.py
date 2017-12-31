@@ -139,9 +139,6 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
     pawn = match.readfield(srcx, srcy)
 
-    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
-        return token
-
     color = Match.color_of_piece(pawn)
     opp_color = Match.oppcolor_of_piece(pawn)
 

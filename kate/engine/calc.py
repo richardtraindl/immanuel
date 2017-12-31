@@ -65,6 +65,13 @@ def read_steps(steps, dir_idx, step_idx):
     prom_piece = steps[dir_idx][step_idx][2]
     return stepx, stepy, prom_piece
 
+class PrioMove:
+    def __init__(self, gmove=None, piece=None, tokens=None, prio=None):
+        self.gmove = gmove
+        self.piece = piece
+        self.tokens = tokens
+        self.prio = prio
+
 def generate_moves(match):
     color = match.next_color()
     priomoves = []
@@ -205,7 +212,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         max_dpth = 7
     elif(match.level == LEVELS['medium']):
         cnts = 16
-        dpth = 4
+        dpth = 5
         max_dpth = 9
     else:
         cnts = 20
@@ -214,22 +221,20 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     if(depth <= dpth):
         return max(cnts, prio1_mvcnt)
-    elif( (depth <= max_dpth and (last_prio == PRIO['prio1a'] or last_prio == PRIO['prio1b'] or last_prio == PRIO['prio1c'])) or
-          (depth <= max_dpth + 4 and last_prio == PRIO['prio1a']) ):
+    elif(depth <= max_dpth and (last_prio == PRIO['prio1a'] or last_prio == PRIO['prio1b'] or last_prio == PRIO['prio1c'])):
         addcnt = 0
-        if(prio2_mvcnt + prio3_mvcnt > 0):
-            addcnt += 1
-            idx = random.randint(prio1_mvcnt, (prio1_mvcnt + prio2_mvcnt + prio3_mvcnt - 1))
-            priomoves.insert(0, priomoves.pop(idx))
-        elif(prio4_mvcnt > 0):
-            addcnt += 1
-            idx = random.randint(prio1_mvcnt, (prio1_mvcnt + prio4_mvcnt - 1))
-            priomoves.insert(0, priomoves.pop(idx))
-        elif(priocnts[PRIO_INDICES[PRIO['last']]] > 0):
+        if(mvcnt > prio1_mvcnt):
             addcnt += 1
             idx = random.randint(prio1_mvcnt, (mvcnt - 1))
             priomoves.insert(0, priomoves.pop(idx))
-        return prio1_mvcnt + addcnt
+        return min(8, prio1_mvcnt + addcnt)
+    elif(depth <= max_dpth + 4 and last_prio == PRIO['prio1a']):
+        addcnt = 0
+        if(mvcnt > priocnts[PRIO_INDICES[PRIO['prio1a']]]):
+            addcnt += 1
+            idx = random.randint(priocnts[PRIO_INDICES[PRIO['prio1a']]], (mvcnt - 1))
+            priomoves.insert(0, priomoves.pop(idx))
+        return min(4, priocnts[PRIO_INDICES[PRIO['prio1a']]] + addcnt)
     else:
         return 0
 

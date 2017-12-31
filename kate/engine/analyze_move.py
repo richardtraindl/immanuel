@@ -5,6 +5,7 @@ from .move import *
 from .pieces import pawn, knight, bishop, rook, king
 from .pieces.generic_piece import contacts_to_token
 from .calc import *
+from .analyze_helper import *
 from .cvalues import *
 from . import rules
 from .analyze_position import score_contacts, score_opening, score_endgame
@@ -60,15 +61,27 @@ def castles(match, move):
 def attacks_and_supports(match, move, attacked, supported):
     token = 0x0
 
-    token = token | rook.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
+    piece = match.readfield(move.srcx, move.srcy)
 
-    token = token | bishop.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
-
-    token = token | knight.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
-
-    token = token | king.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
-
-    token = token | pawn.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
+    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+        token = token | pawn.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+        token = token | knight.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+        token = token | bishop.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+        token = token | rook.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)    
+    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+        token = token | rook.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
+        token = token | bishop.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
+    elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+        token = token | king.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, attacked, supported)
+        if(move.srcx - move.dstx == -2):
+            token = token | rook.attacks_and_supports(match, move.dstx + 1, move.srcy, move.dstx - 1, move.dsty, attacked, supported)
+        elif(move.srcx - move.dstx == 2):
+            token = token | rook.attacks_and_supports(match, move.dstx - 2, move.srcy, move.dstx + 1, move.dsty, attacked, supported)
+    else:
+        return token
 
     return token
 
@@ -266,283 +279,9 @@ def analyze_move(match, move):
     return tokens
 
 
-def piece_is_lower_equal_than_captured(token):
-    if(token & MV_PIECE_IS_KG > 0):
-        return False
-    elif(token & MV_PIECE_IS_QU > 0):
-        if(token & CAPTURED_IS_QU > 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_RK > 0):
-        if(token & CAPTURED_IS_QU > 0 or 
-           token & CAPTURED_IS_RK > 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if(token & CAPTURED_IS_QU > 0 or 
-           token & CAPTURED_IS_RK > 0 or
-           token & CAPTURED_IS_BP > 0 or
-           token & CAPTURED_IS_KN > 0):
-            return True
-        else:
-            return False
-    else: # MV_PIECE_IS_PW
-        if(token & CAPTURED_IS_QU > 0 or
-           token & CAPTURED_IS_RK > 0 or
-           token & CAPTURED_IS_BP > 0 or
-           token & CAPTURED_IS_KN > 0 or
-           token & CAPTURED_IS_PW > 0):
-            return True
-        else:
-            return False
-
-def piece_is_lower_equal_than_attacked(token):
-    if(token & MV_PIECE_IS_KG > 0):
-        return False
-    elif(token & MV_PIECE_IS_QU > 0):
-        if(token & ATTACKED_IS_KG > 0 or 
-           token & ATTACKED_IS_QU > 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_RK > 0):
-        if(token & ATTACKED_IS_KG > 0 or 
-           token & ATTACKED_IS_QU > 0 or
-           token & ATTACKED_IS_RK > 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if(token & ATTACKED_IS_KG > 0 or 
-           token & ATTACKED_IS_QU > 0 or 
-           token & ATTACKED_IS_RK > 0 or 
-           token & ATTACKED_IS_BP > 0 or 
-           token & ATTACKED_IS_KN > 0):
-            return True
-        else:
-            return False
-    else: # MV_PIECE_IS_PW
-        if(token & ATTACKED_IS_KG > 0 or 
-           token & ATTACKED_IS_QU > 0 or
-           token & ATTACKED_IS_RK > 0 or
-           token & ATTACKED_IS_BP > 0 or
-           token & ATTACKED_IS_KN > 0 or
-           token & ATTACKED_IS_PW > 0):
-            return True
-        else:
-            return False
-
-def piece_is_lower_equal_than_enemy_on_srcfield(token):
-    if(token & MV_PIECE_IS_KG > 0):
-        return False
-    elif(token & MV_PIECE_IS_QU > 0):
-        if(token & SRCFLD_IS_ENM_TOU_BY_QU > 0 and 
-           token & SRCFLD_IS_ENM_TOU_BY_RK == 0 and
-           token & SRCFLD_IS_ENM_TOU_BY_BP == 0 and
-           token & SRCFLD_IS_ENM_TOU_BY_KN == 0 and
-           token & SRCFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_RK > 0):
-        if((token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
-            token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
-            token & SRCFLD_IS_ENM_TOU_BY_RK > 0) and
-           token & SRCFLD_IS_ENM_TOU_BY_BP == 0 and
-           token & SRCFLD_IS_ENM_TOU_BY_KN == 0 and
-           token & SRCFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if((token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
-            token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
-            token & SRCFLD_IS_ENM_TOU_BY_RK > 0 or
-            token & SRCFLD_IS_ENM_TOU_BY_BP > 0 or
-            token & SRCFLD_IS_ENM_TOU_BY_KN > 0) and 
-           token & SRCFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    else: # MV_PIECE_IS_PW
-        if(token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_RK > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_BP > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_KN > 0 or
-           token & SRCFLD_IS_ENM_TOU_BY_PW > 0):
-            return True
-        else:
-            return False
-
-def piece_is_lower_equal_than_enemy_on_dstfield(token):
-    if(token & MV_PIECE_IS_KG > 0):
-        return False
-    elif(token & MV_PIECE_IS_QU > 0):
-        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0) and 
-           token & DSTFLD_IS_ENM_TOU_BY_RK == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_RK > 0):
-        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_RK > 0) and
-           token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_KN > 0) and 
-           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    else: # MV_PIECE_IS_PW
-        if(token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
-            return True
-        else:
-            return False
-
-def piece_is_lower_fairy_equal_than_enemy_on_dstfield(token):
-    if(token & MV_PIECE_IS_KG > 0):
-        return False
-    elif(token & MV_PIECE_IS_QU > 0):
-        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0) and
-           token & DSTFLD_IS_ENM_TOU_BY_RK == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_RK > 0 or token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_KN > 0) and
-           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    else: # MV_PIECE_IS_PW
-        if(token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
-            return True
-        else:
-            return False
-
-def srcfield_is_supported(token):
-    if(token & SRCFLD_IS_FRDL_TOU_BY_PW > 0 or 
-       token & SRCFLD_IS_FRDL_TOU_BY_KN > 0 or 
-       token & SRCFLD_IS_FRDL_TOU_BY_BP > 0 or 
-       token & SRCFLD_IS_FRDL_TOU_BY_RK > 0 or 
-       token & SRCFLD_IS_FRDL_TOU_BY_QU > 0 or 
-       token & SRCFLD_IS_FRDL_TOU_BY_KG > 0):
-        return True
-    else:
-        return False
-
-def dstfield_is_attacked(token):
-    if(token & DSTFLD_IS_ENM_TOU_BY_PW > 0 or 
-       token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or 
-       token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or 
-       token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or 
-       token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-       token & DSTFLD_IS_ENM_TOU_BY_KG > 0):
-        return True
-    else:
-        return False
-
-def dstfield_is_supported(token):
-    if(token & DSTFLD_IS_FRDL_TOU_BY_PW > 0 or 
-       token & DSTFLD_IS_FRDL_TOU_BY_KN > 0 or 
-       token & DSTFLD_IS_FRDL_TOU_BY_BP > 0 or 
-       token & DSTFLD_IS_FRDL_TOU_BY_RK > 0 or 
-       token & DSTFLD_IS_FRDL_TOU_BY_QU > 0 or 
-       token & DSTFLD_IS_FRDL_TOU_BY_KG > 0):
-        return True
-    else:
-        return False
-
-def is_attacked_supported(attacked):
-    for ctouch in attacked:
-        if(len(ctouch.supporter_beyond) > 0):
-            return True
-    return False
-
-def is_attacked_add_attacked(attacked):
-    for ctouch in attacked:
-        if(len(ctouch.attacker_beyond) > 0):
-            return True
-    return False
-
-def is_supported_attacked(supported):
-    for ctouch in supported:
-        if(len(ctouch.attacker_beyond) > 0):
-            return True
-    return False
-
-def is_supported_lower_equal_than_attacker(supported):
-    for ctouch in supported:
-        for attacker_beyond in ctouch.attacker_beyond:
-            if(PIECES_RANK[ctouch.piece] <= PIECES_RANK[attacker_beyond[0]]):
-                return True
-    return False
-
-def is_supported_add_supported(supported):
-    for ctouch in supported:
-        if(len(ctouch.supporter_beyond) > 1):
-            return True
-    return False
-
-def is_disclosed_attacked_supported(disclosed_attacked):
-    for ctouch in disclosed_attacked:
-        if(len(ctouch.supporter_beyond) == 0):
-            return False
-    return True
-
-def highest_disclosed_attacked(disclosed_attacked):
-    piece = PIECES['blk']
-
-    for ctouch in disclosed_attacked:
-        if(PIECES_RANK[ctouch.piece] > PIECES_RANK[piece]):
-            piece = ctouch.piece
-    return piece
-
-class PrioMove:
-    def __init__(self, gmove=None, piece=None, tokens=None, prio=None):
-        self.gmove = gmove
-        self.piece = piece
-        self.tokens = tokens
-        self.prio = prio
-
 def rank_moves(priomoves):
     fleecnt = 0
-    flee_list = []
+    flee_list = []    
 
     for priomove in priomoves:
         token = priomove.tokens[0]
@@ -551,42 +290,42 @@ def rank_moves(priomoves):
         disclosed_attacked = priomove.tokens[3]
 
         if(token & MV_IS_CASTLING > 0):
-            priomove.prio = min(PRIO['prio3a'], priomove.prio)
+            priomove.prio = min(PRIO['prio2a'], priomove.prio)
 
         if(token & MV_IS_PROMOTION > 0):
             priomove.prio = min(PRIO['prio1a'], priomove.prio)
 
         if(token & MV_IS_CAPTURE > 0):
-            if(piece_is_lower_equal_than_captured(token) or 
-               dstfield_is_attacked(token) == False or 
-               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)) ):
+            """if(piece_is_lower_equal_than_captured(token)):
                 priomove.prio = min(PRIO['prio1a'], priomove.prio)
-            elif(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
-                priomove.prio = min(PRIO['prio2a'], priomove.prio)
+            elif(dstfield_is_attacked(token) == False):
+                priomove.prio = min(PRIO['prio1a'], priomove.prio)
+            elif(dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)):
+                    priomove.prio = min(PRIO['prio1a'], priomove.prio)
             else:
-                priomove.prio = min(PRIO['prio3a'], priomove.prio)
+                priomove.prio = min(PRIO['prio2a'], priomove.prio)"""
+            priomove.prio = min(PRIO['prio1a'], priomove.prio)
 
         if(token & MV_IS_ATTACK > 0):
-            if(dstfield_is_attacked(token) == False or 
-               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)) ):
-                if(token & ATTACKED_IS_KG > 0):
+            if(dstfield_is_attacked(token) == False or
+               (dstfield_is_supported(token) and 
+                piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                if(token & ATTACKED_IS_KG > 0 or is_attacked_supported(attacked) == False):
                     priomove.prio = min(PRIO['prio1b'], priomove.prio)
-                elif(is_attacked_supported(attacked) == False):
-                    priomove.prio = min(PRIO['prio2b'], priomove.prio)
                 else:
-                    priomove.prio = min(PRIO['prio3b'], priomove.prio)
+                    priomove.prio = min(PRIO['prio2b'], priomove.prio)
             else:
-                if(token & ATTACKED_IS_KG > 0):
+                if(token & ATTACKED_IS_KG > 0 or is_attacked_supported(attacked) == False):
                     priomove.prio = min(PRIO['prio2b'], priomove.prio)
                 else:
                     priomove.prio = min(PRIO['prio3b'], priomove.prio)
 
         if(token & MV_IS_SUPPORT > 0):
-            if(is_supported_attacked(supported)):
-                if(dstfield_is_attacked(token) == False or
-                   (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)) ):
-                    if(is_supported_add_supported(supported) == False and 
-                       is_supported_lower_equal_than_attacker(supported)):
+            if(dstfield_is_attacked(token) == False or
+               (dstfield_is_supported(token) and 
+                piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                if(is_supported_attacked(supported)):
+                    if(is_supported_lower_equal_than_attacker(supported)):
                         priomove.prio = min(PRIO['prio1c'], priomove.prio)
                     else:
                         priomove.prio = min(PRIO['prio2c'], priomove.prio)
@@ -597,8 +336,9 @@ def rank_moves(priomoves):
 
         if(token & MV_IS_FORK_DEFENSE > 0):
             if(dstfield_is_attacked(token) == False or 
-               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)) ):
-                priomove.prio = min(PRIO['prio1c'], priomove.prio)
+               (dstfield_is_supported(token) and 
+                piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                priomove.prio = min(PRIO['prio2c'], priomove.prio)
             else:
                 priomove.prio = min(PRIO['prio3c'], priomove.prio)
 
@@ -608,26 +348,27 @@ def rank_moves(priomoves):
             else:
                 priomove.prio = min(PRIO['prio2b'], priomove.prio)
 
-        if(token & MV_IS_FLEE > 0):
-            if(srcfield_is_supported(token) == False or 
-               (srcfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_srcfield(token) == False)):
-                if(dstfield_is_attacked(token) == False or
-                   (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)) ):
-                    if(priomove.prio != PRIO['prio1b']):
-                        flee_list.append([priomove, priomove.prio])
-                    priomove.prio = min(PRIO['prio1b'], priomove.prio)
-                else:
-                    priomove.prio = min(PRIO['prio4b'], priomove.prio)
-            else:
-                priomove.prio = min(PRIO['last'], priomove.prio)
-
         if(token & MV_IS_PROGRESS > 0):
             priomove.prio = min(PRIO['prio2b'], priomove.prio)
+
+        if(token & MV_IS_FLEE > 0):
+            if(srcfield_is_supported(token) == False or 
+               piece_is_lower_equal_than_enemy_on_srcfield(token) == False):
+                if(dstfield_is_attacked(token) == False or
+                   (dstfield_is_supported(token) and 
+                    piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                    if(priomove.prio > PRIO['prio1c']):
+                        flee_list.append([priomove, priomove.prio])
+                        priomove.prio = PRIO['prio1c']
+                else:
+                    priomove.prio = min(PRIO['prio4c'], priomove.prio)
+            else:
+                priomove.prio = min(PRIO['last'], priomove.prio)
 
         if(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
             priomove.prio = min(PRIO['prio4a'], priomove.prio)
 
-        if(token & MV_PIECE_IS_QU > 0 and priomove.prio != PRIO['prio1c'] and priomove.prio != PRIO['last']):
+        if(token & MV_PIECE_IS_QU > 0 and priomove.prio != PRIO['prio1a'] and priomove.prio != PRIO['prio1c'] and priomove.prio != PRIO['last']):
             priomove.prio += 1
 
     fleecnt = 0

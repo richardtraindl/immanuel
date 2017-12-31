@@ -106,9 +106,6 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
     knight = match.readfield(srcx, srcy)
 
-    if(knight != PIECES['wKn'] and knight != PIECES['bKn']):
-        return token 
-
     color = Match.color_of_piece(knight)
     opp_color = Match.oppcolor_of_piece(knight)
 

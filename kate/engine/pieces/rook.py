@@ -98,9 +98,6 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
     rook = match.readfield(srcx, srcy)
 
-    if(rook != PIECES['wRk'] and rook != PIECES['wQu'] and rook != PIECES['bRk'] and rook != PIECES['bQu']):
-        return token 
-    
     color = Match.color_of_piece(rook)
     opp_color = Match.oppcolor_of_piece(rook)
 

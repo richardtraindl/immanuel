@@ -99,9 +99,6 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
     king = match.readfield(srcx, srcy)
 
-    if(king != PIECES['wKg'] and king != PIECES['bKg']):
-        return token
-
     color = Match.color_of_piece(king)
     opp_color = Match.oppcolor_of_piece(king)
 
