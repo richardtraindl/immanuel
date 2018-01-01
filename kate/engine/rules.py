@@ -243,19 +243,19 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        return queen.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
+        return queen.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        return rook.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
+        return rook.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        return bishop.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
+        return bishop.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        return knight.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
+        return knight.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
     elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        return king.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
+        return king.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
     elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        return pawn.defends_fork_field(match, piece, srcx, srcy, dstx, dsty)
+        return pawn.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
     else:
         return False
 

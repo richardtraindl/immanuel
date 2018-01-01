@@ -74,10 +74,10 @@ def field_color_touches_beyond(match, color, ctouch):
                 if(pin_dir != rules.DIRS['undefined']):
                     continue
                 if(Match.color_of_piece(piece) == color):
-                    ctouch = cTouch(piece, x1, y1)
+                    ctouch = cTouch(None, None, None, None, piece, x1, y1)
                     ctouch.supporter_beyond.append([piece, x1, y1])
                 else:
-                    ctouch = cTouch(piece, x1, y1)
+                    ctouch = cTouch(None, None, None, None, piece, x1, y1)
                     ctouch.attacker_beyond.append([piece, x1, y1])
 
 
@@ -119,7 +119,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
             piece = match.readfield(x1, y1)
 
             if(match.color_of_piece(piece) == opp_color):
-                ctouch = cTouch(piece, x1, y1)
+                ctouch = cTouch(srcx, srcy, dstx, dsty, piece, x1, y1)
                 attacked.append(ctouch)
 
                 token = token | MV_IS_ATTACK
@@ -148,7 +148,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     continue
 
-                ctouch = cTouch(piece, x1, y1)
+                ctouch = cTouch(srcx, srcy, dstx, dsty, piece, x1, y1)
                 supported.append(ctouch)
 
                 token = token | MV_IS_SUPPORT
@@ -226,13 +226,14 @@ def score_supports_of_attacked(match, srcx, srcy):
     return score 
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
+                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
                 return True
 
     return False

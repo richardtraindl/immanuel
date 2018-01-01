@@ -91,7 +91,11 @@ def contacts_to_token(frdlycontacts, enmycontacts, mode):
 
 
 class cTouch:
-    def __init__(self, piece, fieldx, fieldy):
+    def __init__(self, srcx, srcy, dstx, dsty, piece, fieldx, fieldy):
+        self.agent_srcx = srcx
+        self.agent_srcy = srcy
+        self.agent_dstx = dstx
+        self.agent_dsty = dsty        
         self.piece = piece
         self.fieldx = fieldx
         self.fieldy = fieldy

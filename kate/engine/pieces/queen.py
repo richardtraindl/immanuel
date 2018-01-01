@@ -29,13 +29,14 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     for i in range(8):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
+                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
                 return True
     return False
 

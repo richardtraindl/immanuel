@@ -112,7 +112,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
             piece = match.readfield(x1, y1)
             
             if(Match.color_of_piece(piece) == opp_color):
-                ctouch = cTouch(piece, x1, y1)
+                ctouch = cTouch(srcx, srcy, dstx, dsty, piece, x1, y1)
                 attacked.append(ctouch)
 
                 token = token | MV_IS_ATTACK
@@ -140,7 +140,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     continue
 
-                ctouch = cTouch(piece, x1, y1)
+                ctouch = cTouch(srcx, srcy, dstx, dsty, piece, x1, y1)
                 supported.append(ctouch)
 
                 token = token | MV_IS_SUPPORT
@@ -168,8 +168,8 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
 def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked):
     for j in range(0, 4, 2):
-        first = cTouch(PIECES['blk'], 0, 0)
-        second = cTouch(PIECES['blk'], 0, 0)
+        first = cTouch(None, None, None, None, PIECES['blk'], 0, 0)
+        second = cTouch(None, None, None, None, PIECES['blk'], 0, 0)
 
         for i in range(0, 2, 1):
             stepx = STEPS[j+i][0]
@@ -263,13 +263,14 @@ def score_supports_of_attacked(match, srcx, srcy):
 
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
         if(x1 != rules.UNDEF_X):
             if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
+                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
                 return True
 
     return False
