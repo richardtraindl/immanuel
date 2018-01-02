@@ -264,8 +264,8 @@ def is_fork_field(match, piece, srcx, srcy, forkx, forky):
     color = Match.color_of_piece(piece)
     opp_color = Match.oppcolor_of_piece(piece)
     
-    if(is_field_touched(match, color, forkx, forky) == True):
-        return False
+    #if(is_field_touched(match, color, forkx, forky) == True):
+    #    return False
 
     match.writefield(srcx, srcy, PIECES['blk'])
     if(queen.is_field_touched(match, opp_color, forkx, forky)):
