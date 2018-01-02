@@ -148,13 +148,14 @@ def generate_moves(match):
             gmove = priomove.gmove
             if(match.readfield(gmove.dstx, gmove.dsty) != PIECES['blk']):
                 # sort captures first!
-                priomove.prio = PRIO['prio1a']
+                tmpprio = PRIO['prio1a']
             else:
-                if(priomove.piece == PIECES['wQu'] or priomove.piece == PIECES['bQu']):
-                    # sort silent queens last!
-                    priomove.prio = PRIO['prio1c']
-                else:
-                    priomove.prio = PRIO['prio1b']
+                tmpprio = PRIO['prio1c']
+
+            if(priomove.piece == PIECES['wQu'] or priomove.piece == PIECES['bQu']):
+                tmpprio += 1
+
+            priomove.prio = tmpprio
 
         priomoves.sort(key=attrgetter('prio'))
 
@@ -203,33 +204,37 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         last_prio = PRIO['last']
         last_token = 0x0
 
-    if(last_token & MV_IS_CAPTURE > 0 or 
-       (last_token & MV_IS_ATTACK > 0 and last_token & ATTACKED_IS_KG > 0)):
+    if(last_token & MV_IS_CAPTURE > 0 or last_token & ATTACKED_IS_KG > 0):
         urgent = True
     else:
         urgent = False
 
     if(match.level == LEVELS['blitz']):
         cnt = 12
+        midcnt = 6
         dpth = 3
         max_dpth = 5
     elif(match.level == LEVELS['low']):
         cnt = 16
+        midcnt = 8
         dpth = 3
         max_dpth = 7
     elif(match.level == LEVELS['medium']):
         cnt = 20
+        midcnt = 10
         dpth = 5
         max_dpth = 9
     else:
         cnt = 24
+        midcnt = 12
         dpth = 5
         max_dpth = 11
 
     if(depth <= dpth):
         return max(cnt, prio1_mvcnt)
-    elif(depth <= max_dpth):
-        if(mvcnt > prio1_mvcnt + prio2_mvcnt and prio2_mvcnt == 0):
+        """elif(depth <= max_dpth and urgent == False):
+        return min(midcnt, mvcnt)
+       if(mvcnt > prio1_mvcnt + prio2_mvcnt and prio2_mvcnt == 0):
             idx = random.randint(prio1_mvcnt + prio2_mvcnt, mvcnt - 1)
             priomoves.insert(0, priomoves.pop(idx))
             tmpcnt = prio1_mvcnt + prio2_mvcnt + 1
@@ -238,7 +243,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         if(urgent):
             return tmpcnt
         else:
-            return min(8, tmpcnt)
+            return min(8, tmpcnt)"""
     elif(depth <= max_dpth + 4 and urgent):
         if(mvcnt > prio1_mvcnt):
             idx = random.randint(prio1_mvcnt, mvcnt - 1)
