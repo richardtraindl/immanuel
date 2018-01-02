@@ -383,7 +383,7 @@ def rank_moves(priomoves):
                      piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
                     list_flee.append([priomove, PRIO['prio2a']])
                 else:
-                    list_flee.append([priomove, PRIO['prio2b']])
+                    list_flee.append([priomove, PRIO['prio3c']])
             else:
                 list_flee.append([priomove, PRIO['prio3c']])
 
