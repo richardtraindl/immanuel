@@ -132,7 +132,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                rules.field_touches_beyond(match, color, ctouch)
+                rules.field_touches_beyond(match, opp_color, ctouch)
 
                 match.writefield(srcx, srcy, rook)
                 ###
