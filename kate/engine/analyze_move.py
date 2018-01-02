@@ -364,7 +364,7 @@ def rank_moves(priomoves):
                 piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
                 list_forked.append([priomove, PRIO['prio2a']])
             else:
-                list_forked.append([priomove, PRIO['prio2b']])
+                list_forked.append([priomove, PRIO['prio3c']])
 
         if(token & MV_IS_DISCLOSURE > 0):
             if(is_disclosed_attacked_supported(disclosed_attacked) == False):
