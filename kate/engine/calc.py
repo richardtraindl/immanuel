@@ -221,7 +221,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     if(depth <= dpth):
         return max(cnt, prio1_mvcnt)
     elif(depth <= max_dpth and prio1_mvcnt + prio2_mvcnt > 0):
-        if(mvcnt > prio1_mvcnt + prio2_mvcnt):
+        if(mvcnt > prio1_mvcnt + prio2_mvcnt and prio2_mvcnt == 0):
             idx = random.randint(prio1_mvcnt + prio2_mvcnt, mvcnt - 1)
             priomoves.insert(0, priomoves.pop(idx))
             return prio1_mvcnt + prio2_mvcnt + 1
