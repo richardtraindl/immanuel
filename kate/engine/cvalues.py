@@ -69,27 +69,25 @@ PRIO = {
     'prio1a' : 1,
     'prio1b' : 2,
     'prio1c' : 3,
-    'prio1d' : 4,
-    'prio2a' : 5,
-    'prio2b' : 6,
-    'prio2c' : 7,
-    'prio3a' : 8,
-    'prio3b' : 9,
-    'prio3c' : 10,
-    'last' : 11 }
+    'prio2a' : 4,
+    'prio2b' : 5,
+    'prio2c' : 6,
+    'prio3a' : 7,
+    'prio3b' : 8,
+    'prio3c' : 9,
+    'last' : 10 }
 
 PRIO_INDICES = {
     PRIO['prio1a'] : 0,
     PRIO['prio1b'] : 1,
     PRIO['prio1c'] : 2,
-    PRIO['prio1d' ] : 3,
-    PRIO['prio2a' ] : 4,
-    PRIO['prio2b' ] : 5,
-    PRIO['prio2c' ] : 6,
-    PRIO['prio3a'] : 7,
-    PRIO['prio3b'] : 8,
-    PRIO['prio3c'] : 9,
-    PRIO['last'] : 10 }
+    PRIO['prio2a' ] : 3,
+    PRIO['prio2b' ] : 4,
+    PRIO['prio2c' ] : 5,
+    PRIO['prio3a'] : 6,
+    PRIO['prio3b'] : 7,
+    PRIO['prio3c'] : 8,
+    PRIO['last'] : 9 }
 
 
 MV_IS_CASTLING                         = 0x8000000000000000
