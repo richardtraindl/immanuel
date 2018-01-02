@@ -391,8 +391,8 @@ def rank_moves(priomoves):
         if(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
             priomove.prio = min(PRIO['prio3a'], priomove.prio)
 
-         if(token & MV_PIECE_IS_QU > 0 and priomove.prio > PRIO['prio1c']] and priomove.prio < PRIO['last']]):
-             priomove.prio += 1
+        if(token & MV_PIECE_IS_QU > 0 and priomove.prio > PRIO['prio1c'] and priomove.prio < PRIO['last']):
+            priomove.prio += 1
 
     excludes.clear()
     list_attacked.sort(key=itemgetter(1))
