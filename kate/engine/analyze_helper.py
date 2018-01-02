@@ -306,15 +306,3 @@ def highest_disclosed_attacked(disclosed_attacked):
             piece = ctouch.piece
 
     return piece
-
-def disable_fork_defenders(forked, forkx, forky):
-    found = False
-
-    for fork in forked:
-        if(forkx == fork[4] and forky == fork[5]):
-            fork[4] = None
-            fork[5] = None
-            found = True
-    
-    return found
-
