@@ -144,27 +144,19 @@ def generate_moves(match):
         kg_attacked = rules.is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)
 
     if(kg_attacked):
-        captures = []
-        others = []
-        silent_queens = []
-
         for priomove in priomoves:
-            priomove.prio = PRIO['prio1a']
-
             gmove = priomove.gmove
             if(match.readfield(gmove.dstx, gmove.dsty) != PIECES['blk']):
-                captures.append(priomove)
+                # sort captures first!
+                priomove.prio = PRIO['prio1a']
             else:
                 if(priomove.piece == PIECES['wQu'] or priomove.piece == PIECES['bQu']):
-                    silent_queens.append(priomove)
+                    # sort silent queens last!
+                    priomove.prio = PRIO['prio1c']
                 else:
-                    others.append(priomove)
+                    priomove.prio = PRIO['prio1b']
 
-        # sort captures first!
-        captures.extend(others)
-        captures.extend(silent_queens)
-        priomoves.clear()
-        priomoves = captures
+        priomoves.sort(key=attrgetter('prio'))
 
         for i in range(len(PRIO)):
             priocnts[i] = 0
