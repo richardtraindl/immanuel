@@ -191,8 +191,10 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 
 def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
-    prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]]
-    prio2_mvcnt = priocnts[PRIO_INDICES[PRIO['prio2a']]] + priocnts[PRIO_INDICES[PRIO['prio2b']]] + priocnts[PRIO_INDICES[PRIO['prio2c']]]
+
+    prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]] + priocnts[PRIO_INDICES[PRIO['prio1d']]]
+
+    prio2_mvcnt = priocnts[PRIO_INDICES[PRIO['prio2a']]] + priocnts[PRIO_INDICES[PRIO['prio2b']]] + priocnts[PRIO_INDICES[PRIO['prio2c']]] + priocnts[PRIO_INDICES[PRIO['prio2d']]]
 
     if(last_priomove):
         last_prio = last_priomove.prio
@@ -200,6 +202,12 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     else:
         last_prio = PRIO['last']
         last_token = 0x0
+
+    if(last_token & MV_IS_CAPTURE > 0 or 
+       (last_token & MV_IS_ATTACK > 0 and last_token & ATTACKED_IS_KG > 0)):
+        urgent = True
+    else:
+        urgent = False
 
     if(match.level == LEVELS['blitz']):
         cnt = 12
@@ -220,16 +228,18 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     if(depth <= dpth):
         return max(cnt, prio1_mvcnt)
-    elif(depth <= max_dpth and prio1_mvcnt + prio2_mvcnt > 0):
+    elif(depth <= max_dpth):
         if(mvcnt > prio1_mvcnt + prio2_mvcnt and prio2_mvcnt == 0):
             idx = random.randint(prio1_mvcnt + prio2_mvcnt, mvcnt - 1)
             priomoves.insert(0, priomoves.pop(idx))
-            return prio1_mvcnt + prio2_mvcnt + 1
+            tmpcnt = prio1_mvcnt + prio2_mvcnt + 1
         else:
-            return prio1_mvcnt + prio2_mvcnt
-    elif(depth <= max_dpth + 4 and 
-         (last_token & MV_IS_CAPTURE > 0 or 
-          (last_token & MV_IS_ATTACK > 0 and last_token & ATTACKED_IS_KG > 0))):
+            tmpcnt = prio1_mvcnt + prio2_mvcnt
+        if(urgent):
+            return tmpcnt
+        else:
+            return min(8, tmpcnt)
+    elif(depth <= max_dpth + 4 and urgent):
         if(mvcnt > prio1_mvcnt):
             idx = random.randint(prio1_mvcnt, mvcnt - 1)
             priomoves.insert(0, priomoves.pop(idx))

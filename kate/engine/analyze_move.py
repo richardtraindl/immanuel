@@ -321,45 +321,59 @@ def rank_moves(priomoves):
         if(token & MV_IS_CAPTURE > 0):
             if(piece_is_lower_equal_than_captured(token) or
                dstfield_is_attacked(token) == False or
-               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                priomove.prio = min(PRIO['prio1a'], priomove.prio)
+               (dstfield_is_supported(token) and 
+                piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                tmpprio = PRIO['prio1a']
             else:
-                priomove.prio = min(PRIO['prio1c'], priomove.prio)
+                tmpprio = PRIO['prio1c']
+            
+            if(token & MV_PIECE_IS_QU > 0):
+                tmpprio += 1
+
+            priomove.prio = min(tmpprio, priomove.prio)
 
         if(token & MV_IS_ATTACK > 0):
             if(token & ATTACKED_IS_KG > 0):
-                if(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
-                    list_attacked.append([priomove, PRIO['prio1a']])
+                if(dstfield_is_attacked(token) == False or 
+                   (dstfield_is_supported(token) and 
+                    piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                    tmpprio = PRIO['prio1a']
                 else:
-                    list_attacked.append([priomove, PRIO['prio1c']])
-            elif(dstfield_is_attacked(token) == False or (dstfield_is_supported(token)):
-                if(piece_is_lower_fairy_equal_than_enemy_on_dstfield(token)):
-                    if(is_attacked_supported(attacked) == False):
-                        list_attacked.append([priomove, PRIO['prio2a']])
-                    else:
-                        list_attacked.append([priomove, PRIO['prio2c']])
+                    tmpprio = PRIO['prio1c']
+            else:
+                if(dstfield_is_attacked(token) == False or 
+                   (dstfield_is_supported(token) and 
+                    piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                    tmpprio = PRIO['prio2a']
                 else:
-                    if(is_attacked_supported(attacked) == False):
-                        list_attacked.append([priomove, PRIO['prio3a']])
-                    else:
-                        list_attacked.append([priomove, PRIO['prio3c']])
-            #else: prio PRIO['last']
+                    tmpprio = PRIO['prio4a']
+
+                if(is_attacked_supported(attacked)):
+                    tmpprio += PRIO_HALF_STEP
+
+            if(token & MV_PIECE_IS_QU > 0):
+                tmpprio += 1
+
+            list_attacked.append([priomove, min(tmpprio, PRIO['last'])])
 
         if(token & MV_IS_SUPPORT > 0):
             if(dstfield_is_attacked(token) == False or 
-               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+               (dstfield_is_supported(token) and 
+                piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
                 tmpprio = PRIO['prio2a']
             else:
-                tmpprio = PRIO['prio3a']
-            
+                tmpprio = PRIO['prio4a']
+
             if(is_supported_attacked(supported) == False):
-                tmpprio += 2
+                tmpprio += PRIO_HALF_STEP
 
             if(is_supported_lower_equal_than_attacker(supported) == False):
-                tmpprio += 4
+                tmpprio += PRIO_HALF_STEP
 
-            list_supported.append([priomove, tmpprio])
-            #else: prio PRIO['last']
+            if(token & MV_PIECE_IS_QU > 0):
+                tmpprio += 1
+
+            list_supported.append([priomove, min(tmpprio, PRIO['last'])])
 
         if(token & MV_IS_FORK_DEFENSE > 0):
             if(dstfield_is_attacked(token) == False or 
@@ -373,28 +387,30 @@ def rank_moves(priomoves):
             if(is_disclosed_attacked_supported(disclosed_attacked) == False):
                 priomove.prio = min(PRIO['prio2a'], priomove.prio)
             else:
-                priomove.prio = min(PRIO['prio2b'], priomove.prio)
+                priomove.prio = min(PRIO['prio2c'], priomove.prio)
 
         #if(token & MV_IS_PROGRESS > 0):
-        #    priomove.prio = min(PRIO['prio2b'], priomove.prio)
+        #    priomove.prio = min(PRIO['prio3a'], priomove.prio)
 
         if(token & MV_IS_FLEE > 0):
-            if(srcfield_is_supported(token) == False or 
-               piece_is_lower_equal_than_enemy_on_srcfield(token) == False):
-                if(dstfield_is_attacked(token) == False or
-                   (dstfield_is_supported(token) and 
-                     piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                    list_flee.append([priomove, PRIO['prio2a']])
-                else:
-                    list_flee.append([priomove, PRIO['prio3a']])
+            if(dstfield_is_attacked(token) == False or
+               (dstfield_is_supported(token) and 
+                piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                tmpprio = PRIO['prio2a']
             else:
-                list_flee.append([priomove, PRIO['prio3a']])
+                tmpprio = PRIO['prio4a']
 
-        if(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
-            priomove.prio = min(PRIO['prio3a'], priomove.prio)
+            if(srcfield_is_supported(token) and 
+               piece_is_lower_equal_than_enemy_on_srcfield(token)):
+                tmpprio += PRIO_STEP
 
-        if(token & MV_PIECE_IS_QU > 0 and priomove.prio > PRIO['prio1c'] and priomove.prio < PRIO['last']):
-            priomove.prio += 1
+            if(token & MV_PIECE_IS_QU > 0):
+                tmpprio += 1
+
+            list_flee.append([priomove, min(tmpprio, PRIO['last'])])
+
+        #if(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
+        #    priomove.prio = min(PRIO['prio3a'], priomove.prio)
 
     excludes.clear()
     list_attacked.sort(key=itemgetter(1))
