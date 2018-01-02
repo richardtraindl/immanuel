@@ -329,28 +329,17 @@ def rank_moves(priomoves):
                 priomove.prio = min(PRIO['prio4a'], priomove.prio)
 
         if(token & MV_IS_ATTACK > 0):
-            if(dstfield_is_attacked(token) == False or
+            if(token & ATTACKED_IS_KG > 0):
+                priomove.prio = min(PRIO['prio1a'], priomove.prio)
+            elif(dstfield_is_attacked(token) == False or
                (dstfield_is_supported(token) and 
                 piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                if(token & ATTACKED_IS_KG > 0):
-                    list_attacked.append([priomove, PRIO['prio1a']])
-                    # priomove.prio = min(PRIO['prio1a'], priomove.prio)
-                elif(is_attacked_supported(attacked) == False):
+                if(is_attacked_supported(attacked) == False):
                     list_attacked.append([priomove, PRIO['prio1b']])
-                    # priomove.prio = min(PRIO['prio1b'], priomove.prio)
                 else:
                     list_attacked.append([priomove, PRIO['prio2b']])
-                    # priomove.prio = min(PRIO['prio2b'], priomove.prio)
             else:
-                if(token & ATTACKED_IS_KG > 0):
-                    list_attacked.append([priomove, PRIO['prio2a']])
-                    #priomove.prio = min(PRIO['prio2a'], priomove.prio)
-                elif(is_attacked_supported(attacked) == False):
-                    list_attacked.append([priomove, PRIO['prio2b']])
-                    #priomove.prio = min(PRIO['prio2b'], priomove.prio)
-                else:
-                    list_attacked.append([priomove, PRIO['prio3b']])
-                    #priomove.prio = min(PRIO['prio3b'], priomove.prio)
+                list_attacked.append([priomove, PRIO['prio3b']])
 
         if(token & MV_IS_SUPPORT > 0):
             if(dstfield_is_attacked(token) == False or
@@ -359,16 +348,12 @@ def rank_moves(priomoves):
                 if(is_supported_attacked(supported)):
                     if(is_supported_lower_equal_than_attacker(supported)):
                         list_supported.append([priomove, PRIO['prio1c']])
-                        # priomove.prio = min(PRIO['prio1c'], priomove.prio)
                     else:
                         list_supported.append([priomove, PRIO['prio2c']])
-                        #priomove.prio = min(PRIO['prio2c'], priomove.prio)
                 else:
                     list_supported.append([priomove, PRIO['prio3c']])
-                    # priomove.prio = min(PRIO['prio3c'], priomove.prio)
             else:
                 list_supported.append([priomove, PRIO['prio3c']])
-                # priomove.prio = min(PRIO['prio3c'], priomove.prio)
 
         if(token & MV_IS_FORK_DEFENSE > 0):
             if(dstfield_is_attacked(token) == False or 
