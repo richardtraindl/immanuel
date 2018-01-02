@@ -200,6 +200,7 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
     prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]]
+    prio2_mvcnt = priocnts[PRIO_INDICES[PRIO['prio2a']]] + priocnts[PRIO_INDICES[PRIO['prio2b']]] + priocnts[PRIO_INDICES[PRIO['prio2c']]]
 
     if(last_priomove):
         last_prio = last_priomove.prio
@@ -227,22 +228,22 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     if(depth <= dpth):
         return max(cnt, prio1_mvcnt)
-    elif(depth <= max_dpth and (last_prio == PRIO['prio1a'] or last_prio == PRIO['prio1b'] or last_prio == PRIO['prio1c'])):
-        addcnt = 0
-        if(mvcnt > prio1_mvcnt):
-            addcnt += 1
-            idx = random.randint(prio1_mvcnt, (mvcnt - 1))
+    elif(depth <= max_dpth and prio1_mvcnt + prio2_mvcnt > 0):
+        if(mvcnt > prio1_mvcnt + prio2_mvcnt):
+            idx = random.randint(prio1_mvcnt + prio2_mvcnt, mvcnt - 1)
             priomoves.insert(0, priomoves.pop(idx))
-        return prio1_mvcnt + addcnt
+            return prio1_mvcnt + prio2_mvcnt + 1
+        else:
+            return prio1_mvcnt + prio2_mvcnt
     elif(depth <= max_dpth + 4 and 
          (last_token & MV_IS_CAPTURE > 0 or 
           (last_token & MV_IS_ATTACK > 0 and last_token & ATTACKED_IS_KG > 0))):
-        if(mvcnt > priocnts[PRIO_INDICES[PRIO['prio1a']]]):
-            idx = random.randint(priocnts[PRIO_INDICES[PRIO['prio1a']]], (mvcnt - 1))
+        if(mvcnt > prio1_mvcnt):
+            idx = random.randint(prio1_mvcnt, mvcnt - 1)
             priomoves.insert(0, priomoves.pop(idx))
-            return priocnts[PRIO_INDICES[PRIO['prio1a']]] + 1
+            return prio1_mvcnt + 1
         else:
-            return 0
+            return prio1_mvcnt
     else:
         return 0
 
