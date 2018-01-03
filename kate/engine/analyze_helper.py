@@ -265,6 +265,15 @@ def is_attacked_add_attacked(attacked):
     return True
 
 
+def is_attacked_higher_than_piece(match, attacked):
+    for ctouch in attacked:
+        piece = match.readfield(ctouch.agent_srcx, ctouch.agent_srcy)
+        if(PIECES_RANK[ctouch.piece] > PIECES_RANK[piece]):
+            return True
+
+    return False
+
+
 def is_supported_attacked(supported):
     if(len(supported) == 0):
         return None

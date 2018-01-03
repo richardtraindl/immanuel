@@ -349,7 +349,8 @@ def rank_moves(match, priomoves):
                     tmpprio = PRIO['prio3a']
 
                 if(is_attacked_supported(attacked) and 
-                   is_attacked_pinned(match, attacked) == False):
+                   (is_attacked_higher_than_piece(match, attacked) == False and  
+                    is_attacked_pinned(match, attacked) == False)):
                     tmpprio += PRIO_STEP
 
             if(token & MV_PIECE_IS_QU > 0):
