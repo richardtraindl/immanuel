@@ -86,8 +86,10 @@ def settings(request, matchid=None, switch=0):
 
     if(matchid == None):
         modelmatch = ModelMatch()
+        create = True
     else:
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+        create = False
 
     if(request.method == 'POST'):
         form = MatchForm(request.POST)
@@ -102,6 +104,8 @@ def settings(request, matchid=None, switch=0):
             #thread = ModelMatch.get_active_thread(modelmatch)
             #if(thread is None):
             #    interface.calc_move_for_immanuel(modelmatch)
+            if(create):
+                interface.calc_move_for_immanuel(modelmatch)
 
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
         else:
