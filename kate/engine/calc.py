@@ -1,6 +1,6 @@
 import time
 from operator import attrgetter, itemgetter
-import random
+# import random
 # import gc
 from .match import *
 from .move import *
@@ -194,9 +194,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
 
     prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]] + priocnts[PRIO_INDICES[PRIO['prio1d']]]
-
-    prio2_mvcnt = priocnts[PRIO_INDICES[PRIO['prio2a']]] + priocnts[PRIO_INDICES[PRIO['prio2b']]] + priocnts[PRIO_INDICES[PRIO['prio2c']]] + priocnts[PRIO_INDICES[PRIO['prio2d']]]
-
+    
     if(last_priomove):
         last_prio = last_priomove.prio
         last_token = last_priomove.tokens[0]
@@ -211,46 +209,25 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     if(match.level == LEVELS['blitz']):
         cnt = 12
-        midcnt = 6
         dpth = 3
         max_dpth = 5
     elif(match.level == LEVELS['low']):
         cnt = 16
-        midcnt = 8
         dpth = 3
         max_dpth = 7
     elif(match.level == LEVELS['medium']):
         cnt = 20
-        midcnt = 10
         dpth = 5
         max_dpth = 9
     else:
         cnt = 24
-        midcnt = 12
         dpth = 5
         max_dpth = 11
 
     if(depth <= dpth):
         return max(cnt, prio1_mvcnt)
-        """elif(depth <= max_dpth and urgent == False):
-        return min(midcnt, mvcnt)
-       if(mvcnt > prio1_mvcnt + prio2_mvcnt and prio2_mvcnt == 0):
-            idx = random.randint(prio1_mvcnt + prio2_mvcnt, mvcnt - 1)
-            priomoves.insert(0, priomoves.pop(idx))
-            tmpcnt = prio1_mvcnt + prio2_mvcnt + 1
-        else:
-            tmpcnt = prio1_mvcnt + prio2_mvcnt
-        if(urgent):
-            return tmpcnt
-        else:
-            return min(8, tmpcnt)"""
     elif(depth <= max_dpth + 4 and urgent):
-        if(mvcnt > prio1_mvcnt):
-            idx = random.randint(prio1_mvcnt, mvcnt - 1)
-            priomoves.insert(0, priomoves.pop(idx))
-            return prio1_mvcnt + 1
-        else:
-            return prio1_mvcnt
+        return min(prio1_mvcnt + 1, mvcnt)
     else:
         return 0
 
