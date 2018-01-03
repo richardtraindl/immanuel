@@ -347,7 +347,7 @@ def rank_moves(priomoves):
                     piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
                     tmpprio = PRIO['prio2a']
                 else:
-                    tmpprio = PRIO['prio4a']
+                    tmpprio = PRIO['prio3a']
 
                 if(is_attacked_supported(attacked)):
                     tmpprio += PRIO_STEP
@@ -364,7 +364,7 @@ def rank_moves(priomoves):
                 piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
                 tmpprio = PRIO['prio2a']
             else:
-                tmpprio = PRIO['prio4a']
+                tmpprio = PRIO['prio3a']
 
             if(is_supported_attacked(supported) == False):
                 tmpprio += PRIO_STEP
@@ -414,7 +414,7 @@ def rank_moves(priomoves):
                 piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
                 tmpprio = PRIO['prio2a']
             else:
-                tmpprio = PRIO['prio4a']
+                tmpprio = PRIO['prio3a']
 
             if(srcfield_is_supported(token) and 
                piece_is_lower_equal_than_enemy_on_srcfield(token)):
