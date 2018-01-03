@@ -1,5 +1,5 @@
 from .cvalues import *
-
+from . import rules
 
 def piece_is_lower_equal_than_captured(token):
     if(token & MV_PIECE_IS_KG > 0):
@@ -240,6 +240,18 @@ def is_attacked_supported(attacked):
             return False
 
     return True
+
+
+def is_attacked_pinned(match, attacked):
+    if(len(attacked) == 0):
+        return None
+
+    for ctouch in attacked:
+        pindir = rules.pin_dir(match, ctouch.fieldx, ctouch.fieldy)
+        if(pindir != rules.DIRS['undefined']):
+            return True
+
+    return False
 
 
 def is_attacked_add_attacked(attacked):

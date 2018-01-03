@@ -288,7 +288,7 @@ def analyze_move(match, move):
     return tokens
 
 
-def rank_moves(priomoves):
+def rank_moves(match, priomoves):
     all_attacked = []
     all_supported = []
     all_forked = []
@@ -348,7 +348,8 @@ def rank_moves(priomoves):
                 else:
                     tmpprio = PRIO['prio3a']
 
-                if(is_attacked_supported(attacked)):
+                if(is_attacked_supported(attacked) and 
+                   is_attacked_pinned(match, attacked) == False):
                     tmpprio += PRIO_STEP
 
             if(token & MV_PIECE_IS_QU > 0):

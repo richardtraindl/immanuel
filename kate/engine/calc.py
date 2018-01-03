@@ -166,7 +166,7 @@ def generate_moves(match):
             priocnts[i] = 0
         priocnts[0] = len(priomoves)
     else:
-        rank_moves(priomoves)
+        rank_moves(match, priomoves)
         priomoves.sort(key=attrgetter('prio'))
 
         for priomove in priomoves:
