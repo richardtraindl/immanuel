@@ -350,7 +350,7 @@ def rank_moves(priomoves):
                     tmpprio = PRIO['prio4a']
 
                 if(is_attacked_supported(attacked)):
-                    tmpprio += PRIO_HALF_STEP
+                    tmpprio += PRIO_STEP
 
             if(token & MV_PIECE_IS_QU > 0):
                 tmpprio += 2
