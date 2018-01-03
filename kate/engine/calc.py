@@ -1,7 +1,6 @@
 import time
+import random
 from operator import attrgetter, itemgetter
-# import random
-# import gc
 from .match import *
 from .move import *
 from . import matchmove
@@ -149,11 +148,15 @@ def generate_moves(match):
             if(match.readfield(gmove.dstx, gmove.dsty) != PIECES['blk']):
                 # sort captures first!
                 tmpprio = PRIO['prio1a']
+            elif((priomove.piece == PIECES['wPw'] or priomove.piece == PIECES['bPw']) and 
+                 gmove.srcx != gmove.dstx):
+                # en passants!
+                tmpprio = PRIO['prio1a']
             else:
-                tmpprio = PRIO['prio1c']
+                tmpprio = PRIO['prio1b']
 
             if(priomove.piece == PIECES['wQu'] or priomove.piece == PIECES['bQu']):
-                tmpprio += 1
+                tmpprio += PRIO_HALF_STEP
 
             priomove.prio = tmpprio
 
@@ -194,7 +197,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
 
     prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]] + priocnts[PRIO_INDICES[PRIO['prio1d']]]
-    
+
     if(last_priomove):
         last_prio = last_priomove.prio
         last_token = last_priomove.tokens[0]
@@ -202,32 +205,43 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         last_prio = PRIO['last']
         last_token = 0x0
 
-    if(last_token & MV_IS_CAPTURE > 0 or last_token & ATTACKED_IS_KG > 0):
-        urgent = True
-    else:
-        urgent = False
-
     if(match.level == LEVELS['blitz']):
         cnt = 12
         dpth = 3
-        max_dpth = 5
+        mid_dpth = 5
+        max_dpth = 7
     elif(match.level == LEVELS['low']):
         cnt = 16
         dpth = 3
-        max_dpth = 7
+        mid_dpth = 5
+        max_dpth = 9
     elif(match.level == LEVELS['medium']):
         cnt = 20
         dpth = 5
+        mid_dpth = 7
         max_dpth = 9
     else:
         cnt = 24
         dpth = 5
+        mid_dpth = 7
         max_dpth = 11
 
     if(depth <= dpth):
         return max(cnt, prio1_mvcnt)
-    elif(depth <= max_dpth + 4 and urgent):
-        return min(prio1_mvcnt + 1, mvcnt)
+    elif(depth <= mid_dpth and (last_token & MV_IS_CAPTURE > 0 or last_token & ATTACKED_IS_KG > 0)):
+        if(mvcnt > prio1_mvcnt):
+            idx = random.randint(prio1_mvcnt, mvcnt - 1)
+            priomoves.insert(0, priomoves.pop(idx))
+            return prio1_mvcnt + 1
+        else:
+            return prio1_mvcnt
+    elif(depth <= max_dpth and last_token & MV_IS_CAPTURE > 0):
+        if(mvcnt > prio1_mvcnt):
+            idx = random.randint(prio1_mvcnt, mvcnt - 1)
+            priomoves.insert(0, priomoves.pop(idx))
+            return prio1_mvcnt + 1
+        else:
+            return prio1_mvcnt
     else:
         return 0
 
@@ -266,10 +280,7 @@ def calc_max(match, depth, alpha, beta, last_priomove):
             print("   " + reverse_lookup(PRIO, priomove.prio))
 
             token = priomove.tokens[0]
-            print("token:" + hex(token) + 
-                  " " + reverse_lookup(PRIO, priomove.prio) + 
-                  " \ntoken: " + hex(token) + " " + token_to_text(token))
-            # gc.collect()
+            print("token: " + hex(token) + " " + token_to_text(token))
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
@@ -278,12 +289,10 @@ def calc_max(match, depth, alpha, beta, last_priomove):
         score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
         if(depth == 1):
-            prnt_move("\nCURR SEARCH: [", newmove, "]")
+            prnt_move("\nCURR SEARCH: " + str(newscore).rjust(8, " ") + " [", newmove, "]")
             prnt_moves("", newcandidates)
 
-            prnt_moves("CANDIDATES: ", candidates)
-            print("newscore: " + str(newscore) + " / score: " + str(score) + " / maxscore: " + str(maxscore))
-
+            prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         matchmove.undo_move(match)
@@ -330,10 +339,7 @@ def calc_min(match, depth, alpha, beta, last_priomove):
             print("   " + reverse_lookup(PRIO, priomove.prio))
 
             token = priomove.tokens[0]
-            print("token:" + hex(token) + 
-                  " " + reverse_lookup(PRIO, priomove.prio) + 
-                  " \ntoken: " + hex(token) + " " + token_to_text(token))
-            # gc.collect()
+            print("token: " + hex(token) + " " + token_to_text(token))
 
         matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
@@ -344,12 +350,10 @@ def calc_min(match, depth, alpha, beta, last_priomove):
         matchmove.undo_move(match)
 
         if(depth == 1):
-            prnt_move("\nCURR SEARCH: [", newmove, "]")
+            prnt_move("\nCURR SEARCH: " + str(newscore).rjust(8, " ") + " [", newmove, "]")
             prnt_moves("", newcandidates)
 
-            prnt_moves("CANDIDATES: ", candidates)
-            print("newscore: " + str(newscore) + " / score: " + str(score) + " / minscore: " + str(minscore))
-
+            prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         if(score < minscore):

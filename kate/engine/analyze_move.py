@@ -1,4 +1,3 @@
-from random import randint
 from .match import *
 from .matchmove import do_move, undo_move
 from .move import *
@@ -328,7 +327,7 @@ def rank_moves(priomoves):
                 tmpprio = PRIO['prio1b']
             
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += 2
+                tmpprio += PRIO_HALF_STEP
 
             tmpprio = min(tmpprio, PRIO['last'])
             priomove.prio = min(tmpprio, priomove.prio)
@@ -353,7 +352,7 @@ def rank_moves(priomoves):
                     tmpprio += PRIO_STEP
 
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += 2
+                tmpprio += PRIO_HALF_STEP
 
             tmpprio = min(tmpprio, PRIO['last'])
             list_attacked.append([priomove, tmpprio])
@@ -371,10 +370,10 @@ def rank_moves(priomoves):
 
             if(is_supported_attacked(supported) and 
                is_supported_lower_equal_than_attacker(supported) == False):
-                tmpprio += PRIO_HALF_STEP
+                tmpprio += PRIO_STEP
 
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += 2
+                tmpprio += PRIO_HALF_STEP
 
             tmpprio = min(tmpprio, PRIO['last'])
             list_supported.append([priomove, tmpprio])
@@ -388,7 +387,7 @@ def rank_moves(priomoves):
                 tmpprio = PRIO['prio3a']
                 
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += 2
+                tmpprio += PRIO_HALF_STEP
 
             tmpprio = min(tmpprio, PRIO['last'])
             list_forked.append([priomove, tmpprio])
@@ -400,7 +399,7 @@ def rank_moves(priomoves):
                 tmpprio = PRIO['prio3a']
 
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += 2
+                tmpprio += PRIO_HALF_STEP
 
             tmpprio = min(tmpprio, PRIO['last'])
             priomove.prio = min(tmpprio, priomove.prio)
@@ -421,13 +420,15 @@ def rank_moves(priomoves):
                 tmpprio += PRIO_STEP
 
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += 2
+                tmpprio += PRIO_HALF_STEP
 
             tmpprio = min(tmpprio, PRIO['last'])
             list_flee.append([priomove, tmpprio])
 
         #if(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
         #    priomove.prio = min(PRIO['prio3a'], priomove.prio)
+
+    priomoves.sort(key=attrgetter('prio'))
 
     excludes.clear()
     list_attacked.sort(key=itemgetter(1))
