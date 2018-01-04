@@ -26,10 +26,10 @@ class Match(models.Model):
                                                                   'bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;' \
                                                                   'bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;')
     fifty_moves_count = models.SmallIntegerField(null=False, default=0)
-    wKg_x = models.SmallIntegerField(null=False, default=0)
+    wKg_x = models.SmallIntegerField(null=False, default=4)
     wKg_y = models.SmallIntegerField(null=False, default=0)
-    bKg_x = models.SmallIntegerField(null=False, default=0)
-    bKg_y = models.SmallIntegerField(null=False, default=0)
+    bKg_x = models.SmallIntegerField(null=False, default=4)
+    bKg_y = models.SmallIntegerField(null=False, default=7)
     wKg_first_movecnt = models.SmallIntegerField(null=False, default=0)
     bKg_first_movecnt = models.SmallIntegerField(null=False, default=0)
     wRk_a1_first_movecnt = models.SmallIntegerField(null=False, default=0)
