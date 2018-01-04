@@ -193,12 +193,15 @@ def score_attacks(match, srcx, srcy):
             if(Match.color_of_piece(piece) == opp_color):
                 pin_dir = rules.pin_dir(match, srcx, srcy)
                 if(pin_dir == rules.DIRS['undefined']):
-                    score += ATTACKED_SCORES[piece]
+                    if(PIECES_RANK[piece] > PIECES_RANK[knight]):
+                        score += ATTACKED_SCORES[piece] * 2
+                    else:
+                        score += ATTACKED_SCORES[piece]
 
     return score
 
 
-def score_supports_of_attacked(match, srcx, srcy):
+def score_supports(match, srcx, srcy):
     score = 0
 
     knight = match.readfield(srcx, srcy)

@@ -183,7 +183,7 @@ def score_attacks(match, srcx, srcy):
     return score
 
 
-def score_supports_of_attacked(match, srcx, srcy):
+def score_supports(match, srcx, srcy):
     score = 0
 
     king = match.readfield(srcx, srcy)

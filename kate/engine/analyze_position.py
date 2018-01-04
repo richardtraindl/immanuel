@@ -20,34 +20,33 @@ def score_attacks(match, srcx, srcy):
     return score
 
 
-def score_supports_of_attacked(match, srcx, srcy):
+def score_supports(match, srcx, srcy):
     score = 0
     
-    score += rook.score_supports_of_attacked(match, srcx, srcy)
+    score += rook.score_supports(match, srcx, srcy)
 
-    score += bishop.score_supports_of_attacked(match, srcx, srcy)
+    score += bishop.score_supports(match, srcx, srcy)
 
-    score += knight.score_supports_of_attacked(match, srcx, srcy)
+    score += knight.score_supports(match, srcx, srcy)
 
-    score += king.score_supports_of_attacked(match, srcx, srcy)
+    score += king.score_supports(match, srcx, srcy)
 
-    score += pawn.score_supports_of_attacked(match, srcx, srcy)
+    score += pawn.score_supports(match, srcx, srcy)
 
     return score
 
 
-def score_contacts(match, color):
-    supported = 0
-    attacked = 0
+def score_supports_and_attacks(match):
+    score = 0
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
-            if(Match.color_of_piece(piece) == color):
-                supported += score_supports_of_attacked(match, x, y)
-                attacked += score_attacks(match, x, y)
+            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                score += score_supports(match, x, y)
+                score += score_attacks(match, x, y)
 
-    return (supported + attacked)
+    return score
 
 
 def check_mobility_move(match, srcx, srcy, dstx, dsty, prom_piece):
@@ -215,9 +214,9 @@ def is_rook_over_king(match, color):
 def score_opening(match):
     value = 0
 
-    whiterate = SCORES[PIECES['bPw']] / 20
-
-    blackrate = SCORES[PIECES['wPw']] / 20
+    whiterate = ATTACKED_SCORES[PIECES['bPw']] // 2
+    
+    blackrate = ATTACKED_SCORES[PIECES['wPw']] // 2
 
     # white position
     y = 0
@@ -230,7 +229,7 @@ def score_opening(match):
         for x in range(2, 5):
             piece = match.readfield(x, y)
             if(piece == PIECES['wPw']):
-                value += whiterate + 1
+                value += whiterate
 
     piece = match.readfield(1, 2)
     if(piece == PIECES['wPw']):
@@ -250,7 +249,7 @@ def score_opening(match):
         for x in range(2, 5):
             piece = match.readfield(x, y)
             if(piece == PIECES['bPw']):
-                value += blackrate - 1
+                value += blackrate
 
     piece = match.readfield(1, 5)
     if(piece == PIECES['bPw']):
@@ -263,33 +262,16 @@ def score_opening(match):
     # white king
     if(is_king_defended_by_pawns(match, COLORS['white'])):
         value += whiterate
-    else:
-        value += blackrate
 
     if(is_rook_over_king(match, COLORS['white'])):
-        value += whiterate + 2
-    else:
-        value += blackrate
+        value += whiterate
 
     # black king
     if(is_king_defended_by_pawns(match, COLORS['black'])):
         value += blackrate
-    else:
-        value += whiterate
 
     if(is_rook_over_king(match, COLORS['black'])):
-        value += blackrate - 2
-    else:
-        value += whiterate
-
-
-    """excludedpieces = [ PIECES['wKg'], PIECES['wQu']]
-    movecnt = count_all_moves(match, COLORS['white'], excludedpieces)
-    value += (movecnt * SUPPORTED_SCORES[PIECES['wPw']])
-
-    excludedpieces = [ PIECES['bKg'], PIECES['bQu'] ]
-    movecnt = count_all_moves(match, COLORS['black'], excludedpieces)    
-    value += (movecnt * SUPPORTED_SCORES[PIECES['bPw']])"""
+        value += blackrate
 
     return value
 
@@ -297,11 +279,11 @@ def score_opening(match):
 def score_endgame(match):
     value = 0
 
-    whiterate = SCORES[PIECES['bPw']] / 5
-    whitesteprate = (SCORES[PIECES['bPw']] / 20)
+    whiterate = ATTACKED_SCORES[PIECES['bPw']]
+    whitesteprate = whiterate / 2
 
-    blackrate = SCORES[PIECES['wPw']] / 5
-    blacksteprate = (SCORES[PIECES['wPw']] / 20)
+    blackrate = ATTACKED_SCORES[PIECES['wPw']]
+    blacksteprate = blackrate / 2
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -330,9 +312,7 @@ def score_position(match, movecnt):
     else:
         value = match.score
 
-        #value += score_contacts(match, COLORS['white'])
-
-        #value += score_contacts(match, COLORS['black'])
+        value += score_supports_and_attacks(match)
 
         if(match.count < 30):
             value += score_opening(match)

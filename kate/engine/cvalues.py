@@ -35,34 +35,34 @@ SCORES = {
 
 ATTACKED_SCORES = {
         PIECES['blk'] : 0,
-        PIECES['wKg'] : -10,
-        PIECES['wPw'] : -1,
-        PIECES['wRk'] : -5,
-        PIECES['wKn'] : -4,
-        PIECES['wBp'] : -4,
-        PIECES['wQu'] : -7,
-        PIECES['bKg'] : 10,
-        PIECES['bPw'] : 1,
-        PIECES['bRk'] : 5,
-        PIECES['bKn'] : 4,
-        PIECES['bBp'] : 4,
-        PIECES['bQu'] : 7 }
+        PIECES['wKg'] : -20,
+        PIECES['wPw'] : -2,
+        PIECES['wRk'] : -8,
+        PIECES['wKn'] : -6,
+        PIECES['wBp'] : -6,
+        PIECES['wQu'] : -14,
+        PIECES['bKg'] : 20,
+        PIECES['bPw'] : 2,
+        PIECES['bRk'] : 8,
+        PIECES['bKn'] : 6,
+        PIECES['bBp'] : 6,
+        PIECES['bQu'] : 14 }
 
 
 SUPPORTED_SCORES = {
         PIECES['blk'] : 0,
-        PIECES['wKg'] : 10,
-        PIECES['wPw'] : 1,
-        PIECES['wRk'] : 5,
-        PIECES['wKn'] : 4,
-        PIECES['wBp'] : 4,
-        PIECES['wQu'] : 7,
-        PIECES['bKg'] : -10,
-        PIECES['bPw'] : -1,
-        PIECES['bRk'] : -5,
-        PIECES['bKn'] : -4,
-        PIECES['bBp'] : -4,
-        PIECES['bQu'] : -7 }
+        PIECES['wKg'] : 20,
+        PIECES['wPw'] : 2,
+        PIECES['wRk'] : 8,
+        PIECES['wKn'] : 6,
+        PIECES['wBp'] : 6,
+        PIECES['wQu'] : 14,
+        PIECES['bKg'] : -20,
+        PIECES['bPw'] : -2,
+        PIECES['bRk'] : -8,
+        PIECES['bKn'] : -6,
+        PIECES['bBp'] : -6,
+        PIECES['bQu'] : -14 }
 
 PRIO_STEP = 4
 PRIO_HALF_STEP = 2

@@ -236,12 +236,15 @@ def score_attacks(match, srcx, srcy):
                 pin_dir = rules.pin_dir(match, srcx, srcy)
                 direction = pw_dir(srcx, srcy, x1, y1, piece)
                 if(pin_dir == direction or pin_dir == rules.DIRS['undefined']):
-                    score += ATTACKED_SCORES[piece]
+                    if(PIECES_RANK[piece] > PIECES_RANK[pawn]):
+                        score += ATTACKED_SCORES[piece] * 2
+                    else:
+                        score += ATTACKED_SCORES[piece]
 
     return score
 
 
-def score_supports_of_attacked(match, srcx, srcy):
+def score_supports(match, srcx, srcy):
     score = 0
 
     pawn = match.readfield(srcx, srcy)

@@ -7,7 +7,7 @@ from .calc import *
 from .analyze_helper import *
 from .cvalues import *
 from . import rules
-from .analyze_position import score_contacts, score_opening, score_endgame
+from .analyze_position import score_supports_and_attacks, score_opening, score_endgame
 
 
 TOKENS = {
@@ -171,52 +171,13 @@ def progress(match, move):
 
     value = match.score
 
-    value += score_contacts(match, COLORS['white'])
+    value += score_supports_and_attacks(match)
 
-    value += score_contacts(match, COLORS['black'])
-
-    if((value >= (SCORES[PIECES['bPw']] / 2) and color == COLORS['white']) or 
-       (value <= (SCORES[PIECES['wPw']] / 2) and color == COLORS['black'])):
+    if((value >= (SCORES[PIECES['bPw']] / 10) and color == COLORS['white']) or 
+       (value <= (SCORES[PIECES['wPw']] / 10) and color == COLORS['black'])):
         return token | MV_IS_PROGRESS
     else:
         return token
-
-    ###
-    """oldvalue = match.score
-
-    oldvalue += score_contacts(match, COLORS['white'])
-
-    oldvalue += score_contacts(match, COLORS['black'])
-
-    if(match.count < 30):
-        oldvalue += score_opening(match)
-
-    if(match.count >= 30):
-        oldvalue += score_endgame(match)
-    ###
-
-    do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
-
-    newvalue = match.score
-
-    newvalue += score_contacts(match, COLORS['white'])
-
-    newvalue += score_contacts(match, COLORS['black'])
-
-    if(match.count < 30):
-        newvalue += score_opening(match)
-
-    if(match.count >= 30):
-        newvalue += score_endgame(match)
-
-    undo_move(match)
-    ###
-
-    if((newvalue - oldvalue >= (SCORES[PIECES['bPw']] / 2) and color == COLORS['white']) or 
-       (newvalue - oldvalue <= (SCORES[PIECES['wPw']] / 2) and color == COLORS['black'])):
-        return token | MV_IS_PROGRESS
-    else:
-        return token"""
 
 
 def analyze_move(match, move):
