@@ -211,7 +211,7 @@ def score_supports_of_attacked(match, srcx, srcy):
 
 
 def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
-    for i in range(4):
+    for i in range(8):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
@@ -226,7 +226,7 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
 def count_attacks(match, color, fieldx, fieldy):
     count = 0
 
-    for i in range(4):
+    for i in range(8):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
