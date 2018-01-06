@@ -1,13 +1,13 @@
 from .match import *
 from .matchmove import do_move, undo_move
 from .move import *
-from .pieces import pawn, knight, bishop, rook, king
-from .pieces.generic_piece import contacts_to_token
 from .calc import *
-from .analyze_helper import *
 from .cvalues import *
 from . import rules
 from .analyze_position import score_supports_and_attacks, score_opening, score_endgame
+from .analyze_helper import * 
+from .pieces import pawn, knight, bishop, rook, king
+from .pieces.generic_piece import contacts_to_token
 
 
 TOKENS = {
@@ -98,7 +98,7 @@ def defends_fork(match, move, forked):
 
     piece = match.readfield(move.srcx, move.srcy)
 
-    if(rules.defends_fork_field(match, piece, move.srcx, move.srcy, move.dstx, move.dsty, forked)):
+    if(defends_fork_field(match, piece, move.srcx, move.srcy, move.dstx, move.dsty, forked)):
         token = token | MV_IS_FORK_DEFENSE
 
     return token
@@ -129,7 +129,7 @@ def disclosures(match, move, disclosed_attacked):
     match.writefield(move.srcx, move.srcy, PIECES['blk'])
 
     for ctouch in disclosed_attacked:
-        rules.field_touches_beyond(match, color, ctouch)
+        field_touches_beyond(match, color, ctouch)
 
     match.writefield(move.srcx, move.srcy, piece)
     ###
@@ -145,14 +145,14 @@ def flees(match, move):
     color = Match.color_of_piece(piece)
     opp_color = Match.oppcolor_of_piece(piece)
 
-    enmycontacts = rules.list_field_touches(match, opp_color, move.srcx, move.srcy)
+    enmycontacts = list_field_touches(match, opp_color, move.srcx, move.srcy)
     old_cnt = len(enmycontacts)
     enmycontacts.clear()
 
     ###
     do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
-    enmycontacts = rules.list_field_touches(match, opp_color, move.dstx, move.dsty)
+    enmycontacts = list_field_touches(match, opp_color, move.dstx, move.dsty)
     new_cnt = len(enmycontacts)
 
     undo_move(match)
@@ -178,6 +178,32 @@ def progress(match, move):
         return token | MV_IS_PROGRESS
     else:
         return token
+
+
+def controles_file(match, move):
+    token = 0x0
+    piece = match.readfield(move.srcx, move.srcy)
+    color = Match.color_of_piece(piece)
+
+    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+        return token
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+        return token
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+        if(bishop.controles_file(match, piece, color, move.srcx, move.srcy, move.dstx, move.dsty)):
+            return token | MV_CONTROLES_FILE        
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+        if(rook.controles_file(match, piece, color, move.srcx, move.srcy, move.dstx, move.dsty)):
+            return token | MV_CONTROLES_FILE
+    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+        if(rook.controles_file(match, piece, color, move.srcx, move.srcy, move.dstx, move.dsty)):
+            return token | MV_CONTROLES_FILE
+        if(bishop.controles_file(match, piece, color, move.srcx, move.srcy, move.dstx, move.dsty)):
+            return token | MV_CONTROLES_FILE
+    else:
+        return token
+    
+    return token
 
 
 def analyze_move(match, move):
@@ -210,13 +236,13 @@ def analyze_move(match, move):
     ###
     match.writefield(move.srcx, move.srcy, PIECES['blk'])
 
-    frdlycontacts, enmycontacts = rules.field_touches(match, color, move.srcx, move.srcy)
+    frdlycontacts, enmycontacts = field_touches(match, color, move.srcx, move.srcy)
 
     token = token | contacts_to_token(frdlycontacts, enmycontacts, "SRCFIELDTOUCHES")
     frdlycontacts.clear()
     enmycontacts.clear()
 
-    frdlycontacts, enmycontacts = rules.field_touches(match, color, move.dstx, move.dsty)
+    frdlycontacts, enmycontacts = field_touches(match, color, move.dstx, move.dsty)
 
     match.writefield(move.srcx, move.srcy, piece)
 
@@ -240,6 +266,8 @@ def analyze_move(match, move):
     token = token | flees(match, move)
 
     # token = token | progress(match, move)
+    
+    token = token | controles_file(match, move)
 
     tokens[TOKENS['token']] = token
     tokens[TOKENS['attacked']] = attacked
@@ -369,6 +397,9 @@ def rank_moves(match, priomoves):
 
         #if(token & MV_IS_PROGRESS > 0):
         #    priomove.prio = min(PRIO['prio3a'], priomove.prio)
+        
+        if(token & MV_CONTROLES_FILE > 0):
+            priomove.prio = max(PRIO['prio2a'], priomove.prio - PRIO_HALF_STEP)
 
         if(token & MV_IS_FLEE > 0):
             if(dstfield_is_attacked(token) == False or

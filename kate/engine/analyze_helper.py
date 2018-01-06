@@ -1,5 +1,124 @@
+from .match import *
 from .cvalues import *
 from . import rules
+from .pieces import pawn, rook, knight, bishop, queen, king
+
+
+def field_touches(match, color, fieldx, fieldy):
+    frdlytouches = []
+    enmytouches = []
+
+    rook.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
+
+    bishop.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
+
+    knight.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
+
+    king.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
+
+    pawn.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
+
+    return frdlytouches, enmytouches
+
+
+def field_touches_beyond(match, color, ctouch):
+    rook.field_color_touches_beyond(match, color, ctouch)
+
+    bishop.field_color_touches_beyond(match, color, ctouch)
+
+    knight.field_color_touches_beyond(match, color, ctouch)
+
+    king.field_color_touches_beyond(match, color, ctouch)
+
+    pawn.field_color_touches_beyond(match, color, ctouch)
+
+    return
+
+
+def list_field_touches(match, color, fieldx, fieldy):
+    touches = []
+
+    newtouches = rook.list_field_touches(match, color, fieldx, fieldy)
+    if(len(newtouches) > 0):
+        touches.extend(newtouches)
+
+    newtouches = bishop.list_field_touches(match, color, fieldx, fieldy)
+    if(len(newtouches) > 0):
+        touches.extend(newtouches)
+
+    newtouches = knight.list_field_touches(match, color, fieldx, fieldy)
+    if(len(newtouches) > 0):
+        touches.extend(newtouches)
+
+    newtouches = king.list_field_touches(match, color, fieldx, fieldy)
+    if(len(newtouches) > 0):
+        touches.extend(newtouches)
+
+    newtouches = pawn.list_field_touches(match, color, fieldx, fieldy)
+    if(len(newtouches) > 0):
+        touches.extend(newtouches)
+
+    return touches
+
+
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
+    if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+        return queen.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+        return rook.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+        return bishop.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+        return knight.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+    elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+        return king.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+    elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+        return pawn.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+    else:
+        return False
+
+
+def is_fork_field(match, piece, srcx, srcy, forkx, forky):
+    color = Match.color_of_piece(piece)
+    opp_color = Match.oppcolor_of_piece(piece)
+    
+    #if(is_field_touched(match, color, forkx, forky) == True):
+    #    return False
+
+    match.writefield(srcx, srcy, PIECES['blk'])
+    if(queen.is_field_touched(match, opp_color, forkx, forky)):
+        if(queen.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    if(rook.is_field_touched(match, opp_color, forkx, forky)):
+        if(rook.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    if(bishop.is_field_touched(match, opp_color, forkx, forky)):
+        if(bishop.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    if(knight.is_field_touched(match, opp_color, forkx, forky)):
+        if(knight.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    if(pawn.is_field_touched(match, opp_color, forkx, forky)):
+        if(pawn.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    if(king.is_field_touched(match, opp_color, forkx, forky)):
+        if(king.count_attacks(match, color, forkx, forky) > 1):
+            match.writefield(srcx, srcy, piece)
+            return True
+
+    match.writefield(srcx, srcy, piece)
+    return False
+
 
 def piece_is_lower_equal_than_captured(token):
     if(token & MV_PIECE_IS_KG > 0):
@@ -29,43 +148,6 @@ def piece_is_lower_equal_than_captured(token):
            token & CAPTURED_IS_BP > 0 or
            token & CAPTURED_IS_KN > 0 or
            token & CAPTURED_IS_PW > 0):
-            return True
-        else:
-            return False
-
-
-def piece_is_lower_equal_than_attacked(token):
-    if(token & MV_PIECE_IS_KG > 0):
-        return False
-    elif(token & MV_PIECE_IS_QU > 0):
-        if(token & ATTACKED_IS_KG > 0 or 
-           token & ATTACKED_IS_QU > 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_RK > 0):
-        if(token & ATTACKED_IS_KG > 0 or 
-           token & ATTACKED_IS_QU > 0 or
-           token & ATTACKED_IS_RK > 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if(token & ATTACKED_IS_KG > 0 or 
-           token & ATTACKED_IS_QU > 0 or 
-           token & ATTACKED_IS_RK > 0 or 
-           token & ATTACKED_IS_BP > 0 or 
-           token & ATTACKED_IS_KN > 0):
-            return True
-        else:
-            return False
-    else: # MV_PIECE_IS_PW
-        if(token & ATTACKED_IS_KG > 0 or 
-           token & ATTACKED_IS_QU > 0 or
-           token & ATTACKED_IS_RK > 0 or
-           token & ATTACKED_IS_BP > 0 or
-           token & ATTACKED_IS_KN > 0 or
-           token & ATTACKED_IS_PW > 0):
             return True
         else:
             return False
@@ -115,7 +197,7 @@ def piece_is_lower_equal_than_enemy_on_srcfield(token):
             return False
 
 
-def piece_is_lower_equal_than_enemy_on_dstfield(token):
+"""def piece_is_lower_equal_than_enemy_on_dstfield(token):
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):
@@ -157,7 +239,7 @@ def piece_is_lower_equal_than_enemy_on_dstfield(token):
            token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
             return True
         else:
-            return False
+            return False"""
 
 
 def piece_is_lower_fairy_equal_than_enemy_on_dstfield(token):
@@ -327,3 +409,4 @@ def highest_disclosed_attacked(disclosed_attacked):
             piece = ctouch.piece
 
     return piece
+

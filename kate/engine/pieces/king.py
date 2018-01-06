@@ -1,6 +1,7 @@
 from .. match import *
-from .. import rules
 from .. cvalues import *
+from .. import rules
+from .. import analyze_helper
 from .generic_piece import cTouch
 
 
@@ -77,7 +78,6 @@ def field_color_touches_beyond(match, color, ctouch):
                 else:
                     ctouch.attacker_beyond.append([piece, x1, y1])
 
-
 def list_field_touches(match, color, fieldx, fieldy):
     touches = []
 
@@ -130,7 +130,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                rules.field_touches_beyond(match, opp_color, ctouch)
+                analyze_helper.field_touches_beyond(match, opp_color, ctouch)
 
                 match.writefield(srcx, srcy, king)
                 ###
@@ -153,7 +153,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                rules.field_touches_beyond(match, color, ctouch)
+                analyze_helper.field_touches_beyond(match, color, ctouch)
 
                 match.writefield(srcx, srcy, king)
                 ###
@@ -178,6 +178,10 @@ def score_attacks(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
+                pin_dir = rules.pin_dir(match, srcx, srcy)
+                if(pin_dir != rules.DIRS['undefined']):
+                    score += ATTACKED_SCORES[piece]
+
                 score += ATTACKED_SCORES[piece]
 
     return score
@@ -210,19 +214,6 @@ def score_supports(match, srcx, srcy):
     return score 
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
-    for i in range(8):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
-                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
-                return True
-
-    return False
-
-
 def count_attacks(match, color, fieldx, fieldy):
     count = 0
 
@@ -238,6 +229,19 @@ def count_attacks(match, color, fieldx, fieldy):
                 else:
                     count += 1
     return count
+
+
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
+    for i in range(8):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
+            if(analyze_helper.is_fork_field(match, piece, srcx, srcy, x1, y1)):
+                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
+                return True
+
+    return False
 
 
 def kg_dir(srcx, srcy, dstx, dsty):

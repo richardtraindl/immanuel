@@ -1,5 +1,7 @@
 from .. match import *
+from .. cvalues import *
 from .. import rules
+from .. import analyze_helper
 from . import rook, bishop
 
 
@@ -29,13 +31,22 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
+def is_move_stuck(match, srcx, srcy, dstx, dsty):
+    bp_flag = bishop.is_move_stuck(match, srcx, srcy, dstx, dsty)
+    rk_flag = rook.is_move_stuck(match, srcx, srcy, dstx, dsty)
+    return bp_flag or rk_flag
+
+
 def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     for i in range(8):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
         if(x1 != rules.UNDEF_X):
-            if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
+            if(is_move_stuck(match, dstx, dsty, x1, y1)):
+                continue
+
+            if(analyze_helper.is_fork_field(match, piece, srcx, srcy, x1, y1)):
                 forked.append([srcx, srcy, dstx, dsty,  x1, y1])
                 return True
     return False
@@ -49,6 +60,9 @@ def count_attacks(match, color, fieldx, fieldy):
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
+            if(is_move_stuck(match, fieldx, fieldy, x1, y1)):
+                continue
+
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == color):
                 if(piece == PIECES['wKg'] or piece == PIECES['bKg']):

@@ -53,7 +53,7 @@ def match(request, matchid=None, switch=0, msg=None):
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:3]
     
     if(msg == None):
-        status = interface.game_status(modelmatch)
+        status = interface.status(modelmatch)
         if(status != STATUS['open']):
             if(status == STATUS['winner_white']):
                 msg = RETURN_CODES['winner_white']
@@ -145,7 +145,7 @@ def do_move(request, matchid, switch=0):
                 if(valid):
                     interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
                     interface.calc_move_for_immanuel(modelmatch)
-                    status = interface.game_status(modelmatch)
+                    status = interface.status(modelmatch)
                     if(status != STATUS['open']):
                         if(status == STATUS['winner_white']):
                             msg = RETURN_CODES['winner_white']    

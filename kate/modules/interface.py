@@ -63,10 +63,10 @@ def map_moves(src, dst, map_dir):
     dst.fifty_moves_count = src.fifty_moves_count
 
 
-def game_status(modelmatch):
+def status(modelmatch):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    return rules.game_status(match)
+    return rules.status(match)
 
 
 def is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
@@ -140,8 +140,8 @@ def thread_do_move(match):
 def calc_move_for_immanuel(modelmatch):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    if(rules.game_status(match) != STATUS['open']):
-        return False, rules.game_status(match)
+    if(rules.status(match) != STATUS['open']):
+        return False, rules.status(match)
     elif(modelmatch.next_color_human()):
         return False, rules.RETURN_CODES['wrong-color']
     else:

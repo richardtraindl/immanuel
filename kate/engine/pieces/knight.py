@@ -1,6 +1,7 @@
 from .. match import *
-from .. import rules
 from .. cvalues import *
+from .. import rules
+from .. import analyze_helper
 from .generic_piece import cTouch
 
 
@@ -47,6 +48,14 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
+def is_stuck(match, fieldx, fieldy):
+    pin_dir = rules.pin_dir(match, fieldx, fieldy)
+    if(pin_dir == rules.DIRS['undefined']):
+        return False
+    else:
+        return True
+                    
+
 def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches):
     for i in range(8):
         x1 = fieldx + STEPS[i][0]
@@ -54,9 +63,9 @@ def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                pin_dir = rules.pin_dir(match, x1, y1)
-                if(pin_dir != rules.DIRS['undefined']):
+                if(is_stuck(match, x1, y1)):
                     continue
+
                 if(Match.color_of_piece(piece) == color):
                     frdlytouches.append(piece)
                 else:
@@ -70,9 +79,9 @@ def field_color_touches_beyond(match, color, ctouch):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                pin_dir = rules.pin_dir(match, x1, y1)
-                if(pin_dir != rules.DIRS['undefined']):
+                if(is_stuck(match, x1, y1)):
                     continue
+
                 if(Match.color_of_piece(piece) == color):
                     ctouch = cTouch(None, None, None, None, piece, x1, y1)
                     ctouch.supporter_beyond.append([piece, x1, y1])
@@ -88,12 +97,10 @@ def list_field_touches(match, color, fieldx, fieldy):
         x1 = fieldx + STEPS[i][0]
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-
-            pin_dir = rules.pin_dir(match, x1, y1)
-            if(pin_dir != rules.DIRS['undefined']):
+            if(is_stuck(match, x1, y1)):
                 continue
 
+            piece = match.readfield(x1, y1)
             if( (color == COLORS['white'] and piece == PIECES['wKn']) or
                 (color == COLORS['black'] and piece == PIECES['bKn']) ):
                 touches.append([piece, x1, y1])
@@ -103,6 +110,9 @@ def list_field_touches(match, color, fieldx, fieldy):
 
 def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
     token = 0x0
+
+    if(is_stuck(match, srcx, srcy)):
+        return token
 
     knight = match.readfield(srcx, srcy)
 
@@ -139,7 +149,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                rules.field_touches_beyond(match, opp_color, ctouch)
+                analyze_helper.field_touches_beyond(match, opp_color, ctouch)
 
                 match.writefield(srcx, srcy, knight)
                 ###
@@ -166,7 +176,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                rules.field_touches_beyond(match, color, ctouch)
+                analyze_helper.field_touches_beyond(match, color, ctouch)
 
                 match.writefield(srcx, srcy, knight)
                 ###
@@ -176,6 +186,9 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
 def score_attacks(match, srcx, srcy):
     score = 0
+
+    if(is_stuck(match, srcx, srcy)):
+        return score
 
     knight = match.readfield(srcx, srcy)
 
@@ -191,18 +204,23 @@ def score_attacks(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                pin_dir = rules.pin_dir(match, srcx, srcy)
-                if(pin_dir == rules.DIRS['undefined']):
-                    if(PIECES_RANK[piece] > PIECES_RANK[knight]):
-                        score += ATTACKED_SCORES[piece] * 2
-                    else:
-                        score += ATTACKED_SCORES[piece]
+                direction = pin_dir(match, x1, y1)
+                if(direction != DIRS['undefined']):
+                    score += ATTACKED_SCORES[piece]
+
+                if(PIECES_RANK[piece] > PIECES_RANK[knight]):
+                    score += ATTACKED_SCORES[piece] * 2
+                else:
+                    score += ATTACKED_SCORES[piece]
 
     return score
 
 
 def score_supports(match, srcx, srcy):
     score = 0
+
+    if(is_stuck(match, srcx, srcy)):
+        return score
 
     knight = match.readfield(srcx, srcy)
 
@@ -219,9 +237,11 @@ def score_supports(match, srcx, srcy):
         if(x1 != rules.UNDEF_X):
             if(x1 == srcx and y1 == srcy):
                 continue
+
             piece = match.readfield(x1, y1)
             if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
+
             if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += SUPPORTED_SCORES[piece]
@@ -229,21 +249,11 @@ def score_supports(match, srcx, srcy):
     return score 
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
-                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
-                return True
-
-    return False
-
-
 def count_attacks(match, color, fieldx, fieldy):
     count = 0
+
+    if(is_stuck(match, fieldx, fieldy)):
+        return count
 
     for i in range(8):
         x1 = fieldx + STEPS[i][0]
@@ -258,6 +268,22 @@ def count_attacks(match, color, fieldx, fieldy):
                 else:
                     count += 1
     return count
+
+
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
+    if(is_stuck(match, srcx, srcy)):
+        return False
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
+            if(analyze_helper.is_fork_field(match, piece, srcx, srcy, x1, y1)):
+                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
+                return True
+
+    return False
 
 
 def kn_dir(srcx, srcy, dstx, dsty):

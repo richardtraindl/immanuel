@@ -1,6 +1,7 @@
 from .. match import *
-from .. import rules
 from .. cvalues import *
+from .. import rules
+from .. import analyze_helper
 from .generic_piece import cTouch
 
 
@@ -35,6 +36,15 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
+def is_move_stuck(match, srcx, srcy, dstx, dsty):
+    move_dir = bp_dir(srcx, srcy, dstx, dsty)
+    pin_dir = rules.pin_dir(match, srcx, srcy)
+    if(pin_dir == rules.DIRS['undefined'] or move_dir == pin_dir):
+        return False
+    else:
+        return True
+
+
 def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches):
     for i in range(4):
         stepx = STEPS[i][0]
@@ -43,10 +53,9 @@ def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(piece == PIECES['wQu'] or piece == PIECES['bQu'] or piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                pin_dir = rules.pin_dir(match, x1, y1)
-                direction = bp_dir(fieldx, fieldy, x1, y1)
-                if(pin_dir != direction and pin_dir != rules.DIRS['undefined']):
+                if(is_move_stuck(match, x1, y1, fieldx, fieldy)):
                     continue
+
                 if(Match.color_of_piece(piece) == color):
                     frdlytouches.append(piece)
                 else:
@@ -61,10 +70,9 @@ def field_color_touches_beyond(match, color, ctouch):
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(piece == PIECES['wQu'] or piece == PIECES['bQu'] or piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                pin_dir = rules.pin_dir(match, x1, y1)
-                direction = bp_dir(ctouch.fieldx, ctouch.fieldy, x1, y1)
-                if(pin_dir != direction and pin_dir != rules.DIRS['undefined']):
+                if(is_move_stuck(match, x1, y1, ctouch.fieldx, ctouch.fieldy)):
                     continue
+
                 if(Match.color_of_piece(piece) == color):
                     ctouch.supporter_beyond.append([piece, x1, y1])
                 else:
@@ -79,13 +87,10 @@ def list_field_touches(match, color, fieldx, fieldy):
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
-            piece = match.readfield(x1, y1)
-
-            pin_dir = rules.pin_dir(match, x1, y1)
-            direction = bp_dir(fieldx, fieldy, x1, y1)
-            if(pin_dir != direction and pin_dir != rules.DIRS['undefined']):
+            if(is_move_stuck(match, x1, y1, fieldx, fieldy)):
                 continue
 
+            piece = match.readfield(x1, y1)
             if( (color == COLORS['white'] and (piece == PIECES['wQu'] or piece == PIECES['wBp'])) or
                 (color == COLORS['black'] and (piece == PIECES['bQu'] or piece == PIECES['bBp'])) ):
                 touches.append([piece, x1, y1])
@@ -107,6 +112,9 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
         x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             if(x1 == srcx and y1 == srcy):
+                continue
+            
+            if(is_move_stuck(match, srcx, srcy, x1, y1)):
                 continue
 
             piece = match.readfield(x1, y1)
@@ -132,7 +140,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                rules.field_touches_beyond(match, opp_color, ctouch)
+                analyze_helper.field_touches_beyond(match, opp_color, ctouch)
 
                 match.writefield(srcx, srcy, bishop)
                 ###
@@ -158,7 +166,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                rules.field_touches_beyond(match, color, ctouch)
+                analyze_helper.field_touches_beyond(match, color, ctouch)
 
                 match.writefield(srcx, srcy, bishop)
                 ###
@@ -222,17 +230,25 @@ def score_attacks(match, srcx, srcy):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
+        x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
+            if(is_move_stuck(match, srcx, srcy, x1, y1)):
+                continue
+
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
-                pin_dir = rules.pin_dir(match, srcx, srcy)
-                direction = bp_dir(srcx, srcy, x1, y1)
-                if(pin_dir == direction or pin_dir == rules.DIRS['undefined']):
-                    if(PIECES_RANK[piece] > PIECES_RANK[bishop]):
-                        score += ATTACKED_SCORES[piece] * 2
-                    else:
-                        score += ATTACKED_SCORES[piece]
+                direction = pin_dir(match, x1, y1)
+                if(direction != DIRS['undefined'] and 
+                   direction != DIRS['north-east'] and 
+                   direction != DIRS['south-west'] and 
+                   direction != DIRS['north-west'] and 
+                   direction != DIRS['south-east']):
+                    score += ATTACKED_SCORES[piece]
+
+                if(PIECES_RANK[piece] > PIECES_RANK[bishop]):
+                    score += ATTACKED_SCORES[piece] * 2
+                else:
+                    score += ATTACKED_SCORES[piece]
 
     return score
 
@@ -255,28 +271,20 @@ def score_supports(match, srcx, srcy):
         if(x1 != rules.UNDEF_X):
             if(x1 == srcx and y1 == srcy):
                 continue
+
+            if(is_move_stuck(match, srcx, srcy, x1, y1)):
+                continue
+
             piece = match.readfield(x1, y1)
+
             if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
+
             if( color == Match.color_of_piece(piece) ):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += SUPPORTED_SCORES[piece]
 
     return score 
-
-
-
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
-        if(x1 != rules.UNDEF_X):
-            if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
-                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
-                return True
-
-    return False
 
 
 def count_attacks(match, color, fieldx, fieldy):
@@ -287,6 +295,9 @@ def count_attacks(match, color, fieldx, fieldy):
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
+            if(is_move_stuck(match, fieldx, fieldy, x1, y1)):
+                continue
+
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == color):
                 if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
@@ -296,6 +307,57 @@ def count_attacks(match, color, fieldx, fieldy):
                 else:
                     count += 1
     return count
+
+
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
+    if(is_move_stuck(match, srcx, srcy, dstx, dsty)):
+        return False
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
+        if(x1 != rules.UNDEF_X):
+            if(is_move_stuck(match, dstx, dsty, x1, y1)):
+                continue
+
+            if(analyze_helper.is_fork_field(match, piece, srcx, srcy, x1, y1)):
+                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
+                return True
+
+    return False
+
+
+def controles_file(match, piece, color, srcx, srcy, dstx, dsty):
+    cnt = 0
+
+    move_dir = bp_dir(srcx, srcy, dstx, dsty)
+
+    move_opp_dir = rules.REVERSE_DIRS[move_dir]
+    
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+
+        direction = bp_dir(dstx, dsty, dstx + stepx, dsty + stepy)
+        if(direction == move_dir or direction == move_opp_dir):
+            continue
+
+        x1 = dstx + stepx
+        y1 = dsty + stepy
+        while(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if(Match.color_of_piece(piece) == color):
+                break
+            else:
+                cnt += 1
+                x1 += stepx
+                y1 += stepy
+
+    if(cnt >= 5):
+        return True
+    else:
+        return False
 
 
 def bp_dir(srcx, srcy, dstx, dsty):

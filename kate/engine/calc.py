@@ -208,23 +208,23 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     if(match.level == LEVELS['blitz']):
         cnt = 12
         dpth = 3
-        mid_dpth = 5
-        max_dpth = 7
+        mid_dpth = 6
+        max_dpth = 12
     elif(match.level == LEVELS['low']):
-        cnt = 16
+        cnt = 12
         dpth = 3
-        mid_dpth = 5
-        max_dpth = 9
+        mid_dpth = 6
+        max_dpth = 12
     elif(match.level == LEVELS['medium']):
         cnt = 20
-        dpth = 5
-        mid_dpth = 7
-        max_dpth = 9
+        dpth = 4
+        mid_dpth = 8
+        max_dpth = 12
     else:
         cnt = 24
         dpth = 5
-        mid_dpth = 7
-        max_dpth = 11
+        mid_dpth = 8
+        max_dpth = 12
 
     if(depth <= dpth):
         return max(cnt, prio1_mvcnt)

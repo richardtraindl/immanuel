@@ -1,6 +1,7 @@
 from .. match import *
-from .. import rules
 from .. cvalues import *
+from .. import rules
+from .. import analyze_helper
 from .generic_piece import cTouch
 
 
@@ -65,6 +66,15 @@ def is_field_touched(match, color, fieldx, fieldy):
     return False
 
 
+def is_move_stuck(match, piece, srcx, srcy, dstx, dsty):
+    move_dir = pw_dir(srcx, srcy, dstx, dsty, piece)
+    pin_dir = rules.pin_dir(match, srcx, srcy)
+    if(pin_dir == rules.DIRS['undefined'] or move_dir == pin_dir):
+        return False
+    else:
+        return True
+
+
 def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches):
     PW_BACK_STEPS = [ [1, -1], [-1, -1], [1, 1], [-1, 1] ]
     
@@ -74,16 +84,13 @@ def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if((i <= 1 and piece == PIECES['wPw']) or (i >= 2 and  piece == PIECES['bPw'])):
-                pin_dir = rules.pin_dir(match, x1, y1)
-                direction = pw_dir(x1, y1, fieldx, fieldy, piece)
-                if(direction == rules.DIRS['undefined']):
+                if(is_move_stuck(match, piece, x1, y1, fieldx, fieldy)):
                     continue
-                if(pin_dir == direction or pin_dir == rules.REVERSE_DIRS[direction] or 
-                   pin_dir == rules.DIRS['undefined']):
-                    if(Match.color_of_piece(piece) == color):
-                        frdlytouches.append(piece)
-                    else:
-                        enmytouches.append(piece)
+                
+                if(Match.color_of_piece(piece) == color):
+                    frdlytouches.append(piece)
+                else:
+                    enmytouches.append(piece)
 
 
 def field_color_touches_beyond(match, color, ctouch):
@@ -95,16 +102,13 @@ def field_color_touches_beyond(match, color, ctouch):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if((i <= 1 and piece == PIECES['wPw']) or (i >= 2 and  piece == PIECES['bPw'])):
-                pin_dir = rules.pin_dir(match, x1, y1)
-                direction = pw_dir(x1, y1, ctouch.fieldx, ctouch.fieldy, piece)
-                if(direction == rules.DIRS['undefined']):
+                if(is_move_stuck(match, piece, x1, y1, ctouch.fieldx, ctouch.fieldy)):
                     continue
-                if(pin_dir == direction or pin_dir == rules.REVERSE_DIRS[direction] or 
-                   pin_dir == rules.DIRS['undefined']):
-                    if(Match.color_of_piece(piece) == color):
-                        ctouch.supporter_beyond.append([piece, x1, y1])
-                    else:
-                        ctouch.attacker_beyond.append([piece, x1, y1])
+
+                if(Match.color_of_piece(piece) == color):
+                    ctouch.supporter_beyond.append([piece, x1, y1])
+                else:
+                    ctouch.attacker_beyond.append([piece, x1, y1])
 
 
 def list_field_touches(match, color, fieldx, fieldy):
@@ -121,15 +125,11 @@ def list_field_touches(match, color, fieldx, fieldy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
 
-            pin_dir = rules.pin_dir(match, x1, y1)
-            direction = pw_dir(x1, y1, fieldx, fieldy, piece)
-            if(direction == rules.DIRS['undefined']):
-                continue
-            if(pin_dir == direction or pin_dir == rules.REVERSE_DIRS[direction] or 
-               pin_dir == rules.DIRS['undefined']):
-                if( (color == COLORS['white'] and piece == PIECES['wPw']) or
-                    (color == COLORS['black'] and piece == PIECES['bPw']) ):
-                    touches.append([piece, x1, y1])
+            if( (color == COLORS['white'] and piece == PIECES['wPw']) or
+                (color == COLORS['black'] and piece == PIECES['bPw']) ):
+                if(is_move_stuck(match, piece, x1, y1, fieldx, fieldy)):
+                    continue
+                touches.append([piece, x1, y1])
 
     return touches
  
@@ -152,6 +152,9 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
         y1 = dsty + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             if(x1 == srcx and y1 == srcy):
+                continue
+
+            if(is_move_stuck(match, pawn, srcx, srcy, x1, y1)):
                 continue
 
             piece = match.readfield(x1, y1)
@@ -177,7 +180,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                rules.field_touches_beyond(match, opp_color, ctouch)
+                analyze_helper.field_touches_beyond(match, opp_color, ctouch)
 
                 match.writefield(srcx, srcy, pawn)
                 ###
@@ -203,7 +206,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                rules.field_touches_beyond(match, color, ctouch)
+                analyze_helper.field_touches_beyond(match, color, ctouch)
 
                 match.writefield(srcx, srcy, pawn)
                 ###
@@ -231,15 +234,19 @@ def score_attacks(match, srcx, srcy):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
+            if(is_move_stuck(match, pawn, srcx, srcy, x1, y1)):
+                continue
+
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
-                pin_dir = rules.pin_dir(match, srcx, srcy)
-                direction = pw_dir(srcx, srcy, x1, y1, piece)
-                if(pin_dir == direction or pin_dir == rules.DIRS['undefined']):
-                    if(PIECES_RANK[piece] > PIECES_RANK[pawn]):
-                        score += ATTACKED_SCORES[piece] * 2
-                    else:
-                        score += ATTACKED_SCORES[piece]
+                direction = rules.pin_dir(match, x1, y1)
+                if(direction != rules.DIRS['undefined']):
+                    score += ATTACKED_SCORES[piece]
+
+                if(PIECES_RANK[piece] > PIECES_RANK[pawn]):
+                    score += ATTACKED_SCORES[piece] * 2
+                else:
+                    score += ATTACKED_SCORES[piece]
 
     return score
 
@@ -267,14 +274,49 @@ def score_supports(match, srcx, srcy):
             piece = match.readfield(x1, y1)
             if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
-            if( color == Match.color_of_piece(piece) ):
+
+            if(is_move_stuck(match, pawn, srcx, srcy, x1, y1)):
+                continue
+
+            if(color == Match.color_of_piece(piece)):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += SUPPORTED_SCORES[piece]
 
     return score
 
 
+def count_attacks(match, color, fieldx, fieldy):
+    count = 0
+
+    if(color == COLORS['white']):
+        STEPS = WPW_STEPS
+        pawn = PIECES['wPw']
+    else:
+        STEPS = BPW_STEPS
+        pawn = PIECES['bPw']
+
+    for i in range(2):
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            if(is_move_stuck(match, pawn, fieldx, fieldy, x1, y1)):
+                continue
+
+            piece = match.readfield(x1, y1)
+            if(match.color_of_piece(piece) == color):
+                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                    count += 1
+                elif(rules.is_field_touched(match, color, x1, y1)):
+                    continue
+                else:
+                    count += 1
+    return count
+
+
 def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
+    if(is_move_stuck(match, piece, srcx, srcy, dstx, dsty)):
+        return False
+
     color = Match.color_of_piece(piece)
 
     if(color == COLORS['white']):
@@ -286,34 +328,11 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
         x1 = dstx + STEPS[i][0]
         y1 = dsty + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
-            if(rules.is_fork_field(match, piece, srcx, srcy, x1, y1)):
+            if(analyze_helper.is_fork_field(match, piece, srcx, srcy, x1, y1)):
                 forked.append([srcx, srcy, dstx, dsty,  x1, y1])
                 return True
 
     return False
-
-
-def count_attacks(match, color, fieldx, fieldy):
-    count = 0
-
-    if(color == COLORS['white']):
-        STEPS = WPW_STEPS
-    else:
-        STEPS = BPW_STEPS
-
-    for i in range(2):
-        x1 = fieldx + STEPS[i][0]
-        y1 = fieldy + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == color):
-                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    count += 1
-                elif(rules.is_field_touched(match, color, x1, y1)):
-                    continue
-                else:
-                    count += 1
-    return count
 
 
 def is_running(match, srcx, srcy):

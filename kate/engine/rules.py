@@ -161,6 +161,7 @@ def pin_dir(match, scrx, srcy):
                             return direction
                         else:
                             return DIRS['undefined']
+
     return DIRS['undefined']
 
 
@@ -183,122 +184,6 @@ def is_field_touched(match, color, srcx, srcy):
     if(pawn.is_field_touched(match, color, srcx, srcy)):
         return True
 
-    return False
-
-
-def field_touches(match, color, fieldx, fieldy):
-    frdlytouches = []
-    enmytouches = []
-
-    rook.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
-
-    bishop.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
-
-    knight.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
-
-    king.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
-
-    pawn.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
-
-    return frdlytouches, enmytouches
-
-
-def field_touches_beyond(match, color, ctouch):
-    rook.field_color_touches_beyond(match, color, ctouch)
-
-    bishop.field_color_touches_beyond(match, color, ctouch)
-
-    knight.field_color_touches_beyond(match, color, ctouch)
-
-    king.field_color_touches_beyond(match, color, ctouch)
-
-    pawn.field_color_touches_beyond(match, color, ctouch)
-
-    return
-
-
-def list_field_touches(match, color, fieldx, fieldy):
-    touches = []
-
-    newtouches = rook.list_field_touches(match, color, fieldx, fieldy)
-    if(len(newtouches) > 0):
-        touches.extend(newtouches)
-
-    newtouches = bishop.list_field_touches(match, color, fieldx, fieldy)
-    if(len(newtouches) > 0):
-        touches.extend(newtouches)
-
-    newtouches = knight.list_field_touches(match, color, fieldx, fieldy)
-    if(len(newtouches) > 0):
-        touches.extend(newtouches)
-
-    newtouches = king.list_field_touches(match, color, fieldx, fieldy)
-    if(len(newtouches) > 0):
-        touches.extend(newtouches)
-
-    newtouches = pawn.list_field_touches(match, color, fieldx, fieldy)
-    if(len(newtouches) > 0):
-        touches.extend(newtouches)
-
-    return touches
-
-
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
-    if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        return queen.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
-    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        return rook.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
-    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        return bishop.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
-    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        return knight.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
-    elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        return king.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
-    elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        return pawn.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
-    else:
-        return False
-
-
-def is_fork_field(match, piece, srcx, srcy, forkx, forky):
-    color = Match.color_of_piece(piece)
-    opp_color = Match.oppcolor_of_piece(piece)
-    
-    #if(is_field_touched(match, color, forkx, forky) == True):
-    #    return False
-
-    match.writefield(srcx, srcy, PIECES['blk'])
-    if(queen.is_field_touched(match, opp_color, forkx, forky)):
-        if(queen.count_attacks(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
-            return True
-
-    if(rook.is_field_touched(match, opp_color, forkx, forky)):
-        if(rook.count_attacks(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
-            return True
-
-    if(bishop.is_field_touched(match, opp_color, forkx, forky)):
-        if(bishop.count_attacks(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
-            return True
-
-    if(knight.is_field_touched(match, opp_color, forkx, forky)):
-        if(knight.count_attacks(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
-            return True
-
-    if(pawn.is_field_touched(match, opp_color, forkx, forky)):
-        if(pawn.count_attacks(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
-            return True
-
-    if(king.is_field_touched(match, opp_color, forkx, forky)):
-        if(king.count_attacks(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
-            return True
-
-    match.writefield(srcx, srcy, piece)
     return False
 
 
@@ -362,10 +247,11 @@ def is_move_available(match):
                         flag = is_move_valid(match, x1, y1, x2, y2, prom_piece)[0]
                         if(flag):
                             return True
+
     return False
 
 
-def game_status(match):
+def status(match):
     if(is_move_available(match)):
         return STATUS['open']
     else:
@@ -380,9 +266,6 @@ def game_status(match):
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
-    #print(" counts " + str(match.wKg_first_movecnt) + " " + str(match.wRk_h1_first_movecnt)  + " " + str(match.wRk_a1_first_movecnt))
-    #print(" counts " + str(match.bKg_first_movecnt) + " " + str(match.bRk_h8_first_movecnt)  + " " + str(match.bRk_a8_first_movecnt))
-    #print("-------------------------------------------")
     if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
         return False, RETURN_CODES['out-of-bounds']
 

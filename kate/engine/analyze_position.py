@@ -1,5 +1,5 @@
 from .match import *
-from .rules import RETURN_CODES, game_status, is_move_inbounds
+from . import rules # RETURN_CODES, status, is_move_inbounds
 from .pieces import pawn, knight, bishop, rook, king 
 from .cvalues import *
 
@@ -19,7 +19,6 @@ def score_attacks(match, srcx, srcy):
 
     return score
 
-
 def score_supports(match, srcx, srcy):
     score = 0
     
@@ -35,7 +34,6 @@ def score_supports(match, srcx, srcy):
 
     return score
 
-
 def score_supports_and_attacks(match):
     score = 0
 
@@ -49,7 +47,7 @@ def score_supports_and_attacks(match):
     return score
 
 
-def check_mobility_move(match, srcx, srcy, dstx, dsty, prom_piece):
+"""def check_mobility_move(match, srcx, srcy, dstx, dsty, prom_piece):
     if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
         return False
 
@@ -127,19 +125,8 @@ def count_mobility(match, srcx, srcy, excludedpieces):
             else:
                 break
 
-    return movecnt
+    return movecnt"""
 
-def count_all_moves(match, color, excludedpieces):
-    movecnt = 0
-
-    for y1 in range(8):
-        for x1 in range(8):
-            piece = match.readfield(x1, y1)
-            if(Match.color_of_piece(piece) == color):
-                count = count_mobility(match, x1, y1, excludedpieces)
-                movecnt += count
-
-    return movecnt
 
 def is_king_defended_by_pawns(match, color):
     if(color == COLORS['white']):
@@ -301,7 +288,7 @@ def score_endgame(match):
 
 
 def score_position(match, movecnt):
-    status = game_status(match)
+    status = rules.status(match)
     if(movecnt == 0 and status != STATUS['open']):
         if(status == STATUS['winner_black']):
             return ( SCORES[PIECES['wKg']] + match.count )
