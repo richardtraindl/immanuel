@@ -219,9 +219,6 @@ def score_attacks(match, srcx, srcy):
 
     pawn = match.readfield(srcx, srcy)
 
-    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
-        return score
-
     color = Match.color_of_piece(pawn)
     opp_color = Match.oppcolor_of_piece(pawn)
 
@@ -239,14 +236,17 @@ def score_attacks(match, srcx, srcy):
 
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
-                direction = rules.pin_dir(match, x1, y1)
-                if(direction != rules.DIRS['undefined']):
+                score += ATTACKED_SCORES[piece]
+
+                # extra score for pinned attacked
+                enmy_pin = rules.pin_dir(match, x1, y1)
+                if(enmy_pin != rules.DIRS['undefined']):
                     score += ATTACKED_SCORES[piece]
 
+                # extra score if attacked is higher
                 if(PIECES_RANK[piece] > PIECES_RANK[pawn]):
-                    score += ATTACKED_SCORES[piece] * 2
-                else:
                     score += ATTACKED_SCORES[piece]
+
 
     return score
 
@@ -255,9 +255,6 @@ def score_supports(match, srcx, srcy):
     score = 0
 
     pawn = match.readfield(srcx, srcy)
-
-    if(pawn != PIECES['wPw'] and pawn != PIECES['bPw']):
-        return score
 
     color = Match.color_of_piece(pawn)
     opp_color = Match.oppcolor_of_piece(pawn)

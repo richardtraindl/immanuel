@@ -192,9 +192,6 @@ def score_attacks(match, srcx, srcy):
 
     knight = match.readfield(srcx, srcy)
 
-    if(knight != PIECES['wKn'] and knight != PIECES['bKn']):
-        return score
-
     color = Match.color_of_piece(knight)
     opp_color = Match.oppcolor_of_piece(knight)
 
@@ -204,13 +201,15 @@ def score_attacks(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                direction = pin_dir(match, x1, y1)
-                if(direction != DIRS['undefined']):
-                    score += ATTACKED_SCORES[piece]
+                score += ATTACKED_SCORES[piece]
 
+                # extra score for pinned attacked
+                enmy_pin = rules.pin_dir(match, x1, y1)
+                if(enmy_pin != rules.DIRS['undefined']):
+                    score += ATTACKED_SCORES[piece]
+                    
+                # extra score if attacked is higher
                 if(PIECES_RANK[piece] > PIECES_RANK[knight]):
-                    score += ATTACKED_SCORES[piece] * 2
-                else:
                     score += ATTACKED_SCORES[piece]
 
     return score
@@ -223,9 +222,6 @@ def score_supports(match, srcx, srcy):
         return score
 
     knight = match.readfield(srcx, srcy)
-
-    if(knight != PIECES['wKn'] and knight != PIECES['bKn']):
-        return score
 
     color = Match.color_of_piece(knight)
     opp_color = Match.oppcolor_of_piece(knight)

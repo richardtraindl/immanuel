@@ -219,9 +219,6 @@ def score_attacks(match, srcx, srcy):
 
     rook = match.readfield(srcx, srcy)
 
-    if(rook != PIECES['wRk'] and rook != PIECES['wQu'] and rook != PIECES['bRk'] and rook != PIECES['bQu']):
-        return score
-
     color = Match.color_of_piece(rook)
     opp_color = Match.oppcolor_of_piece(rook)
 
@@ -232,17 +229,18 @@ def score_attacks(match, srcx, srcy):
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                direction = pin_dir(match, x1, y1)
-                if(direction != DIRS['undefined'] and 
-                   direction != DIRS['north'] and 
-                   direction != DIRS['south'] and 
-                   direction != DIRS['east'] and 
-                   direction != DIRS['west']):
+                score += ATTACKED_SCORES[piece]
+                
+                # extra score for pinned attacked
+                rk_direction = rk_dir(srcx, srcy, x1, y1)
+                enmy_pin = rules.pin_dir(match, x1, y1)
+                if(enmy_pin != rules.DIRS['undefined'] and 
+                   enmy_pin != rk_direction and 
+                   enmy_pin != rules.REVERSE_DIRS[rk_direction]):
                     score += ATTACKED_SCORES[piece]
 
+                # extra score if attacked is higher
                 if(PIECES_RANK[piece] > PIECES_RANK[rook]):
-                    score += ATTACKED_SCORES[piece] * 2
-                else:
                     score += ATTACKED_SCORES[piece]
 
     return score
@@ -252,9 +250,6 @@ def score_supports(match, srcx, srcy):
     score = 0
 
     rook = match.readfield(srcx, srcy)
-
-    if(rook != PIECES['wRk'] and rook != PIECES['wQu'] and rook != PIECES['bRk'] and rook != PIECES['bQu']):
-        return score
 
     color = Match.color_of_piece(rook)
     opp_color = Match.oppcolor_of_piece(rook)

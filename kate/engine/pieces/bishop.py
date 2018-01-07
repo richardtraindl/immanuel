@@ -221,9 +221,6 @@ def score_attacks(match, srcx, srcy):
 
     bishop = match.readfield(srcx, srcy)
 
-    if(bishop != PIECES['wBp'] and bishop != PIECES['wQu'] and bishop != PIECES['bBp'] and bishop != PIECES['bQu']):
-        return score
-
     color = Match.color_of_piece(bishop)
     opp_color = Match.oppcolor_of_piece(bishop)
 
@@ -237,17 +234,18 @@ def score_attacks(match, srcx, srcy):
 
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
-                direction = pin_dir(match, x1, y1)
-                if(direction != DIRS['undefined'] and 
-                   direction != DIRS['north-east'] and 
-                   direction != DIRS['south-west'] and 
-                   direction != DIRS['north-west'] and 
-                   direction != DIRS['south-east']):
+                score += ATTACKED_SCORES[piece]
+
+                # extra score for pinned attacked
+                bp_direction = bp_dir(srcx, srcy, x1, y1)
+                enmy_pin = rules.pin_dir(match, x1, y1)
+                if(enmy_pin != rules.DIRS['undefined'] and 
+                   enmy_pin != bp_direction and 
+                   enmy_pin != rules.REVERSE_DIRS[bp_direction]):
                     score += ATTACKED_SCORES[piece]
 
+                # extra score if attacked is higher
                 if(PIECES_RANK[piece] > PIECES_RANK[bishop]):
-                    score += ATTACKED_SCORES[piece] * 2
-                else:
                     score += ATTACKED_SCORES[piece]
 
     return score
@@ -257,9 +255,6 @@ def score_supports(match, srcx, srcy):
     score = 0
 
     bishop = match.readfield(srcx, srcy)
-
-    if(bishop != PIECES['wBp'] and bishop != PIECES['wQu'] and bishop != PIECES['bBp'] and bishop != PIECES['bQu']):
-        return score
 
     color = Match.color_of_piece(bishop)
     opp_color = Match.oppcolor_of_piece(bishop)
