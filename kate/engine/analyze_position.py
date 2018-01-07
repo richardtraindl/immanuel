@@ -6,8 +6,6 @@ from .cvalues import *
 
 def score_supports_and_attacks(match):
     score = 0
-    
-    next_color = match.next_color()
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -18,30 +16,24 @@ def score_supports_and_attacks(match):
                 continue
             elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                 score += pawn.score_supports(match, x, y)
-                if(color == next_color):
-                    score += pawn.score_attacks(match, x, y)
+                score += pawn.score_attacks(match, x, y)
             elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
                 score += knight.score_supports(match, x, y)
-                if(color == next_color):
-                    score += knight.score_attacks(match, x, y)
+                score += knight.score_attacks(match, x, y)
             elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
                 score += bishop.score_supports(match, x, y)
-                if(color == next_color):
-                    score += bishop.score_attacks(match, x, y)
+                score += bishop.score_attacks(match, x, y)
             elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
                 score += rook.score_supports(match, x, y)
-                if(color == next_color):
-                    score += rook.score_attacks(match, x, y)    
+                score += rook.score_attacks(match, x, y)    
             elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                 score += bishop.score_supports(match, x, y)
                 score += rook.score_supports(match, x, y)
-                if(color == next_color):
-                    score += bishop.score_attacks(match, x, y)
-                    score += rook.score_attacks(match, x, y)
+                score += bishop.score_attacks(match, x, y)
+                score += rook.score_attacks(match, x, y)
             else:
                 score += king.score_supports(match, x, y)
-                if(color == next_color):
-                    score += king.score_attacks(match, x, y)
+                score += king.score_attacks(match, x, y)
 
     return score
 
@@ -200,9 +192,9 @@ def is_rook_over_king(match, color):
 def score_opening(match):
     value = 0
 
-    whiterate = ATTACKED_SCORES[PIECES['bPw']] // 2
+    whiterate = ATTACKED_SCORES[PIECES['bPw']]
     
-    blackrate = ATTACKED_SCORES[PIECES['wPw']] // 2
+    blackrate = ATTACKED_SCORES[PIECES['wPw']]
 
     # white position
     y = 0
@@ -211,18 +203,18 @@ def score_opening(match):
         if(piece == PIECES['wKn'] or piece == PIECES['wBp']):
             value += blackrate
 
-    for y in range(2, 4):
-        for x in range(2, 5):
-            piece = match.readfield(x, y)
-            if(piece == PIECES['wPw']):
-                value += whiterate
+    y = 1
+    for x in range(2, 5):
+        piece = match.readfield(x, y)
+        if(piece == PIECES['wPw']):
+            value += blackrate // 2
 
     piece = match.readfield(1, 2)
     if(piece == PIECES['wPw']):
-        value += whiterate
+        value += whiterate // 2
     piece = match.readfield(6, 2)
     if(piece == PIECES['wPw']):
-        value += whiterate
+        value += whiterate // 2
 
     # black position
     y = 7
@@ -231,18 +223,18 @@ def score_opening(match):
         if(piece == PIECES['bKn'] or piece == PIECES['bBp']):
             value += whiterate
 
-    for y in range(5, 3, -1):
-        for x in range(2, 5):
-            piece = match.readfield(x, y)
-            if(piece == PIECES['bPw']):
-                value += blackrate
+    y = 6
+    for x in range(2, 5):
+        piece = match.readfield(x, y)
+        if(piece == PIECES['bPw']):
+            value += whiterate // 2
 
     piece = match.readfield(1, 5)
     if(piece == PIECES['bPw']):
-        value += blackrate
+        value += blackrate // 2
     piece = match.readfield(6, 5)
     if(piece == PIECES['bPw']):
-        value += blackrate
+        value += blackrate // 2
 
 
     # white king
