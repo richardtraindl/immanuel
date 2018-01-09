@@ -38,6 +38,84 @@ def score_supports_and_attacks(match):
     return score
 
 
+def score_controled_horizontal_files(match):
+    score = 0
+
+    whiterate = SCORES[PIECES['bPw']] // 3
+    
+    blackrate = SCORES[PIECES['wPw']] // 3
+
+    for y in range(0, 2, 1):
+        cnt = 0
+        for x in range(8):
+            piece = match.readfield(x, y)
+            if(piece == PIECES['wRk'] or piece == PIECES['wQu']):
+                cnt -= 1
+            elif(piece == PIECES['bRk'] or piece == PIECES['bQu']):
+                cnt += 1
+            else:
+                continue
+
+        if(cnt > 0):
+            score += blackrate
+
+    for y in range(7, 5, -1):
+        cnt = 0
+        for x in range(8):
+            piece = match.readfield(x, y)
+            if(piece == PIECES['wRk'] or piece == PIECES['wQu']):
+                cnt += 1
+            elif(piece == PIECES['bRk'] or piece == PIECES['bQu']):
+                cnt -= 1
+            else:
+                continue
+
+        if(cnt > 0):
+            score += whiterate
+
+    return score
+
+
+def score_controled_vertical_files(match):
+    score = 0
+
+    whiterate = SCORES[PIECES['bPw']] // 3
+    
+    blackrate = SCORES[PIECES['wPw']] // 3
+
+    for x in range(8):
+        cnt = 0
+        wpwcnt = 0
+        bpwcnt = 0
+        for y in range(8):
+            piece = match.readfield(x, y)
+            if(piece == PIECES['blk']):
+                continue
+            elif(piece == PIECES['wPw']):
+                wpwcnt += 1
+                continue
+            elif(piece == PIECES['bPw']):
+                bpwcnt += 1
+                continue
+            elif(piece == PIECES['wRk'] or piece == PIECES['wQu']):
+                cnt += 1
+                continue
+            elif(piece == PIECES['bRk'] or piece == PIECES['bQu']):
+                cnt -= 1
+                continue
+            else:
+                continue
+
+        if(wpwcnt == 0 and bpwcnt == 0):
+            if(cnt > 0):
+                score += whiterate
+            elif(cnt < 0):
+                score += blackrate
+
+    return score
+
+
+
 """def check_mobility_move(match, srcx, srcy, dstx, dsty, prom_piece):
     if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
         return False
@@ -288,15 +366,19 @@ def score_position(match, movecnt):
         else: # draw
             return SCORES[PIECES['blk']]
     else:
-        value = match.score
+        score = match.score
 
-        value += score_supports_and_attacks(match)
+        score += score_supports_and_attacks(match)
+        
+        score += score_controled_horizontal_files(match)
+        
+        score += score_controled_vertical_files(match)
 
         if(match.count < 30):
-            value += score_opening(match)
+            score += score_opening(match)
 
         if(match.count >= 30):
-            value += score_endgame(match)
+            score += score_endgame(match)
 
-        return value
+        return score
 

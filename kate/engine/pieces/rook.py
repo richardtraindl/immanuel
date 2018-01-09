@@ -274,24 +274,6 @@ def score_supports(match, srcx, srcy):
     return score 
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
-    if(is_move_stuck(match, srcx, srcy, dstx, dsty)):
-        return False
-
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            if(is_move_stuck(match, dstx, dsty, x1, y1)):
-                continue
-
-            if(analyze_helper.is_fork_field(match, piece, srcx, srcy, x1, y1)):
-                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
-                return True
-    return False
-
-
 def count_attacks(match, color, fieldx, fieldy):
     count = 0
 
@@ -312,6 +294,24 @@ def count_attacks(match, color, fieldx, fieldy):
                 else:
                     count += 1
     return count
+
+
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
+    if(is_move_stuck(match, srcx, srcy, dstx, dsty)):
+        return False
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
+            if(is_move_stuck(match, dstx, dsty, x1, y1)):
+                continue
+
+            if(analyze_helper.is_fork_field(match, piece, srcx, srcy, x1, y1)):
+                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
+                return True
+    return False
 
 
 def controles_file(match, piece, color, srcx, srcy, dstx, dsty):
