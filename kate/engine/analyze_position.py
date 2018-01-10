@@ -41,36 +41,38 @@ def score_supports_and_attacks(match):
 def score_controled_horizontal_files(match):
     score = 0
 
-    whiterate = SCORES[PIECES['bPw']] // 3
+    whiterate = ATTACKED_SCORES[PIECES['bKn']]
     
-    blackrate = SCORES[PIECES['wPw']] // 3
+    blackrate = ATTACKED_SCORES[PIECES['wKn']]
 
     for y in range(0, 2, 1):
-        cnt = 0
+        wcnt = 0
+        bcnt = 0
         for x in range(8):
             piece = match.readfield(x, y)
             if(piece == PIECES['wRk'] or piece == PIECES['wQu']):
-                cnt -= 1
+                wcnt += 1
             elif(piece == PIECES['bRk'] or piece == PIECES['bQu']):
-                cnt += 1
+                bcnt += 1
             else:
                 continue
 
-        if(cnt > 0):
+        if(bcnt > wcnt):
             score += blackrate
 
-    for y in range(7, 5, -1):
-        cnt = 0
+    for y in range(6, 8, 1):
+        wcnt = 0
+        bcnt = 0
         for x in range(8):
             piece = match.readfield(x, y)
-            if(piece == PIECES['wRk'] or piece == PIECES['wQu']):
-                cnt += 1
-            elif(piece == PIECES['bRk'] or piece == PIECES['bQu']):
-                cnt -= 1
+            if(piece == PIECES['bRk'] or piece == PIECES['bQu']):
+                bcnt += 1
+            elif(piece == PIECES['wRk'] or piece == PIECES['wQu']):
+                wcnt += 1
             else:
                 continue
 
-        if(cnt > 0):
+        if(wcnt > bcnt):
             score += whiterate
 
     return score
@@ -79,12 +81,13 @@ def score_controled_horizontal_files(match):
 def score_controled_vertical_files(match):
     score = 0
 
-    whiterate = SCORES[PIECES['bPw']] // 3
+    whiterate = ATTACKED_SCORES[PIECES['bKn']]
     
-    blackrate = SCORES[PIECES['wPw']] // 3
+    blackrate = ATTACKED_SCORES[PIECES['wKn']]
 
     for x in range(8):
-        cnt = 0
+        wcnt = 0
+        bcnt = 0
         wpwcnt = 0
         bpwcnt = 0
         for y in range(8):
@@ -98,18 +101,18 @@ def score_controled_vertical_files(match):
                 bpwcnt += 1
                 continue
             elif(piece == PIECES['wRk'] or piece == PIECES['wQu']):
-                cnt += 1
+                wcnt += 1
                 continue
             elif(piece == PIECES['bRk'] or piece == PIECES['bQu']):
-                cnt -= 1
+                bcnt += 1
                 continue
             else:
                 continue
 
         if(wpwcnt == 0 and bpwcnt == 0):
-            if(cnt > 0):
+            if(wcnt > bcnt):
                 score += whiterate
-            elif(cnt < 0):
+            elif(bcnt > wcnt):
                 score += blackrate
 
     return score
@@ -282,17 +285,14 @@ def score_opening(match):
             value += blackrate
 
     y = 1
-    for x in range(2, 5):
+    cnt = 0
+    for x in range(8):
         piece = match.readfield(x, y)
         if(piece == PIECES['wPw']):
-            value += blackrate // 2
-
-    piece = match.readfield(1, 2)
-    if(piece == PIECES['wPw']):
-        value += whiterate // 2
-    piece = match.readfield(6, 2)
-    if(piece == PIECES['wPw']):
-        value += whiterate // 2
+            cnt += 1
+    
+    if(cnt <= 6): 
+        value += whiterate
 
     # black position
     y = 7
@@ -302,18 +302,14 @@ def score_opening(match):
             value += whiterate
 
     y = 6
-    for x in range(2, 5):
+    cnt = 0
+    for x in range(8):
         piece = match.readfield(x, y)
         if(piece == PIECES['bPw']):
-            value += whiterate // 2
-
-    piece = match.readfield(1, 5)
-    if(piece == PIECES['bPw']):
-        value += blackrate // 2
-    piece = match.readfield(6, 5)
-    if(piece == PIECES['bPw']):
-        value += blackrate // 2
-
+            cnt += 1
+    
+    if(cnt <= 6): 
+        value += blackrate
 
     # white king
     if(is_king_defended_by_pawns(match, COLORS['white'])):
