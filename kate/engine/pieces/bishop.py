@@ -246,7 +246,7 @@ def score_attacks(match, srcx, srcy):
 
                 # extra score if attacked is higher
                 if(PIECES_RANK[piece] > PIECES_RANK[bishop]):
-                    score += ATTACKED_SCORES[piece]
+                    score += ATTACKED_SCORES[piece] + ATTACKED_SCORES[bishop]
 
     return score
 
