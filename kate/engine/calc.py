@@ -198,6 +198,8 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]] + priocnts[PRIO_INDICES[PRIO['prio1d']]]
 
+    prio2_mvcnt = priocnts[PRIO_INDICES[PRIO['prio2a']]] + priocnts[PRIO_INDICES[PRIO['prio2b']]] + priocnts[PRIO_INDICES[PRIO['prio2c']]] + priocnts[PRIO_INDICES[PRIO['prio2d']]]
+
     if(last_priomove):
         last_prio = last_priomove.prio
         last_token = last_priomove.tokens[0]
@@ -207,27 +209,29 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     if(match.level == LEVELS['blitz']):
         cnt = 12
-        dpth = 3
+        dpth = 2
         mid_dpth = 6
         max_dpth = 12
     elif(match.level == LEVELS['low']):
         cnt = 12
         dpth = 3
-        mid_dpth = 6
+        mid_dpth = 7
         max_dpth = 12
     elif(match.level == LEVELS['medium']):
-        cnt = 20
+        cnt = 16
         dpth = 4
         mid_dpth = 8
         max_dpth = 12
     else:
         cnt = 24
         dpth = 5
-        mid_dpth = 8
+        mid_dpth = 9
         max_dpth = 12
 
-    if(depth <= dpth or (mvcnt <= 24 and depth <= mid_dpth)):
+    if(depth <= dpth):
         return max(cnt, prio1_mvcnt)
+    elif(depth <= mid_dpth and mvcnt <= 24 and last_token & ATTACKED_IS_KG == 0):
+        return prio1_mvcnt + prio2_mvcnt
     elif(depth <= mid_dpth and (last_token & MV_IS_CAPTURE > 0 or last_token & ATTACKED_IS_KG > 0)):
         if(mvcnt > prio1_mvcnt):
             idx = random.randint(prio1_mvcnt, mvcnt - 1)
