@@ -226,7 +226,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         mid_dpth = 8
         max_dpth = 12
 
-    if(depth <= dpth):
+    if(depth <= dpth or (mvcnt <= 24 and depth <= mid_dpth)):
         return max(cnt, prio1_mvcnt)
     elif(depth <= mid_dpth and (last_token & MV_IS_CAPTURE > 0 or last_token & ATTACKED_IS_KG > 0)):
         if(mvcnt > prio1_mvcnt):
