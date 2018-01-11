@@ -7,8 +7,8 @@ from .cvalues import *
 def score_supports(match, color):
     score = 0
 
-    for y in range(0, 8, 1):
-        for x in range(0, 8, 1):
+    for y in range(8):
+        for x in range(8):
             piece = match.readfield(x, y)
 
             if(piece == PIECES['blk']):
@@ -35,8 +35,8 @@ def score_supports(match, color):
 def score_attacks(match, color):
     score = 0
 
-    for y in range(0, 8, 1):
-        for x in range(0, 8, 1):
+    for y in range(8):
+        for x in range(8):
             piece = match.readfield(x, y)
 
             if(piece == PIECES['blk']):
