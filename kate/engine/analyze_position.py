@@ -4,36 +4,58 @@ from .pieces import pawn, knight, bishop, rook, king
 from .cvalues import *
 
 
-def score_supports_and_attacks(match):
+def score_supports(match, color):
     score = 0
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
-            color = Match.color_of_piece(piece)
 
             if(piece == PIECES['blk']):
                 continue
+            elif(Match.color_of_piece(piece) != color):
+                continue
             elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                score += pawn.score_supports(match, x, y)
-                score += pawn.score_attacks(match, x, y)
+                score += pawn.score_supports(match, color, x, y)
             elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                score += knight.score_supports(match, x, y)
-                score += knight.score_attacks(match, x, y)
+                score += knight.score_supports(match, color, x, y)
             elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                score += bishop.score_supports(match, x, y)
-                score += bishop.score_attacks(match, x, y)
+                score += bishop.score_supports(match, color, x, y)
             elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                score += rook.score_supports(match, x, y)
-                score += rook.score_attacks(match, x, y)    
+                score += rook.score_supports(match, color, x, y)
             elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                score += bishop.score_supports(match, x, y)
-                score += rook.score_supports(match, x, y)
-                score += bishop.score_attacks(match, x, y)
-                score += rook.score_attacks(match, x, y)
+                score += bishop.score_supports(match, color, x, y)
+                score += rook.score_supports(match, color, x, y)
             else:
-                score += king.score_supports(match, x, y)
-                score += king.score_attacks(match, x, y)
+                score += king.score_supports(match, color, x, y)
+
+    return score
+
+
+def score_attacks(match, color):
+    score = 0
+
+    for y in range(0, 8, 1):
+        for x in range(0, 8, 1):
+            piece = match.readfield(x, y)
+
+            if(piece == PIECES['blk']):
+                continue
+            elif(Match.color_of_piece(piece) != color):
+                continue
+            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                score += pawn.score_attacks(match, color, x, y)
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+                score += knight.score_attacks(match, color, x, y)
+            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                score += bishop.score_attacks(match, color, x, y)
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+                score += rook.score_attacks(match, color, x, y)    
+            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                score += bishop.score_attacks(match, color, x, y)
+                score += rook.score_attacks(match, color, x, y)
+            else:
+                score += king.score_attacks(match, color, x, y)
 
     return score
 
@@ -363,9 +385,13 @@ def score_position(match, movecnt):
             return SCORES[PIECES['blk']]
     else:
         score = match.score
-
-        score += score_supports_and_attacks(match)
         
+        color = match.next_color()
+
+        score += score_attacks(match, color)
+
+        score += score_supports(match, REVERSED_COLORS[color])
+
         score += score_controled_horizontal_files(match)
         
         score += score_controled_vertical_files(match)
