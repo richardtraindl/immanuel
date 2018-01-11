@@ -4,7 +4,7 @@ from .move import *
 from .calc import *
 from .cvalues import *
 from . import rules
-from .analyze_position import score_supports_and_attacks, score_opening, score_endgame
+from .analyze_position import score_supports, score_attacks, score_opening, score_endgame
 from .analyze_helper import * 
 from .pieces import pawn, knight, bishop, rook, king
 from .pieces.generic_piece import contacts_to_token
@@ -171,7 +171,9 @@ def progress(match, move):
 
     value = match.score
 
-    value += score_supports_and_attacks(match)
+    value += score_attacks(match, color)
+
+    value += score_supports(match, REVERSED_COLORS[color])
 
     if((value >= (SCORES[PIECES['bPw']] / 10) and color == COLORS['white']) or 
        (value <= (SCORES[PIECES['wPw']] / 10) and color == COLORS['black'])):
