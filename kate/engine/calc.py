@@ -203,9 +203,11 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     if(last_priomove):
         last_prio = last_priomove.prio
         last_token = last_priomove.tokens[0]
+        last_token_attacked = last_priomove.tokens[1]
     else:
         last_prio = PRIO['last']
         last_token = 0x0
+        last_token_attacked = []
 
     if(match.level == LEVELS['blitz']):
         cnt = 12
@@ -232,7 +234,8 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         return max(cnt, prio1_mvcnt)
     elif(depth <= mid_dpth and mvcnt <= 24 and last_token & ATTACKED_IS_KG == 0):
         return prio1_mvcnt + prio2_mvcnt
-    elif(depth <= mid_dpth and (last_token & MV_IS_CAPTURE > 0 or last_token & ATTACKED_IS_KG > 0)):
+    elif( depth <= mid_dpth and (last_token & MV_IS_CAPTURE > 0 or last_token & ATTACKED_IS_KG > 0 or 
+                                 (last_token & MV_IS_ATTACK > 0 and is_attacked_pinned(match, last_token_attacked))) ):
         if(mvcnt > prio1_mvcnt):
             idx = random.randint(prio1_mvcnt, mvcnt - 1)
             priomoves.insert(0, priomoves.pop(idx))
