@@ -195,7 +195,7 @@ def is_king_attacked(match, x1, y1):
 
     color = match.color_of_piece(king)
 
-    return is_field_touched(match, match.REVERSED_COLORS[color], x1, y1)
+    return is_field_touched(match, REVERSED_COLORS[color], x1, y1)
 
 
 def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):

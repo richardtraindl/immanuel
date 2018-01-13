@@ -355,6 +355,26 @@ def controles_file(match, piece, color, srcx, srcy, dstx, dsty):
         return False
 
 
+def is_capture_possible(match, srcx, srcy):
+    bishop = match.readfield(srcx, srcy)
+
+    opp_color = Match.oppcolor_of_piece(bishop)
+
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
+            if(is_move_stuck(match, srcx, srcy, x1, y1)):
+                continue
+
+            piece = match.readfield(x1, y1)
+            if(match.color_of_piece(piece) == opp_color):
+                return True
+
+    return False
+
+
 def bp_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS
     if( (srcx - dstx) == (srcy - dsty) and (srcy < dsty) ):

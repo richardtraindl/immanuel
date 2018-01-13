@@ -1,5 +1,4 @@
 import time
-import random
 from operator import attrgetter, itemgetter
 from .match import *
 from .move import *
@@ -211,44 +210,38 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     if(match.level == LEVELS['blitz']):
         cnt = 12
-        dpth = 2
-        mid_dpth = 6
-        max_dpth = 12
-    elif(match.level == LEVELS['low']):
-        cnt = 12
         dpth = 3
-        mid_dpth = 7
-        max_dpth = 12
-    elif(match.level == LEVELS['medium']):
+        max_dpth = 7
+    elif(match.level == LEVELS['low']):
         cnt = 16
-        dpth = 4
-        mid_dpth = 8
-        max_dpth = 12
+        dpth = 3
+        max_dpth = 9
+    elif(match.level == LEVELS['medium']):
+        cnt = 20
+        dpth = 5
+        max_dpth = 11
     else:
         cnt = 24
         dpth = 5
-        mid_dpth = 9
-        max_dpth = 12
+        max_dpth = 11
 
     if(depth <= dpth):
-        return max(cnt, prio1_mvcnt)
-    elif(depth <= mid_dpth and mvcnt <= 24 and last_token & ATTACKED_IS_KG == 0):
-        return prio1_mvcnt + prio2_mvcnt
-    elif( depth <= mid_dpth and (last_token & MV_IS_CAPTURE > 0 or last_token & ATTACKED_IS_KG > 0 or 
-                                 (last_token & MV_IS_ATTACK > 0 and is_attacked_pinned(match, last_token_attacked))) ):
-        if(mvcnt > prio1_mvcnt):
-            idx = random.randint(prio1_mvcnt, mvcnt - 1)
-            priomoves.insert(0, priomoves.pop(idx))
-            return prio1_mvcnt + 1
+        if(is_endgame(match) and mvcnt <= 24):
+            return mvcnt
         else:
-            return prio1_mvcnt
-    elif(depth <= max_dpth and last_token & MV_IS_CAPTURE > 0):
-        if(mvcnt > prio1_mvcnt):
-            idx = random.randint(prio1_mvcnt, mvcnt - 1)
-            priomoves.insert(0, priomoves.pop(idx))
-            return prio1_mvcnt + 1
+            return max(cnt, prio1_mvcnt)
+    elif(depth <= max_dpth):
+        if(is_stormy(match)):
+            diffcnt = mvcnt - prio1_mvcnt
+            addcnt = min(2, diffcnt)
+            for x in range(addcnt):
+                idx = prio1_mvcnt + x
+                priomoves.insert(0, priomoves.pop(idx))
+            return prio1_mvcnt + addcnt
+        elif(is_endgame(match) and mvcnt <= 24):
+            return mvcnt
         else:
-            return prio1_mvcnt
+            return 0
     else:
         return 0
 
@@ -261,7 +254,7 @@ def calc_max(match, depth, alpha, beta, last_priomove):
     count = 0
 
     priomoves, priocnts = generate_moves(match)
-
+    
     maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):

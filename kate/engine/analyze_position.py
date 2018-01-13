@@ -1,6 +1,8 @@
 from .match import *
 from . import rules # RETURN_CODES, status, is_move_inbounds
 from .pieces import pawn, knight, bishop, rook, king 
+from .pieces.generic_piece import cTouch
+from .analyze_helper import field_touches_beyond
 from .cvalues import *
 
 
@@ -222,6 +224,14 @@ def count_mobility(match, srcx, srcy, excludedpieces):
     return movecnt"""
 
 
+def is_opening(match):
+    return match.count < 30
+
+
+def is_endgame(match):
+    return match.count >= 30
+
+
 def is_king_defended_by_pawns(match, color):
     if(color == COLORS['white']):
         y = 1
@@ -376,6 +386,7 @@ def score_endgame(match):
 
 def score_position(match, movecnt):
     status = rules.status(match)
+
     if(movecnt == 0 and status != STATUS['open']):
         if(status == STATUS['winner_black']):
             return ( SCORES[PIECES['wKg']] + match.count )
@@ -396,11 +407,94 @@ def score_position(match, movecnt):
         
         score += score_controled_vertical_files(match)
 
-        if(match.count < 30):
+        if(is_opening(match)):
             score += score_opening(match)
 
-        if(match.count >= 30):
+        if(is_endgame(match)):
             score += score_endgame(match)
 
         return score
+
+
+def is_capture_possible(match, color):
+    for y in range(8):
+        for x in range(8):
+            piece = match.readfield(x, y)
+
+            if(piece == PIECES['blk']):
+                continue
+            elif(Match.color_of_piece(piece) != color):
+                continue
+            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                if(pawn.is_capture_possible(match, x, y)):
+                    return True
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+                if(knight.is_capture_possible(match, x, y)):
+                    return True
+            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                if(bishop.is_capture_possible(match, x, y)):
+                    return True
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+                if(rook.is_capture_possible(match, x, y)):
+                    return True
+            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                if(bishop.is_capture_possible(match, x, y)):
+                    return True
+                if(rook.is_capture_possible(match, x, y)):
+                    return True
+            else:
+                if(king.is_capture_possible(match, x, y)):
+                    return True
+
+    return False
+
+
+def is_stormy(match):
+    color = match.next_color()
+
+    # is king attaked
+    if(color == COLORS['white']):
+        kg_x = match.wKg_x
+        kg_y = match.wKg_y
+    else:
+        kg_x = match.bKg_x
+        kg_y = match.bKg_y
+
+    if(rules.is_king_attacked(match, kg_x, kg_y)):
+        return True
+    ###
+
+    # is capture possible
+    if(is_capture_possible(match, color)):
+        return True
+    ###
+
+    # is pawn on last row before promotion
+    if(color == COLORS['white']):
+        y = 6
+        pw = PIECES['wPw']
+    else:
+        y = 1
+        pw = PIECES['bPw']
+    for x in range(8):
+        piece = match.readfield(x, y)
+        if(piece == pw):
+            return True
+    ###
+
+    # is pinned enemy attacked
+    opp_color = REVERSED_COLORS[color]
+    for y in range(8):
+        for x in range(8):
+            piece = match.readfield(x, y)
+            if(Match.color_of_piece(piece) == color):
+                direction = rules.pin_dir(match, x, y)
+                if(direction != rules.DIRS['undefined']):
+                    ctouch = cTouch(None, None, None, None, piece, x, y)
+                    field_touches_beyond(match, color, ctouch)
+                    if(len(ctouch.attacker_beyond) > 0):
+                        return True
+     ###
+
+    return False
 
