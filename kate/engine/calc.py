@@ -219,29 +219,20 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     elif(match.level == LEVELS['medium']):
         cnt = 20
         dpth = 5
-        max_dpth = 11
+        max_dpth = 9
     else:
         cnt = 24
         dpth = 5
         max_dpth = 11
 
-    if(depth <= dpth):
-        if(is_endgame(match) and mvcnt <= 24):
-            return mvcnt
-        else:
-            return max(cnt, prio1_mvcnt)
-    elif(depth <= max_dpth):
-        if(is_stormy(match)):
-            diffcnt = mvcnt - prio1_mvcnt
-            addcnt = min(2, diffcnt)
-            for x in range(addcnt):
-                idx = prio1_mvcnt + x
-                priomoves.insert(0, priomoves.pop(idx))
-            return prio1_mvcnt + addcnt
-        elif(is_endgame(match) and mvcnt <= 24):
-            return mvcnt
-        else:
-            return 0
+    if(depth <= max_dpth and last_token & MV_IS_ATTACK > 0 and last_token & ATTACKED_IS_KG > 0):
+        return mvcnt
+    elif(depth <= max_dpth and is_endgame(match) and mvcnt <= 24):
+        return mvcnt
+    elif(depth <= dpth):
+        return max(cnt, prio1_mvcnt)
+    elif(depth <= max_dpth and is_stormy(match)):
+        return min(cnt - 4, prio1_mvcnt + prio2_mvcnt)
     else:
         return 0
 
