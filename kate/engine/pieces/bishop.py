@@ -57,9 +57,9 @@ def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
                     continue
 
                 if(Match.color_of_piece(piece) == color):
-                    frdlytouches.append(piece)
+                    frdlytouches.append([piece, x1, y1])
                 else:
-                    enmytouches.append(piece)
+                    enmytouches.append([piece, x1, y1])
 
 
 def field_color_touches_beyond(match, color, ctouch):

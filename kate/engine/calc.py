@@ -249,6 +249,13 @@ def calc_max(match, depth, alpha, beta, last_priomove):
     maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):
+        analysis = analyze_position(match)
+        for analyzer in analysis:
+            print(str(analyzer.prio) + " " + reverse_lookup(PIECES, analyzer.piece) + " " +
+                  str(analyzer.fieldx) + " " + str(analyzer.fieldy) + " " + 
+                  reverse_lookup(rules.DIRS, analyzer.pin_dir) + " " + 
+                  str(len(analyzer.attacker)) + " " + str(len(analyzer.supporter)))
+
         prnt_priorities(priomoves, priocnts)
         if(len(priomoves) == 1):
             pmove = priomoves[0]

@@ -12,17 +12,19 @@ def count_contacts(contacts):
     kg_cnt = 0
 
     for contact in contacts:
-        if(contact == PIECES['wPw'] or contact == PIECES['bPw']):
+        piece = contact[0]
+
+        if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
             pw_cnt += 1
-        elif(contact == PIECES['wRk'] or contact == PIECES['bRk']):
+        elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
             rk_cnt += 1
-        elif(contact == PIECES['wBp'] or contact == PIECES['bBp']):
+        elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
             bp_cnt += 1
-        elif(contact == PIECES['wKn'] or contact == PIECES['bKn']):
+        elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
             kn_cnt += 1
-        elif(contact == PIECES['wQu'] or contact == PIECES['bQu']):
+        elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
             qu_cnt += 1
-        elif(contact == PIECES['wKg'] or contact == PIECES['bKg']):
+        elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
             kg_cnt += 1
 
     return pw_cnt, kn_cnt, bp_cnt, rk_cnt, qu_cnt, kg_cnt

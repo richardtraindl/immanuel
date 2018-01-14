@@ -2,7 +2,7 @@ from .match import *
 from . import rules # RETURN_CODES, status, is_move_inbounds
 from .pieces import pawn, knight, bishop, rook, king 
 from .pieces.generic_piece import cTouch
-from .analyze_helper import field_touches_beyond
+from .analyze_helper import field_touches_beyond, field_touches
 from .cvalues import *
 
 
@@ -497,4 +497,40 @@ def is_stormy(match):
      ###
 
     return False
+
+
+ANALYZE = {
+        'IS_ATTACKED' : 0x10,
+        'IS_PINNED' : 0x01,
+        'IS_SUPPORTED' : 0x001 }
+
+class cAnalyzer:
+    def __init__(self, prio, piece, fieldx, fieldy, pin_dir):
+        self.prio = prio
+        self.piece = piece
+        self.fieldx = fieldx
+        self.fieldy = fieldy
+        self.pin_dir = pin_dir
+        self.attacker = []
+        self.supporter = []
+
+def analyze_position(match):
+    analysis = []
+
+    for y in range(8):
+        for x in range(8):
+            piece = match.readfield(x, y)
+
+            if(piece == PIECES['blk']):
+                continue
+            else:
+                frdlytouches, enmytouches = field_touches(match, Match.color_of_piece(piece), x, y)
+                if(len(frdlytouches) > 0 or len(enmytouches) > 0):
+                    pin_dir = rules.pin_dir(match, x, y)
+                    analyzer = cAnalyzer(10, piece, x, y, pin_dir)
+                    analyzer.attacker = enmytouches
+                    analyzer.supporter = frdlytouches
+                    analysis.append(analyzer)
+
+    return analysis
 
