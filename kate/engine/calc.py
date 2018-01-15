@@ -232,7 +232,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     elif(depth <= dpth):
         return max(cnt, prio1_mvcnt)
     elif(depth <= max_dpth and is_stormy(match)):
-        return min(cnt - 4, prio1_mvcnt + prio2_mvcnt)
+        return prio1_mvcnt + 2
     else:
         return 0
 
