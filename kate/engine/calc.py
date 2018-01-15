@@ -194,10 +194,9 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 
 def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
-
     prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]] + priocnts[PRIO_INDICES[PRIO['prio1d']]]
-
     prio2_mvcnt = priocnts[PRIO_INDICES[PRIO['prio2a']]] + priocnts[PRIO_INDICES[PRIO['prio2b']]] + priocnts[PRIO_INDICES[PRIO['prio2c']]] + priocnts[PRIO_INDICES[PRIO['prio2d']]]
+
 
     if(last_priomove):
         last_prio = last_priomove.prio
@@ -208,31 +207,38 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         last_token = 0x0
         last_token_attacked = []
 
+
     if(match.level == LEVELS['blitz']):
         cnt = 12
         dpth = 3
+        mid_dpth = 5
         max_dpth = 7
     elif(match.level == LEVELS['low']):
         cnt = 16
         dpth = 3
+        mid_dpth = 7
         max_dpth = 9
     elif(match.level == LEVELS['medium']):
         cnt = 20
         dpth = 5
-        max_dpth = 9
+        mid_dpth = 9
+        max_dpth = 11
     else:
         cnt = 24
         dpth = 5
+        mid_dpth = 9
         max_dpth = 11
 
-    if(depth <= max_dpth and last_token & MV_IS_ATTACK > 0 and last_token & ATTACKED_IS_KG > 0):
-        return mvcnt
-    elif(depth <= max_dpth and is_endgame(match) and mvcnt <= 24):
+    if(depth <= max_dpth and is_endgame(match) and mvcnt <= 20):
+        print(".", end="")
         return mvcnt
     elif(depth <= dpth):
-        return max(cnt, prio1_mvcnt)
-    elif(depth <= max_dpth and is_stormy(match)):
+        return max(cnt, prio1_mvcnt + 2)
+    elif(depth <= mid_dpth and is_stormy(match)):
         return prio1_mvcnt + 2
+    elif(depth <= max_dpth and 
+         (last_token & MV_IS_PROMOTION > 0 or last_token & MV_IS_CAPTURE > 0)):
+        return prio1_mvcnt + 1
     else:
         return 0
 
@@ -249,12 +255,12 @@ def calc_max(match, depth, alpha, beta, last_priomove):
     maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):
-        analysis = analyze_position(match)
+        """analysis = analyze_position(match)
         for analyzer in analysis:
             print(str(analyzer.prio) + " " + reverse_lookup(PIECES, analyzer.piece) + " " +
                   str(analyzer.fieldx) + " " + str(analyzer.fieldy) + " " + 
                   reverse_lookup(rules.DIRS, analyzer.pin_dir) + " " + 
-                  str(len(analyzer.attacker)) + " " + str(len(analyzer.supporter)))
+                  str(len(analyzer.attacker)) + " " + str(len(analyzer.supporter)))"""
 
         prnt_priorities(priomoves, priocnts)
         if(len(priomoves) == 1):

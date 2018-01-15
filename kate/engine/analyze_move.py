@@ -289,6 +289,8 @@ def rank_moves(match, priomoves):
     list_forked = []
     list_flee = []
 
+    excludes = []
+
     for priomove in priomoves:
         token = priomove.tokens[TOKENS['token']]
         attacked = priomove.tokens[TOKENS['attacked']]
@@ -300,7 +302,7 @@ def rank_moves(match, priomoves):
         all_supported.extend(supported)
         all_forked.extend(forked)
         
-        excludes = []
+        # excludes = []
 
         if(token & MV_IS_CASTLING > 0):
             priomove.prio = min(PRIO['prio2a'], priomove.prio)
@@ -426,7 +428,7 @@ def rank_moves(match, priomoves):
 
     priomoves.sort(key=attrgetter('prio'))
 
-    excludes.clear()
+    #excludes.clear()
     list_attacked.sort(key=itemgetter(1))
     for attackeditem in list_attacked:
         pmove = attackeditem[0]
@@ -439,7 +441,7 @@ def rank_moves(match, priomoves):
                         pmove.prio = max(PRIO['prio1a'], attackeditem[1] - PRIO_STEP)
                         excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, attack.fieldx, attack.fieldy])
 
-    excludes.clear()
+    #excludes.clear()
     list_supported.sort(key=itemgetter(1))
     for supporteditem in list_supported:
         pmove = supporteditem[0]
@@ -452,7 +454,7 @@ def rank_moves(match, priomoves):
                         pmove.prio = max(PRIO['prio1a'], supporteditem[1] - PRIO_STEP)
                         excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, support.fieldx, support.fieldy])
 
-    excludes.clear()
+    #excludes.clear()
     list_forked.sort(key=itemgetter(1))
     for forkitem in list_forked:
         pmove = forkitem[0]
@@ -465,7 +467,7 @@ def rank_moves(match, priomoves):
                         pmove.prio = max(PRIO['prio1a'], forkitem[1] - PRIO_STEP)
                         excludes.append([fork[0], fork[1], fork[4], fork[5]])
 
-    excludes.clear()
+    #excludes.clear()
     list_flee.sort(key=itemgetter(1))
     for fleeitem in list_flee:
         pmove = fleeitem[0]

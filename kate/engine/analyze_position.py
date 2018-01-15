@@ -483,7 +483,7 @@ def is_stormy(match):
     ###
 
     # is pinned enemy attacked
-    opp_color = REVERSED_COLORS[color]
+    """opp_color = REVERSED_COLORS[color]
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
@@ -493,7 +493,7 @@ def is_stormy(match):
                     ctouch = cTouch(None, None, None, None, piece, x, y)
                     field_touches_beyond(match, color, ctouch)
                     if(len(ctouch.attacker_beyond) > 0):
-                        return True
+                        return True"""
      ###
 
     return False
