@@ -436,7 +436,7 @@ def rank_moves(match, priomoves):
                 if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy and  
                        e[2] == attack.fieldx and e[3] == attack.fieldy for e in excludes) == False):
                     if(pmove.prio > attackeditem[1]):
-                        pmove.prio = attackeditem[1] - PRIO_STEP
+                        pmove.prio = max(PRIO['prio1a'], attackeditem[1] - PRIO_STEP)
                         excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, attack.fieldx, attack.fieldy])
 
     excludes.clear()
@@ -449,7 +449,7 @@ def rank_moves(match, priomoves):
                 if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy and  
                        e[2] == support.fieldx and e[3] == support.fieldy for e in excludes) == False):
                     if(pmove.prio > supporteditem[1]):
-                        pmove.prio = supporteditem[1] - PRIO_STEP
+                        pmove.prio = max(PRIO['prio1a'], supporteditem[1] - PRIO_STEP)
                         excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, support.fieldx, support.fieldy])
 
     excludes.clear()
@@ -462,7 +462,7 @@ def rank_moves(match, priomoves):
                 if(any(e[0] == fork[0] and e[1] == fork[1] and
                        e[2] == fork[4] and e[3] == fork[5] for e in excludes) == False):
                     if(pmove.prio > forkitem[1]):
-                        pmove.prio = forkitem[1] - PRIO_STEP
+                        pmove.prio = max(PRIO['prio1a'], forkitem[1] - PRIO_STEP)
                         excludes.append([fork[0], fork[1], fork[4], fork[5]])
 
     excludes.clear()
@@ -471,6 +471,6 @@ def rank_moves(match, priomoves):
         pmove = fleeitem[0]
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             if(pmove.prio > fleeitem[1]):
-                pmove.prio = fleeitem[1] - PRIO_STEP
+                pmove.prio = max(PRIO['prio1a'], fleeitem[1] - PRIO_STEP)
                 excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
 
