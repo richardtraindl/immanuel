@@ -194,7 +194,9 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 
 def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
+
     prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]] + priocnts[PRIO_INDICES[PRIO['prio1d']]]
+    
     #prio2_mvcnt = priocnts[PRIO_INDICES[PRIO['prio2a']]] + priocnts[PRIO_INDICES[PRIO['prio2b']]] + priocnts[PRIO_INDICES[PRIO['prio2c']]] + priocnts[PRIO_INDICES[PRIO['prio2d']]]
 
 
@@ -236,9 +238,8 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         return max(cnt, prio1_mvcnt + 2)
     elif(depth <= max_dpth and is_stormy(match)):
         return prio1_mvcnt + 1
-    """elif(depth <= max_dpth and 
-          (last_token & MV_IS_PROMOTION > 0 or last_token & MV_IS_CAPTURE > 0)):
-        return prio1_mvcnt + 1"""
+    #elif(depth <= max_dpth and (last_token & MV_IS_PROMOTION > 0 or last_token & MV_IS_CAPTURE > 0)):
+        #return prio1_mvcnt + 1
     else:
         return 0
 
