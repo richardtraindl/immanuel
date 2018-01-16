@@ -296,7 +296,12 @@ def is_capture_possible(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                return True
+                if(PIECES_RANK[knight] <= PIECES_RANK[piece]):
+                    return True
+                else:
+                    friends, enemies = analyze_helper.field_touches(match, Match.color_of_piece(knight), x1, y1)
+                    if(len(friends) >= len(enemies)):
+                        return True
 
     return False
 
