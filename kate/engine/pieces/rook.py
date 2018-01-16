@@ -361,7 +361,12 @@ def is_capture_possible(match, srcx, srcy):
 
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
-                return True
+                if(PIECES_RANK[rook] <= PIECES_RANK[piece]):
+                    return True
+                else:
+                    friends, enemies = analyze_helper.field_touches(match, Match.color_of_piece(rook), x1, y1)
+                    if(len(friends) >= len(enemies)):
+                        return True
 
     return False
 
