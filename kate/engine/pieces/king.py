@@ -250,7 +250,7 @@ def is_capture_possible(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(Match.color_of_piece(piece) == opp_color):
-                if(is_field_touched(match, opp_color, srcx, srcy) == False):
+                if(is_field_touched(match, opp_color, x1, y1) == False):
                     return True
 
     return False
