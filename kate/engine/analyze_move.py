@@ -302,37 +302,44 @@ def rank_moves(match, priomoves):
         all_supported.extend(supported)
         all_forked.extend(forked)
         
-        # excludes = []
-
         if(token & MV_IS_CASTLING > 0):
             priomove.prio = min(PRIO['prio2a'], priomove.prio)
 
         if(token & MV_IS_PROMOTION > 0):
             priomove.prio = min(PRIO['prio1a'], priomove.prio)
+            continue
 
         if(token & MV_IS_CAPTURE > 0):
             if(piece_is_lower_equal_than_captured(token) or
                dstfield_is_attacked(token) == False or
                (dstfield_is_supported(token) and 
                 piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                tmpprio = PRIO['prio1a']
+                if(token & MV_PIECE_IS_QU > 0):
+                    priomove.prio = min(PRIO['prio1b'], priomove.prio)
+                else:
+                    priomove.prio = min(PRIO['prio1a'], priomove.prio)
             else:
-                tmpprio = PRIO['prio1c']
-            
-            if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += PRIO_HALF_STEP
-
-            tmpprio = min(tmpprio, PRIO['last'])
-            priomove.prio = min(tmpprio, priomove.prio)
+                if(token & MV_PIECE_IS_QU > 0):
+                    priomove.prio = min(PRIO['prio1d'], priomove.prio)
+                else:
+                    priomove.prio = min(PRIO['prio1c'], priomove.prio)
+            continue
 
         if(token & MV_IS_ATTACK > 0):
             if(token & ATTACKED_IS_KG > 0):
                 if(dstfield_is_attacked(token) == False or 
                    (dstfield_is_supported(token) and 
                     piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                    tmpprio = PRIO['prio1a']
+                    if(token & MV_PIECE_IS_QU > 0):
+                        priomove.prio = min(PRIO['prio1c'], priomove.prio)
+                    else:
+                        priomove.prio = min(PRIO['prio1a'], priomove.prio)
                 else:
-                    tmpprio = PRIO['prio1c']
+                    if(token & MV_PIECE_IS_QU > 0):
+                        priomove.prio = min(PRIO['prio1d'], priomove.prio)
+                    else:
+                        priomove.prio = min(PRIO['prio1c'], priomove.prio)
+                continue
             else:
                 if(dstfield_is_attacked(token) == False or 
                    (dstfield_is_supported(token) and 
@@ -347,12 +354,12 @@ def rank_moves(match, priomoves):
                     tmpprio += PRIO_STEP
 
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += PRIO_HALF_STEP
+                tmpprio += 1
 
             tmpprio = min(tmpprio, PRIO['last'])
             list_attacked.append([priomove, tmpprio])
-            negtoken = 0xFFFFFFFFFFFFFFFF ^ MV_IS_ATTACK
-            priomove.tokens[TOKENS['token']] = token & negtoken
+            #negtoken = 0xFFFFFFFFFFFFFFFF ^ MV_IS_ATTACK
+            #priomove.tokens[TOKENS['token']] = token & negtoken
 
         if(token & MV_IS_SUPPORT > 0):
             if(dstfield_is_attacked(token) == False or 
@@ -370,12 +377,12 @@ def rank_moves(match, priomoves):
                 tmpprio += PRIO_STEP
 
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += PRIO_HALF_STEP
+                tmpprio += 1
 
             tmpprio = min(tmpprio, PRIO['last'])
             list_supported.append([priomove, tmpprio])
-            negtoken = 0xFFFFFFFFFFFFFFFF ^ MV_IS_SUPPORT
-            priomove.tokens[TOKENS['token']] = token & negtoken
+            #negtoken = 0xFFFFFFFFFFFFFFFF ^ MV_IS_SUPPORT
+            #priomove.tokens[TOKENS['token']] = token & negtoken
 
         if(token & MV_IS_FORK_DEFENSE > 0):
             if(dstfield_is_attacked(token) == False or 
@@ -386,12 +393,12 @@ def rank_moves(match, priomoves):
                 tmpprio = PRIO['prio3a']
                 
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += PRIO_HALF_STEP
+                tmpprio += 1
 
             tmpprio = min(tmpprio, PRIO['last'])
             list_forked.append([priomove, tmpprio])
-            negtoken = 0xFFFFFFFFFFFFFFFF ^ MV_IS_FORK_DEFENSE
-            priomove.tokens[TOKENS['token']] = token & negtoken
+            #negtoken = 0xFFFFFFFFFFFFFFFF ^ MV_IS_FORK_DEFENSE
+            #priomove.tokens[TOKENS['token']] = token & negtoken
 
         if(token & MV_IS_DISCLOSURE > 0):
             if(is_disclosed_attacked_supported(disclosed_attacked) == False):
@@ -400,7 +407,7 @@ def rank_moves(match, priomoves):
                 tmpprio = PRIO['prio3a']
 
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += PRIO_HALF_STEP
+                tmpprio += 1
 
             tmpprio = min(tmpprio, PRIO['last'])
             priomove.prio = min(tmpprio, priomove.prio)
@@ -424,12 +431,12 @@ def rank_moves(match, priomoves):
                 tmpprio += PRIO_STEP
 
             if(token & MV_PIECE_IS_QU > 0):
-                tmpprio += PRIO_HALF_STEP
+                tmpprio += 1
 
             tmpprio = min(tmpprio, PRIO['last'])
             list_flee.append([priomove, tmpprio])
-            negtoken = 0xFFFFFFFFFFFFFFFF ^ MV_IS_FLEE
-            priomove.tokens[TOKENS['token']] = token & negtoken
+            #negtoken = 0xFFFFFFFFFFFFFFFF ^ MV_IS_FLEE
+            #priomove.tokens[TOKENS['token']] = token & negtoken
 
         #if(dstfield_is_attacked(token) == False or dstfield_is_supported(token)):
         #    priomove.prio = min(PRIO['prio3a'], priomove.prio)
@@ -447,7 +454,7 @@ def rank_moves(match, priomoves):
                        e[2] == attack.fieldx and e[3] == attack.fieldy for e in excludes) == False):
                     if(pmove.prio > attackeditem[1]):
                         pmove.prio = max(PRIO['prio1a'], attackeditem[1] - PRIO_STEP)
-                        pmove.tokens[TOKENS['token']] = pmove.tokens[TOKENS['token']] | MV_IS_ATTACK
+                        #pmove.tokens[TOKENS['token']] = pmove.tokens[TOKENS['token']] | MV_IS_ATTACK
                         excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, attack.fieldx, attack.fieldy])
 
     #excludes.clear()
@@ -461,7 +468,7 @@ def rank_moves(match, priomoves):
                        e[2] == support.fieldx and e[3] == support.fieldy for e in excludes) == False):
                     if(pmove.prio > supporteditem[1]):
                         pmove.prio = max(PRIO['prio1a'], supporteditem[1] - PRIO_STEP)
-                        pmove.tokens[TOKENS['token']] = pmove.tokens[TOKENS['token']] | MV_IS_SUPPORT
+                        #pmove.tokens[TOKENS['token']] = pmove.tokens[TOKENS['token']] | MV_IS_SUPPORT
                         excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, support.fieldx, support.fieldy])
 
     #excludes.clear()
@@ -475,7 +482,7 @@ def rank_moves(match, priomoves):
                        e[2] == fork[4] and e[3] == fork[5] for e in excludes) == False):
                     if(pmove.prio > forkitem[1]):
                         pmove.prio = max(PRIO['prio1a'], forkitem[1] - PRIO_STEP)
-                        pmove.tokens[TOKENS['token']] = pmove.tokens[TOKENS['token']] | MV_IS_FORK_DEFENSE
+                        #pmove.tokens[TOKENS['token']] = pmove.tokens[TOKENS['token']] | MV_IS_FORK_DEFENSE
                         excludes.append([fork[0], fork[1], fork[4], fork[5]])
 
     #excludes.clear()
@@ -485,6 +492,6 @@ def rank_moves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             if(pmove.prio > fleeitem[1]):
                 pmove.prio = max(PRIO['prio1a'], fleeitem[1] - PRIO_STEP)
-                pmove.tokens[TOKENS['token']] = pmove.tokens[TOKENS['token']] | MV_IS_FLEE
+                #pmove.tokens[TOKENS['token']] = pmove.tokens[TOKENS['token']] | MV_IS_FLEE
                 excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
 
