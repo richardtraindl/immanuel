@@ -155,7 +155,7 @@ def generate_moves(match):
                 tmpprio = PRIO['prio1b']
 
             if(priomove.piece == PIECES['wQu'] or priomove.piece == PIECES['bQu']):
-                tmpprio += PRIO_HALF_STEP
+                tmpprio += 1
 
             priomove.prio = tmpprio
 
@@ -192,6 +192,15 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         return newscore
 
 
+def is_last_move_stormy(last_token):
+    if(last_token & MV_IS_PROMOTION > 0 or 
+       last_token & MV_IS_CAPTURE > 0 or
+       (last_token & MV_IS_ATTACK > 0 and (last_token & ATTACKED_IS_QU > 0 or 
+        last_token & ATTACKED_IS_KG > 0))):
+        return True
+    else:
+        return False
+
 def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
     prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]] + priocnts[PRIO_INDICES[PRIO['prio1d']]]
@@ -207,26 +216,26 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     if(match.level == LEVELS['blitz']):
         cnt = 12
-        dpth = 3
-        max_dpth = 7
+        dpth = 1
+        max_dpth = 9
     elif(match.level == LEVELS['low']):
         cnt = 16
         dpth = 3
-        max_dpth = 7
+        max_dpth = 9
     elif(match.level == LEVELS['medium']):
         cnt = 20
         dpth = 5
         max_dpth = 9
     else:
         cnt = 24
-        dpth = 5
+        dpth = 7
         max_dpth = 9
 
     if(depth <= max_dpth and is_endgame(match) and mvcnt <= 20):
         return mvcnt
     elif(depth <= dpth):
         return max(cnt, prio1_mvcnt)
-    elif(depth <= max_dpth and (last_token & MV_IS_PROMOTION > 0 or last_token & MV_IS_CAPTURE > 0) and is_stormy(match)):
+    elif(depth <= max_dpth and is_last_move_stormy(last_token) and is_stormy(match)):
         return prio1_mvcnt + 1
     else:
         return 0

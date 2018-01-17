@@ -64,8 +64,6 @@ SUPPORTED_SCORES = {
         PIECES['bBp'] : -6,
         PIECES['bQu'] : -14 }
 
-PRIO_STEP = 4
-PRIO_HALF_STEP = 2
 
 PRIO = {
     'prio1a' : 1,
