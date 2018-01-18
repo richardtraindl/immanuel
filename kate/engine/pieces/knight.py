@@ -35,17 +35,21 @@ GEN_STEPS = [ [[1, 2, blank]],
               [[-1, 2, blank]] ]
 
 
-def is_field_touched(match, color, fieldx, fieldy):
+def is_field_touched(match, fieldx, fieldy):
+    whitetouch = False
+    blacktouch = False
+
     for i in range(8):
         x1 = fieldx + STEPS[i][0]
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if( (color == COLORS['white'] and piece == PIECES['wKn']) or
-                (color == COLORS['black'] and piece == PIECES['bKn']) ):
-                return True
+            if(piece == PIECES['wKn']):
+                whitetouch = True
+            elif(piece == PIECES['bKn']):
+                blacktouch = True
 
-    return False
+    return whitetouch, blacktouch
 
 
 def is_stuck(match, fieldx, fieldy):
