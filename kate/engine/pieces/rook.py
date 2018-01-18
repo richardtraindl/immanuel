@@ -23,22 +23,18 @@ GEN_STEPS = [ [[0, 1, blank], [0, 2, blank], [0, 3, blank], [0, 4, blank], [0, 5
               [[-1, 0, blank], [-2, 0, blank], [-3, 0, blank], [-4, 0, blank], [-5, 0, blank], [-6, 0, blank], [-7, 0, blank]] ]
 
 
-def is_field_touched(match, fieldx, fieldy):
-    whitetouch = False
-    blacktouch = False
-
+def is_field_touched(match, color, fieldx, fieldy):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
-            if(piece == PIECES['wRk']):
-                whitetouch = True
-            elif(piece == PIECES['bRk']):
-                blacktouch = True
+            if( (color == COLORS['white'] and piece == PIECES['wRk']) or
+                (color == COLORS['black'] and piece == PIECES['bRk']) ):
+                return True
 
-    return whitetouch, blacktouch
+    return False
 
 
 def is_move_stuck(match, srcx, srcy, dstx, dsty):
@@ -370,7 +366,7 @@ def is_capture_possible(match, srcx, srcy):
                     return True
                 else:
                     friends, enemies = analyze_helper.field_touches(match, Match.color_of_piece(rook), x1, y1)
-                    if(len(friends) >= len(enemies)):
+                    if(len(friends) > len(enemies)):
                         return True
 
     return False

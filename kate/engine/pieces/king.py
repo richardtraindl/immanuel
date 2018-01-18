@@ -41,22 +41,17 @@ GEN_STEPS = [ [[0, 1, blank]],
               [[-2, 0, blank]] ]
 
 
-def is_field_touched(match, fieldx, fieldy):
-    whitetouch = False
-    blacktouch = False
-
+def is_field_touched(match, color, fieldx, fieldy):
     for i in range(8):
         x1 = fieldx + STEPS[i][0]
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            piece = match.readfield(x1, y1)
-            if(piece == PIECES['wKg']):
-                whitetouch = True
-            elif(piece == PIECES['bKg']):
-                blacktouch = True
+            if( (color == COLORS['white'] and piece == PIECES['wKg']) or
+                (color == COLORS['black'] and piece == PIECES['bKg']) ):
+                return True
 
-    return whitetouch, blacktouch
+    return False
   
 
 def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches):

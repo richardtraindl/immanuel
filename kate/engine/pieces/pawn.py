@@ -48,24 +48,20 @@ GEN_BPROM_STEPS = [ [[0, -1, PIECES['bQu']], [0, -1, PIECES['bRk']], [0, -1, PIE
                     [[-1, -1, PIECES['bQu']], [-1, -1, PIECES['bRk']], [-1, -1, PIECES['bBp']], [-1, -1, PIECES['bKn']]] ]
 
 
-def is_field_touched(match, fieldx, fieldy):
-    touches = [False, False]
-    ALLSTEPS = [WPW_BACK_STEPS, BPW_BACK_STEPS]
-    PAWNS = [PIECES['wPw'], PIECES['bPw']]
+def is_field_touched(match, color, fieldx, fieldy):
+    if(color == COLORS['white']):
+        STEPS = WPW_BACK_STEPS
+    else:
+        STEPS = BPW_BACK_STEPS
 
-    for k in range(2):
-        steps = ALLSTEPS[k]
-        pawn = PAWNS[k]
-
-        for i in range(2):
-            x1 = fieldx + steps[i][0]
-            y1 = fieldy + steps[i][1]
-            if(rules.is_inbounds(x1, y1)):
-                piece = match.readfield(x1, y1)
-                if(piece == pawn):
-                    touches[k] = True
-
-    return touches[0], touches[1]
+    for i in range(2):
+        x1 = fieldx + STEPS[i][0]
+        y1 = fieldy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if( (color == COLORS['white'] and piece == PIECES['wPw']) or
+                (color == COLORS['black'] and piece == PIECES['bPw']) ):
+                return True
 
 
 def is_move_stuck(match, piece, srcx, srcy, dstx, dsty):

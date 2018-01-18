@@ -449,6 +449,21 @@ def is_capture_possible(match, color):
     return False
 
 
+def is_attacked(match, color):
+    for y in range(8):
+        for x in range(8):
+            piece = match.readfield(x, y)
+
+            if(piece == PIECES['blk']):
+                continue
+            elif(Match.color_of_piece(piece) == color):
+                friends, enemies = field_touches(match, color, x, y)
+                if(len(friends) < len(enemies)):
+                    return True
+
+    return False
+
+
 def is_stormy(match):
     color = match.next_color()
 
@@ -466,6 +481,11 @@ def is_stormy(match):
 
     # is capture possible
     if(is_capture_possible(match, color)):
+        return True
+    ###
+
+    # is attacked
+    if(is_attacked(match, color)):
         return True
     ###
 

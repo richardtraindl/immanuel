@@ -4,7 +4,7 @@ from .. models import Match as ModelMatch, Move as ModelMove
 from .. engine.match import *
 from .. engine.move import *
 from .. engine import matchmove, rules, calc
-
+from .. engine.analyze_position import is_stormy
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
 
@@ -78,6 +78,7 @@ def is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
 def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+    print("is_stormy before move: " + str(is_stormy(match)))
     move = matchmove.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
     map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
     modelmatch.save()
