@@ -217,19 +217,19 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     if(match.level == LEVELS['blitz']):
         cnt = 12
         dpth = 3
-        max_dpth = 8
+        max_dpth = 7
     elif(match.level == LEVELS['low']):
         cnt = 16
         dpth = 3
-        max_dpth = 10
+        max_dpth = 9
     elif(match.level == LEVELS['medium']):
         cnt = 20
         dpth = 5
-        max_dpth = 10
+        max_dpth = 11
     else:
         cnt = 24
         dpth = 7
-        max_dpth = 12
+        max_dpth = 13
 
     if(depth <= max_dpth and is_endgame(match) and mvcnt <= 20):
         return mvcnt
