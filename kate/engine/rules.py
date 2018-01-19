@@ -106,9 +106,24 @@ def search(match, srcx, srcy, stepx, stepy):
     return UNDEF_X, UNDEF_Y
 
 
-def pin_dir(match, scrx, srcy):
+def is_move_not_pinned(match, scrx, srcy, dstx, dsty):
+    flag, direction = is_not_pinned(match, scrx, srcy)
+    
+    if(flag):
+        return True
+    else:
+        if(direction == bp_dir(srcx, srcy, dstx, dsty)):
+            return True
+        elif(direction == rk_dir(srcx, srcy, dstx, dsty)):
+            return True
+        else:
+            return False
+
+
+def is_not_pinned(match, scrx, srcy):
     piece = match.readfield(scrx, srcy)
     color = match.color_of_piece(piece)
+
     if(color == COLORS['white']):
         kgx = match.wKg_x
         kgy = match.wKg_y
@@ -116,7 +131,26 @@ def pin_dir(match, scrx, srcy):
         kgx = match.bKg_x
         kgy = match.bKg_y
 
-    direction, stepx, stepy = rook.rk_step(None, scrx, srcy, kgx, kgy)
+    direction = pin_dir(match, scrx, srcy, kgx, kgy)
+    if(direction == DIRS['undefined']):
+        return True, direction
+    else:
+        return False, direction
+
+
+def is_not_soft_pinned(match, scrx, srcy, hubx, huby):
+    direction = pin_dir(match, scrx, srcy, kgx, kgy)
+    if(direction == DIRS['undefined']):
+        return True, direction
+    else:
+        return False, direction
+
+
+def pin_dir(match, scrx, srcy, hubx, huby):
+    piece = match.readfield(scrx, srcy)
+    color = match.color_of_piece(piece)
+
+    direction, stepx, stepy = rook.rk_step(None, scrx, srcy, hubx, huby)
     if(direction != DIRS['undefined']):
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
@@ -139,7 +173,7 @@ def pin_dir(match, scrx, srcy):
                         else:
                             return DIRS['undefined']
 
-    direction, stepx, stepy = bishop.bp_step(None, scrx, srcy, kgx, kgy)
+    direction, stepx, stepy = bishop.bp_step(None, scrx, srcy, hubx, huby)
     if(direction != DIRS['undefined']):
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
