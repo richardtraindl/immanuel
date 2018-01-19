@@ -106,8 +106,8 @@ def search(match, srcx, srcy, stepx, stepy):
     return UNDEF_X, UNDEF_Y
 
 
-def is_move_not_pinned(match, scrx, srcy, dstx, dsty):
-    flag, direction = is_not_pinned(match, scrx, srcy)
+def is_move_unpinned(match, scrx, srcy, dstx, dsty):
+    flag, direction = is_unpinned(match, scrx, srcy)
     
     if(flag):
         return True
@@ -120,7 +120,7 @@ def is_move_not_pinned(match, scrx, srcy, dstx, dsty):
             return False
 
 
-def is_not_pinned(match, scrx, srcy):
+def is_unpinned(match, scrx, srcy):
     piece = match.readfield(scrx, srcy)
     color = match.color_of_piece(piece)
 
@@ -138,7 +138,7 @@ def is_not_pinned(match, scrx, srcy):
         return False, direction
 
 
-def is_not_soft_pinned(match, scrx, srcy, hubx, huby):
+def is_soft_unpinned(match, scrx, srcy, hubx, huby):
     direction = pin_dir(match, scrx, srcy, kgx, kgy)
     if(direction == DIRS['undefined']):
         return True, direction
