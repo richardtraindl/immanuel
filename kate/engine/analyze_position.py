@@ -457,6 +457,9 @@ def is_attacked(match, color):
             if(piece == PIECES['blk']):
                 continue
             elif(Match.color_of_piece(piece) == color):
+                if(rules.is_soft_pin(match, x, y)):
+                    continue
+
                 friends, enemies = field_touches(match, color, x, y)
                 if(len(friends) < len(enemies)):
                     return True

@@ -369,6 +369,9 @@ def is_capture_possible(match, srcx, srcy):
             if(is_move_stuck(match, srcx, srcy, x1, y1)):
                 continue
 
+            if(rules.is_soft_pin(match, srcx, srcy)):
+                continue
+
             piece = match.readfield(x1, y1)
             if(match.color_of_piece(piece) == opp_color):
                 if(PIECES_RANK[bishop] <= PIECES_RANK[piece]):
@@ -377,7 +380,7 @@ def is_capture_possible(match, srcx, srcy):
                     match.writefield(srcx, srcy, PIECES['blk'])
                     friends, enemies = analyze_helper.field_touches(match, Match.color_of_piece(bishop), x1, y1)
                     match.writefield(srcx, srcy, bishop)
-                    if(len(friends) > len(enemies)):
+                    if(len(friends) >= len(enemies)):
                         return True
 
     return False

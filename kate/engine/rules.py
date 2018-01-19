@@ -1,6 +1,6 @@
 from .match import *
 from .pieces import pawn, rook, knight, bishop, queen, king
-
+from .cvalues import PIECES_RANK
 
 RETURN_CODES = {
     'ok' : 10,
@@ -106,21 +106,36 @@ def search(match, srcx, srcy, stepx, stepy):
     return UNDEF_X, UNDEF_Y
 
 
-def is_move_unpinned(match, scrx, srcy, dstx, dsty):
-    flag, direction = is_unpinned(match, scrx, srcy)
-    
-    if(flag):
-        return True
-    else:
-        if(direction == bp_dir(srcx, srcy, dstx, dsty)):
-            return True
-        elif(direction == rk_dir(srcx, srcy, dstx, dsty)):
-            return True
-        else:
-            return False
+def is_soft_pin(match, srcx, srcy):
+    piece = match.readfield(srcx, srcy)
+    color = Match.color_of_piece(piece)
+    opp_color = Match.oppcolor_of_piece(piece)
+
+    enemies = rook.list_field_touches(match, opp_color, srcx, srcy)
+    for enemy in enemies:
+        enemy_dir = rook.rk_dir(srcx, srcy, enemy[1], enemy[2])
+        stepx, stepy = rook.rk_step(REVERSE_DIRS[enemy_dir], None, None, None, None)[1:]
+        x1, y1 = search(match, srcx, srcy, stepx, stepy)
+        if(x1 != UNDEF_X):
+            friend = match.readfield(x1, y1)
+            if(match.color_of_piece(friend) == color and PIECES_RANK[friend] > PIECES_RANK[piece]):
+                return True
+
+    enemies.clear()
+    enemies = bishop.list_field_touches(match, opp_color, srcx, srcy)
+    for enemy in enemies:
+        enemy_dir = bishop.bp_dir(srcx, srcy, enemy[1], enemy[2])
+        stepx, stepy = bishop.bp_step(REVERSE_DIRS[enemy_dir], None, None, None, None)[1:]
+        x1, y1 = search(match, srcx, srcy, stepx, stepy)
+        if(x1 != UNDEF_X):
+            friend = match.readfield(x1, y1)
+            if(match.color_of_piece(friend) == color and PIECES_RANK[friend] > PIECES_RANK[piece]):
+                return True
+
+    return False
 
 
-def is_unpinned(match, scrx, srcy):
+def pin_dir(match, scrx, srcy):
     piece = match.readfield(scrx, srcy)
     color = match.color_of_piece(piece)
 
@@ -131,26 +146,7 @@ def is_unpinned(match, scrx, srcy):
         kgx = match.bKg_x
         kgy = match.bKg_y
 
-    direction = pin_dir(match, scrx, srcy, kgx, kgy)
-    if(direction == DIRS['undefined']):
-        return True, direction
-    else:
-        return False, direction
-
-
-def is_soft_unpinned(match, scrx, srcy, hubx, huby):
-    direction = pin_dir(match, scrx, srcy, kgx, kgy)
-    if(direction == DIRS['undefined']):
-        return True, direction
-    else:
-        return False, direction
-
-
-def pin_dir(match, scrx, srcy, hubx, huby):
-    piece = match.readfield(scrx, srcy)
-    color = match.color_of_piece(piece)
-
-    direction, stepx, stepy = rook.rk_step(None, scrx, srcy, hubx, huby)
+    direction, stepx, stepy = rook.rk_step(None, scrx, srcy, kgx, kgy)
     if(direction != DIRS['undefined']):
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
@@ -173,7 +169,7 @@ def pin_dir(match, scrx, srcy, hubx, huby):
                         else:
                             return DIRS['undefined']
 
-    direction, stepx, stepy = bishop.bp_step(None, scrx, srcy, hubx, huby)
+    direction, stepx, stepy = bishop.bp_step(None, scrx, srcy, kgx, kgy)
     if(direction != DIRS['undefined']):
         dstx, dsty = search(match, scrx, srcy, stepx, stepy)
         if(dstx != UNDEF_X):
@@ -344,3 +340,4 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece):
             return False, RETURN_CODES['king-error']
     else:
         return False, RETURN_CODES['general-error']
+
