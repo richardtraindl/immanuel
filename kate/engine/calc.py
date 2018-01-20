@@ -232,7 +232,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         max_dpth = 13
 
     if(depth <= max_dpth and is_endgame(match) and mvcnt <= 20):
-        return mvcnt
+        return min(cnt, mvcnt)
     elif(depth <= dpth):
         return max(cnt, prio1_mvcnt)
     elif(depth <= max_dpth and is_stormy(match)): # and is_last_move_stormy(last_token) 
