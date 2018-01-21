@@ -192,17 +192,20 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         return newscore
 
 
-def is_last_move_stormy(last_token):
-    if(last_token & MV_IS_PROMOTION > 0 or 
-       last_token & MV_IS_CAPTURE > 0 or
-       (last_token & MV_IS_ATTACK > 0 and (last_token & ATTACKED_IS_QU > 0 or 
-        last_token & ATTACKED_IS_KG > 0))):
+def is_last_move_stormy(last_prio, last_token):
+    if( last_token & MV_IS_PROMOTION > 0 or 
+        last_token & MV_IS_CAPTURE > 0 or
+        last_token & MV_DEFENDS_CHECK > 0 or
+        (last_token & MV_IS_ATTACK > 0 and (last_token & ATTACKED_IS_QU > 0 or 
+         last_token & ATTACKED_IS_KG > 0)) or
+        (last_token & MV_IS_FLEE > 0 and last_prio <= PRIO['prio2a']) ):
         return True
     else:
         return False
 
 def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
+
     prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]] + priocnts[PRIO_INDICES[PRIO['prio1d']]]
 
     if(last_priomove):
@@ -216,8 +219,8 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     if(match.level == LEVELS['blitz']):
         cnt = 12
-        dpth = 2
-        max_dpth = 5
+        dpth = 1
+        max_dpth = 7
     elif(match.level == LEVELS['low']):
         cnt = 16
         dpth = 3
@@ -225,17 +228,15 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     elif(match.level == LEVELS['medium']):
         cnt = 20
         dpth = 5
-        max_dpth = 11
+        max_dpth = 9
     else:
         cnt = 24
-        dpth = 7
-        max_dpth = 13
+        dpth = 5
+        max_dpth = 11
 
-    if(depth <= max_dpth and is_endgame(match) and mvcnt <= 20):
-        return min(cnt, mvcnt)
-    elif(depth <= dpth):
+    if(depth <= dpth):
         return max(cnt, prio1_mvcnt)
-    elif(depth <= max_dpth and is_stormy(match)): # and is_last_move_stormy(last_token) 
+    elif(depth <= max_dpth and is_stormy(match)): # and is_last_move_stormy(last_prio, last_token) 
         return prio1_mvcnt + 1
     else:
         return 0

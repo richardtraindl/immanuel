@@ -282,35 +282,6 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     return False
 
 
-def is_capture_possible(match, srcx, srcy):
-    if(is_stuck(match, srcx, srcy)):
-        return False
-
-    knight = match.readfield(srcx, srcy)
-
-    opp_color = Match.oppcolor_of_piece(knight)
-
-    for i in range(8):
-        x1 = srcx + STEPS[i][0]
-        y1 = srcy + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            if(rules.is_soft_pin(match, srcx, srcy)):
-                continue
-
-            piece = match.readfield(x1, y1)
-            if(Match.color_of_piece(piece) == opp_color):
-                if(PIECES_RANK[knight] <= PIECES_RANK[piece]):
-                    return True
-                else:
-                    match.writefield(srcx, srcy, PIECES['blk'])
-                    friends, enemies = analyze_helper.field_touches(match, Match.color_of_piece(knight), x1, y1)
-                    match.writefield(srcx, srcy, knight)
-                    if(len(friends) >= len(enemies)):
-                        return True
-
-    return False
-
-
 def kn_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS
     step_x = dstx - srcx

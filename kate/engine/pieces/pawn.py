@@ -329,31 +329,6 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     return False
 
 
-def is_capture_possible(match, srcx, srcy):
-    pawn = match.readfield(srcx, srcy)
-
-    color = Match.color_of_piece(pawn)
-    opp_color = Match.oppcolor_of_piece(pawn)
-
-    if(color == COLORS['white']):
-        STEPS = WPW_STEPS
-    else:
-        STEPS = BPW_STEPS
-
-    for i in range(2):
-        x1 = srcx + STEPS[i][0]
-        y1 = srcy + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            if(is_move_stuck(match, pawn, srcx, srcy, x1, y1)):
-                continue
-
-            piece = match.readfield(x1, y1)
-            if(Match.color_of_piece(piece) == opp_color):
-                return True
-
-    return False
-
-
 def is_running(match, srcx, srcy):
     piece = match.readfield(srcx, srcy)
     if(piece == PIECES['wPw']):

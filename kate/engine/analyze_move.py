@@ -93,6 +93,27 @@ def attacks_and_supports(match, move, attacked, supported):
     return token
 
 
+def defends_check(match, move):
+    token = 0x0
+
+    piece = match.readfield(move.srcx, move.srcy)
+
+    color = Match.color_of_piece(piece)
+
+    # is king attaked
+    if(color == COLORS['white']):
+        kg_x = match.wKg_x
+        kg_y = match.wKg_y
+    else:
+        kg_x = match.bKg_x
+        kg_y = match.bKg_y
+
+    if(rules.is_king_attacked(match, kg_x, kg_y)):
+        token = token | MV_DEFENDS_CHECK
+
+    return token
+
+
 def defends_fork(match, move, forked):
     token = 0x0
 
@@ -260,6 +281,8 @@ def analyze_move(match, move):
     token = token | castles(match, move)
 
     token = token | attacks_and_supports(match, move, attacked, supported)
+    
+    token = token | defends_check(match, move)
 
     token = token | defends_fork(match, move, forked)
     
@@ -359,7 +382,8 @@ def rank_moves(match, priomoves):
                     tmpprio += 1
 
                 tmpprio = min(tmpprio, PRIO['last'])
-                list_attacked.append([priomove, tmpprio])
+                priomove.prio = min(tmpprio, priomove.prio)
+                list_attacked.append([priomove, priomove.prio])
 
 
         if(token & MV_IS_SUPPORT > 0):
@@ -381,7 +405,8 @@ def rank_moves(match, priomoves):
                 tmpprio += 1
 
             tmpprio = min(tmpprio, PRIO['last'])
-            list_supported.append([priomove, tmpprio])
+            priomove.prio = min(tmpprio, priomove.prio)
+            list_supported.append([priomove, priomove.prio])
 
 
         if(token & MV_IS_FORK_DEFENSE > 0):
@@ -396,7 +421,8 @@ def rank_moves(match, priomoves):
                 tmpprio += 1
 
             tmpprio = min(tmpprio, PRIO['last'])
-            list_forked.append([priomove, tmpprio])
+            priomove.prio = min(tmpprio, priomove.prio)
+            list_forked.append([priomove, priomove.prio])
 
 
         if(token & MV_IS_DISCLOSURE > 0):
@@ -419,24 +445,20 @@ def rank_moves(match, priomoves):
         if(token & MV_CONTROLES_FILE > 0):
             priomove.prio = max(PRIO['prio2a'], priomove.prio - 2)
 
-
         if(token & MV_IS_FLEE > 0):
-            if(dstfield_is_attacked(token) == False or
-               (dstfield_is_supported(token) and 
-                piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                tmpprio = PRIO['prio2a']
-            else:
-                tmpprio = PRIO['prio3a']
-
-            if(srcfield_is_supported(token) and 
-               piece_is_lower_equal_than_enemy_on_srcfield(token)):
-                tmpprio += 4
+            if(dstfield_is_attacked(token) == False):
+                tmpprio = PRIO['prio1c']
+            elif(dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token)):
+                tmpprio = PRIO['prio1c']
+            else: # srcfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_srcfield(token)
+                tmpprio = PRIO['prio3c']
 
             if(token & MV_PIECE_IS_QU > 0):
                 tmpprio += 1
 
             tmpprio = min(tmpprio, PRIO['last'])
-            list_flee.append([priomove, tmpprio])
+            priomove.prio = min(tmpprio, priomove.prio)
+            list_flee.append([priomove, priomove.prio])
 
     priomoves.sort(key=attrgetter('prio'))
 
@@ -449,9 +471,10 @@ def rank_moves(match, priomoves):
                 if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy and  
                        e[2] == attack.fieldx and e[3] == attack.fieldy for e in excludes) == False):
                     if(pmove.prio > attackeditem[1]):
-                        pmove.prio = min(pmove.prio, attackeditem[1])
+                        # pmove.prio = min(pmove.prio, attackeditem[1])
                         excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, attack.fieldx, attack.fieldy])
 
+    excludes.clear()
     list_supported.sort(key=itemgetter(1))
     for supporteditem in list_supported:
         pmove = supporteditem[0]
@@ -461,9 +484,10 @@ def rank_moves(match, priomoves):
                 if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy and  
                        e[2] == support.fieldx and e[3] == support.fieldy for e in excludes) == False):
                     if(pmove.prio > supporteditem[1]):
-                        pmove.prio = min(pmove.prio, supporteditem[1])
+                        #pmove.prio = min(pmove.prio, supporteditem[1])
                         excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, support.fieldx, support.fieldy])
 
+    excludes.clear()
     list_forked.sort(key=itemgetter(1))
     for forkitem in list_forked:
         pmove = forkitem[0]
@@ -473,14 +497,15 @@ def rank_moves(match, priomoves):
                 if(any(e[0] == fork[0] and e[1] == fork[1] and
                        e[2] == fork[4] and e[3] == fork[5] for e in excludes) == False):
                     if(pmove.prio > forkitem[1]):
-                        pmove.prio = min(pmove.prio, forkitem[1])
+                        # pmove.prio = min(pmove.prio, forkitem[1])
                         excludes.append([fork[0], fork[1], fork[4], fork[5]])
 
+    excludes.clear()
     list_flee.sort(key=itemgetter(1))
     for fleeitem in list_flee:
         pmove = fleeitem[0]
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             if(pmove.prio > fleeitem[1]):
-                pmove.prio = min(pmove.prio, fleeitem[1])
+                # pmove.prio = min(pmove.prio, fleeitem[1])
                 excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
 

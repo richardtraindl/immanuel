@@ -449,20 +449,21 @@ def is_capture_possible(match, color):
     return False
 
 
-def is_attacked(match, color):
+def are_attacks_or_captures_possible(match):
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
 
             if(piece == PIECES['blk']):
                 continue
-            elif(Match.color_of_piece(piece) == color):
-                if(rules.is_soft_pin(match, x, y)):
-                    continue
-
-                friends, enemies = field_touches(match, color, x, y)
-                if(len(friends) < len(enemies)):
+            else:
+                friends, enemies = field_touches(match, Match.color_of_piece(piece), x, y)
+                if(len(friends) <= len(enemies)):
                     return True
+                else:
+                    for enemy in enemies:
+                        if(PIECES_RANK[enemy[0]] <= PIECES_RANK[piece]):
+                            return True
 
     return False
 
@@ -470,25 +471,8 @@ def is_attacked(match, color):
 def is_stormy(match):
     color = match.next_color()
 
-    # is king attaked
-    if(color == COLORS['white']):
-        kg_x = match.wKg_x
-        kg_y = match.wKg_y
-    else:
-        kg_x = match.bKg_x
-        kg_y = match.bKg_y
-
-    if(rules.is_king_attacked(match, kg_x, kg_y)):
-        return True
-    ###
-
-    # is capture possible
-    if(is_capture_possible(match, color)):
-        return True
-    ###
-
     # is attacked
-    if(is_attacked(match, color)):
+    if(are_attacks_or_captures_possible(match)):
         return True
     ###
 

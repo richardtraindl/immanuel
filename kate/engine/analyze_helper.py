@@ -197,7 +197,7 @@ def piece_is_lower_equal_than_enemy_on_srcfield(token):
             return False
 
 
-"""def piece_is_lower_equal_than_enemy_on_dstfield(token):
+def piece_is_lower_equal_than_enemy_on_dstfield(token):
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):
@@ -239,7 +239,7 @@ def piece_is_lower_equal_than_enemy_on_srcfield(token):
            token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
             return True
         else:
-            return False"""
+            return False
 
 
 def piece_is_lower_fairy_equal_than_enemy_on_dstfield(token):

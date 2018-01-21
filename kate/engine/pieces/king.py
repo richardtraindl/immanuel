@@ -240,23 +240,6 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     return False
 
 
-def is_capture_possible(match, srcx, srcy):
-    king = match.readfield(srcx, srcy)
-
-    opp_color = Match.oppcolor_of_piece(king)
-
-    for i in range(8):
-        x1 = srcx + STEPS[i][0]
-        y1 = srcy + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-            if(Match.color_of_piece(piece) == opp_color):
-                if(is_field_touched(match, opp_color, x1, y1) == False):
-                    return True
-
-    return False
-
-
 def kg_dir(srcx, srcy, dstx, dsty):
     DIRS = rules.DIRS
     step_x = dstx - srcx
