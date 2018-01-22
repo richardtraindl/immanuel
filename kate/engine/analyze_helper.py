@@ -318,10 +318,10 @@ def is_attacked_supported(attacked):
         return None
 
     for ctouch in attacked:
-        if(len(ctouch.supporter_beyond) == 0):
-            return False
+        if(len(ctouch.supporter_beyond) > 0):
+            return True
 
-    return True
+    return False
 
 
 def is_attacked_pinned(match, attacked):
@@ -341,10 +341,10 @@ def is_attacked_add_attacked(attacked):
         return None
 
     for ctouch in attacked:
-        if(len(ctouch.attacker_beyond) == 0):
-            return False
+        if(len(ctouch.attacker_beyond) > 0):
+            return True
 
-    return True
+    return False
 
 
 def is_attacked_higher_than_piece(match, attacked):
@@ -361,10 +361,10 @@ def is_supported_attacked(supported):
         return None
 
     for ctouch in supported:
-        if(len(ctouch.attacker_beyond) == 0):
-            return False
+        if(len(ctouch.attacker_beyond) > 0):
+            return True
 
-    return True
+    return False
 
 
 def is_supported_lower_equal_than_attacker(supported):
@@ -384,8 +384,8 @@ def is_supported_add_supported(supported):
         return None
 
     for ctouch in supported:
-        if(len(ctouch.supporter_beyond) == 0):
-            return False
+        if(len(ctouch.supporter_beyond) > 0):
+            return True
 
     return False
 
@@ -395,10 +395,10 @@ def is_disclosed_attacked_supported(disclosed_attacked):
         return None
 
     for ctouch in disclosed_attacked:
-        if(len(ctouch.supporter_beyond) == 0):
-            return False
+        if(len(ctouch.supporter_beyond) > 0):
+            return True
 
-    return True
+    return False
 
 
 def highest_disclosed_attacked(disclosed_attacked):
