@@ -232,7 +232,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         max_dpth = 9
 
     if(depth <= dpth):
-        return min(cnt, high_prio_mvcnt + 1)
+        return min(cnt, mvcnt)
     # elif(match.level == LEVELS['blitz'] and depth <= dpth + 2 and is_stormy(match)):
     #    return high_prio_mvcnt + 1
     elif(depth <= max_dpth and is_last_move_stormy(last_prio, last_token) and is_stormy(match)):
