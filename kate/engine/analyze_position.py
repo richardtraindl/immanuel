@@ -231,7 +231,6 @@ def is_opening(match):
 def is_endgame(match):
     return match.count >= 30
 
-
 def is_king_defended_by_pawns(match, color):
     if(color == COLORS['white']):
         y = 1
@@ -255,24 +254,40 @@ def is_king_defended_by_pawns(match, color):
     else:
         return False
 
-def is_rook_over_king(match, color):
+def is_king_centered(match, color):
+    if(color == COLORS['white']):
+        if(wKg_y >= 2):
+            return True
+
+        x = match.wKg_x
+    else:
+        if(bKg_y <= 5):
+            return True
+
+        x = match.bKg_x
+
+    if(x == 3 or x == 4 or x == 5):
+        return True
+    
+    return False
+
+def is_rook_trapped(match, color):
     if(color == COLORS['white']):
         y = 0
         Kg_x = match.wKg_x
         Kg_y = match.wKg_y
-        king = PIECES['wKg']
         rook = PIECES['wRk']
     else:
         y= 7
         Kg_x = match.bKg_x
         Kg_y = match.bKg_y
-        king = PIECES['bKg']
         rook = PIECES['bRk']
 
-    rleftcnt = 0
-    rrightcnt = 0
-    pleftcnt = 0
-    prightcnt = 0
+    rook_leftcnt = 0
+    piece_leftcnt = 0
+    rook_rightcnt = 0
+    piece_rightcnt = 0
+
     if(Kg_x > 0):
         for x in range(0, Kg_x, 1):
             piece = match.readfield(x, y)
@@ -280,9 +295,9 @@ def is_rook_over_king(match, color):
             if(piece == PIECES['blk']):
                 continue
             elif(piece == rook):
-                rleftcnt += 1
+                rook_leftcnt += 1
             else:
-                pleftcnt += 1
+                piece_leftcnt += 1
 
     if(Kg_x < 7):
         for x in range(Kg_x + 1, 8, 1):
@@ -291,16 +306,15 @@ def is_rook_over_king(match, color):
             if(piece == PIECES['blk']):
                 continue
             elif(piece == rook):
-                rrightcnt += 1
+                rook_rightcnt += 1
             else:
-                prightcnt += 1
+                piece_rightcnt += 1
 
-    if(rleftcnt == 2 or rrightcnt == 2 or 
-       ((pleftcnt == 0 or prightcnt == 0) and 
-        (Kg_x == 0 or Kg_x == 1 or Kg_x == 2 or Kg_x == 5 or Kg_x == 6 or Kg_x == 7)) ):
-        return True
-    else:
+    if((rook_leftcnt == 0 and piece_leftcnt == 0) or 
+       (rook_rightcnt == 0 and piece_rightcnt == 0)):
         return False
+    else:
+        return True
 
 def score_opening(match):
     value = 0
@@ -311,10 +325,13 @@ def score_opening(match):
 
     # white position
     y = 0
+    cnt = 0
     for x in range(8):
         piece = match.readfield(x, y)
         if(piece == PIECES['wKn'] or piece == PIECES['wBp']):
-            value += blackrate
+            cnt += 1
+
+    value += cnt * blackrate
 
     y = 1
     cnt = 0
@@ -328,10 +345,13 @@ def score_opening(match):
 
     # black position
     y = 7
+    cnt = 0
     for x in range(8):
         piece = match.readfield(x, y)
         if(piece == PIECES['bKn'] or piece == PIECES['bBp']):
-            value += whiterate
+            cnt += 1
+
+    value += cnt * whiterate
 
     y = 6
     cnt = 0
@@ -345,17 +365,23 @@ def score_opening(match):
 
     # white king
     if(is_king_defended_by_pawns(match, COLORS['white'])):
-        value += whiterate
+        value += whiterate * 3
 
-    if(is_rook_over_king(match, COLORS['white'])):
-        value += whiterate
+    if(is_rook_trapped(match, COLORS['white']) == False):
+        value += whiterate * 3
+
+    if(is_king_centered == False):
+        value += whiterate * 3
 
     # black king
     if(is_king_defended_by_pawns(match, COLORS['black'])):
-        value += blackrate
+        value += blackrate * 3
 
-    if(is_rook_over_king(match, COLORS['black'])):
-        value += blackrate
+    if(is_rook_trapped(match, COLORS['black']) == False):
+        value += blackrate * 3
+
+    if(is_king_centered == False):
+        value += blackrate * 3
 
     return value
 

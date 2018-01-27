@@ -200,10 +200,10 @@ def score_supports(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             if(x1 == srcx and y1 == srcy):
                 continue
+
             piece = match.readfield(x1, y1)
-            if(piece == PIECES['blk']):
-                continue
-            if( color == Match.color_of_piece(piece) ):
+
+            if(Match.color_of_piece(piece) == color):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += SUPPORTED_SCORES[piece]
 
@@ -238,6 +238,53 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
                 return True
 
     return False
+
+
+def is_king_safe(match, color):
+    if(color == COLORS['white']):
+        Kg_x = match.wKg_x
+        Kg_y = match.wKg_y
+    else:
+        Kg_x = match.bKg_x
+        Kg_y = match.bKg_y
+
+    for i in range(8):
+        x1 = Kg_x + STEPS[i][0]
+        y1 = Kg_y + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            friends, enemies = field_touches(match, color, x1, y1)
+            if(len(friends) < len(enemies)):
+                return False
+
+    friends.clear()
+    enemies.clear()
+    friends, enemies = field_touches(match, color, Kg_x, Kg_y)
+    if(len(enemies) >= 2):
+        return False
+
+    for enemy in enemies:
+        friends_beyond, enemies_beyond = field_touches(match, color, enemy[1], enemy[2])
+        if(len(friends_beyond) >= len(enemies_beyond)):
+            continue
+
+        direction = rook.rk_dir(Kg_x, Kg_y, enemy[1], enemy[2])
+        if(direction != DIRS['undefined']):
+            direction, step_x, step_y = rook.rk_step(direction, None, None, None, None)
+        else:
+            direction = bishop.bp_dir(Kg_x, Kg_y, enemy[1], enemy[2])
+            if(direction != DIRS['undefined']):
+                direction, step_x, step_y = bishop.bp_step(direction, None, None, None, None)
+            else:
+                return False
+
+        x1 = Kg_x + step_x
+        y1 = Kg_y + step_y
+        while(rules.is_inbounds(x1, y1)):
+            blocking_friends, blocking_enemies = field_touches(match, color, x1, y1)
+            if(len(blocking_friends) > 0):
+                break
+
+    return True
 
 
 def kg_dir(srcx, srcy, dstx, dsty):

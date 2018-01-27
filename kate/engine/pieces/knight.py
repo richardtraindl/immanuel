@@ -207,10 +207,6 @@ def score_attacks(match, srcx, srcy):
                 enmy_pin = rules.pin_dir(match, x1, y1)
                 if(enmy_pin != rules.DIRS['undefined']):
                     score += ATTACKED_SCORES[piece]
-                    
-                # extra score if attacked is higher
-                if(PIECES_RANK[piece] > PIECES_RANK[knight]):
-                    score += ATTACKED_SCORES[piece] + ATTACKED_SCORES[knight]
 
     return score
 
@@ -235,10 +231,8 @@ def score_supports(match, srcx, srcy):
                 continue
 
             piece = match.readfield(x1, y1)
-            if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                continue
 
-            if( color == Match.color_of_piece(piece) ):
+            if(Match.color_of_piece(piece) == color):
                 if(rules.is_field_touched(match, opp_color, x1, y1)):
                     score += SUPPORTED_SCORES[piece]
 
