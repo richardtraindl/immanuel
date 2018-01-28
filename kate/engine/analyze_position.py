@@ -231,6 +231,7 @@ def is_opening(match):
 def is_endgame(match):
     return match.count >= 30
 
+
 def is_king_defended_by_pawns(match, color):
     if(color == COLORS['white']):
         y = 1
@@ -367,7 +368,9 @@ def score_opening(match):
     if(is_king_defended_by_pawns(match, COLORS['white'])):
         value += whiterate * 3
 
-    if(is_rook_trapped(match, COLORS['white']) == False):
+    if(is_rook_trapped(match, COLORS['white'])):
+        value += blackrate * 3
+    else:
         value += whiterate * 3
 
     if(is_king_centered == False):
@@ -377,7 +380,9 @@ def score_opening(match):
     if(is_king_defended_by_pawns(match, COLORS['black'])):
         value += blackrate * 3
 
-    if(is_rook_trapped(match, COLORS['black']) == False):
+    if(is_rook_trapped(match, COLORS['black'])):
+        value += whiterate * 3
+    else:
         value += blackrate * 3
 
     if(is_king_centered == False):
