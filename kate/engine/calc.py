@@ -215,7 +215,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         last_token_attacked = []
 
     if(match.level == LEVELS['blitz']):
-        cnt = 8
+        cnt = 12
         dpth = 3
         max_dpth = 6
     elif(match.level == LEVELS['low']):
