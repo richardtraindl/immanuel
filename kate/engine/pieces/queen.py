@@ -67,8 +67,8 @@ def count_attacks(match, color, fieldx, fieldy):
             if(match.color_of_piece(piece) == color):
                 if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     count += 1
-                elif(rules.is_field_touched(match, color, x1, y1)):
-                    continue
+                #elif(rules.is_field_touched(match, color, x1, y1)):
+                    #continue
                 else:
                     count += 1
     return count

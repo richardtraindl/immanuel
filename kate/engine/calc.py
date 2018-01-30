@@ -143,18 +143,7 @@ def generate_moves(match):
 
     if(kg_attacked):
         for priomove in priomoves:
-            gmove = priomove.gmove
-            if(match.readfield(gmove.dstx, gmove.dsty) != PIECES['blk']):
-                # sort captures first!
-                tmpprio = PRIO['prio1a']
-            elif((priomove.piece == PIECES['wPw'] or priomove.piece == PIECES['bPw']) and 
-                 gmove.srcx != gmove.dstx):
-                # en passants!
-                tmpprio = PRIO['prio1a']
-            else:
-                tmpprio = PRIO['prio1b']
-
-            priomove.prio = tmpprio
+            priomove.prio = PRIO['prio1']
 
         priomoves.sort(key=attrgetter('prio'))
 
@@ -195,7 +184,7 @@ def is_last_move_stormy(last_prio, last_token):
         last_token & MV_DEFENDS_CHECK > 0 or
         (last_token & MV_IS_ATTACK > 0 and (last_token & ATTACKED_IS_QU > 0 or 
          last_token & ATTACKED_IS_KG > 0)) or
-        (last_token & MV_IS_FLEE > 0 and last_prio <= PRIO['prio2a']) ):
+        (last_token & MV_IS_FLEE > 0 and last_prio <= PRIO['prio2']) ):
         return True
     else:
         return False
@@ -203,7 +192,7 @@ def is_last_move_stormy(last_prio, last_token):
 def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
 
-    high_prio_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio2a']]] + priocnts[PRIO_INDICES[PRIO['prio2b']]]
+    high_prio_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1']]] + priocnts[PRIO_INDICES[PRIO['prio2']]]
 
     if(last_priomove):
         last_prio = last_priomove.prio

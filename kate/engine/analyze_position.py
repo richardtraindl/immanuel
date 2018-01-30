@@ -317,12 +317,35 @@ def is_rook_trapped(match, color):
     else:
         return True
 
+"""def score_baseline_pieces(match):
+    score = 0
+
+    cnt = 0
+    y = 0
+    for x in range(8):
+        piece = match.readfield(x, y)
+        if(piece == PIECES['wKn'] or piece == PIECES['wBp']):
+            cnt += 1
+
+    score += (cnt * ATTACKED_SCORES[PIECES['wKn']])
+
+    cnt = 0
+    y = 7
+    for x in range(8):
+        piece = match.readfield(x, y)
+        if(piece == PIECES['bKn'] or piece == PIECES['bBp']):
+            cnt += 1
+
+    score += (cnt * ATTACKED_SCORES[PIECES['bKn']])
+
+    return score"""
+
 def score_opening(match):
     value = 0
 
-    whiterate = ATTACKED_SCORES[PIECES['bPw']]
-    
-    blackrate = ATTACKED_SCORES[PIECES['wPw']]
+    whiterate = ATTACKED_SCORES[PIECES['bKn']]
+
+    blackrate = ATTACKED_SCORES[PIECES['wKn']]
 
     # white position
     y = 0
@@ -331,17 +354,12 @@ def score_opening(match):
         piece = match.readfield(x, y)
         if(piece == PIECES['wKn'] or piece == PIECES['wBp']):
             cnt += 1
-
     value += cnt * blackrate
 
-    y = 1
-    cnt = 0
-    for x in range(8):
-        piece = match.readfield(x, y)
-        if(piece == PIECES['wPw']):
-            cnt += 1
-    
-    if(cnt <= 6): 
+    if(match.readfield(1, 1) == PIECES['blk'] or match.readfield(3, 1) == PIECES['blk']):
+        value += whiterate
+
+    if(match.readfield(4, 1) == PIECES['blk'] or match.readfield(6, 1) == PIECES['blk']):
         value += whiterate
 
     # black position
@@ -351,17 +369,12 @@ def score_opening(match):
         piece = match.readfield(x, y)
         if(piece == PIECES['bKn'] or piece == PIECES['bBp']):
             cnt += 1
-
     value += cnt * whiterate
 
-    y = 6
-    cnt = 0
-    for x in range(8):
-        piece = match.readfield(x, y)
-        if(piece == PIECES['bPw']):
-            cnt += 1
-    
-    if(cnt <= 6): 
+    if(match.readfield(1, 6) == PIECES['blk'] or match.readfield(3, 6) == PIECES['blk']):
+        value += blackrate
+
+    if(match.readfield(4, 6) == PIECES['blk'] or match.readfield(6, 6) == PIECES['blk']):
         value += blackrate
 
     # white king
@@ -435,7 +448,7 @@ def score_position(match, movecnt):
         score += score_supports(match, REVERSED_COLORS[color])
 
         score += score_controled_horizontal_files(match)
-        
+
         score += score_controled_vertical_files(match)
 
         if(is_opening(match)):
@@ -447,7 +460,7 @@ def score_position(match, movecnt):
         return score
 
 
-def is_capture_possible(match, color):
+"""def is_capture_possible(match, color):
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
@@ -477,7 +490,7 @@ def is_capture_possible(match, color):
                 if(king.is_capture_possible(match, x, y)):
                     return True
 
-    return False
+    return False"""
 
 
 def are_attacks_or_captures_possible(match):

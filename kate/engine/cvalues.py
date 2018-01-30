@@ -66,30 +66,20 @@ SUPPORTED_SCORES = {
 
 
 PRIO = {
-    'prio1a' : 1,
-    'prio1b' : 2,
-    'prio2a' : 3,
-    'prio2b' : 4,
-    'prio3a' : 5,
-    'prio3b' : 6,
-    'prio4a' : 7,
-    'prio4b' : 8,
-    'prio5a' : 9,
-    'prio5b' : 10,
-    'last' : 11 }
+    'prio1' : 1,
+    'prio2' : 2,
+    'prio3' : 3,
+    'prio4' : 4,
+    'prio5' : 5,
+    'last' : 6 }
 
 PRIO_INDICES = {
-    PRIO['prio1a'] : 0,
-    PRIO['prio1b'] : 1,
-    PRIO['prio2a'] : 2,
-    PRIO['prio2b'] : 3,
-    PRIO['prio3a' ] : 4,
-    PRIO['prio3b' ] : 5,
-    PRIO['prio4a' ] : 6,
-    PRIO['prio4b' ] : 7,
-    PRIO['prio5a'] : 8,
-    PRIO['prio5b'] : 9,
-    PRIO['last'] : 10 }
+    PRIO['prio1'] : 0,
+    PRIO['prio2'] : 1,
+    PRIO['prio3'] : 2,
+    PRIO['prio4'] : 3,
+    PRIO['prio5' ] : 4,
+    PRIO['last'] : 5 }
 
 
 MV_IS_CASTLING                         = 0x8000000000000000
