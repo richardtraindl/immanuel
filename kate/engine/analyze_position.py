@@ -534,18 +534,16 @@ def is_stormy(match):
     ###
 
     # is pinned enemy attacked
-    """opp_color = REVERSED_COLORS[color]
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
+            if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                continue
+
             if(Match.color_of_piece(piece) == color):
                 direction = rules.pin_dir(match, x, y)
                 if(direction != rules.DIRS['undefined']):
-                    ctouch = cTouch(None, None, None, None, piece, x, y)
-                    field_touches_beyond(match, color, ctouch)
-                    if(len(ctouch.attacker_beyond) > 0):
-                        return True"""
-     ###
+                    return True
 
     return False
 

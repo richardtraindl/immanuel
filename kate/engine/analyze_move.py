@@ -331,7 +331,7 @@ def rank_moves(match, priomoves):
 
 
         if(token & MV_IS_PROMOTION > 0):
-            priomove.prio = min(PRIO['prio1'], priomove.prio)
+            priomove.prio = min(PRIO['prio1b'], priomove.prio)
             continue
 
 
@@ -339,20 +339,20 @@ def rank_moves(match, priomoves):
             if(piece_is_lower_equal_than_captured(token) or
                dstfield_is_attacked(token) == False or
                (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                priomove.prio = min(priomove.prio, PRIO['prio1'])
+                priomove.prio = min(priomove.prio, PRIO['prio1b'])
                 continue
             else:
-                priomove.prio = min(priomove.prio, PRIO['prio3'])
+                priomove.prio = min(priomove.prio, PRIO['prio1d'])
 
 
         if(token & MV_IS_ATTACK > 0):
             if(token & ATTACKED_IS_KG > 0):
                 if(dstfield_is_attacked(token) == False or 
                    (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                    priomove.prio = min(priomove.prio, PRIO['prio1'])
+                    priomove.prio = min(priomove.prio, PRIO['prio1a'])
                     continue
                 else:
-                    priomove.prio = min(priomove.prio, PRIO['prio2'])
+                    priomove.prio = min(priomove.prio, PRIO['prio1c'])
             else:
                 if(dstfield_is_attacked(token) == False or 
                    (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
@@ -406,7 +406,7 @@ def rank_moves(match, priomoves):
 
 
         if(token & MV_CONTROLES_FILE > 0):
-            priomove.prio = max(PRIO['prio3'], priomove.prio - 2)
+            priomove.prio = min(priomove.prio, PRIO['prio3'])
 
 
         if(token & MV_IS_FLEE > 0):

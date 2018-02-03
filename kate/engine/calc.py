@@ -143,7 +143,7 @@ def generate_moves(match):
 
     if(kg_attacked):
         for priomove in priomoves:
-            priomove.prio = PRIO['prio1']
+            priomove.prio = PRIO['prio1a']
 
         priomoves.sort(key=attrgetter('prio'))
 
@@ -192,7 +192,7 @@ def is_last_move_stormy(last_prio, last_token):
 def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
 
-    high_prio_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1']]] + priocnts[PRIO_INDICES[PRIO['prio2']]]
+    prio1_mvcnt = priocnts[PRIO_INDICES[PRIO['prio1a']]] + priocnts[PRIO_INDICES[PRIO['prio1b']]] + priocnts[PRIO_INDICES[PRIO['prio1c']]] + priocnts[PRIO_INDICES[PRIO['prio1d']]]
 
     if(last_priomove):
         last_prio = last_priomove.prio
@@ -209,7 +209,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         max_dpth = 6
     elif(match.level == LEVELS['low']):
         cnt = 16
-        dpth = 3
+        dpth = 4
         max_dpth = 7
     elif(match.level == LEVELS['medium']):
         cnt = 16
@@ -217,15 +217,15 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         max_dpth = 8
     else:
         cnt = 24
-        dpth = 5
+        dpth = 6
         max_dpth = 9
 
     if(depth <= dpth):
-        return max(cnt, high_prio_mvcnt)
+        return max(cnt, prio1_mvcnt + priocnts[PRIO_INDICES[PRIO['prio2']]])
     # elif(match.level == LEVELS['blitz'] and depth <= dpth + 2 and is_stormy(match)):
-    #    return high_prio_mvcnt + 1
+    #    return prio1_mvcnt + 1
     elif(depth <= max_dpth and is_last_move_stormy(last_prio, last_token) and is_stormy(match)):
-        return min(8, high_prio_mvcnt + 1)
+        return prio1_mvcnt + 1
     else:
         return 0
 

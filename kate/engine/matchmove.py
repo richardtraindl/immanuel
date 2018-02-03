@@ -1,6 +1,6 @@
 from .match import *
 from .move import *
-from .cvalues import SCORES
+from .cvalues import SCORES, PIECES_RANK, ATTACKED_SCORES
 
 
 def do_move(match, srcx, srcy, dstx, dsty, prom_piece):
@@ -64,6 +64,13 @@ def generic_do_move(match, move, srcpiece, dstpiece):
             match.bRk_h8_first_movecnt = match.count
 
     match.score += SCORES[dstpiece]
+    if(srcpiece != PIECES['wKg'] and srcpiece != PIECES['bKg']):
+        addscore = PIECES_RANK[srcpiece] - PIECES_RANK[dstpiece]
+        if(Match.color_of_piece(srcpiece) == COLORS['white']):
+            match.score += ATTACKED_SCORES[PIECES['wPw']] * addscore
+        else:
+            match.score += ATTACKED_SCORES[PIECES['bPw']] * addscore
+
     match.move_list.append(move)
 
     return move
@@ -183,7 +190,15 @@ def generic_undo_move(match, move):
     piece = match.readfield(move.dstx, move.dsty)
     match.writefield(move.srcx, move.srcy, piece)
     match.writefield(move.dstx, move.dsty, move.captured_piece)
+
     match.score -= SCORES[move.captured_piece]
+    if(piece != PIECES['wKg'] and piece != PIECES['bKg']):
+        subscore = PIECES_RANK[piece] - PIECES_RANK[move.captured_piece]
+        if(Match.color_of_piece(piece) == COLORS['white']):
+            match.score -= ATTACKED_SCORES[PIECES['wPw']] * subscore
+        else:
+            match.score -= ATTACKED_SCORES[PIECES['bPw']] * subscore
+
     if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
         match.wKg_y = move.srcy
