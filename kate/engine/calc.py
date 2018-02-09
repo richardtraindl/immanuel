@@ -212,13 +212,13 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         last_token_attacked = []
 
     if(match.level == LEVELS['blitz']):
-        cnt = 12
+        cnt = 8
         dpth = 1
         max_dpth = 7
     elif(match.level == LEVELS['low']):
-        cnt = 16
+        cnt = 12
         dpth = 3
-        max_dpth = 9
+        max_dpth = 7
     elif(match.level == LEVELS['medium']):
         cnt = 20
         dpth = 5
@@ -229,11 +229,11 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         max_dpth = 11
 
     if(depth <= dpth):
-        return cnt # max(cnt, prio1_mvcnt + priocnts[PRIO_INDICES[PRIO['prio2']]])
+        return max(cnt, prio2_mvcnt) # max(cnt, prio1_mvcnt + priocnts[PRIO_INDICES[PRIO['prio2']]])
     # elif(match.level == LEVELS['blitz'] and depth <= dpth + 2 and is_stormy(match)):
     #    return prio1_mvcnt + 1
     elif(depth <= dpth + 2 and is_stormy(match)):
-        return min(8, prio1_mvcnt + 1)
+        return min(cnt, prio2_mvcnt)
     elif(depth <= max_dpth and is_last_move_stormy(last_prio, last_token) and is_stormy(match)):
         return prio1_mvcnt + 1
     else:
