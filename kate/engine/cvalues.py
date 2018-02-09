@@ -66,26 +66,27 @@ SUPPORTED_SCORES = {
 
 
 PRIO = {
-    'prio1a' : 1,
-    'prio1b' : 2,
-    'prio1c' : 3,
-    'prio1d' : 4,
-    'prio2' : 5,
-    'prio3' : 6,
-    'prio4' : 7,
-    'prio5' : 8,
-    'last' : 9 }
+    'defend-check' : 0,
+    'promotion' : 1,
+    'capture-good-deal' : 2,
+    'capture-bad-deal' : 3,
+    'attack-king-good-deal' : 4,
+    'attack-king-bad-deal' : 5,
+    'attack-good-deal' : 6,
+    'disclosed-attack' : 7,
+    'flee' : 8,
+    'support-good-deal' : 9,
+    'defend-fork' : 10,
+    'castling' : 11,
+    'good' : 12,
+    'support-unattacked' : 13,
+    'attack-bad-deal' : 14,
+    'support-bad-deal' : 15,
+    'bad' : 16,
+    'last' : 17 }
 
-PRIO_INDICES = {
-    PRIO['prio1a'] : 0,
-    PRIO['prio1b'] : 1,
-    PRIO['prio1c'] : 2,
-    PRIO['prio1d'] : 3,
-    PRIO['prio2'] : 4,
-    PRIO['prio3'] : 5,
-    PRIO['prio4'] : 6,
-    PRIO['prio5' ] : 7,
-    PRIO['last'] : 8 }
+PRIO1_LIMES = PRIO['attack-king-bad-deal']
+PRIO2_LIMES = PRIO['castling']
 
 
 MV_IS_CASTLING                         = 0x8000000000000000

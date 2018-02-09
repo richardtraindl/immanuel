@@ -540,10 +540,8 @@ def is_stormy(match):
             if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
 
-            if(Match.color_of_piece(piece) == color):
-                direction = rules.pin_dir(match, x, y)
-                if(direction != rules.DIRS['undefined']):
-                    return True
+            if(is_soft_pin(match, x, y)):
+                return True
 
     return False
 
