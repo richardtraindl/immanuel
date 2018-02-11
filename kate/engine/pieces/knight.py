@@ -83,10 +83,8 @@ def field_color_touches_beyond(match, color, ctouch):
                     continue
 
                 if(Match.color_of_piece(piece) == color):
-                    ctouch = cTouch(None, None, None, None, piece, x1, y1)
                     ctouch.supporter_beyond.append([piece, x1, y1])
                 else:
-                    ctouch = cTouch(None, None, None, None, piece, x1, y1)
                     ctouch.attacker_beyond.append([piece, x1, y1])
 
 
@@ -111,7 +109,7 @@ def list_field_touches(match, color, fieldx, fieldy):
 def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
     token = 0x0
 
-    if(is_stuck(match, srcx, srcy)):
+    if(is_stuck(match, dstx, dsty)):
         return token
 
     knight = match.readfield(srcx, srcy)
@@ -239,7 +237,7 @@ def score_supports(match, srcx, srcy):
     return score 
 
 
-def count_attacks(match, color, fieldx, fieldy):
+def count_touches(match, color, fieldx, fieldy):
     count = 0
 
     if(is_stuck(match, fieldx, fieldy)):
@@ -250,13 +248,13 @@ def count_attacks(match, color, fieldx, fieldy):
         y1 = fieldy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
-            if(Match.color_of_piece(piece) == color):
-                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    count += 1
-                #elif(rules.is_field_touched(match, color, x1, y1)):
-                    #continue
-                else:
-                    count += 1
+            if(piece == PIECES['blk']):
+                continue
+            elif(match.color_of_piece(piece) == color):
+                count += 1
+            else:
+                count -= 1
+
     return count
 
 

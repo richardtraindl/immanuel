@@ -210,7 +210,7 @@ def score_supports(match, srcx, srcy):
     return score 
 
 
-def count_attacks(match, color, fieldx, fieldy):
+def count_touches(match, color, fieldx, fieldy):
     count = 0
 
     for i in range(8):
@@ -219,11 +219,13 @@ def count_attacks(match, color, fieldx, fieldy):
         x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == color):
-                #if(rules.is_field_touched(match, color, x1, y1)):
-                    #continue
-                #else:
+            if(piece == PIECES['blk']):
+                continue
+            elif(match.color_of_piece(piece) == color):
                 count += 1
+            else:
+                count -= 1
+
     return count
 
 

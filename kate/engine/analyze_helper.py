@@ -113,35 +113,38 @@ def is_fork_field(match, piece, srcx, srcy, forkx, forky):
     
     #if(is_field_touched(match, color, forkx, forky) == True):
     #    return False
+    frdlytouches, enmytouches = field_touches(match, color, forkx, forky)
+    if(len(frdlytouches) >= len(enmytouches)):
+        return False      
 
     match.writefield(srcx, srcy, PIECES['blk'])
     if(queen.is_field_touched(match, opp_color, forkx, forky)):
-        if(queen.count_attacks(match, color, forkx, forky) > 1):
+        if(queen.count_touches(match, color, forkx, forky) > 1):
             match.writefield(srcx, srcy, piece)
             return True
 
     if(rook.is_field_touched(match, opp_color, forkx, forky)):
-        if(rook.count_attacks(match, color, forkx, forky) > 1):
+        if(rook.count_touches(match, color, forkx, forky) > 1):
             match.writefield(srcx, srcy, piece)
             return True
 
     if(bishop.is_field_touched(match, opp_color, forkx, forky)):
-        if(bishop.count_attacks(match, color, forkx, forky) > 1):
+        if(bishop.count_touches(match, color, forkx, forky) > 1):
             match.writefield(srcx, srcy, piece)
             return True
 
     if(knight.is_field_touched(match, opp_color, forkx, forky)):
-        if(knight.count_attacks(match, color, forkx, forky) > 1):
+        if(knight.count_touches(match, color, forkx, forky) > 1):
             match.writefield(srcx, srcy, piece)
             return True
 
     if(pawn.is_field_touched(match, opp_color, forkx, forky)):
-        if(pawn.count_attacks(match, color, forkx, forky) > 1):
+        if(pawn.count_touches(match, color, forkx, forky) > 1):
             match.writefield(srcx, srcy, piece)
             return True
 
     if(king.is_field_touched(match, opp_color, forkx, forky)):
-        if(king.count_attacks(match, color, forkx, forky) > 1):
+        if(king.count_touches(match, color, forkx, forky) > 1):
             match.writefield(srcx, srcy, piece)
             return True
 

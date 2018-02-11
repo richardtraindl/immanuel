@@ -152,7 +152,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
             if(x1 == srcx and y1 == srcy):
                 continue
 
-            if(is_move_stuck(match, pawn, srcx, srcy, x1, y1)):
+            if(is_move_stuck(match, pawn, dstx, dsty, x1, y1)):
                 continue
 
             piece = match.readfield(x1, y1)
@@ -273,7 +273,7 @@ def score_supports(match, srcx, srcy):
     return score
 
 
-def count_attacks(match, color, fieldx, fieldy):
+def count_touches(match, color, fieldx, fieldy):
     count = 0
 
     if(color == COLORS['white']):
@@ -291,13 +291,13 @@ def count_attacks(match, color, fieldx, fieldy):
                 continue
 
             piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == color):
-                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    count += 1
-                #elif(rules.is_field_touched(match, color, x1, y1)):
-                    #continue
-                else:
-                    count += 1
+            if(piece == PIECES['blk']):
+                continue
+            elif(match.color_of_piece(piece) == color):
+                count += 1
+            else:
+                count -= 1
+
     return count
 
 

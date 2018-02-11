@@ -79,14 +79,16 @@ PRIO = {
     'defend-fork' : 10,
     'castling' : 11,
     'good' : 12,
-    'support-unattacked' : 13,
-    'attack-bad-deal' : 14,
-    'support-bad-deal' : 15,
-    'bad' : 16,
-    'last' : 17 }
+    'good-postponed' : 13,
+    'support-unattacked' : 14,
+    'attack-bad-deal' : 15,
+    'support-bad-deal' : 16,
+    'bad' : 17,
+    'last' : 18 }
 
-PRIO1_LIMES = PRIO['attack-king-bad-deal']
-PRIO2_LIMES = PRIO['castling']
+PRIO_URGENT_LIMES = PRIO['capture-bad-deal']
+PRIO1_LIMES = PRIO['castling']
+PRIO2_LIMES = PRIO['support-unattacked']
 
 
 MV_IS_CASTLING                         = 0x8000000000000000

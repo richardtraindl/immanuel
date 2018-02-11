@@ -52,7 +52,7 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     return False
 
 
-def count_attacks(match, color, fieldx, fieldy):
+def count_touches(match, color, fieldx, fieldy):
     count = 0
 
     for i in range(8):
@@ -64,13 +64,13 @@ def count_attacks(match, color, fieldx, fieldy):
                 continue
 
             piece = match.readfield(x1, y1)
-            if(match.color_of_piece(piece) == color):
-                if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    count += 1
-                #elif(rules.is_field_touched(match, color, x1, y1)):
-                    #continue
-                else:
-                    count += 1
+            if(piece == PIECES['blk']):
+                continue
+            elif(match.color_of_piece(piece) == color):
+                count += 1
+            else:
+                count -= 1
+
     return count
 
 
