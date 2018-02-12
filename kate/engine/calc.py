@@ -229,12 +229,12 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         cnt = 8
         dpth = 1
         mid_dpth = 3
-        max_dpth = 9
+        max_dpth = 7
     elif(match.level == LEVELS['low']):
         cnt = 12
         dpth = 3
         mid_dpth = 5
-        max_dpth = 11
+        max_dpth = 9
     elif(match.level == LEVELS['medium']):
         cnt = 16
         dpth = 5
@@ -247,11 +247,11 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         max_dpth = 13
 
     if(depth <= dpth):
-        return max(cnt, prio1_mvcnt)
+        return max(cnt, prio2_mvcnt)
     elif(depth <= mid_dpth and is_last_move_stormy(last_prio, last_token) and is_stormy(match)):
-        return min(6, prio1_mvcnt + 1)
+        return min(cnt, prio2_mvcnt)
     elif(depth <= max_dpth and is_last_move_very_stormy(last_prio, last_token) and is_stormy(match)):
-        return min(4, prio1_mvcnt)
+        return min(6, prio2_mvcnt)
     else:
         return 0
 
