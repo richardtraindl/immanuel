@@ -426,12 +426,12 @@ def rank_moves(match, priomoves):
                pmove.gmove.dstx == attack.agent_dstx and pmove.gmove.dsty == attack.agent_dsty):
                 if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy and  
                        e[2] == attack.fieldx and e[3] == attack.fieldy for e in excludes) == False):
-                    #if(pmove.prio > attackeditem[1]):
+                    priomove.prio = min(priomove.prio, attackeditem[1])
                     excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, attack.fieldx, attack.fieldy])
                 else:
                     pmove.prio = PRIO['good-postponed']
 
-    #excludes.clear()
+    excludes.clear()
     list_supported.sort(key=itemgetter(1))
     for supporteditem in list_supported:
         pmove = supporteditem[0]
@@ -440,12 +440,12 @@ def rank_moves(match, priomoves):
                pmove.gmove.dstx == support.agent_dstx and pmove.gmove.dsty == support.agent_dsty):
                 if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy and  
                        e[2] == support.fieldx and e[3] == support.fieldy for e in excludes) == False):
-                    #if(pmove.prio > supporteditem[1]):
+                    priomove.prio = min(priomove.prio, supporteditem[1])
                     excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, support.fieldx, support.fieldy])
                 else:
                     pmove.prio = PRIO['good-postponed']
 
-    #excludes.clear()
+    excludes.clear()
     list_forked.sort(key=itemgetter(1))
     for forkitem in list_forked:
         pmove = forkitem[0]
@@ -454,17 +454,18 @@ def rank_moves(match, priomoves):
                pmove.gmove.dstx == fork[2] and pmove.gmove.dsty == fork[3]):
                 if(any(e[0] == fork[0] and e[1] == fork[1] and
                        e[2] == fork[4] and e[3] == fork[5] for e in excludes) == False):
-                    #if(pmove.prio > forkitem[1]):
+                    priomove.prio = min(priomove.prio, forkitem[1])
                     excludes.append([fork[0], fork[1], fork[4], fork[5]])
                 else:
                     pmove.prio = PRIO['good-postponed']
 
-    #excludes.clear()
+    excludes.clear()
     list_flee.sort(key=itemgetter(1))
     for fleeitem in list_flee:
         pmove = fleeitem[0]
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             #if(pmove.prio > fleeitem[1]):
+            priomove.prio = min(priomove.prio, fleeitem[1])
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.prio = PRIO['good-postponed']
