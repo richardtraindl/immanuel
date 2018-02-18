@@ -87,7 +87,7 @@ PRIO = {
     'bad' : 18,
     'last' : 19 }
 
-PRIO_URGENT_LIMES = PRIO['capture-bad-deal']
+PRIO_URGENT_LIMES = PRIO['flee-urgent']
 PRIO1_LIMES = PRIO['support-good-deal']
 PRIO2_LIMES = PRIO['castling']
 

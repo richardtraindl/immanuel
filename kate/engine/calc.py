@@ -227,33 +227,27 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     if(match.level == LEVELS['blitz']):
         cnt = 8
-        dpth = 1
-        mid_dpth = 3
+        dpth = 3
         max_dpth = 7
     elif(match.level == LEVELS['low']):
         cnt = 12
         dpth = 3
-        mid_dpth = 5
         max_dpth = 9
     elif(match.level == LEVELS['medium']):
         cnt = 16
         dpth = 5
-        mid_dpth = 7
         max_dpth = 11
     else:
-        cnt = 24
+        cnt = 20
         dpth = 7
-        mid_dpth = 9
         max_dpth = 13
 
     if(depth <= dpth):
-        return max(cnt, prio2_mvcnt)
-    elif(depth <= mid_dpth and is_last_move_stormy(last_prio, last_token) and is_stormy(match)):
-        return min(cnt, prio2_mvcnt)
+        return max(cnt, prio2_mvcnt), False
     elif(depth <= max_dpth and is_last_move_very_stormy(last_prio, last_token) and is_stormy(match)):
-        return min(6, prio2_mvcnt)
+        return prio_urgent_mvcnt, True
     else:
-        return 0
+        return 0, False
 
 
 def calc_max(match, depth, alpha, beta, last_priomove):
@@ -261,11 +255,13 @@ def calc_max(match, depth, alpha, beta, last_priomove):
     candidates = []
     newcandidates = []
     maxscore = SCORES[PIECES['wKg']] * 2
+    urgent_score_limit = PIECES['bPw'] * 8 // 10
     count = 0
+    add_count = 0
 
     priomoves, priocnts = generate_moves(match)
     
-    maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
+    maxcnt, urgent = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):
         """analysis = analyze_position(match)
@@ -286,12 +282,12 @@ def calc_max(match, depth, alpha, beta, last_priomove):
         candidates.append(None)
         return score_position(match, len(priomoves)), candidates
 
-    for priomove in priomoves[:maxcnt]:
+    for priomove in priomoves: # [:maxcnt]
         newmove = priomove.gmove
 
-        if(depth == 1):
-            count += 1
+        count += 1
 
+        if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
             print("   " + reverse_lookup(PRIO, priomove.prio))
@@ -305,6 +301,8 @@ def calc_max(match, depth, alpha, beta, last_priomove):
 
         score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
+        matchmove.undo_move(match)
+
         if(depth == 1):
             prnt_move("\nCURR SEARCH: " + str(newscore).rjust(8, " ") + " [", newmove, "]")
             prnt_moves("", newcandidates)
@@ -312,12 +310,17 @@ def calc_max(match, depth, alpha, beta, last_priomove):
             prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
-        matchmove.undo_move(match)
-
         if(score > maxscore):
             maxscore = score
             if(maxscore > beta):
                 return maxscore, candidates
+
+        if(urgent and add_count < 4 and len(priomoves) > count and 
+           abs(newscore) - abs(maxscore) > urgent_score_limit):
+            add_count += 1
+            continue
+        elif(count >= maxcnt):
+            return maxscore, candidates
 
     return maxscore, candidates
 
@@ -327,11 +330,13 @@ def calc_min(match, depth, alpha, beta, last_priomove):
     candidates = []
     newcandidates = []
     minscore = SCORES[PIECES['bKg']] * 2
+    urgent_score_limit = PIECES['bPw'] * 8 // 10
     count = 0
+    add_count = 0
 
     priomoves, priocnts = generate_moves(match)
 
-    maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
+    maxcnt, urgent = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):
         prnt_priorities(priomoves, priocnts)
@@ -345,12 +350,12 @@ def calc_min(match, depth, alpha, beta, last_priomove):
         candidates.append(None)
         return score_position(match, len(priomoves)), candidates
 
-    for priomove in priomoves[:maxcnt]:
+    for priomove in priomoves: #[:maxcnt]:
         newmove = priomove.gmove
-        
-        if(depth == 1):
-            count += 1
 
+        count += 1
+
+        if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
             print("   " + reverse_lookup(PRIO, priomove.prio))
@@ -365,7 +370,7 @@ def calc_min(match, depth, alpha, beta, last_priomove):
         score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
 
         matchmove.undo_move(match)
-
+        
         if(depth == 1):
             prnt_move("\nCURR SEARCH: " + str(newscore).rjust(8, " ") + " [", newmove, "]")
             prnt_moves("", newcandidates)
@@ -377,6 +382,13 @@ def calc_min(match, depth, alpha, beta, last_priomove):
             minscore = score
             if(minscore < alpha):
                 return minscore, candidates
+
+        if(urgent and add_count < 4 and len(priomoves) > count and 
+           abs(newscore) - abs(minscore) > urgent_score_limit):
+            add_count += 1
+            continue
+        elif(count >= maxcnt):
+            return minscore, candidates
 
     return minscore, candidates
 
