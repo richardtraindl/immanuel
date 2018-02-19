@@ -303,7 +303,7 @@ def calc_max(match, depth, alpha, beta, last_priomove):
                 return maxscore, candidates
 
         if(urgent and len(priomoves) > count and 
-           priomove.prio > PRIO_URGENT_LIMES and add_count < 2):
+           priomove.prio > PRIO_URGENT_LIMES and add_count < 3):
             add_count += 1
             continue
         elif(count >= maxcnt):
@@ -370,7 +370,7 @@ def calc_min(match, depth, alpha, beta, last_priomove):
                 return minscore, candidates
 
         if(urgent and len(priomoves) > count and 
-           priomove.prio > PRIO_URGENT_LIMES and add_count < 2):
+           priomove.prio > PRIO_URGENT_LIMES and add_count < 3):
             add_count += 1
             continue
         elif(count >= maxcnt):
