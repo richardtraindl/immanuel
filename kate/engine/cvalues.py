@@ -70,15 +70,15 @@ PRIO = {
     'promotion' : 1,
     'capture-good-deal' : 2,
     'capture-bad-deal' : 3,
-    'attack-king-good-deal' : 4,
-    'attack-king-bad-deal' : 5,
-    'flee-urgent' : 6,
-    'attack-good-deal' : 7,
-    'disclosed-attack' : 8,
-    'support-good-deal' : 9,
-    'flee' : 10,
-    'defend-fork' : 11,
-    'castling' : 12,
+    'flee-urgent' : 4,
+    'support-good-deal' : 5,
+    'attack-king-good-deal' : 6,
+    'attack-king-bad-deal' : 7,    
+    'defend-fork' : 8,
+    'attack-good-deal' : 9,
+    'disclosed-attack' : 10,
+    'castling' : 11,
+    'flee' : 12,
     'good' : 13,
     'good-postponed' : 14,
     'support-unattacked' : 15,
@@ -87,9 +87,8 @@ PRIO = {
     'bad' : 18,
     'last' : 19 }
 
-PRIO_URGENT_LIMES = PRIO['flee-urgent']
-PRIO1_LIMES = PRIO['support-good-deal']
-PRIO2_LIMES = PRIO['castling']
+PRIO_URGENT_LIMES = PRIO['capture-bad-deal']
+PRIO1_LIMES = PRIO['castling']
 
 
 MV_IS_CASTLING                         = 0x8000000000000000

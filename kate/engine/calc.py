@@ -203,18 +203,13 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
     prio_urgent_mvcnt = 0
     prio1_mvcnt = 0
-    prio2_mvcnt = 0
 
-    for i in range(PRIO_URGENT_LIMES ):
+    for i in range(PRIO_URGENT_LIMES):
         prio_urgent_mvcnt += priocnts[i]
 
     prio1_mvcnt = prio_urgent_mvcnt
-    for i in range(PRIO1_LIMES):
+    for i in range(PRIO_URGENT_LIMES, PRIO1_LIMES):
         prio1_mvcnt += priocnts[i]
-
-    prio2_mvcnt = prio1_mvcnt
-    for i in range(PRIO1_LIMES, PRIO2_LIMES):
-        prio2_mvcnt += priocnts[i]
 
     if(last_priomove):
         last_prio = last_priomove.prio
@@ -243,8 +238,8 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         max_dpth = 13
 
     if(depth <= dpth):
-        return max(cnt, prio2_mvcnt), False
-    elif(depth <= max_dpth and is_last_move_very_stormy(last_prio, last_token) and is_stormy(match)):
+        return max(cnt, prio1_mvcnt), False
+    elif(depth <= max_dpth and is_stormy(match)): # (is_last_move_stormy(last_prio, last_token) or 
         return prio_urgent_mvcnt, True
     else:
         return 0, False
@@ -315,8 +310,8 @@ def calc_max(match, depth, alpha, beta, last_priomove):
             if(maxscore > beta):
                 return maxscore, candidates
 
-        if(urgent and add_count < 4 and len(priomoves) > count and 
-           abs(newscore) - abs(maxscore) > urgent_score_limit):
+        if(urgent and len(priomoves) > count and 
+           priomove.prio > PRIO_URGENT_LIMES and add_count < 3): # abs(newscore) - abs(maxscore) > urgent_score_limit
             add_count += 1
             continue
         elif(count >= maxcnt):
@@ -383,8 +378,8 @@ def calc_min(match, depth, alpha, beta, last_priomove):
             if(minscore < alpha):
                 return minscore, candidates
 
-        if(urgent and add_count < 4 and len(priomoves) > count and 
-           abs(newscore) - abs(minscore) > urgent_score_limit):
+        if(urgent and len(priomoves) > count and 
+           priomove.prio > PRIO_URGENT_LIMES and add_count < 3): # abs(newscore) - abs(minscore) > urgent_score_limit):
             add_count += 1
             continue
         elif(count >= maxcnt):
