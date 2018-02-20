@@ -184,8 +184,8 @@ def is_last_move_stormy(last_prio, last_token):
     else:
         return False
 
-def is_last_move_very_stormy(last_prio, last_token):
-    if(last_prio <= PRIO_URGENT_LIMES):
+def is_last_move_very_stormy(last_prio): # , last_token
+    if(last_prio < PRIO_URGENT_LIMES):
         return True
     else:
         return False
@@ -199,7 +199,7 @@ def is_last_move_very_stormy(last_prio, last_token):
     else:
         return False"""
 
-def select_maxcnt(match, depth, priomoves, priocnts): # , last_priomove
+def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
     prio_urgent_mvcnt = 0
     prio1_mvcnt = 0
@@ -211,23 +211,23 @@ def select_maxcnt(match, depth, priomoves, priocnts): # , last_priomove
     for i in range(PRIO_URGENT_LIMES, PRIO1_LIMES):
         prio1_mvcnt += priocnts[i]
 
-    """if(last_priomove):
+    if(last_priomove):
         last_prio = last_priomove.prio
-        last_token = last_priomove.tokens[0]
-        last_token_attacked = last_priomove.tokens[1]
+        """last_token = last_priomove.tokens[0]
+        last_token_attacked = last_priomove.tokens[1]"""
     else:
         last_prio = PRIO['last']
-        last_token = 0x0
+        """last_token = 0x0
         last_token_attacked = []"""
 
     if(match.level == LEVELS['blitz']):
         cnt = 8
         dpth = 2
-        max_dpth = 7
+        max_dpth = 9
     elif(match.level == LEVELS['low']):
         cnt = 12
         dpth = 3
-        max_dpth = 7
+        max_dpth = 9
     elif(match.level == LEVELS['medium']):
         cnt = 16
         dpth = 4
@@ -235,11 +235,13 @@ def select_maxcnt(match, depth, priomoves, priocnts): # , last_priomove
     else:
         cnt = 20
         dpth = 5
-        max_dpth = 9
+        max_dpth = 11
 
     if(depth <= dpth):
         return max(cnt, prio1_mvcnt), False
-    elif(depth <= max_dpth and is_stormy(match)): # (is_last_move_stormy(last_prio, last_token) or 
+    #elif(depth <= max_dpth and is_stormy(match)): # (is_last_move_stormy(last_prio, last_token) or 
+        #return prio_urgent_mvcnt, True
+    elif(depth <= max_dpth and is_stormy(match) and is_last_move_very_stormy(last_prio)):
         return prio_urgent_mvcnt, True
     else:
         return 0, False
@@ -254,7 +256,7 @@ def calc_max(match, depth, alpha, beta, last_priomove):
 
     priomoves, priocnts = generate_moves(match)
     
-    maxcnt, urgent = select_maxcnt(match, depth, priomoves, priocnts) # , last_priomove
+    maxcnt, urgent = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):
         prnt_priorities(priomoves, priocnts)
@@ -318,7 +320,7 @@ def calc_min(match, depth, alpha, beta, last_priomove):
 
     priomoves, priocnts = generate_moves(match)
 
-    maxcnt, urgent = select_maxcnt(match, depth, priomoves, priocnts) # , last_priomove
+    maxcnt, urgent = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):
         prnt_priorities(priomoves, priocnts)
