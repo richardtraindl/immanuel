@@ -1,6 +1,6 @@
 from .match import *
 from .move import *
-from .cvalues import SCORES, PIECES_RANK, ATTACKED_SCORES
+from .cvalues import *
 
 
 def do_move(match, srcx, srcy, dstx, dsty, prom_piece):

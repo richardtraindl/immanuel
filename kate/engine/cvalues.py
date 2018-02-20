@@ -1,4 +1,4 @@
-from .match import PIECES
+from .match import *
 
 
 PIECES_RANK = {

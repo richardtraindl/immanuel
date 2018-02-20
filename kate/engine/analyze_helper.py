@@ -12,9 +12,9 @@ def is_soft_pin(match, srcx, srcy):
     enemies = rook.list_field_touches(match, opp_color, srcx, srcy)
     for enemy in enemies:
         enemy_dir = rook.rk_dir(srcx, srcy, enemy[1], enemy[2])
-        stepx, stepy = rook.rk_step(REVERSE_DIRS[enemy_dir], None, None, None, None)[1:]
-        x1, y1 = search(match, srcx, srcy, stepx, stepy)
-        if(x1 != UNDEF_X):
+        stepx, stepy = rook.rk_step(rules.REVERSE_DIRS[enemy_dir], None, None, None, None)[1:]
+        x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
             friend = match.readfield(x1, y1)
             if(match.color_of_piece(friend) == color and PIECES_RANK[friend] > PIECES_RANK[piece]):
                 return True
@@ -23,9 +23,9 @@ def is_soft_pin(match, srcx, srcy):
     enemies = bishop.list_field_touches(match, opp_color, srcx, srcy)
     for enemy in enemies:
         enemy_dir = bishop.bp_dir(srcx, srcy, enemy[1], enemy[2])
-        stepx, stepy = bishop.bp_step(REVERSE_DIRS[enemy_dir], None, None, None, None)[1:]
-        x1, y1 = search(match, srcx, srcy, stepx, stepy)
-        if(x1 != UNDEF_X):
+        stepx, stepy = bishop.bp_step(rules.REVERSE_DIRS[enemy_dir], None, None, None, None)[1:]
+        x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
             friend = match.readfield(x1, y1)
             if(match.color_of_piece(friend) == color and PIECES_RANK[friend] > PIECES_RANK[piece]):
                 return True

@@ -1,6 +1,7 @@
 from .match import *
+from .cvalues import *
 from .pieces import pawn, rook, knight, bishop, queen, king
-from .cvalues import PIECES_RANK
+
 
 RETURN_CODES = {
     'ok' : 10,

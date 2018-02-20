@@ -1,7 +1,7 @@
 import random
 from .match import *
 from .move import *
-from .openings import * 
+from .openings import *
 from .helper import coord_to_index, index_to_coord
 
 

@@ -1,11 +1,12 @@
+from operator import attrgetter
 from .match import *
-from .matchmove import do_move, undo_move
-from .move import *
-from .calc import *
 from .cvalues import *
+from .matchmove import do_move, undo_move
+#from .move import *
+#from .calc import *
 from . import rules
 from .analyze_position import score_supports, score_attacks, score_opening, score_endgame
-from .analyze_helper import * 
+from .analyze_helper import *
 from .pieces import pawn, knight, bishop, rook, king
 from .pieces.generic_piece import contacts_to_token
 

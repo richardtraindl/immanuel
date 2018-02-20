@@ -1,9 +1,10 @@
 from .match import *
-from . import rules # RETURN_CODES, status, is_move_inbounds
+from .cvalues import *
+from . import rules
 from .pieces import pawn, knight, bishop, rook, king 
 from .pieces.generic_piece import cTouch
-from .analyze_helper import field_touches_beyond, field_touches
-from .cvalues import *
+from .analyze_helper import field_touches_beyond, field_touches, is_soft_pin
+
 
 
 def score_supports(match, color):
@@ -534,14 +535,14 @@ def is_stormy(match):
     ###
 
     # is pinned enemy attacked
-    for y in range(8):
+    """for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
             if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
 
             if(is_soft_pin(match, x, y)):
-                return True
+                return True"""
 
     return False
 
