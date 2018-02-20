@@ -251,7 +251,6 @@ def calc_max(match, depth, alpha, beta, last_priomove):
     newcandidates = []
     maxscore = SCORES[PIECES['wKg']] * 2
     count = 0
-    add_count = 0
 
     priomoves, priocnts = generate_moves(match)
     
@@ -269,7 +268,7 @@ def calc_max(match, depth, alpha, beta, last_priomove):
         candidates.append(None)
         return score_position(match, len(priomoves)), candidates
 
-    for priomove in priomoves: # [:maxcnt]
+    for priomove in priomoves:
         newmove = priomove.gmove
 
         count += 1
@@ -302,9 +301,7 @@ def calc_max(match, depth, alpha, beta, last_priomove):
             if(maxscore > beta):
                 return maxscore, candidates
 
-        if(urgent and len(priomoves) > count and 
-           priomove.prio > PRIO_URGENT_LIMES and add_count < 3):
-            add_count += 1
+        if(urgent and len(priomoves) > count and priomove.prio <= PRIO_URGENT_LIMES):
             continue
         elif(count >= maxcnt):
             return maxscore, candidates
@@ -318,7 +315,6 @@ def calc_min(match, depth, alpha, beta, last_priomove):
     newcandidates = []
     minscore = SCORES[PIECES['bKg']] * 2
     count = 0
-    add_count = 0
 
     priomoves, priocnts = generate_moves(match)
 
@@ -336,7 +332,7 @@ def calc_min(match, depth, alpha, beta, last_priomove):
         candidates.append(None)
         return score_position(match, len(priomoves)), candidates
 
-    for priomove in priomoves: #[:maxcnt]:
+    for priomove in priomoves:
         newmove = priomove.gmove
 
         count += 1
@@ -369,9 +365,7 @@ def calc_min(match, depth, alpha, beta, last_priomove):
             if(minscore < alpha):
                 return minscore, candidates
 
-        if(urgent and len(priomoves) > count and 
-           priomove.prio > PRIO_URGENT_LIMES and add_count < 3):
-            add_count += 1
+        if(urgent and len(priomoves) > count and priomove.prio <= PRIO_URGENT_LIMES):
             continue
         elif(count >= maxcnt):
             return minscore, candidates
