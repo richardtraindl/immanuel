@@ -70,24 +70,25 @@ PRIO = {
     'promotion' : 1,
     'capture-good-deal' : 2,
     'capture-bad-deal' : 3,
-    'flee-urgent' : 4,
-    'support-good-deal' : 5,
-    'attack-king-good-deal' : 6,
-    'attack-king-bad-deal' : 7,    
-    'defend-fork' : 8,
-    'attack-good-deal' : 9,
-    'disclosed-attack' : 10,
-    'castling' : 11,
-    'flee' : 12,
-    'good' : 13,
-    'good-postponed' : 14,
-    'support-unattacked' : 15,
-    'attack-bad-deal' : 16,
-    'support-bad-deal' : 17,
-    'bad' : 18,
-    'last' : 19 }
+    'single-silent-move' : 4,
+    'flee-urgent' : 5,
+    'support-good-deal' : 6,
+    'attack-king-good-deal' : 7,
+    'attack-king-bad-deal' : 8,    
+    'defend-fork' : 9,
+    'attack-good-deal' : 10,
+    'disclosed-attack' : 11,
+    'castling' : 12,
+    'flee' : 13,
+    'good' : 14,
+    'good-postponed' : 15,
+    'support-unattacked' : 16,
+    'attack-bad-deal' : 17,
+    'support-bad-deal' : 18,
+    'bad' : 19,
+    'last' : 20 }
 
-PRIO_URGENT_LIMES = PRIO['capture-bad-deal']
+PRIO_URGENT_LIMES = PRIO['single-silent-move']
 PRIO1_LIMES = PRIO['castling']
 
 
