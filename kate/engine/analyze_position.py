@@ -502,7 +502,7 @@ def are_attacks_or_captures_possible(match):
                 continue
             else:
                 friends, enemies = field_touches(match, Match.color_of_piece(piece), x, y)
-                if(len(friends) <= len(enemies)):
+                if(len(friends) < len(enemies)):
                     return True
                 else:
                     for enemy in enemies:
