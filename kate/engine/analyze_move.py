@@ -464,3 +464,9 @@ def rank_moves(match, priomoves):
             pmove.prio = PRIO['good-postponed']
 
     priomoves.sort(key=attrgetter('prio'))
+
+    for priomove in reversed(priomoves):
+        if(priomove.prio > PRIO['single-silent-move'] and priomove.prio <= PRIO['good-postponed']):
+            priomove.prio = PRIO['single-silent-move']
+            break
+
