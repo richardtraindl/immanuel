@@ -1,7 +1,9 @@
+import re
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
+from django.utils import timezone
 from .forms import *
 from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from .modules import interface
@@ -183,6 +185,79 @@ def resume(request, matchid, switch=0):
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch, msg)))
 
     return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
+
+
+def print_match(request, matchid):
+    context = RequestContext(request)
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+    form = WriteMatchForm()
+    data = str(modelmatch.status) + ";" + str(modelmatch.count) + ";" + str(modelmatch.score) + ";" + \
+           modelmatch.begin.strftime("%Y-%m-%d-%H:%M:%S") + ";" + modelmatch.white_player + ";" + str(modelmatch.white_player_human) + ";" +  \
+           str(modelmatch.elapsed_time_white) + ";" + modelmatch.black_player + ";" + str(modelmatch.black_player_human) + ";" +  \
+           str(modelmatch.elapsed_time_black) + ";" + str(modelmatch.level) + ";" + modelmatch.board + \
+           str(modelmatch.fifty_moves_count) + ";" + str(modelmatch.wKg_x) + ";" + str(modelmatch.wKg_y) + ";" + \
+           str(modelmatch.bKg_x) + ";" + str(modelmatch.bKg_y) + ";" + str(modelmatch.wKg_first_movecnt) + ";" + \
+           str(modelmatch.bKg_first_movecnt) + ";" + str(modelmatch.wRk_a1_first_movecnt) + ";" + \
+           str(modelmatch.wRk_h1_first_movecnt) + ";" + str(modelmatch.bRk_a8_first_movecnt) + ";" + \
+           str(modelmatch.bRk_h8_first_movecnt) + ";"
+
+    return render(request, 'kate/print_core_match.html', { 'match': modelmatch , 'form': form, 'data': data } )
+
+
+def write_match(request):
+    context = RequestContext(request)
+
+    if(request.method == 'POST'):
+        form = WriteMatchForm(request.POST)
+        if(form.is_valid()):
+            modelmatch = ModelMatch()
+
+            re.sub('[^A-Za-z0-9-;]+', '', form.match_data)
+            print(form.match_data)
+            data_fields = form.match_data.split(";")
+            modelmatch.status = int(data_fields[0])
+            modelmatch.count = 0 #int(data_fields[1])
+            modelmatch.score = 1 #int(data_fields[2])
+            # modelmatch.begin = timezone.now #int(data_fields[3])
+            modelmatch.white_player = data_fields[4]
+
+            if(data_fields[5] == "True"):
+                modelmatch.white_player_human = True
+            else:
+                modelmatch.white_player_human = False
+
+            modelmatch.elapsed_time_white = int(data_fields[6])
+            modelmatch.black_player = data_fields[7]
+
+            if(data_fields[8] == "True"):
+                modelmatch.black_player_human = True
+            else:
+                modelmatch.black_player_human = False
+
+            modelmatch.elapsed_time_black = int(data_fields[9])
+            modelmatch.level = int(data_fields[10])
+
+            board = ""
+            for i in range(11, 75):
+                board += data_fields[i] + ";"
+            modelmatch.board = board
+
+            modelmatch.fifty_moves_count = int(data_fields[75])
+            modelmatch.wKg_x = int(data_fields[76])
+            modelmatch.wKg_y = int(data_fields[77])
+            modelmatch.bKg_x = int(data_fields[78])
+            modelmatch.bKg_y = int(data_fields[79])
+            modelmatch.wKg_first_movecnt = int(data_fields[80])
+            modelmatch.bKg_first_movecnt = int(data_fields[81])
+            modelmatch.wRk_a1_first_movecnt = int(data_fields[82])
+            modelmatch.wRk_h1_first_movecnt = int(data_fields[83])
+            modelmatch.bRk_a8_first_movecnt = int(data_fields[84])
+            modelmatch.bRk_h8_first_movecnt = int(data_fields[85])
+
+            modelmatch.save()
+            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id,)))
+
+    return HttpResponseRedirect(reverse('kate:index'))
 
 
 def analyze(request, matchid=None, threadidx=0, rcount=0):

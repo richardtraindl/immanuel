@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load kate_extras %}
+
+
+{% block header %}
+    <div class="grid">
+        <div class="row_12_of_12">
+            <h1>Print Match</h1>
+            <h2>
+                {{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }} , &nbsp; 
+                Level: &nbsp; {{ match.level|matchlevel }}
+            </h2>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block nav %}
+    <div class="grid">
+        <div class="row_12_of_12">
+            <h2>
+                <a href="{% url 'kate:index' %}">OVERVIEW</a>
+            </h2>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block content %}
+    <div class="grid">
+        <div class="row_12_of_12">
+            {{ data }}
+        </div>
+
+        <div class="row_12_of_12">
+            <form method="post" action="{% url 'kate:writematch' %}">
+               {% csrf_token %}
+               {{ form }}
+               <input type="submit" value="submit" />
+           </form>
+        </div>
+    </div>
+{% endblock %}
