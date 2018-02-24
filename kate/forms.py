@@ -42,10 +42,10 @@ class MatchForm(forms.Form):
             raise ValidationError("...")
 
 
-class WriteMatchForm(forms.Form):
+class ImportMatchForm(forms.Form):
     match_data = forms.CharField(label=' Put all data', max_length=4096)
 
     def clean(self):
-        cleaned_data = super(WriteMatchForm, self).clean()
+        cleaned_data = super(ImportMatchForm, self).clean()
         self.match_data = cleaned_data.get("match_data")
 

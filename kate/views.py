@@ -21,8 +21,12 @@ def index(request):
     return render(request, 'kate/index.html', { 'matches': modelmatches } )
 
 
-def match(request, matchid=None, switch=0, msg=None):
+def match(request, matchid=None):
     context = RequestContext(request)
+    switch = request.GET.get('switch', 0)
+    msg = request.GET.get('msg', None)
+    debug = request.GET.get('debug', "false")
+
     if(matchid == None):
         modelmatch = ModelMatch(white_player=None, black_player=None)
     else:
@@ -80,11 +84,40 @@ def match(request, matchid=None, switch=0, msg=None):
 
     form = DoMoveForm()
 
-    return render(request, 'kate/match.html', { 'match': modelmatch, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running, } )
+    if(debug == "true"):
+        importform = ImportMatchForm()
+        debug_data = str(modelmatch.status) + ";" + \
+                 str(modelmatch.count) + ";" + \
+                 str(modelmatch.score) + ";" + \
+                 modelmatch.begin.strftime("%Y-%m-%d-%H:%M:%S") + ";" + \
+                 modelmatch.white_player + ";" + \
+                 str(modelmatch.white_player_human) + ";" + \
+                 str(modelmatch.elapsed_time_white) + ";" + \
+                 modelmatch.black_player + ";" + \
+                 str(modelmatch.black_player_human) + ";" + \
+                 str(modelmatch.elapsed_time_black) + ";" + \
+                 str(modelmatch.level) + ";" + \
+                 modelmatch.board + \
+                 str(modelmatch.fifty_moves_count) + ";" + \
+                 str(modelmatch.wKg_x) + ";" + \
+                 str(modelmatch.wKg_y) + ";" + \
+                 str(modelmatch.bKg_x) + ";" + \
+                 str(modelmatch.bKg_y) + ";" + \
+                 str(modelmatch.wKg_first_movecnt) + ";" + \
+                 str(modelmatch.bKg_first_movecnt) + ";" + \
+                 str(modelmatch.wRk_a1_first_movecnt) + ";" + \
+                 str(modelmatch.wRk_h1_first_movecnt) + ";" + \
+                 str(modelmatch.bRk_a8_first_movecnt) + ";" + \
+                 str(modelmatch.bRk_h8_first_movecnt) + ";"
+    else:
+        debug_data = ""
+
+    return render(request, 'kate/match.html', { 'match': modelmatch, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running, 'debug': debug, 'debug_data': debug_data } )
 
 
-def settings(request, matchid=None, switch=0):
+def settings(request, matchid=None):
     context = RequestContext(request)
+    switch = request.GET.get('switch', 0)
 
     if(matchid == None):
         modelmatch = ModelMatch()
@@ -103,13 +136,10 @@ def settings(request, matchid=None, switch=0):
             modelmatch.level = form.level
             modelmatch.save()
             
-            #thread = ModelMatch.get_active_thread(modelmatch)
-            #if(thread is None):
-            #    interface.calc_move_for_immanuel(modelmatch)
             if(create):
                 interface.calc_move_for_immanuel(modelmatch)
 
-            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
+            return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
         else:
             return render(request, 'kate/settings.html', { 'form': form, 'matchid': matchid, 'switch': switch } )
     else:
@@ -126,13 +156,16 @@ def settings(request, matchid=None, switch=0):
             return render(request, 'kate/settings.html', { 'form': form, 'matchid': matchid, 'switch': switch } )
 
 
-def delete(request, matchid):
-    ModelMatch.objects.filter(id=matchid).delete()
+def delete(request, matchid=None):
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+    ModelMatch.objects.filter(id=modelmatch.id).delete()
     return HttpResponseRedirect('/kate')
 
 
-def do_move(request, matchid, switch=0):
+def do_move(request, matchid=None):
     context = RequestContext(request)
+    switch = request.GET.get('switch', 0)
+
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
         if(modelmatch.next_color_human() == False):
@@ -158,13 +191,15 @@ def do_move(request, matchid, switch=0):
             else:
                 msg= RETURN_CODES['format-error']
 
-        return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch, msg)))
+        return HttpResponseRedirect("%s?switch=%s&msg=%s" % (reverse('kate:match', args=(matchid,)), switch, msg))
     else:
-        return HttpResponseRedirect(reverse('kate:match', args=(matchid, switch)))
+        return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(matchid,)), switch))
 
 
-def undo_move(request, matchid, switch=0):
+def undo_move(request, matchid=None):
     context = RequestContext(request)
+    switch = request.GET.get('switch', 0)
+
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
@@ -172,52 +207,37 @@ def undo_move(request, matchid, switch=0):
         ModelMatch.remove_outdated_threads()
 
     interface.undo_move(modelmatch)
-    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
+
+    return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
 
-def resume(request, matchid, switch=0):
+def resume(request, matchid=None):
     context = RequestContext(request)
+    switch = request.GET.get('switch', 0)
+
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread is None):
         flag, msg = interface.calc_move_for_immanuel(modelmatch)
         if(flag == False):
-            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch, msg)))
+            return HttpResponseRedirect("%s?switch=%s&msg=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msg))
 
-    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switch)))
-
-
-def print_match(request, matchid):
-    context = RequestContext(request)
-    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-    form = WriteMatchForm()
-    data = str(modelmatch.status) + ";" + str(modelmatch.count) + ";" + str(modelmatch.score) + ";" + \
-           modelmatch.begin.strftime("%Y-%m-%d-%H:%M:%S") + ";" + modelmatch.white_player + ";" + str(modelmatch.white_player_human) + ";" +  \
-           str(modelmatch.elapsed_time_white) + ";" + modelmatch.black_player + ";" + str(modelmatch.black_player_human) + ";" +  \
-           str(modelmatch.elapsed_time_black) + ";" + str(modelmatch.level) + ";" + modelmatch.board + \
-           str(modelmatch.fifty_moves_count) + ";" + str(modelmatch.wKg_x) + ";" + str(modelmatch.wKg_y) + ";" + \
-           str(modelmatch.bKg_x) + ";" + str(modelmatch.bKg_y) + ";" + str(modelmatch.wKg_first_movecnt) + ";" + \
-           str(modelmatch.bKg_first_movecnt) + ";" + str(modelmatch.wRk_a1_first_movecnt) + ";" + \
-           str(modelmatch.wRk_h1_first_movecnt) + ";" + str(modelmatch.bRk_a8_first_movecnt) + ";" + \
-           str(modelmatch.bRk_h8_first_movecnt) + ";"
-
-    return render(request, 'kate/print_core_match.html', { 'match': modelmatch , 'form': form, 'data': data } )
+    return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
 
-def write_match(request):
+def import_match(request):
     context = RequestContext(request)
 
     if(request.method == 'POST'):
-        form = WriteMatchForm(request.POST)
+        form = ImportMatchForm(request.POST)
         if(form.is_valid()):
             modelmatch = ModelMatch()
 
             re.sub('[^A-Za-z0-9-;]+', '', form.match_data)
-            print(form.match_data)
             data_fields = form.match_data.split(";")
             modelmatch.status = int(data_fields[0])
-            modelmatch.count = 0 #int(data_fields[1])
-            modelmatch.score = 1 #int(data_fields[2])
+            modelmatch.count = int(data_fields[1])
+            modelmatch.score = int(data_fields[2])
             # modelmatch.begin = timezone.now #int(data_fields[3])
             modelmatch.white_player = data_fields[4]
 
@@ -256,12 +276,14 @@ def write_match(request):
 
             modelmatch.save()
             return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id,)))
-
-    return HttpResponseRedirect(reverse('kate:index'))
+    else:
+        form = ImportMatchForm()
+        return render(request, 'kate/import.html', { 'form': form } )
 
 
 def analyze(request, matchid=None, threadidx=0, rcount=0):
     context = RequestContext(request)
+
     if(matchid == None):
         return HttpResponseRedirect('/kate')
     else:
@@ -281,6 +303,7 @@ def analyze(request, matchid=None, threadidx=0, rcount=0):
 
 def replay(request, matchid, threadidx=0, rcount=0):
     context = RequestContext(request)
+
     if(request.method == 'POST'):
         match, searchmoves = read_searchmoves()
         if(match.id != matchid or threadidx is None or rcount is None):
@@ -315,6 +338,7 @@ def replay(request, matchid, threadidx=0, rcount=0):
 
 def add_comment(request, matchid):
     context = RequestContext(request)
+
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     if(request.method == 'POST'):
         newcomment = request.POST['newcomment']
@@ -324,11 +348,12 @@ def add_comment(request, matchid):
             comment.match_id = modelmatch.id
             comment.text = newcomment
             comment.save()
-        return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id, switchflag)))
+        return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switchflag))
 
 
 def fetch_comments(request):
     context = RequestContext(request)
+
     if(request.method == 'GET'):
         matchid = request.GET['matchid']
         comments = ModelComment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:3]

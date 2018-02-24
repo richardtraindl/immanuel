@@ -7,13 +7,12 @@
 {% block header %}
     <div class="grid">
         <div class="row_12_of_12">
-            <h1><a href="{% url 'kate:match' match.id switch %}">Game</a></h1>
+            <h1><a href="{% url 'kate:match' match.id %}?switch={{ switch }}">Game</a></h1>
             <h2>
                 {{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }} , &nbsp; 
                 Created on: &nbsp; {{ match.begin|fmtdate }} ,&nbsp;
                 Level: &nbsp; {{ match.level|matchlevel }}
             </h2>
-            <p style="font-size: 12px;">2018.02.20-2</p>
         </div>
     </div>
 {% endblock %}
@@ -23,12 +22,10 @@
     <div class="grid">
         <div class="row_12_of_12">
             <h2>
-                <a href="{% url 'kate:match' match.id switch|invert %}">SWITCH BOARD</a> |
-                <a href="{% url 'kate:undomove' match.id switch %}" onclick="return confirm('Withdraw last move?')">WITHDRAW MOVE</a> |
-                <a href="{% url 'kate:resume' match.id switch %}">RESUME</a> |
-                <a href="{% url 'kate:settings' match.id switch %}">EDIT GAME</a> |
-                <a href="{% url 'kate:settings' %}">NEW GAME</a> |
-                <a href="{% url 'kate:printmatch' match.id %}">PRINT MATCH</a> |
+                <a href="{% url 'kate:match' match.id %}?switch={{ switch|invert }}">SWITCH BOARD</a> |
+                <a href="{% url 'kate:undomove' match.id %}?switch={{ switch }}" onclick="return confirm('Withdraw last move?')">WITHDRAW MOVE</a> |
+                <a href="{% url 'kate:resume' match.id %}?switch={{ switch }}">RESUME</a> |
+                <a href="{% url 'kate:settings' match.id %}?switch={{ switch }}">EDIT GAME</a> |
                 <a href="{% url 'kate:index' %}">OVERVIEW</a>
             </h2>
         </div>
@@ -75,7 +72,7 @@
                 </table>
             </div>
 
-           <form id="move" method="post" action="{% url 'kate:domove' match.id switch %}" style="display: none;">
+           <form id="move" method="post" action="{% url 'kate:domove' match.id %}?switch={{ switch }}" style="display: none;">
                {% csrf_token %}
                {{ form }}
                <input type="submit" value="submit" />
@@ -94,6 +91,12 @@
             <div id="minutes">
               {% include "kate/_minutes.html" with match=match %}
             </div>
+        </div>
+        
+        <div class="row_12_of_12">
+            {% if debug == 'true' %}
+              {{ debug_data }}
+            {% endif %}
         </div>
     </div>
 
