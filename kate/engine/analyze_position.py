@@ -230,7 +230,7 @@ def is_opening(match):
 
 
 def is_endgame(match):
-    return match.count >= 30
+    return match.count >= 40
 
 
 def is_king_defended_by_pawns(match, color):

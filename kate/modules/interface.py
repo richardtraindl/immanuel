@@ -115,7 +115,7 @@ class immanuelsThread(threading.Thread):
     def run(self):
         print("Thread starting " + str(self.name))
         candidates = calc.calc_move(self.match) 
-        if(len(candidates) > 0 and ModelMatch.get_active_thread(self.match) and self.running):
+        if(len(candidates) > 0 and ModelMatch.get_active_thread(self.match)): #  and self.running
             gmove = candidates[0]
 
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -128,14 +128,10 @@ class immanuelsThread(threading.Thread):
             map_moves(move, modelmove, MAP_DIR['engine-to-model'])
             modelmove.match = modelmatch
             modelmove.save()
+            self.running = False
             print("move saved")
         else:
             print("no move found or thread outdated!")
-
-
-def thread_do_move(match):
-    thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
-    thread.start()
 
 
 def calc_move_for_immanuel(modelmatch):
@@ -146,7 +142,8 @@ def calc_move_for_immanuel(modelmatch):
     elif(modelmatch.next_color_human()):
         return False, rules.RETURN_CODES['wrong-color']
     else:
-        thread_do_move(match)
+        thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
+        thread.start()
         return True, 0
 
 
