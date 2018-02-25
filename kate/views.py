@@ -23,7 +23,7 @@ def index(request):
 
 def match(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', 0)
+    switch = request.GET.get('switch', '0')
     msg = request.GET.get('msg', None)
     debug = request.GET.get('debug', "false")
 
@@ -117,7 +117,7 @@ def match(request, matchid=None):
 
 def settings(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', 0)
+    switch = request.GET.get('switch', '0')
 
     if(matchid == None):
         modelmatch = ModelMatch()
@@ -164,7 +164,7 @@ def delete(request, matchid=None):
 
 def do_move(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', 0)
+    switch = request.GET.get('switch', '0')
 
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
@@ -198,7 +198,7 @@ def do_move(request, matchid=None):
 
 def undo_move(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', 0)
+    switch = request.GET.get('switch', '0')
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     thread = ModelMatch.get_active_thread(modelmatch)
@@ -213,7 +213,7 @@ def undo_move(request, matchid=None):
 
 def resume(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', 0)
+    switch = request.GET.get('switch', '0')
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     thread = ModelMatch.get_active_thread(modelmatch)
