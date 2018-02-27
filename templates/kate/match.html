@@ -5,20 +5,17 @@
 
 
 {% block header %}
-    <div>
         <h1><a href="{% url 'kate:match' match.id %}?switch={{ switch }}">Game</a></h1>
 
         <h2>{{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }}</h2>
-        
+
         <p>Level: &nbsp; {{ match.level|matchlevel }}</p>
 
-        <p>Created on: &nbsp; {{ match.begin|fmtdate }}</p>        
-    </div>
+        <p>Created on: &nbsp; {{ match.begin|fmtdate }}</p>
 {% endblock %}
 
 
 {% block nav %}
-    <div>
         <h2>
             <a href="{% url 'kate:match' match.id %}?switch={{ switch|invert }}">SWITCH BOARD</a> |
             <a href="{% url 'kate:undomove' match.id %}?switch={{ switch }}" onclick="return confirm('Withdraw last move?')">WITHDRAW MOVE</a> |
@@ -26,7 +23,6 @@
             <a href="{% url 'kate:settings' match.id %}?switch={{ switch }}">EDIT GAME</a> |
             <a href="{% url 'kate:index' %}">OVERVIEW</a>
         </h2>
-    </div>
 {% endblock %}
 
 
