@@ -85,7 +85,7 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 10px;
-    width: 748px;
+    width: 480px;
     min-width: 480px;
     background-color: #FF8C69;
 }
@@ -247,6 +247,9 @@ a.btn, a.btn:visited, a.btn:hover {
 }
 
 @media (min-width: 1024px) {
+    #wrapper {
+        width: 748px;
+    }
     #content {
         display: grid;
         grid-template-columns: 7fr 3fr;
