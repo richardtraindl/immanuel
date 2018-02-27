@@ -250,7 +250,7 @@ a.btn, a.btn:visited, a.btn:hover {
     }
     #content {
         display: grid;
-        grid-template-columns: 7fr 3fr;
+        grid-template-columns: 460px 1fr;
         grid-gap: 10px;
     }
     #chat {
