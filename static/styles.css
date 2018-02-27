@@ -43,18 +43,21 @@ h1, h2, h3 {
     padding: 0px;
 }
 
-h1, h1 a {
+h1, h1 a  {
     font-size: 22px;
 }
 
-h2 {
+h2, h2 a  {
+    font-size: 20px;
+}
+
+h3, h3 a  {
     font-size: 18px;
 }
 
 p {
     margin: 0px;
     padding: 0px;
-    font-size: 16px;
 }
 
 a, a:link, a:visited, a:active {
