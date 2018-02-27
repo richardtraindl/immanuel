@@ -7,11 +7,14 @@
 {% block header %}
     <div>
         <h1><a href="{% url 'kate:match' match.id %}?switch={{ switch }}">Game</a></h1>
+
         <h2>
             {{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }} , &nbsp; 
-            Created on: &nbsp; {{ match.begin|fmtdate }} ,&nbsp;
             Level: &nbsp; {{ match.level|matchlevel }}
         </h2>
+        
+        <p>Created on: &nbsp; {{ match.begin|fmtdate }} ,&nbsp;</p>
+        
     </div>
 {% endblock %}
 
