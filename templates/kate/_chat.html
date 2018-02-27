@@ -1,14 +1,16 @@
+{% load staticfiles %}
+{% load kate_extras %}
 
-            <div>
-                <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}?switch={{ switch }}" matchid="{{ match.id }}">
-                    {% csrf_token %}
-                    <textarea id="newcomment" name="newcomment" style="width: 100%"></textarea>
-                    <input type="submit" value="comment" />
-                </form>
-            </div>
+    <div>
+        <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}?switch={{ switch }}" matchid="{{ match.id }}">
+            {% csrf_token %}
+            <textarea id="newcomment" name="newcomment" style="width: 100%"></textarea>
+            <input type="submit" value="comment" />
+        </form>
+    </div>
 
-            <div>
-                {% for comment in comments reversed %}
-                    <p>{{ comment.text }}</p>
-                {% endfor %}
-            </div>
+    <div>
+        {% for comment in comments reversed %}
+            <p>{{ comment.text }}</p>
+        {% endfor %}
+    </div>
