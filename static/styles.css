@@ -3,7 +3,7 @@
     padding: 0;
     border: 0;
     font-family: "Trebuchet MS", Copperplate, "Myriad Pro", Arial, sans-serif;
-    font-size: 16px;
+    font-size: 22px;
 }
 
 /* HTML5 display-role reset for older browsers */
@@ -43,21 +43,21 @@ h1, h2, h3 {
     padding: 0px;
 }
 
-h1, h1 a  {
-    font-size: 22px;
-}
-
-h2, h2 a  {
-    font-size: 20px;
-}
-
-h3, h3 a  {
-    font-size: 18px;
-}
-
 p {
     margin: 0px;
     padding: 0px;
+}
+
+h1, h1 a  {
+    font-size: 28px;
+}
+
+h2, h2 a  {
+    font-size: 26px;
+}
+
+h3, h3 a  {
+    font-size: 24px;
 }
 
 a, a:link, a:visited, a:active {
@@ -160,8 +160,8 @@ nav li a:active {
 }
 
 #board td {
-    width: 48px; 
-    height: 48px;
+    width: 64px; 
+    height: 64px;
 }
 
 #board tr:nth-child(odd) td:nth-child(even), #board tr:nth-child(even) td:nth-child(odd) {
@@ -169,23 +169,23 @@ nav li a:active {
 }
 
 #board img {
-    width: 48px; 
-    height: 48px;
+    width: 64px; 
+    height: 64px;
 }
 
 #board-letters1 td, #board-letters2 td, .board-label {
     background-color: #FF8C69 !important;
     text-align: center !important;
-    font-size: 12px !important;
+    font-size: 20px !important;
 }
 
 #board-letters1 td:first-child, #board-letters1 td:nth-child(10),
 #board-letters2 td:first-child, #board-letters2 td:nth-child(10) {
-    width: 24px !important;
+    width: 32px !important;
 }
 
 #board-letters1 td, #board-letters2 td {
-    height: 24px !important;
+    height: 32px !important;
 }
 
 #minutes {
@@ -263,5 +263,35 @@ a.btn, a.btn:visited, a.btn:hover {
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-gap: 10px;
+    }
+    #board td {
+        width: 48px; 
+        height: 48px;
+    }
+    #board img {
+        width: 48px; 
+        height: 48px;
+    }
+    #board-letters1 td, #board-letters2 td, .board-label {
+        font-size: 12px !important;
+    }
+    #board-letters1 td:first-child, #board-letters1 td:nth-child(10),
+    #board-letters2 td:first-child, #board-letters2 td:nth-child(10) {
+        width: 24px !important;
+    }
+    #board-letters1 td, #board-letters2 td {
+        height: 24px !important;
+    }
+    h1, h1 a  {
+        font-size: 22px;
+    }
+    h2, h2 a  {
+        font-size: 20px;
+    }
+    h3, h3 a  {
+        font-size: 18px;
+    }
+    p  {
+        font-size: 16px;
     }
 }
