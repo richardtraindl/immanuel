@@ -89,23 +89,17 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 10px;
-    width: 460px;
-    min-width: 460px;
+    width: 576px;
+    min-width: 576px;
     background-color: #FF8C69;
 }
 
 header {
-    /* display: grid;
-    grid-template-columns: 1fr;
-    grid-gap: 10px; */
     margin: 0px 0px 10px 0px;
     background-color: Lightgray;
 }
 
 nav {
-    /* display: grid;
-    grid-template-columns: 1fr;
-    grid-gap: 10px; */
     margin: 0px 0px 10px 0px;
 }
 
