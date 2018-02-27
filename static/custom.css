@@ -72,7 +72,7 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 10px;
-    width: 748px;
+    /* width: 748px; */
     min-width: 600px;
     background-color: #FF8C69;
 }
