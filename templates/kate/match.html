@@ -71,22 +71,16 @@
     </div>
 
     <div id="minutes">
-        <!-- div id="score" -->
         <p>Score: &nbsp; {{ match.score }}</p>
-        <!-- /div -->
 
-        <!-- div id="running" -->
         <p> &nbsp; {{ running }}</p>
-        <!-- /div -->
 
         {% include "kate/_minutes.html" with match=match %}
     </div>
 
-    <div>
-        {% if debug == 'true' %}
-            {{ debug_data }}
-        {% endif %}
-    </div>
+    {% if debug == 'true' %}
+        <p>{{ debug_data }}</p>
+    {% endif %}
 
     <script>
         $(document).ready(function() {
