@@ -8,13 +8,11 @@
     <div>
         <h1><a href="{% url 'kate:match' match.id %}?switch={{ switch }}">Game</a></h1>
 
-        <h2>
-            {{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }} , &nbsp; 
-            Level: &nbsp; {{ match.level|matchlevel }}
-        </h2>
+        <h2>{{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }}</h2>
         
-        <p>Created on: &nbsp; {{ match.begin|fmtdate }} ,&nbsp;</p>
-        
+        <p>Level: &nbsp; {{ match.level|matchlevel }}</p>
+
+        <p>Created on: &nbsp; {{ match.begin|fmtdate }}</p>        
     </div>
 {% endblock %}
 
@@ -41,9 +39,7 @@
 
 {% block content %}
     <div id="board-wrapper">
-        <div id="msg">
-            {{ msg|safe }}
-        </div>
+        <p id="msg">{{ msg|safe }}</div>
                 
         {% if switch == '0' %}
             {% include "kate/_chessboard.html" with match=match %}
