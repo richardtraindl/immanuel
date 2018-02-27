@@ -92,17 +92,17 @@ table {
 }
 
 header {
-    display: grid;
+    /* display: grid;
     grid-template-columns: 1fr;
-    grid-gap: 10px;
+    grid-gap: 10px; */
     margin: 0px 0px 10px 0px;
     background-color: Lightgray;
 }
 
 nav {
-    display: grid;
+    /* display: grid;
     grid-template-columns: 1fr;
-    grid-gap: 10px;
+    grid-gap: 10px; */
     margin: 0px 0px 10px 0px;
 }
 
