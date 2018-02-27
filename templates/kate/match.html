@@ -35,7 +35,7 @@
 
 {% block content %}
     <div id="board-wrapper">
-        <p id="msg">{{ msg|safe }}</div>
+        <p id="msg">{{ msg|safe }}</>
                 
         {% if switch == '0' %}
             {% include "kate/_chessboard.html" with match=match %}
