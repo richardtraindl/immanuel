@@ -338,17 +338,17 @@ def replay(request, matchid, threadidx=0, rcount=0):
 
 def add_comment(request, matchid):
     context = RequestContext(request)
+    switch = request.GET.get('switch', '0')
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     if(request.method == 'POST'):
         newcomment = request.POST['newcomment']
-        switchflag = request.POST['switchflag']        
         if(len(newcomment) > 0):
             comment = ModelComment()
             comment.match_id = modelmatch.id
             comment.text = newcomment
             comment.save()
-        return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switchflag))
+        return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
 
 def fetch_comments(request):

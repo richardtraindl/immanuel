@@ -1,18 +1,14 @@
 
-
-        <div class="grid">
-            <div id="comments" class="row_6_of_12">
-            {% for comment in comments reversed %}
-                <p>{{ comment.text }}</p>
-            {% endfor %}
-            </div>
-            
-            <div class="row_6_of_12">
-                <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}" matchid="{{ match.id }}">
+            <div>
+                <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}?switch={{ switch }}" matchid="{{ match.id }}">
                     {% csrf_token %}
-                    <textarea id="newcomment" name="newcomment"></textarea>
-                    <input type="text" name="switchflag" value="{{ switch }}" style="display: none;" />
-                    <input type="submit" value="kommentieren" />
+                    <textarea id="newcomment" name="newcomment" style="width: 100%"></textarea>
+                    <input type="submit" value="comment" />
                 </form>
             </div>
-        </div>
+
+            <div>
+                {% for comment in comments reversed %}
+                    <p>{{ comment.text }}</p>
+                {% endfor %}
+            </div>

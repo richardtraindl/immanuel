@@ -82,9 +82,10 @@ div[class*='row_'] {
     width: 7.33%;
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 768px) {
     header, header * {
         display: inline-block;
+        /* text-align: center; */
     }
     nav li {
         clear: both;
