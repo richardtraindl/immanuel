@@ -21,7 +21,7 @@ html {
 }
 
 body {
-    background-color: white;
+    background-color: White;
 }
 
 h1, h2, h3 {
@@ -82,7 +82,7 @@ header {
     grid-template-columns: 1fr;
     grid-gap: 10px;
     margin: 0px 0px 10px 0px;
-    background-color: lightgrey;
+    background-color: Lightgray;
 }
 
 nav {
@@ -200,7 +200,7 @@ button, input[type="submit"]{
   text-align: center;
   color: #333;
   background-color: #E6E6E6;
-  background: linear-gradient(top, white 0%, #E6E6E6 100%);
+  background: linear-gradient(top, White 0%, #E6E6E6 100%);
   border-radius: 4px;
   cursor: pointer;
   border: 1px solid Black;
@@ -233,7 +233,7 @@ a.btn, a.btn:visited, a.btn:hover {
   padding-bottom: 5px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     #content {
         display: grid;
         grid-template-columns: 7fr 3fr;
