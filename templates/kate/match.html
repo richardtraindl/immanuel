@@ -26,15 +26,15 @@
 {% endblock %}
 
 
-{% block chat %}
-    {% if match.white_player_human and match.black_player_human %}
-        {% include "kate/_chat.html" with match=match %}
-    {% endif %}
-{% endblock %}
-
-
 {% block content %}
-    <div id="board-wrapper">
+    {% if match.white_player_human and match.black_player_human %}
+        <div id="chat">
+            {% include "kate/_chat.html" with match=match %}
+        </div>
+    {% endif %}
+
+    <div id="board-minutes">
+      <div>
         <p id="msg">{{ msg|safe }}</>
                 
         {% if switch == '0' %}
@@ -63,14 +63,15 @@
            {{ form }}
            <input type="submit" value="submit" />
        </form>
-    </div>
+      </div>
 
-    <div id="minutes">
+      <div id="minutes">
         <p>Score: &nbsp; {{ match.score }}</p>
 
         <p> &nbsp; {{ running }}</p>
 
         {% include "kate/_minutes.html" with match=match %}
+      </div>
     </div>
 
     {% if debug == 'true' %}
