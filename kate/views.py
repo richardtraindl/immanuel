@@ -2,6 +2,7 @@ import re
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.template import RequestContext
 from django.utils import timezone
 from .forms import *
@@ -32,7 +33,7 @@ def match(request, matchid=None):
     else:
         try:
             modelmatch = ModelMatch.objects.get(id=matchid)
-        except ModelMatch.DoesNotExist:
+        except ObjectDoesNotExist: #ModelMatch.DoesNotExist:
             return HttpResponseRedirect('/kate')
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
