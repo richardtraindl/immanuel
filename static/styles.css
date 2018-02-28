@@ -87,6 +87,11 @@ table {
     text-align: left;
 }
 
+#match-list th, td {
+    padding: 20px;
+    text-align: left;
+}
+
 #wrapper {
     margin: 0px auto;
     padding: 0px;
