@@ -129,6 +129,10 @@ nav li a:active {
     background-color: Wheat; /* #FFFACD; */ 
 }
 
+#content {
+    background-color: #FF8C69;
+}
+
 #chat {
     padding: 10px;
     background-color: #FFDEAD;
