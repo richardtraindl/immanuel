@@ -33,9 +33,9 @@
         </div>
     {% endif %}
 
-    <div id="board-minutes">
-      <div>
-        <p id="msg">{{ msg|safe }}</>
+    <div id="game">
+      <div id="board-wrapper">
+        <p id="msg">{{ msg|safe }}</p>
                 
         {% if switch == '0' %}
             {% include "kate/_chessboard.html" with match=match %}
