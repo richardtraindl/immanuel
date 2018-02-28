@@ -130,12 +130,13 @@ nav li a:active {
 }
 
 #chat {
-    margin: 0px 0px 10px 0px;
+    padding: 10px;
     background-color: #FFDEAD;
 }
 
 #board-minutes {
     padding: 10px;
+    background-color: #FFFACD;
 }
 
 /* #chat p {
