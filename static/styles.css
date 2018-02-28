@@ -129,9 +129,11 @@ nav li a:active {
     background-color: Wheat; /* #FFFACD; */ 
 } */
 
-/* #content {
+#content {
+    margin: 10px 0px 10px 0px;
+    padding: 10px;
     background-color: #FF8C69;
-} */
+}
 
 #chat {
     padding: 10px;
@@ -139,9 +141,9 @@ nav li a:active {
 }
 
 #board-minutes {
-    padding: 10px;
+    /* padding: 10px; */
     /* background-color: #FFFACD; */
-    background-color: #FF8C69;
+    /* background-color: #FF8C69; */
 }
 
 /* #chat p {
