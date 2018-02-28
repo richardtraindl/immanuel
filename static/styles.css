@@ -129,7 +129,7 @@ nav li a:active {
     background-color: Wheat; /* #FFFACD; */ 
 } */
 
-#content {
+#content-wrapper {
     margin: 10px 0px 10px 0px;
     padding: 10px;
     background-color: #FF8C69;
