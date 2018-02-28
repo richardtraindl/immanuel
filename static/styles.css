@@ -133,6 +133,10 @@ nav li a:active {
     background-color: #FFDEAD;
 }
 
+#board-minutes {
+    padding: 0px 10px;
+}
+
 /* #chat p {
     margin: 0px;
     padding: 0px 0px 4px 0px;
