@@ -1,32 +1,22 @@
 {% extends "base.html" %}
-
 {% load staticfiles %}
 
 
 {% block header %}
-    <div class="grid">
-        <div class="row_12_of_12">
-            <h2>Overview</h2>
-        </div>
-    </div>
+    <h2>Overview</h2>
 {% endblock %}
 
 {% block nav %}
-    <div class="grid">
-        <div class="row_12_of_12">
-            <h2>
-                <a href="{% url 'kate:settings' %}">NEW GAME</a> |
-                <a href="{% url 'kate:importmatch' %}">IMPORT GAME</a>
-            </h2>
-            <p style="font-size: 12px;">2018.02.27-2</p>
-        </div>
-    </div>
+    <h2>
+        <a href="{% url 'kate:settings' %}">NEW GAME</a> |
+        <a href="{% url 'kate:importmatch' %}">IMPORT GAME</a>
+    </h2>
+
+    <p style="font-size: 12px;">2018.02.28-1</p>
 {% endblock %}
 
 
 {% block content %}
-    <div class="grid">
-        <div class="row_12_of_12">
             <ul>
                 <table>
                 {% for match in matches %}
@@ -41,7 +31,4 @@
                 {% endfor %}
                 </table>
             </ul>
-        </div>
-    </div>
 {% endblock %}
-
