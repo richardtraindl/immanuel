@@ -17,10 +17,10 @@
 
 
 {% block content %}
-    <table>
+    <table id="matches-list">
       {% for match in matches %}
         <tr>
-            <td style="padding-right: 20px">
+            <td>
                 <a href="{% url 'kate:match' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a>
             </td>
             <td>
