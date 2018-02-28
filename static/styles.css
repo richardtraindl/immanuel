@@ -275,7 +275,7 @@ a.btn, a.btn:visited, a.btn:hover {
         grid-template-columns: 1fr 1fr;
         grid-gap: 10px;
     }
-    #board-minutes {
+    #game {
         display: grid;
         grid-template-columns: 460px 1fr;
         grid-gap: 10px;
