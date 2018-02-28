@@ -123,11 +123,11 @@ nav li a:active {
     text-decoration: none;
 }
 
-#content-wrapper {
+/* #content-wrapper {
     margin: 10px 0px 10px 0px;
     padding: 10px;
     background-color: Wheat; /* #FFFACD; */ 
-}
+} */
 
 #content {
     background-color: #FF8C69;
@@ -169,7 +169,7 @@ nav li a:active {
 }
 
 #board  {
-    background-color: #FFFACD; /* White; */
+    background-color: White;
 }
 
 #board td {
