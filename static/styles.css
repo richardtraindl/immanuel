@@ -126,7 +126,7 @@ nav li a:active {
 #content-wrapper {
     margin: 10px 0px 10px 0px;
     padding: 10px;
-    background-color: Wheat; /* #FFFACD; */
+    background-color: Wheat; /* #FFFACD; */ 
 }
 
 #chat {
@@ -164,7 +164,7 @@ nav li a:active {
 }
 
 #board  {
-    background-color: White;
+    background-color: #FFFACD; /* White; */
 }
 
 #board td {
