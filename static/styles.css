@@ -92,7 +92,7 @@ table {
     padding: 0px;
     width: 576px;
     min-width: 576px;
-    background-color: #FFFACD; /* #FF8C69 */
+    background-color: #FFFACD;
 }
 
 header {
@@ -123,28 +123,22 @@ nav li a:active {
     text-decoration: none;
 }
 
-/* #content-wrapper {
-    margin: 10px 0px 10px 0px;
-    padding: 10px;
-    background-color: Wheat; /* #FFFACD; */ 
-} */
-
 #content-wrapper {
     margin: 10px 0px 10px 0px;
-    padding: 10px;
-    background-color: Blue; /* #FF8C69; */
+    background-color: #FF8C69;
 }
 
 #chat {
-    padding: 10px;
-    background-color: #FFDEAD;
-}
+        padding: 10px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 10px;
+        background-color: #FFDEAD;
+    }
 
-/* #game {
+#game {
     padding: 10px;
-    background-color: #FFFACD;
-    background-color: #FF8C69;
-} */
+}
 
 /* #chat p {
     margin: 0px;
@@ -270,11 +264,6 @@ a.btn, a.btn:visited, a.btn:hover {
     #wrapper {
         width: 748px;
     }
-    #chat {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-gap: 10px;
-    }
     #game {
         display: grid;
         grid-template-columns: 460px 1fr;
@@ -297,6 +286,9 @@ a.btn, a.btn:visited, a.btn:hover {
     }
     #board-letters1 td, #board-letters2 td {
         height: 24px !important;
+    }
+    * {
+        font-size: 16px;
     }
     h1, h1 a  {
         font-size: 22px;
