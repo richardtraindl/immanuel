@@ -248,14 +248,14 @@ a.btn, a.btn:visited, a.btn:hover {
     #wrapper {
         width: 748px;
     }
-    #content {
-        display: grid;
-        grid-template-columns: 460px 1fr;
-        grid-gap: 10px;
-    }
     #chat {
         display: grid;
         grid-template-columns: 1fr 1fr;
+        grid-gap: 10px;
+    }
+    #board-minutes {
+        display: grid;
+        grid-template-columns: 460px 1fr;
         grid-gap: 10px;
     }
     #board td {
