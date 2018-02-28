@@ -3,7 +3,7 @@
 
 
 {% block header %}
-    <h2>Overview</h2>
+    <h1><a href="{% url 'kate:index' %}">Overview</a></h1>
 {% endblock %}
 
 {% block nav %}
@@ -17,18 +17,16 @@
 
 
 {% block content %}
-            <ul>
-                <table>
-                {% for match in matches %}
-                    <tr>
-                        <td style="padding-right: 20px">
-                            <li><a href="{% url 'kate:match' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a></li>
-                        </td>
-                        <td>
-                            <a style="color: #800000" href="{% url 'kate:delete' match.id %}" onclick="return confirm('Wollen sie diese Partie endgültig löschen?')">delete</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </table>
-            </ul>
+    <table>
+      {% for match in matches %}
+        <tr>
+            <td style="padding-right: 20px">
+                <a href="{% url 'kate:match' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a>
+            </td>
+            <td>
+                <a style="color: #800000" href="{% url 'kate:delete' match.id %}" onclick="return confirm('Wollen sie diese Partie endgültig löschen?')">delete</a>
+            </td>
+        </tr>
+      {% endfor %}
+    </table>
 {% endblock %}
