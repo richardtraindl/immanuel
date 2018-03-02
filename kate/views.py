@@ -69,19 +69,19 @@ def match(request, matchid=None):
             else:
                 msg = RETURN_CODES['draw']
 
-            fmtmsg = "<p id='msg' class='error'>" + RETURN_MSGS[msg] + "</p>"
+            fmtmsg = "<span class='error'>" + RETURN_MSGS[msg] + "</span>"
         else:
-            fmtmsg = "<p id='msg' class='ok'>&nbsp;</p>"
+            fmtmsg = "<span class='ok'>&nbsp;</span>"
     elif(int(msg) == RETURN_CODES['ok']):
-        fmtmsg = "<p id='msg' class='ok'>" + RETURN_MSGS[int(msg)] + "</p>"
+        fmtmsg = "<span class='ok'>" + RETURN_MSGS[int(msg)] + "</span>"
     else:
-        fmtmsg = "<p id='msg' class='error'>" + RETURN_MSGS[int(msg)] + "</p>"
+        fmtmsg = "<span class='error'>" + RETURN_MSGS[int(msg)] + "</span>"
 
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
         running = "calculation is running..."
     else:
-        running = ""
+        running = "..."
 
     form = DoMoveForm()
 
