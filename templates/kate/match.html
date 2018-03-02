@@ -35,7 +35,7 @@
 
     <div id="game">
       <div id="board-wrapper">
-        {{ msg|safe }}
+        <p id="msg">{{ msg|safe }}</p>
 
         {% if switch == '0' %}
             {% include "kate/_chessboard.html" with match=match %}
