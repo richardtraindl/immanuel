@@ -205,7 +205,7 @@ nav li a:active {
 
 #minutes {
     padding: 0px 10px;
-    max-height: 30px;
+    /* max-height: 30px; */
 }
 
 #minutes table {
