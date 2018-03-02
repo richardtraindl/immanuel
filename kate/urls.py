@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    url(r'^index.html$', views.index, name='index'),
     url(r'^match/(?P<matchid>[0-9]+)/$', views.match, name='match'),
     url(r'^domove/(?P<matchid>[0-9]+)/$', views.do_move, name='domove'),
     url(r'^undomove/(?P<matchid>[0-9]+)/$', views.undo_move, name='undomove'),
