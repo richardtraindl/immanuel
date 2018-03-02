@@ -4,47 +4,40 @@
 
 
 {% block header %}
-    <div class="grid">
-        <div class="row_12_of_12">
-          {% if matchid %}
-            <h2>Edit Game</h2>
-          {% else %}
-            <h2>New Game</h2>
-          {% endif %}
-        </div>
-    </div>
+  {% if matchid %}
+    <h2>Edit Game</h2>
+  {% else %}
+    <h2>New Game</h2>
+  {% endif %}
 {% endblock %}
 
 
 {% block nav %}
-    <div class="grid">
-        <div class="row_12_of_12">
-            <h2>
-                <a href="{% url 'kate:index' %}">CANCEL</a>
-            </h2>
-        </div>
-    </div>
+    <ul>
+      {% if matchid %}
+        <li><a href="{% url 'kate:match' matchid %}?switch={{ switch }}">CANCEL</a></li>
+      {% else %}
+        <li><a href="{% url 'kate:index' %}">CANCEL</a></li>
+      {% endif %}
+        
+    </ul>
 {% endblock %}
 
 
 {% block content %}
-    <div class="grid">
-        <div class="row_12_of_12">
-          {% if matchid %} 
-            <form id="new" method="post" action="{% url 'kate:settings' matchid %}?switch={{ switch }}">
-          {% else %} 
-            <form id="new" method="post" action="{% url 'kate:settings' %}">
-          {% endif %} 
-                {% csrf_token %}
-                <table>
-                  {{ form.as_table }}
-                </table>
+  {% if matchid %} 
+    <form id="new" method="post" action="{% url 'kate:settings' matchid %}?switch={{ switch }}">
+  {% else %} 
+    <form id="new" method="post" action="{% url 'kate:settings' %}">
+  {% endif %} 
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
 
-                <div class="gap"></div>
+        <div class="small-gap"></div>
 
-                <input type="submit" value="submit" />
-            </form>
-        </div>
-    </div>
+        <input type="submit" value="submit" />
+    </form>
 {% endblock %}
 

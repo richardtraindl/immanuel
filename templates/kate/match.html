@@ -5,24 +5,28 @@
 
 
 {% block header %}
-        <h1><a href="{% url 'kate:match' match.id %}?switch={{ switch }}">Game</a></h1>
+    <h1><a href="{% url 'kate:match' match.id %}?switch={{ switch }}">Game</a></h1>
 
-        <h2>{{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }}</h2>
+    <h2>{{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }}</h2>
 
-        <p>Level: &nbsp; {{ match.level|matchlevel }}</p>
+    <p>Level: &nbsp; {{ match.level|matchlevel }}</p>
 
-        <p>Created on: &nbsp; {{ match.begin|fmtdate }}</p>
+    <p>Created on: &nbsp; {{ match.begin|fmtdate }}</p>
 {% endblock %}
 
 
 {% block nav %}
-        <h2>
-            <a href="{% url 'kate:match' match.id %}?switch={{ switch|invert }}">SWITCH BOARD</a> |
-            <a href="{% url 'kate:undomove' match.id %}?switch={{ switch }}" onclick="return confirm('Withdraw last move?')">WITHDRAW MOVE</a> |
-            <a href="{% url 'kate:resume' match.id %}?switch={{ switch }}">RESUME</a> |
-            <a href="{% url 'kate:settings' match.id %}?switch={{ switch }}">EDIT GAME</a> |
-            <a href="{% url 'kate:index' %}">OVERVIEW</a>
-        </h2>
+    <ul>
+        <li><a href="{% url 'kate:match' match.id %}?switch={{ switch|invert }}">SWITCH BOARD</a></li>
+
+        <li><a href="{% url 'kate:undomove' match.id %}?switch={{ switch }}" onclick="return confirm('Withdraw last move?')">WITHDRAW MOVE</a></li>
+
+        <li><a href="{% url 'kate:resume' match.id %}?switch={{ switch }}">RESUME</a></li>
+
+        <li><a href="{% url 'kate:settings' match.id %}?switch={{ switch }}">EDIT GAME</a></li>
+
+        <li><a href="{% url 'kate:index' %}">OVERVIEW</a></li>
+    </ul>
 {% endblock %}
 
 
@@ -60,7 +64,7 @@
 
        <form id="move" method="post" action="{% url 'kate:domove' match.id %}?switch={{ switch }}" style="display: none;">
            {% csrf_token %}
-           {{ form }}
+           {{ form.as_p }}
            <input type="submit" value="submit" />
        </form>
       </div>

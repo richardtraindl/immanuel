@@ -7,26 +7,24 @@
 {% endblock %}
 
 {% block nav %}
-    <h2>
-        <a href="{% url 'kate:settings' %}">NEW GAME</a> |
-        <a href="{% url 'kate:importmatch' %}">IMPORT GAME</a>
-    </h2>
+    <ul>
+        <li><a href="{% url 'kate:settings' %}">NEW GAME</a></li>
+
+        <li><a href="{% url 'kate:importmatch' %}">IMPORT GAME</a></li>
+    </ul>
 
     <p style="font-size: 12px;">2018.03.02-1</p>
 {% endblock %}
 
 
 {% block content %}
-    <table id="match-list">
+    <ul id="match-list">
       {% for match in matches %}
-        <tr>
-            <td>
-                <a href="{% url 'kate:match' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a>
-            </td>
-            <td>
-                <a style="color: #800000" href="{% url 'kate:delete' match.id %}" onclick="return confirm('Wollen sie diese Partie endgültig löschen?')">delete</a>
-            </td>
-        </tr>
+        <li>
+            <div><a href="{% url 'kate:match' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a></div>
+
+            <div><a style="color: #800000;" href="{% url 'kate:delete' match.id %}" onclick="return confirm('Wollen sie diese Partie endgültig löschen?')">delete</a></div>
+        </li>
       {% endfor %}
-    </table>
+    </ul>
 {% endblock %}

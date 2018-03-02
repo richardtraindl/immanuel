@@ -60,7 +60,7 @@ h3, h3 a  {
     font-size: 24px;
 }
 
-a, a:link, a:visited, a:active {
+a, a:link, a:visited { /* , a:active */
     color: #0000CD;
     text-decoration: underline;
 }
@@ -87,9 +87,12 @@ table {
     text-align: left;
 }
 
-#match-list th, #match-list td {
-    padding: 8px 16px;
-    text-align: left;
+#match-list li {
+    list-style-type: none;
+    padding-bottom: 16px;
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    grid-gap: 10px;
 }
 
 #wrapper {
@@ -114,10 +117,12 @@ nav {
 
 nav ul {
     list-style-type: none;
+    font-size: 24px;
 }
 
 nav li {
     display: inline-block;
+    margin-right: 20px;
 }
 
 nav li a, 
@@ -130,6 +135,7 @@ nav li a:active {
 
 #content-wrapper {
     margin: 10px 0px 10px 0px;
+    padding: 10px;
     background-color: #FF8C69;
 }
 
@@ -142,7 +148,7 @@ nav li a:active {
     }
 
 #game {
-    padding: 10px;
+    padding-top: 10px;
 }
 
 /* #chat p {
@@ -203,11 +209,6 @@ nav li a:active {
     height: 32px !important;
 }
 
-#minutes {
-    padding: 0px 10px;
-    /* max-height: 30px; */
-}
-
 #minutes table {
     margin: 0px;
 }
@@ -222,11 +223,17 @@ nav li a:active {
 
 button, input[type="submit"]{
     /* min-width: 100px; */
-    width: 100%;
+    width: 50%;
     height: 30px;
+    background-color: #E6E6E6;
+}
+    
+input:hover[type="submit"] {
+    background-color: #D6D6D6;
 }
 
-.btn {
+
+/* .btn {
   display: inline-block;
   padding: 4px 10px 4px;
   text-align: center;
@@ -242,7 +249,7 @@ button, input[type="submit"]{
 a.btn, a.btn:visited, a.btn:hover {
   color: #333;
   text-decoration: none; 
-}
+} */
 
 .ok {
     font-weight: bold;
@@ -262,7 +269,7 @@ a.btn, a.btn:visited, a.btn:hover {
 }
 
 .small-gap {
-  padding-bottom: 5px;
+  padding-bottom: 10px;
 }
 
 @media (min-width: 1024px) {
