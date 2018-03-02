@@ -69,13 +69,13 @@ def match(request, matchid=None):
             else:
                 msg = RETURN_CODES['draw']
 
-            fmtmsg = "<p class='error'>" + RETURN_MSGS[msg] + "</p>"
+            fmtmsg = "<p id='msg' class='error'>" + RETURN_MSGS[msg] + "</p>"
         else:
-            fmtmsg = "<p class='ok'></p>"
+            fmtmsg = "<p id='msg' class='ok'>&nbsp;</p>"
     elif(int(msg) == RETURN_CODES['ok']):
-        fmtmsg = "<p class='ok'>" + RETURN_MSGS[int(msg)] + "</p>"
+        fmtmsg = "<p id='msg' class='ok'>" + RETURN_MSGS[int(msg)] + "</p>"
     else:
-        fmtmsg = "<p class='error'>" + RETURN_MSGS[int(msg)] + "</p>"
+        fmtmsg = "<p id='msg' class='error'>" + RETURN_MSGS[int(msg)] + "</p>"
 
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
