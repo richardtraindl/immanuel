@@ -4,7 +4,7 @@
     <div>
       <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}?switch={{ switch }}" matchid="{{ match.id }}">
         {% csrf_token %}
-        <textarea id="newcomment" name="newcomment" style="width: 100%"></textarea>
+        <textarea id="newcomment" name="newcomment"></textarea>
         
         <div class="small-gap"></div>
 
@@ -12,7 +12,7 @@
       </form>
     </div>
 
-    <div>
+    <div id="comments">
       {% for comment in comments %}
         <p>{{ comment.text }}</p>
       {% endfor %}

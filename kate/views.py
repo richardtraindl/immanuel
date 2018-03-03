@@ -57,7 +57,7 @@ def match(request, matchid=None):
             interface.map_moves(qmove, move, interface.MAP_DIR['model-to-engine'])
             moves.append(move)
 
-    comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:3]
+    comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:5]
     
     if(msg == None):
         status = interface.status(modelmatch)
@@ -81,7 +81,7 @@ def match(request, matchid=None):
     if(thread):
         running = "calculation is running..."
     else:
-        running = "..."
+        running = ""
 
     form = DoMoveForm()
 
