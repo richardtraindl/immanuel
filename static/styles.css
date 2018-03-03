@@ -165,6 +165,10 @@ nav li a:active {
     resize: none;
 }
 
+#newcomment * {
+    background-color: Linen;
+}
+
 #msg {
     background-color: Linen;
     margin: 0px 0px 10px 0px;
@@ -218,7 +222,7 @@ nav li a:active {
     max-height: 30px;
 }
 
-button, input[type="submit"]{
+button, input[type="submit"] {
     /* min-width: 100px; */
     width: 50%;
     height: 30px;
@@ -230,6 +234,9 @@ input:hover[type="submit"] {
     background-color: #D6D6D6;
 }
 
+input[type="text"] {
+    background-color: Linen;
+}
 
 /* .btn {
   display: inline-block;
