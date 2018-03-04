@@ -35,7 +35,7 @@ html {
 
 body {
     background-color: White;
-    min-width: 576px;
+    min-width: 640px;
 }
 
 h1, h2, h3 {
@@ -98,8 +98,8 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 0px;
-    width: 576px;
-    min-width: 576px;
+    width: 640px;
+    min-width: 640px;
     background-color: Linen;
 }
 
@@ -202,8 +202,9 @@ nav li a:active {
 }
 
 #board-letters1 td:first-child, #board-letters1 td:nth-child(10),
-#board-letters2 td:first-child, #board-letters2 td:nth-child(10) {
-    width: 32px !important;
+#board-letters2 td:first-child, #board-letters2 td:nth-child(10), 
+.board-label {
+    width: 54px !important; /* 32 */
 }
 
 #board-letters1 td, #board-letters2 td {
@@ -298,8 +299,9 @@ a.btn, a.btn:visited, a.btn:hover {
         font-size: 12px !important;
     }
     #board-letters1 td:first-child, #board-letters1 td:nth-child(10),
-    #board-letters2 td:first-child, #board-letters2 td:nth-child(10) {
-        width: 24px !important;
+    #board-letters2 td:first-child, #board-letters2 td:nth-child(10), 
+    .board-label {
+        width: 38px !important;
     }
     #board-letters1 td, #board-letters2 td {
         height: 24px !important;
