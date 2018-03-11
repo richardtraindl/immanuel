@@ -107,9 +107,11 @@ def search(match, srcx, srcy, stepx, stepy):
     return UNDEF_X, UNDEF_Y
 
 
-def pin_dir(match, scrx, srcy):
+def pin_dir(match, color, scrx, srcy):
     piece = match.readfield(scrx, srcy)
-    color = match.color_of_piece(piece)
+    
+    if(color == None):
+        color = match.color_of_piece(piece)
 
     if(color == COLORS['white']):
         kgx = match.wKg_x

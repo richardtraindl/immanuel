@@ -26,7 +26,7 @@ def map_matches(src, dst, map_dir):
     dst.black_player_human = src.black_player_human
     dst.elapsed_time_black = src.elapsed_time_black
     dst.level = int(src.level)
-    dst.fifty_moves_count = src.fifty_moves_count
+    """dst.fifty_moves_count = src.fifty_moves_count
     dst.wKg_x = src.wKg_x
     dst.wKg_y = src.wKg_y
     dst.bKg_x = src.bKg_x
@@ -36,12 +36,15 @@ def map_matches(src, dst, map_dir):
     dst.wRk_a1_first_movecnt = src.wRk_a1_first_movecnt
     dst.wRk_h1_first_movecnt = src.wRk_h1_first_movecnt
     dst.bRk_a8_first_movecnt = src.bRk_a8_first_movecnt
-    dst.bRk_h8_first_movecnt = src.bRk_h8_first_movecnt
+    dst.bRk_h8_first_movecnt = src.bRk_h8_first_movecnt"""
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
             piece = src.readfield(x, y)
             dst.writefield(x, y, piece)
+
+    if(map_dir == MAP_DIR['model-to-engine']):
+        dst.update_attributes()
 
 
 def map_moves(src, dst, map_dir):

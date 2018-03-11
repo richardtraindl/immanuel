@@ -430,7 +430,7 @@ def rank_moves(match, priomoves):
                        e[2] == attack.fieldx and e[3] == attack.fieldy for e in excludes) == False):
                     excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, attack.fieldx, attack.fieldy])
                 else:
-                    pmove.prio = PRIO['good-postponed']
+                    pmove.prio = min(pmove.prio, PRIO['good-postponed'])
 
     excludes.clear()
     list_supported.sort(key=attrgetter('prio'))
@@ -442,7 +442,7 @@ def rank_moves(match, priomoves):
                        e[2] == support.fieldx and e[3] == support.fieldy for e in excludes) == False):
                     excludes.append([pmove.gmove.srcx, pmove.gmove.srcy, support.fieldx, support.fieldy])
                 else:
-                    pmove.prio = PRIO['good-postponed']
+                    pmove.prio = min(pmove.prio, PRIO['good-postponed'])
 
     excludes.clear()
     list_forked.sort(key=attrgetter('prio'))
@@ -454,7 +454,7 @@ def rank_moves(match, priomoves):
                        e[2] == fork[4] and e[3] == fork[5] for e in excludes) == False):
                     excludes.append([fork[0], fork[1], fork[4], fork[5]])
                 else:
-                    pmove.prio = PRIO['good-postponed']
+                    pmove.prio = min(pmove.prio, PRIO['good-postponed'])
 
     excludes.clear()
     list_flee.sort(key=attrgetter('prio'))
@@ -462,7 +462,7 @@ def rank_moves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            pmove.prio = PRIO['good-postponed']
+            pmove.prio = min(pmove.prio, PRIO['good-postponed'])
 
     priomoves.sort(key=attrgetter('prio'))
 

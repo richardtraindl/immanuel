@@ -446,11 +446,11 @@ def score_position(match, movecnt):
 
         score += score_attacks(match, color)
 
-        score += score_supports(match, REVERSED_COLORS[color])
+        #score += score_supports(match, REVERSED_COLORS[color])
 
-        score += score_controled_horizontal_files(match)
+        #score += score_controled_horizontal_files(match)
 
-        score += score_controled_vertical_files(match)
+        #score += score_controled_vertical_files(match)
 
         if(is_opening(match)):
             score += score_opening(match)
@@ -574,7 +574,7 @@ def analyze_position(match):
             else:
                 frdlytouches, enmytouches = field_touches(match, Match.color_of_piece(piece), x, y)
                 if(len(frdlytouches) > 0 or len(enmytouches) > 0):
-                    pin_dir = rules.pin_dir(match, x, y)
+                    pin_dir = rules.pin_dir(match, None, x, y)
                     analyzer = cAnalyzer(10, piece, x, y, pin_dir)
                     analyzer.attacker = enmytouches
                     analyzer.supporter = frdlytouches

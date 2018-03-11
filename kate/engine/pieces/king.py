@@ -178,8 +178,8 @@ def score_attacks(match, srcx, srcy):
             if(Match.color_of_piece(piece) == opp_color):
                 score += ATTACKED_SCORES[piece]
 
-                # extra score for pinned attacked
-                enmy_pin = rules.pin_dir(match, x1, y1)
+                # extra score if attacked is pinned
+                enmy_pin = rules.pin_dir(match, opp_color, x1, y1)
                 if(enmy_pin != rules.DIRS['undefined']):
                     score += ATTACKED_SCORES[piece]
 
@@ -333,10 +333,10 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
         return False
 
     if(color == COLORS['white']):
-        if(match.wKg_first_movecnt != 0 or match.wRk_h1_first_movecnt != 0 or rook != PIECES['wRk']):
+        if(match.white_movecnt_short_castling_lost > -1 or rook != PIECES['wRk']):
             return False
     else:
-        if(match.bKg_first_movecnt != 0 or match.bRk_h8_first_movecnt != 0 or rook != PIECES['bRk']):
+        if(match.black_movecnt_short_castling_lost > -1 or rook != PIECES['bRk']):
             return False            
 
     king = match.readfield(srcx, srcy)
@@ -368,10 +368,10 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
         return False
 
     if(color == COLORS['white']):
-        if(match.wKg_first_movecnt != 0 or match.wRk_a1_first_movecnt != 0 or rook != PIECES['wRk']):
+        if(match.white_movecnt_long_castling_lost > -1 or rook != PIECES['wRk']):
             return False
     else:
-        if(match.bKg_first_movecnt != 0 or match.bRk_a8_first_movecnt != 0 or rook != PIECES['bRk']):
+        if(match.black_movecnt_long_castling_lost > -1 or rook != PIECES['bRk']):
             return False
 
     king = match.readfield(srcx, srcy)

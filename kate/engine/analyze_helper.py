@@ -361,7 +361,7 @@ def is_attacked_pinned(match, attacked):
         return None
 
     for ctouch in attacked:
-        pindir = rules.pin_dir(match, ctouch.fieldx, ctouch.fieldy)
+        pindir = rules.pin_dir(match, None, ctouch.fieldx, ctouch.fieldy)
         if(pindir != rules.DIRS['undefined']):
             return True
 

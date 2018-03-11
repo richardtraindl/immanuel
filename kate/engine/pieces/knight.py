@@ -49,7 +49,7 @@ def is_field_touched(match, color, fieldx, fieldy):
 
 
 def is_stuck(match, fieldx, fieldy):
-    pin_dir = rules.pin_dir(match, fieldx, fieldy)
+    pin_dir = rules.pin_dir(match, None, fieldx, fieldy)
     if(pin_dir == rules.DIRS['undefined']):
         return False
     else:
@@ -201,8 +201,8 @@ def score_attacks(match, srcx, srcy):
             if(Match.color_of_piece(piece) == opp_color):
                 score += ATTACKED_SCORES[piece]
 
-                # extra score for pinned attacked
-                enmy_pin = rules.pin_dir(match, x1, y1)
+                # extra score if attacked is pinned
+                enmy_pin = rules.pin_dir(match, opp_color, x1, y1)
                 if(enmy_pin != rules.DIRS['undefined']):
                     score += ATTACKED_SCORES[piece]
 
@@ -306,7 +306,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
 
     color = Match.color_of_piece(piece)
 
-    pin_dir = rules.pin_dir(match, srcx, srcy)
+    pin_dir = rules.pin_dir(match, color, srcx, srcy)
 
     if(pin_dir != DIRS['undefined']):
         return False

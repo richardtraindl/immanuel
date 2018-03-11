@@ -39,7 +39,7 @@ def is_field_touched(match, color, fieldx, fieldy):
 
 def is_move_stuck(match, srcx, srcy, dstx, dsty):
     move_dir = bp_dir(srcx, srcy, dstx, dsty)
-    pin_dir = rules.pin_dir(match, srcx, srcy)
+    pin_dir = rules.pin_dir(match, None, srcx, srcy)
     if(pin_dir == rules.DIRS['undefined'] or move_dir == pin_dir):
         return False
     else:
@@ -237,12 +237,15 @@ def score_attacks(match, srcx, srcy):
             if(match.color_of_piece(piece) == opp_color):
                 score += ATTACKED_SCORES[piece]
 
-                # extra score for pinned attacked
+                # extra score if attacked is pinned
                 bp_direction = bp_dir(srcx, srcy, x1, y1)
-                enmy_pin = rules.pin_dir(match, x1, y1)
-                if(enmy_pin != rules.DIRS['undefined'] and 
-                   enmy_pin != bp_direction and 
-                   enmy_pin != rules.REVERSE_DIRS[bp_direction]):
+                enmy_pin = rules.pin_dir(match, opp_color, x1, y1)
+                if(enmy_pin == rules.DIRS['undefined']):
+                    continue
+                elif(piece != PIECES['wBp'] and piece != PIECES['bBp']):
+                    score += ATTACKED_SCORES[piece]
+                elif(piece != PIECES['wBp'] and piece != PIECES['bBp'] and 
+                     enmy_pin != bp_direction and enmy_pin != rules.REVERSE_DIRS[bp_direction]):
                     score += ATTACKED_SCORES[piece]
 
     return score
@@ -388,7 +391,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
 
     color = Match.color_of_piece(piece)
 
-    pin_dir = rules.pin_dir(match, srcx, srcy)
+    pin_dir = rules.pin_dir(match, color, srcx, srcy)
 
     if(direction == DIRS['north-east'] or direction == DIRS['south-west']):
         if(pin_dir != DIRS['north-east'] and pin_dir != DIRS['south-west'] and pin_dir != DIRS['undefined']):

@@ -45,23 +45,27 @@ def generic_do_move(match, move, srcpiece, dstpiece):
     if(srcpiece == PIECES['wKg']):
         match.wKg_x = move.dstx
         match.wKg_y = move.dsty
-        if(match.wKg_first_movecnt == 0):
-            match.wKg_first_movecnt = match.count
+        if(match.white_movecnt_short_castling_lost == -1):
+            match.white_movecnt_short_castling_lost = match.count
+        if(match.white_movecnt_long_castling_lost == -1):
+            match.white_movecnt_long_castling_lost = match.count
     elif(srcpiece == PIECES['bKg']):
         match.bKg_x = move.dstx
         match.bKg_y = move.dsty
-        if(match.bKg_first_movecnt == 0):
-            match.bKg_first_movecnt = match.count
+        if(match.black_movecnt_short_castling_lost == -1):
+            match.black_movecnt_short_castling_lost = match.count
+        if(match.black_movecnt_long_castling_lost == -1):
+            match.black_movecnt_long_castling_lost = match.count
     elif(srcpiece == PIECES['wRk']):
-        if(move.srcx == 0 and move.srcy == 0 and match.wRk_a1_first_movecnt == 0):
-            match.wRk_a1_first_movecnt = match.count
-        elif(move.srcx == 7 and move.srcy == 0 and match.wRk_h1_first_movecnt == 0):
-            match.wRk_h1_first_movecnt = match.count
+        if(move.srcx == 0 and move.srcy == 0 and match.white_movecnt_long_castling_lost == -1):
+            match.white_movecnt_long_castling_lost = match.count
+        elif(move.srcx == 7 and move.srcy == 0 and match.white_movecnt_short_castling_lost == -1):
+            match.white_movecnt_short_castling_lost = match.count
     elif(srcpiece == PIECES['bRk']):
-        if(move.srcx == 0 and move.srcy == 7 and match.bRk_a8_first_movecnt == 0):
-            match.bRk_a8_first_movecnt = match.count
-        elif(move.srcx == 7 and move.srcy == 7 and match.bRk_h8_first_movecnt == 0):
-            match.bRk_h8_first_movecnt = match.count
+        if(move.srcx == 0 and move.srcy == 7 and match.black_movecnt_long_castling_lost == -1):
+            match.black_movecnt_long_castling_lost == match.count
+        elif(move.srcx == 7 and move.srcy == 7 and match.black_movecnt_short_castling_lost == -1):
+            match.black_movecnt_short_castling_lost == match.count
 
     match.score += SCORES[dstpiece]
     if(srcpiece != PIECES['wKg'] and srcpiece != PIECES['bKg']):
@@ -125,13 +129,11 @@ def king_do_move(match, move, srcpiece, dstpiece):
         if(srcpiece == PIECES['wKg']):
             match.wKg_x = move.dstx
             match.wKg_y = move.dsty
-            match.wKg_first_movecnt = match.count
-            match.wRk_h1_first_movecnt = match.count  
+            match.white_movecnt_short_castling_lost = match.count
         else:
             match.bKg_x = move.dstx
             match.bKg_y = move.dsty
-            match.bKg_first_movecnt = match.count
-            match.bRk_h8_first_movecnt = match.count
+            match.black_movecnt_short_castling_lost = match.count
 
         match.move_list.append(move)
 
@@ -150,13 +152,11 @@ def king_do_move(match, move, srcpiece, dstpiece):
         if(srcpiece == PIECES['wKg']):
             match.wKg_x = move.dstx
             match.wKg_y = move.dsty
-            match.wKg_first_movecnt = match.count
-            match.wRk_a1_first_movecnt = match.count
+            match.white_movecnt_long_castling_lost = match.count
         else:
             match.bKg_x = move.dstx
             match.bKg_y = move.dsty
-            match.bKg_first_movecnt = match.count
-            match.bRk_a8_first_movecnt = match.count
+            match.black_movecnt_long_castling_lost = match.count
 
         match.move_list.append(move)
 
@@ -202,23 +202,27 @@ def generic_undo_move(match, move):
     if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
         match.wKg_y = move.srcy
-        if(match.wKg_first_movecnt == match.count + 1):
-            match.wKg_first_movecnt = 0
+        if(match.white_movecnt_short_castling_lost == match.count + 1):
+            match.white_movecnt_short_castling_lost = -1
+        if(match.white_movecnt_long_castling_lost == match.count + 1):
+            match.white_movecnt_long_castling_lost = -1
     elif(piece == PIECES['bKg']):
         match.bKg_x = move.srcx
         match.bKg_y = move.srcy
-        if(match.bKg_first_movecnt == match.count + 1):
-            match.bKg_first_movecnt = 0
+        if(match.black_movecnt_short_castling_lost == match.count + 1):
+            match.black_movecnt_short_castling_lost = -1
+        if(match.black_movecnt_long_castling_lost == match.count + 1):
+            match.black_movecnt_long_castling_lost = -1
     elif(piece == PIECES['wRk']):
-        if(match.wRk_a1_first_movecnt == match.count + 1):
-            match.wRk_a1_first_movecnt = 0
-        elif(match.wRk_h1_first_movecnt == match.count + 1):
-            match.wRk_h1_first_movecnt = 0
+        if(match.white_movecnt_short_castling_lost == match.count + 1):
+            match.white_movecnt_short_castling_lost = -1
+        elif(match.white_movecnt_long_castling_lost == match.count + 1):
+            match.white_movecnt_long_castling_lost = -1
     elif(piece == PIECES['bRk']):
-        if(match.bRk_a8_first_movecnt == match.count + 1):
-            match.bRk_a8_first_movecnt = 0
-        elif(match.bRk_h8_first_movecnt == match.count + 1):
-            match.bRk_h8_first_movecnt = 0
+        if(match.black_movecnt_short_castling_lost == match.count + 1):
+            match.black_movecnt_short_castling_lost = -1
+        elif(match.black_movecnt_long_castling_lost == match.count + 1):
+            match.black_movecnt_long_castling_lost = -1
 
     return move
 
@@ -236,13 +240,11 @@ def king_undo_short_castling(match, move):
     if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
         match.wKg_y = move.srcy
-        match.wKg_first_movecnt = 0
-        match.wRk_h1_first_movecnt = 0
+        match.white_movecnt_short_castling_lost = -1
     else:
         match.bKg_x = move.srcx
         match.bKg_y = move.srcy
-        match.bKg_first_movecnt = 0
-        match.bRk_h8_first_movecnt = 0
+        match.black_movecnt_short_castling_lost = -1
 
     return move
 
@@ -260,13 +262,11 @@ def king_undo_long_castling(match, move):
     if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
         match.wKg_y = move.srcy
-        match.wKg_first_movecnt = 0
-        match.wRk_a1_first_movecnt = 0
+        match.white_movecnt_long_castling_lost = -1
     else:
         match.bKg_x = move.srcx
         match.bKg_y = move.srcy
-        match.bKg_first_movecnt = 0
-        match.bRk_a8_first_movecnt = 0
+        match.black_movecnt_long_castling_lost = -1
 
     return move
 

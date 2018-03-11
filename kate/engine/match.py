@@ -5,7 +5,7 @@ STATUS = {
         'draw' : 11,
         'winner_white' : 12,
         'winner_black' : 13,
-        'cancelled' : 14 }
+        'paused' : 14 }
 
 
 LEVELS = {
@@ -62,8 +62,16 @@ PIECES_COLOR = {
 
 E1_X = 3
 E1_Y = 0
+A1_X = 0
+A1_Y = 0
+H1_X = 7
+H1_Y = 0
 E8_X = 3
 E8_Y = 7
+A8_X = 0
+A8_Y = 7
+H8_X = 7
+H8_Y = 7
 
 
 class Match:
@@ -78,61 +86,85 @@ class Match:
         self.black_player_human = True
         self.elapsed_time_black = 0
         self.level = LEVELS['blitz']
-        self.board = [[0 for x in range(8)] for x in range(8)]
+        #self.board = [[0 for x in range(8)] for x in range(8)]
+        self.board = [ [PIECES['wRk'], PIECES['wKn'], PIECES['wBp'], PIECES['wQu'], PIECES['wKg'], PIECES['wBp'], PIECES['wKn'], PIECES['wRk']],
+                       [PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw']],
+                       [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                       [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                       [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                       [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                       [PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw']],
+                       [PIECES['bRk'], PIECES['bKn'], PIECES['bBp'], PIECES['bQu'], PIECES['bKg'], PIECES['bBp'], PIECES['bKn'], PIECES['bRk']] ]
         self.fifty_moves_count = 0
         self.wKg_x = E1_X
         self.wKg_y = E1_Y
         self.bKg_x = E8_X
         self.bKg_y = E8_Y
-        self.wKg_first_movecnt = 0
-        self.bKg_first_movecnt = 0
-        self.wRk_a1_first_movecnt = 0
-        self.wRk_h1_first_movecnt = 0
-        self.bRk_a8_first_movecnt = 0
-        self.bRk_h8_first_movecnt = 0
+        self.white_movecnt_short_castling_lost = -1
+        self.white_movecnt_long_castling_lost = -1
+        self.black_movecnt_short_castling_lost = -1
+        self.black_movecnt_long_castling_lost = -1
+        self.wQu_cnt = 1
+        self.bQu_cnt = 1
+        self.wOfficer_cnt = 6
+        self.bOfficer_cnt = 6
         self.move_list = []
 
-            
-    def setboardbase(self):
-        self.board[0][0] = PIECES['wRk']
-        self.board[0][1] = PIECES['wKn']
-        self.board[0][2] = PIECES['wBp']
-        self.board[0][3] = PIECES['wQu']
-        self.board[0][4] = PIECES['wKg']
-        self.board[0][5] = PIECES['wBp']
-        self.board[0][6] = PIECES['wKn']
-        self.board[0][7] = PIECES['wRk']
 
-        for i in range(0, 8, 1):
-            self.board[1][i] = PIECES['wPw']
+    def update_attributes(self):
+        if(len(self.move_list) > 0):
+            move = self.move_list[-1]
+            fifty_moves_count = move.fifty_moves_count
+        
+            for move in self.move_list:
+                if(move.count % 2 == 0):
+                    if(self.white_movecnt_short_castling_lost == -1):
+                        if(move.srcx == E1_X and move.srcy == E1_Y):
+                            self.white_movecnt_short_castling_lost = move.count
+                            continue
+                        elif(move.srcx == A1_X and move.srcy == A1_Y):
+                            self.white_movecnt_short_castling_lost = move.count
+                            continue
+                    if(self.white_movecnt_long_castling_lost == -1):
+                        if(move.srcx == E1_X and move.srcy == E1_Y):
+                            self.white_movecnt_long_castling_lost = move.count
+                            continue
+                        elif(move.srcx == H1_X and move.srcy == H1_Y):
+                            self.white_movecnt_long_castling_lost = move.count
+                            continue
+                else:
+                    if(self.black_movecnt_short_castling_lost == -1):
+                        if(move.srcx == E8_X and move.srcy == E8_Y):
+                            self.black_movecnt_short_castling_lost = move.count
+                            continue
+                        elif(move.srcx == A8_X and move.srcy == A8_Y):
+                            self.black_movecnt_short_castling_lost = move.count
+                            continue
+                    if(self.black_movecnt_long_castling_lost == -1):
+                        if(move.srcx == E8_X and move.srcy == E8_Y):
+                            self.black_movecnt_long_castling_lost = move.count
+                            continue
+                        elif(move.srcx == H8_X and move.srcy == H8_Y):
+                            self.black_movecnt_long_castling_lost = move.count
+                            continue
 
-        for j in range(2, 6, 1):
-            for i in range(0, 8, 1):
-                self.board[j][i] = PIECES['blk']
-
-        for i in range(0, 8, 1):
-            self.board[6][i] = PIECES['bPw']
-
-        self.board[7][0] = PIECES['bRk']
-        self.board[7][1] = PIECES['bKn']
-        self.board[7][2] = PIECES['bBp']
-        self.board[7][3] = PIECES['bQu']
-        self.board[7][4] = PIECES['bKg']
-        self.board[7][5] = PIECES['bBp']
-        self.board[7][6] = PIECES['bKn']
-        self.board[7][7] = PIECES['bRk']
-        self.fifty_moves_count = 0
-        self.wKg_x = E1_X
-        self.wKg_y = E1_Y
-        self.bKg_x = E8_X
-        self.bKg_y = E8_Y
-        self.wKg_first_movecnt = 0
-        self.bKg_first_movecnt = 0
-        self.wRk_a1_first_movecnt = 0
-        self.wRk_h1_first_movecnt = 0
-        self.bRk_a8_first_movecnt = 0
-        self.bRk_h8_first_movecnt = 0
-        self.move_list = []
+        for y in range(8):
+            for x in range(8):
+                piece = self.readfield(x, y)
+                if(piece == PIECES['wKg']):
+                    self.wKg_x = x
+                    self.wKg_y = y
+                elif(piece == PIECES['bKg']):
+                    self.bKg_x = x
+                    self.bKg_y = y
+                elif(piece == PIECES['wQu']):
+                    self.wQu_cnt += 1
+                elif(piece == PIECES['bQu']):
+                    self.bQu_cnt += 1        
+                elif(piece == PIECES['wRk'] or piece == PIECES['wBp'] or piece == PIECES['wPw']):
+                    self.wOfficer_cnt += 1
+                elif(piece == PIECES['bRk'] or piece == PIECES['bBp'] or piece == PIECES['bPw']):
+                    self.bOfficer_cnt + 1
 
 
     def writefield(self, x, y, value):
