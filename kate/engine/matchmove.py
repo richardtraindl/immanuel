@@ -5,7 +5,7 @@ from .cvalues import *
 
 def do_move(match, srcx, srcy, dstx, dsty, prom_piece):
     move = Move(match, 
-                match.count + 1, 
+                match.movecnt + 1, 
                 TYPES['standard'],
                 srcx, 
                 srcy, 
@@ -20,6 +20,15 @@ def do_move(match, srcx, srcy, dstx, dsty, prom_piece):
     srcpiece = match.readfield(srcx, srcy)
     dstpiece = match.readfield(dstx, dsty)
 
+    if(dstpiece == PIECES['wQu']):
+        match.wQu_cnt -= 1
+    elif(dstpiece == PIECES['bQu']):
+        match.bQu_cnt -= 1
+    elif(dstpiece == PIECES['wKn'] or dstpiece == PIECES['wBp'] or dstpiece == PIECES['wRk']):
+        match.wOfficer_cnt -= 1
+    elif(dstpiece == PIECES['bKn'] or dstpiece == PIECES['bBp'] or dstpiece == PIECES['bRk']):
+        match.bOfficer_cnt -= 1
+
     if(srcpiece == PIECES['wPw'] or srcpiece == PIECES['bPw']):
         return pawn_do_move(match, move, srcpiece, dstpiece)
     elif(srcpiece == PIECES['wKg'] or srcpiece == PIECES['bKg']):
@@ -32,7 +41,7 @@ def generic_do_move(match, move, srcpiece, dstpiece):
     move.move_type = TYPES['standard']
     move.captured_piece = dstpiece
 
-    match.count += 1            
+    match.movecnt += 1            
     match.writefield(move.srcx, move.srcy, PIECES['blk'])
     match.writefield(move.dstx, move.dsty, srcpiece)
     if(dstpiece != PIECES['blk']):
@@ -42,30 +51,16 @@ def generic_do_move(match, move, srcpiece, dstpiece):
         match.fifty_moves_count += 1
         move.fifty_moves_count = match.fifty_moves_count
 
-    if(srcpiece == PIECES['wKg']):
-        match.wKg_x = move.dstx
-        match.wKg_y = move.dsty
-        if(match.white_movecnt_short_castling_lost == -1):
-            match.white_movecnt_short_castling_lost = match.count
-        if(match.white_movecnt_long_castling_lost == -1):
-            match.white_movecnt_long_castling_lost = match.count
-    elif(srcpiece == PIECES['bKg']):
-        match.bKg_x = move.dstx
-        match.bKg_y = move.dsty
-        if(match.black_movecnt_short_castling_lost == -1):
-            match.black_movecnt_short_castling_lost = match.count
-        if(match.black_movecnt_long_castling_lost == -1):
-            match.black_movecnt_long_castling_lost = match.count
-    elif(srcpiece == PIECES['wRk']):
-        if(move.srcx == 0 and move.srcy == 0 and match.white_movecnt_long_castling_lost == -1):
-            match.white_movecnt_long_castling_lost = match.count
-        elif(move.srcx == 7 and move.srcy == 0 and match.white_movecnt_short_castling_lost == -1):
-            match.white_movecnt_short_castling_lost = match.count
+    if(srcpiece == PIECES['wRk']):
+        if(move.srcx == 0 and move.srcy == 0 and match.white_movecnt_long_castling_lost == 0):
+            match.white_movecnt_long_castling_lost = match.movecnt
+        elif(move.srcx == 7 and move.srcy == 0 and match.white_movecnt_short_castling_lost == 0):
+            match.white_movecnt_short_castling_lost = match.movecnt
     elif(srcpiece == PIECES['bRk']):
-        if(move.srcx == 0 and move.srcy == 7 and match.black_movecnt_long_castling_lost == -1):
-            match.black_movecnt_long_castling_lost == match.count
-        elif(move.srcx == 7 and move.srcy == 7 and match.black_movecnt_short_castling_lost == -1):
-            match.black_movecnt_short_castling_lost == match.count
+        if(move.srcx == 0 and move.srcy == 7 and match.black_movecnt_long_castling_lost == 0):
+            match.black_movecnt_long_castling_lost == match.movecnt
+        elif(move.srcx == 7 and move.srcy == 7 and match.black_movecnt_short_castling_lost == 0):
+            match.black_movecnt_short_castling_lost == match.movecnt
 
     match.score += SCORES[dstpiece]
     if(srcpiece != PIECES['wKg'] and srcpiece != PIECES['bKg']):
@@ -85,7 +80,7 @@ def pawn_do_move(match, move, srcpiece, dstpiece):
         move.move_type = TYPES['promotion']
         move.captured_piece = dstpiece
 
-        match.count += 1 
+        match.movecnt += 1 
         match.writefield(move.srcx, move.srcy, PIECES['blk'])
         match.writefield(move.dstx, move.dsty, move.prom_piece)
         match.fifty_moves_count = 0
@@ -101,7 +96,7 @@ def pawn_do_move(match, move, srcpiece, dstpiece):
         pawn = match.readfield(move.e_p_fieldx, move.e_p_fieldy)
         move.captured_piece = pawn
 
-        match.count += 1 
+        match.movecnt += 1 
         match.writefield(move.srcx, move.srcy, PIECES['blk'])
         match.writefield(move.dstx, move.dsty, srcpiece)
         match.fifty_moves_count = 0
@@ -115,25 +110,36 @@ def pawn_do_move(match, move, srcpiece, dstpiece):
 
 
 def king_do_move(match, move, srcpiece, dstpiece):
+    if(srcpiece == PIECES['wKg']):
+        match.wKg_x = move.dstx
+        match.wKg_y = move.dsty
+
+        if(match.white_movecnt_short_castling_lost == 0):
+            match.white_movecnt_short_castling_lost = match.movecnt + 1
+
+        if(match.white_movecnt_long_castling_lost == 0):
+            match.white_movecnt_long_castling_lost = match.movecnt + 1
+    else:
+        match.bKg_x = move.dstx
+        match.bKg_y = move.dsty
+
+        if(match.black_movecnt_short_castling_lost == 0):
+            match.black_movecnt_short_castling_lost = match.movecnt + 1
+
+        if(match.black_movecnt_long_castling_lost == 0):
+            match.black_movecnt_long_castling_lost = match.movecnt + 1
+
     if(move.dstx - move.srcx == 2):
         move.move_type = TYPES['short_castling']
         move.captured_piece = dstpiece
+        match.movecnt += 1   
 
-        match.count += 1   
         match.writefield(move.srcx, move.srcy, PIECES['blk'])
         match.writefield(move.dstx, move.dsty, srcpiece)
         rook = match.readfield(move.srcx + 3, move.srcy)
         match.writefield(move.srcx + 3, move.srcy, PIECES['blk'])
         match.writefield(move.dstx - 1, move.dsty, rook)
         match.fifty_moves_count += 1
-        if(srcpiece == PIECES['wKg']):
-            match.wKg_x = move.dstx
-            match.wKg_y = move.dsty
-            match.white_movecnt_short_castling_lost = match.count
-        else:
-            match.bKg_x = move.dstx
-            match.bKg_y = move.dsty
-            match.black_movecnt_short_castling_lost = match.count
 
         match.move_list.append(move)
 
@@ -141,22 +147,14 @@ def king_do_move(match, move, srcpiece, dstpiece):
     elif(move.dstx - move.srcx == -2):
         move.move_type = TYPES['long_castling']
         move.captured_piece = dstpiece
+        match.movecnt += 1   
 
-        match.count += 1   
         match.writefield(move.srcx, move.srcy, PIECES['blk'])
         match.writefield(move.dstx, move.dsty, srcpiece)
         rook = match.readfield(move.srcx - 4, move.srcy)
         match.writefield(move.srcx - 4, move.srcy, PIECES['blk'])
         match.writefield(move.dstx + 1, move.dsty, rook)
         match.fifty_moves_count += 1
-        if(srcpiece == PIECES['wKg']):
-            match.wKg_x = move.dstx
-            match.wKg_y = move.dsty
-            match.white_movecnt_long_castling_lost = match.count
-        else:
-            match.bKg_x = move.dstx
-            match.bKg_y = move.dsty
-            match.black_movecnt_long_castling_lost = match.count
 
         match.move_list.append(move)
 
@@ -171,6 +169,15 @@ def undo_move(match):
     else:
         return None
 
+    if(move.captured_piece == PIECES['wQu']):
+        match.wQu_cnt += 1
+    elif(move.captured_piece == PIECES['bQu']):
+        match.bQu_cnt += 1
+    elif(move.captured_piece == PIECES['wKn'] or move.captured_piece == PIECES['wBp'] or move.captured_piece == PIECES['wRk']):
+        match.wOfficer_cnt += 1
+    elif(move.captured_piece == PIECES['bKn'] or move.captured_piece == PIECES['bBp'] or move.captured_piece == PIECES['bRk']):
+        match.bOfficer_cnt += 1
+
     if(move.move_type == TYPES['standard']):
         return generic_undo_move(match, move)
     elif(move.move_type == TYPES['short_castling']):
@@ -184,7 +191,7 @@ def undo_move(match):
 
 
 def generic_undo_move(match, move):
-    match.count -= 1
+    match.movecnt -= 1
     match.fifty_moves_count = move.fifty_moves_count
 
     piece = match.readfield(move.dstx, move.dsty)
@@ -202,33 +209,33 @@ def generic_undo_move(match, move):
     if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
         match.wKg_y = move.srcy
-        if(match.white_movecnt_short_castling_lost == match.count + 1):
-            match.white_movecnt_short_castling_lost = -1
-        if(match.white_movecnt_long_castling_lost == match.count + 1):
-            match.white_movecnt_long_castling_lost = -1
+        if(match.white_movecnt_short_castling_lost == match.movecnt + 1):
+            match.white_movecnt_short_castling_lost = 0
+        if(match.white_movecnt_long_castling_lost == match.movecnt + 1):
+            match.white_movecnt_long_castling_lost = 0
     elif(piece == PIECES['bKg']):
         match.bKg_x = move.srcx
         match.bKg_y = move.srcy
-        if(match.black_movecnt_short_castling_lost == match.count + 1):
-            match.black_movecnt_short_castling_lost = -1
-        if(match.black_movecnt_long_castling_lost == match.count + 1):
-            match.black_movecnt_long_castling_lost = -1
+        if(match.black_movecnt_short_castling_lost == match.movecnt + 1):
+            match.black_movecnt_short_castling_lost = 0
+        if(match.black_movecnt_long_castling_lost == match.movecnt + 1):
+            match.black_movecnt_long_castling_lost = 0
     elif(piece == PIECES['wRk']):
-        if(match.white_movecnt_short_castling_lost == match.count + 1):
-            match.white_movecnt_short_castling_lost = -1
-        elif(match.white_movecnt_long_castling_lost == match.count + 1):
-            match.white_movecnt_long_castling_lost = -1
+        if(match.white_movecnt_short_castling_lost == match.movecnt + 1):
+            match.white_movecnt_short_castling_lost = 0
+        if(match.white_movecnt_long_castling_lost == match.movecnt + 1):
+            match.white_movecnt_long_castling_lost = 0
     elif(piece == PIECES['bRk']):
-        if(match.black_movecnt_short_castling_lost == match.count + 1):
-            match.black_movecnt_short_castling_lost = -1
-        elif(match.black_movecnt_long_castling_lost == match.count + 1):
-            match.black_movecnt_long_castling_lost = -1
+        if(match.black_movecnt_short_castling_lost == match.movecnt + 1):
+            match.black_movecnt_short_castling_lost = 0
+        if(match.black_movecnt_long_castling_lost == match.movecnt + 1):
+            match.black_movecnt_long_castling_lost = 0
 
     return move
 
 
 def king_undo_short_castling(match, move):
-    match.count -= 1
+    match.movecnt -= 1
     match.fifty_moves_count = move.fifty_moves_count
 
     piece = match.readfield(move.dstx, move.dsty)
@@ -240,17 +247,21 @@ def king_undo_short_castling(match, move):
     if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
         match.wKg_y = move.srcy
-        match.white_movecnt_short_castling_lost = -1
+        match.white_movecnt_short_castling_lost = 0
+        if(match.white_movecnt_long_castling_lost == match.movecnt + 1):
+            match.white_movecnt_long_castling_lost = 0
     else:
         match.bKg_x = move.srcx
         match.bKg_y = move.srcy
-        match.black_movecnt_short_castling_lost = -1
+        match.black_movecnt_short_castling_lost = 0
+        if(match.black_movecnt_long_castling_lost == match.movecnt + 1):
+            match.black_movecnt_long_castling_lost = 0
 
     return move
 
 
 def king_undo_long_castling(match, move):
-    match.count -= 1
+    match.movecnt -= 1
     match.fifty_moves_count = move.fifty_moves_count
 
     piece = match.readfield(move.dstx, move.dsty)
@@ -262,11 +273,15 @@ def king_undo_long_castling(match, move):
     if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
         match.wKg_y = move.srcy
-        match.white_movecnt_long_castling_lost = -1
+        match.white_movecnt_long_castling_lost = 0
+        if(match.white_movecnt_short_castling_lost == match.movecnt + 1):
+            match.white_movecnt_short_castling_lost = 0
     else:
         match.bKg_x = move.srcx
         match.bKg_y = move.srcy
-        match.black_movecnt_long_castling_lost = -1
+        match.black_movecnt_long_castling_lost = 0
+        if(match.black_movecnt_short_castling_lost == match.movecnt + 1):
+            match.black_movecnt_short_castling_lost = 0
 
     return move
 
@@ -277,7 +292,7 @@ def pawn_undo_promotion(match, move):
     else:
         piece = PIECES['bPw']
 
-    match.count -= 1
+    match.movecnt -= 1
     match.fifty_moves_count = move.fifty_moves_count
     match.writefield(move.srcx, move.srcy, piece)
     match.writefield(move.dstx, move.dsty, move.captured_piece)
@@ -287,7 +302,7 @@ def pawn_undo_promotion(match, move):
 
 
 def pawn_undo_en_passant(match, move):
-    match.count -= 1
+    match.movecnt -= 1
     match.fifty_moves_count = move.fifty_moves_count
     piece = match.readfield(move.dstx, move.dsty)
     match.writefield(move.srcx, move.srcy, piece)

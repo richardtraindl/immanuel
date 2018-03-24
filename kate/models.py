@@ -7,14 +7,12 @@ import threading
 
 class Match(models.Model):
     status = models.PositiveSmallIntegerField(null=False, default=STATUS['open'])
-    count = models.SmallIntegerField(null=False, default=0)
-    score = models.IntegerField(null=False, default=0)
     begin = models.DateTimeField(default=timezone.now)
-    white_player = models.CharField(max_length=100, blank=False)
-    white_player_human = models.BooleanField(null=False, default=True)
+    white_player_name = models.CharField(max_length=100, blank=False)
+    is_white_player_human = models.BooleanField(null=False, default=True)
     elapsed_time_white = models.IntegerField(null=False, default=0)
-    black_player = models.CharField(max_length=100, blank=False)
-    black_player_human = models.BooleanField(null=False, default=True)
+    black_player_name = models.CharField(max_length=100, blank=False)
+    is_black_player_human = models.BooleanField(null=False, default=True)
     elapsed_time_black = models.IntegerField(null=False, default=0)
     level = models.SmallIntegerField(null=False, default=LEVELS['blitz'])
     board = models.CharField(max_length=256, blank=False, default='wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;' \
@@ -25,17 +23,6 @@ class Match(models.Model):
                                                                   'blk;blk;blk;blk;blk;blk;blk;blk;' \
                                                                   'bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;' \
                                                                   'bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;')
-    """fifty_moves_count = models.SmallIntegerField(null=False, default=0)
-    wKg_x = models.SmallIntegerField(null=False, default=4)
-    wKg_y = models.SmallIntegerField(null=False, default=0)
-    bKg_x = models.SmallIntegerField(null=False, default=4)
-    bKg_y = models.SmallIntegerField(null=False, default=7)
-    wKg_first_movecnt = models.SmallIntegerField(null=False, default=0)
-    bKg_first_movecnt = models.SmallIntegerField(null=False, default=0)
-    wRk_a1_first_movecnt = models.SmallIntegerField(null=False, default=0)
-    wRk_h1_first_movecnt = models.SmallIntegerField(null=False, default=0)
-    bRk_a8_first_movecnt = models.SmallIntegerField(null=False, default=0)
-    bRk_h8_first_movecnt = models.SmallIntegerField(null=False, default=0)"""
     _matches_thread_lock = threading.Lock()
     _matches_thread_list = []
 
@@ -56,20 +43,8 @@ class Match(models.Model):
         return PIECES[str_value]
 
 
-    def readfield_core(self, x, y):
-        idx = y*32 + x*4
-        return self.board[idx:idx+3]
-
-
-    def next_color_human(self):
-        if(self.count % 2 == 0 ):
-            return self.white_player_human
-        else:
-            return self.black_player_human
-
-
     def is_immanuel(self):
-        return (self.white_player_human == False or self.black_player_human == False)
+        return (self.is_white_player_human == False or self.is_black_player_human == False)
 
 
     @classmethod
@@ -139,25 +114,4 @@ class Comment(models.Model):
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=500)
-
-"""
-class MoveSearch(models.Model):
-    match = models.ForeignKey(Match, on_delete=models.CASCADE, null=False)
-    matchcnt = models.PositiveSmallIntegerField(null=False)
-    rank = models.PositiveSmallIntegerField(null=False)
-    movecnt = models.SmallIntegerField(null=False)
-    srcx = models.PositiveSmallIntegerField(null=False)
-    srcy = models.PositiveSmallIntegerField(null=False)
-    dstx = models.PositiveSmallIntegerField(null=False)
-    dsty = models.PositiveSmallIntegerField(null=False)
-    prom_piece = models.PositiveSmallIntegerField(null=False, default=PIECES['blk'])
-
-
-    def __init__(self, *args, **kwargs):
-        super(MoveSearch, self).__init__(*args, **kwargs)
-
-
-    class Meta:
-        unique_together = (("match", "matchcnt", "rank", "movecnt"),)
-    """
 

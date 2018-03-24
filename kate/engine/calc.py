@@ -377,6 +377,8 @@ def calc_min(match, depth, alpha, beta, last_priomove):
 
 
 def calc_move(match):
+    prnt_attributes(match)
+
     candidates = []
 
     start = time.time()

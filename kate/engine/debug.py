@@ -18,37 +18,48 @@ def prnt_minutes(match):
     print("------------------------------------------------------")
 
 
-
 def prnt_attributes(match):
     print("------------------------------------------------------")
-    print("status: " + str(match.status))
-    print("count: " + str(match.count))
-    print("score: " + str(match.score)) 
-    print("white_player: " + str(match.white_player))
-    print("white_player_human: " + str(match.white_player_human))
-    print("black_player: " + str(match.black_player))
-    print("black_player_human: " + str(match.black_player_human))
-    print("fifty_moves_count: " + str(match.fifty_moves_count))
-    print("wKg_x: " + str(match.wKg_x))
-    print("wKg_y: " + str(match.wKg_y))
-    print("bKg_x: " + str(match.bKg_x))
-    print("bKg_y: " + str(match.bKg_y))
-    print("white_movecnt_short_castling_lost: " + str(match.white_movecnt_short_castling_lost))
-    print("white_movecnt_long_castling_lost: " + str(match.white_movecnt_long_castling_lost))
-    print("black_movecnt_short_castling_lost: " + str(match.black_movecnt_short_castling_lost))
-    print("black_movecnt_long_castling_lost: " + str(match.black_movecnt_long_castling_lost)) 
-    print("level: " + str(match.level))    
+    
+    str_attributes(match, "<br>")
+
     print("------------------------------------------------------")
 
 
-def prnt_board(match):
-    print("------------------------------------------------------")
+def str_attributes(match, delimiter):
+    attr = "status: " + str(match.status) + delimiter + \
+           "movecnt: " + str(match.movecnt) + delimiter + \
+           "score: " + str(match.score) + delimiter + \
+           "level: " + str(match.level) + delimiter + \
+           "begin: " + match.begin.strftime("%Y-%m-%d-%H:%M:%S") + delimiter + \
+           "white_player_name: " + match.white_player_name + delimiter + \
+           "is_white_player_human: " + str(match.is_white_player_human) + delimiter + \
+           "elapsed_time_white: " + str(match.elapsed_time_white) + delimiter + \
+           "black_player_name: " + match.black_player_name + delimiter + \
+           "is_black_player_human: " + str(match.is_black_player_human) + delimiter + \
+           "elapsed_time_black: " + str(match.elapsed_time_black) + delimiter + \
+           "fifty_moves_count: " + str(match.fifty_moves_count) + delimiter + \
+           "white_movecnt_short_castling_lost: " + str(match.white_movecnt_short_castling_lost) + delimiter + \
+           "white_movecnt_long_castling_lost: " + str(match.white_movecnt_long_castling_lost) + delimiter + \
+           "black_movecnt_short_castling_lost: " + str(match.black_movecnt_short_castling_lost) + delimiter + \
+           "black_movecnt_long_castling_lost: " + str(match.black_movecnt_long_castling_lost) + delimiter + \
+           "wKg_x: " + str(match.wKg_x) + delimiter + \
+           "wKg_y: " + str(match.wKg_y) + delimiter + \
+           "bKg_x: " + str(match.bKg_x) + delimiter + \
+           "bKg_y: " + str(match.bKg_y) + delimiter + \
+           "wQu_cnt: " + str(match.wQu_cnt) + delimiter + \
+           "bQu_cnt: " + str(match.bQu_cnt) + delimiter + \
+           "wOfficer_cnt: " + str(match.wOfficer_cnt) + delimiter + \
+           "bOfficer_cnt: " + str(match.bOfficer_cnt) + delimiter
+
     for i in range(7, -1, -1):
         for j in range(8):
             piece = match.readfield(j, i)
-            print(reverse_lookup(PIECES, piece) + " ", end="")
-        print("")
-    print("------------------------------------------------------")
+            attr += reverse_lookup(PIECES, piece)
+
+        attr += delimiter
+        
+    return attr
 
 
 def prnt_generator(generator):
@@ -72,13 +83,13 @@ def write_searchmoves(match, debug_candidates, path):
 
     fobject.write(str(match.id) + "\n")
     fobject.write(str(match.status) + "\n")
-    fobject.write(str(match.count) + "\n")
+    fobject.write(str(match.movecnt) + "\n")
     fobject.write(str(match.score) + "\n")
-    fobject.write(str(match.white_player) + "\n")
-    fobject.write(str(match.white_player_human) + "\n")
+    fobject.write(str(match.white_player_name) + "\n")
+    fobject.write(str(match.is_white_player_human) + "\n")
     fobject.write(str(match.elapsed_time_white) + "\n")
-    fobject.write(str(match.black_player) + "\n")
-    fobject.write(str(match.black_player_human) + "\n")
+    fobject.write(str(match.black_player_name) + "\n")
+    fobject.write(str(match.is_black_player_human) + "\n")
     fobject.write(str(match.elapsed_time_black) + "\n")
     
     for y in range(8):
@@ -94,12 +105,14 @@ def write_searchmoves(match, debug_candidates, path):
     fobject.write(str(match.wKg_y) + "\n")
     fobject.write(str(match.bKg_x) + "\n")
     fobject.write(str(match.bKg_y) + "\n")
-    fobject.write(str(match.wKg_first_movecnt) + "\n")
-    fobject.write(str(match.bKg_first_movecnt) + "\n")
-    fobject.write(str(match.wRk_a1_first_movecnt) + "\n")
-    fobject.write(str(match.wRk_h1_first_movecnt) + "\n")
-    fobject.write(str(match.bRk_a8_first_movecnt) + "\n")
-    fobject.write(str(match.bRk_h8_first_movecnt) + "\n")
+    fobject.write(str(match.white_movecnt_short_castling_lost) + "\n")
+    fobject.write(str(match.white_movecnt_long_castling_lost) + "\n")
+    fobject.write(str(match.black_movecnt_short_castling_lost) + "\n")
+    fobject.write(str(match.black_movecnt_long_castling_lost) + "\n")
+    fobject.write(str(match.wQu_cnt) + "\n")
+    fobject.write(str(match.bQu_cnt) + "\n")
+    fobject.write(str(match.wOfficer_cnt) + "\n")
+    fobject.write(str(match.bOfficer_cnt) + "\n")
 
     if(len(match.move_list) == 0):
         fobject.write("\n")
@@ -145,13 +158,13 @@ def read_searchmoves(path):
     match = Match()    
     match.id = lines[0].rstrip('\n')
     match.status = int(lines[1].rstrip('\n'))
-    match.count = int(lines[2].rstrip('\n'))
+    match.movecnt = int(lines[2].rstrip('\n'))
     match.score = int(lines[3].rstrip('\n'))
-    match.white_player = lines[4].rstrip('\n')
-    match.white_player_human = bool(lines[5].rstrip('\n'))
+    match.white_player_name = lines[4].rstrip('\n')
+    match.is_white_player_human = bool(lines[5].rstrip('\n'))
     match.elapsed_time_white = int(lines[6].rstrip('\n'))
-    match.black_player = lines[7].rstrip('\n')
-    match.black_player_human = bool(lines[8].rstrip('\n'))
+    match.black_player_name = lines[7].rstrip('\n')
+    match.is_black_player_human = bool(lines[8].rstrip('\n'))
     match.elapsed_time_black = int(lines[9].rstrip('\n'))
 
     y = 0
@@ -169,14 +182,16 @@ def read_searchmoves(path):
     match.wKg_y = int(lines[20].rstrip('\n'))
     match.bKg_x = int(lines[21].rstrip('\n'))
     match.bKg_y = int(lines[22].rstrip('\n'))
-    match.wKg_first_movecnt = int(lines[23].rstrip('\n'))
-    match.bKg_first_movecnt = int(lines[24].rstrip('\n'))
-    match.wRk_a1_first_movecnt = int(lines[25].rstrip('\n'))
-    match.wRk_h1_first_movecnt = int(lines[26].rstrip('\n'))
-    match.bRk_a8_first_movecnt = int(lines[27].rstrip('\n'))
-    match.bRk_h8_first_movecnt = int(lines[28].rstrip('\n'))
+    match.white_movecnt_short_castling_lost = int(lines[23].rstrip('\n'))
+    match.white_movecnt_long_castling_lost = int(lines[24].rstrip('\n'))
+    match.black_movecnt_short_castling_lost = int(lines[25].rstrip('\n'))
+    match.black_movecnt_long_castling_lost = int(lines[26].rstrip('\n'))
+    match.wQu_cnt = int(lines[27].rstrip('\n'))
+    match.bQu_cnt = int(lines[28].rstrip('\n'))
+    match.wOfficer_cnt = int(lines[29].rstrip('\n'))
+    match.bOfficer_cnt = int(lines[30].rstrip('\n')) 
 
-    line = lines[29].rstrip('\n')
+    line = lines[31].rstrip('\n')
     if(len(line) > 0):
         moveattr = line.split(";")
         if(len(moveattr) == 12):
@@ -197,7 +212,7 @@ def read_searchmoves(path):
             match.move_list.append(move)
 
     debug_candidates = []
-    for line in lines[30:51]:
+    for line in lines[32:53]:
         line = line.rstrip('\n')
         searchmoves = line.split("]")
         if(len(searchmoves) > 0):

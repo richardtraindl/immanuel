@@ -24,21 +24,22 @@ LEVEL_CHOICES = (
 )
 
 class MatchForm(forms.Form):
-    white_player = forms.CharField(label=' White Player', max_length=100)
-    white_player_human = forms.BooleanField(label='Human', initial=True, required=False)
-    black_player = forms.CharField(label='Black Player', max_length=100)
-    black_player_human = forms.BooleanField(label='Human', initial=True, required=False)
     level = forms.ChoiceField(label="Level", choices = LEVEL_CHOICES, initial=0)
+    white_player_name = forms.CharField(label=' White Player', max_length=100)
+    is_white_player_human = forms.BooleanField(label='Human', initial=True, required=False)
+    black_player_name = forms.CharField(label='Black Player', max_length=100)
+    is_black_player_human = forms.BooleanField(label='Human', initial=True, required=False)
+
 
     def clean(self):
         cleaned_data = super(MatchForm, self).clean()
-        self.white_player = cleaned_data.get("white_player")
-        self.white_player_human = cleaned_data.get("white_player_human")
-        self.black_player = cleaned_data.get("black_player")
-        self.black_player_human = cleaned_data.get("black_player_human")
         self.level = cleaned_data.get("level")
+        self.white_player_name = cleaned_data.get("white_player_name")
+        self.is_white_player_human = cleaned_data.get("is_white_player_human")
+        self.black_player_name = cleaned_data.get("black_player_name")
+        self.is_black_player_human = cleaned_data.get("is_black_player_human")
 
-        if(not (len(self.white_player) > 0 and len(self.black_player) > 0)):
+        if(not (len(self.white_player_name) > 0 and len(self.black_player_name) > 0)):
             raise ValidationError("...")
 
 

@@ -17,26 +17,14 @@ def map_matches(src, dst, map_dir):
 
     dst.id = src.id
     dst.status = src.status
-    dst.count = src.count
-    dst.score = src.score
-    dst.white_player = src.white_player
-    dst.white_player_human = src.white_player_human
+    dst.level = src.level
+    dst.begin = src.begin
+    dst.white_player_name = src.white_player_name
+    dst.is_white_player_human = src.is_white_player_human
     dst.elapsed_time_white = src.elapsed_time_white
-    dst.black_player = src.black_player
-    dst.black_player_human = src.black_player_human
+    dst.black_player_name = src.black_player_name
+    dst.is_black_player_human = src.is_black_player_human
     dst.elapsed_time_black = src.elapsed_time_black
-    dst.level = int(src.level)
-    """dst.fifty_moves_count = src.fifty_moves_count
-    dst.wKg_x = src.wKg_x
-    dst.wKg_y = src.wKg_y
-    dst.bKg_x = src.bKg_x
-    dst.bKg_y = src.bKg_y
-    dst.wKg_first_movecnt = src.wKg_first_movecnt
-    dst.bKg_first_movecnt = src.bKg_first_movecnt
-    dst.wRk_a1_first_movecnt = src.wRk_a1_first_movecnt
-    dst.wRk_h1_first_movecnt = src.wRk_h1_first_movecnt
-    dst.bRk_a8_first_movecnt = src.bRk_a8_first_movecnt
-    dst.bRk_h8_first_movecnt = src.bRk_h8_first_movecnt"""
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -76,7 +64,20 @@ def is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
     return rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
 
- 
+
+def movecnt(modelmatch):
+    moves = ModelMove.objects.filter(match_id=modelmatch.id)
+    return len(moves)
+
+
+def is_next_color_human(modelmatch):
+    moves = ModelMove.objects.filter(match_id=modelmatch.id)
+    if(len(moves) % 2 == 0):
+        return modelmatch.is_white_player_human
+    else:
+        return modelmatch.is_black_player_human
+
+
 def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
@@ -140,7 +141,7 @@ def calc_move_for_immanuel(modelmatch):
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
     if(rules.status(match) != STATUS['open']):
         return False, rules.status(match)
-    elif(modelmatch.next_color_human()):
+    elif(match.is_next_color_human()):
         return False, rules.RETURN_CODES['wrong-color']
     else:
         thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)

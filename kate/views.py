@@ -12,6 +12,7 @@ from .engine.match import *
 from .engine.move import *
 from .engine import matchmove
 from .engine.helper import index_to_coord, coord_to_index
+from .engine.debug import str_attributes
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
 from .modules.interface import read_searchmoves
 
@@ -19,6 +20,7 @@ from .modules.interface import read_searchmoves
 def index(request):
     context = RequestContext(request)
     modelmatches = ModelMatch.objects.order_by("begin").reverse()[:10]
+
     return render(request, 'kate/index.html', { 'matches': modelmatches } )
 
 
@@ -29,12 +31,15 @@ def match(request, matchid=None):
     debug = request.GET.get('debug', "false")
 
     if(matchid == None):
-        modelmatch = ModelMatch(white_player=None, black_player=None)
+        modelmatch = ModelMatch(white_player_name=None, black_player_name=None)
     else:
         try:
             modelmatch = ModelMatch.objects.get(id=matchid)
         except ObjectDoesNotExist: #ModelMatch.DoesNotExist:
             return HttpResponseRedirect('/kate')
+
+    match = Match()
+    interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(lastmove):
@@ -60,11 +65,11 @@ def match(request, matchid=None):
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:5]
     
     if(msg == None):
-        status = interface.status(modelmatch)
-        if(status != STATUS['open']):
-            if(status == STATUS['winner_white']):
+        #status = interface.status(modelmatch)
+        if(match.status != STATUS['open']):
+            if(match.status == STATUS['winner_white']):
                 msg = RETURN_CODES['winner_white']
-            elif(status == STATUS['winner_black']):
+            elif(match.status == STATUS['winner_black']):
                 msg = RETURN_CODES['winner_black']
             else:
                 msg = RETURN_CODES['draw']
@@ -87,38 +92,17 @@ def match(request, matchid=None):
 
     if(debug == "true"):
         importform = ImportMatchForm()
-        debug_data = str(modelmatch.status) + ";" + \
-                 str(modelmatch.count) + ";" + \
-                 str(modelmatch.score) + ";" + \
-                 modelmatch.begin.strftime("%Y-%m-%d-%H:%M:%S") + ";" + \
-                 modelmatch.white_player + ";" + \
-                 str(modelmatch.white_player_human) + ";" + \
-                 str(modelmatch.elapsed_time_white) + ";" + \
-                 modelmatch.black_player + ";" + \
-                 str(modelmatch.black_player_human) + ";" + \
-                 str(modelmatch.elapsed_time_black) + ";" + \
-                 str(modelmatch.level) + ";" + \
-                 modelmatch.board + \
-                 str(modelmatch.fifty_moves_count) + ";" + \
-                 str(modelmatch.wKg_x) + ";" + \
-                 str(modelmatch.wKg_y) + ";" + \
-                 str(modelmatch.bKg_x) + ";" + \
-                 str(modelmatch.bKg_y) + ";" + \
-                 str(modelmatch.wKg_first_movecnt) + ";" + \
-                 str(modelmatch.bKg_first_movecnt) + ";" + \
-                 str(modelmatch.wRk_a1_first_movecnt) + ";" + \
-                 str(modelmatch.wRk_h1_first_movecnt) + ";" + \
-                 str(modelmatch.bRk_a8_first_movecnt) + ";" + \
-                 str(modelmatch.bRk_h8_first_movecnt) + ";"
+        debug_data = str_attributes(match, "<br>")
     else:
         debug_data = ""
 
-    return render(request, 'kate/match.html', { 'match': modelmatch, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running, 'debug': debug, 'debug_data': debug_data } )
+    return render(request, 'kate/match.html', { 'match': match, 'board': modelmatch.board, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running, 'debug': debug, 'debug_data': debug_data } )
 
 
 def settings(request, matchid=None):
     context = RequestContext(request)
     switch = request.GET.get('switch', '0')
+    debug = request.GET.get('debug', "false")
 
     if(matchid == None):
         modelmatch = ModelMatch()
@@ -130,10 +114,10 @@ def settings(request, matchid=None):
     if(request.method == 'POST'):
         form = MatchForm(request.POST)
         if(form.is_valid()):
-            modelmatch.white_player = form.white_player
-            modelmatch.white_player_human = form.white_player_human
-            modelmatch.black_player = form.black_player
-            modelmatch.black_player_human = form.black_player_human
+            modelmatch.white_player_name = form.white_player_name
+            modelmatch.is_white_player_human = form.is_white_player_human
+            modelmatch.black_player_name = form.black_player_name
+            modelmatch.is_black_player_human = form.is_black_player_human
             modelmatch.level = form.level
             modelmatch.save()
             
@@ -149,17 +133,19 @@ def settings(request, matchid=None):
             return render(request, 'kate/settings.html', { 'form': form } )
         else:
             form = MatchForm(initial={
-                'white_player': modelmatch.white_player, 
-                'white_player_human': modelmatch.white_player_human, 
-                'black_player': modelmatch.black_player, 
-                'black_player_human': modelmatch.black_player_human, 
-                'level': modelmatch.level })
+                'level': modelmatch.level,
+                'white_player_name': modelmatch.white_player_name, 
+                'is_white_player_human': modelmatch.is_white_player_human, 
+                'black_player_name': modelmatch.black_player_name, 
+                'is_black_player_human': modelmatch.is_black_player_human })
+
             return render(request, 'kate/settings.html', { 'form': form, 'matchid': matchid, 'switch': switch } )
 
 
 def delete(request, matchid=None):
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     ModelMatch.objects.filter(id=modelmatch.id).delete()
+
     return HttpResponseRedirect('/kate')
 
 
@@ -169,7 +155,7 @@ def do_move(request, matchid=None):
 
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-        if(modelmatch.next_color_human() == False):
+        if(interface.is_next_color_human(modelmatch) == False):
             msg = RETURN_CODES['wrong-color']
         else:
             form = DoMoveForm(request.POST)
@@ -208,7 +194,6 @@ def undo_move(request, matchid=None):
         ModelMatch.remove_outdated_threads()
 
     interface.undo_move(modelmatch)
-
     return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
 
@@ -226,117 +211,6 @@ def resume(request, matchid=None):
     return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
 
-def import_match(request):
-    context = RequestContext(request)
-
-    if(request.method == 'POST'):
-        form = ImportMatchForm(request.POST)
-        if(form.is_valid()):
-            modelmatch = ModelMatch()
-
-            re.sub('[^A-Za-z0-9-;]+', '', form.match_data)
-            data_fields = form.match_data.split(";")
-            modelmatch.status = int(data_fields[0])
-            modelmatch.count = int(data_fields[1])
-            modelmatch.score = int(data_fields[2])
-            # modelmatch.begin = timezone.now #int(data_fields[3])
-            modelmatch.white_player = data_fields[4]
-
-            if(data_fields[5] == "True"):
-                modelmatch.white_player_human = True
-            else:
-                modelmatch.white_player_human = False
-
-            modelmatch.elapsed_time_white = int(data_fields[6])
-            modelmatch.black_player = data_fields[7]
-
-            if(data_fields[8] == "True"):
-                modelmatch.black_player_human = True
-            else:
-                modelmatch.black_player_human = False
-
-            modelmatch.elapsed_time_black = int(data_fields[9])
-            modelmatch.level = int(data_fields[10])
-
-            board = ""
-            for i in range(11, 75):
-                board += data_fields[i] + ";"
-            modelmatch.board = board
-
-            modelmatch.fifty_moves_count = int(data_fields[75])
-            modelmatch.wKg_x = int(data_fields[76])
-            modelmatch.wKg_y = int(data_fields[77])
-            modelmatch.bKg_x = int(data_fields[78])
-            modelmatch.bKg_y = int(data_fields[79])
-            modelmatch.wKg_first_movecnt = int(data_fields[80])
-            modelmatch.bKg_first_movecnt = int(data_fields[81])
-            modelmatch.wRk_a1_first_movecnt = int(data_fields[82])
-            modelmatch.wRk_h1_first_movecnt = int(data_fields[83])
-            modelmatch.bRk_a8_first_movecnt = int(data_fields[84])
-            modelmatch.bRk_h8_first_movecnt = int(data_fields[85])
-
-            modelmatch.save()
-            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id,)))
-    else:
-        form = ImportMatchForm()
-        return render(request, 'kate/import.html', { 'form': form } )
-
-
-def analyze(request, matchid=None, threadidx=0, rcount=0):
-    context = RequestContext(request)
-
-    if(matchid == None):
-        return HttpResponseRedirect('/kate')
-    else:
-        match, searchmoves = read_searchmoves()
-        try:
-            modelmatch = ModelMatch.objects.get(id=matchid)
-        except ModelMatch.DoesNotExist:
-            return HttpResponseRedirect('/kate')
-
-    if(match.id != matchid):
-        return HttpResponseRedirect('/kate')
-        
-    interface.map_matches(match, modelmatch, interface.MAP_DIR['engine-to-model'])
-    
-    return render(request, 'kate/analyze.html', { 'match': modelmatch, 'searchmoves': searchmoves, 'threadidx': threadidx, 'rcount': rcount, } )
-
-
-def replay(request, matchid, threadidx=0, rcount=0):
-    context = RequestContext(request)
-
-    if(request.method == 'POST'):
-        match, searchmoves = read_searchmoves()
-        if(match.id != matchid or threadidx is None or rcount is None):
-            return HttpResponseRedirect('kate')
-
-        thridx = int(threadidx)
-        rcnt = int(rcount) + 1
-        movesrc = ''
-        movedst = ''
-
-        if(len(searchmoves) > thridx and len(searchmoves[thridx]) >= rcnt):
-            for i in range(rcnt):
-                gmove = searchmoves[thridx][i]
-                if(gmove):
-                    matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-                else:
-                    break
-            lastmove = match.move_list[-1]
-            if(lastmove):
-                movesrc = index_to_coord(lastmove.srcx, lastmove.srcy)
-                movedst = index_to_coord(lastmove.dstx, lastmove.dsty)
-        else:
-            thridx = 0
-            rcnt = 0
-
-        modelmatch = ModelMatch()
-        interface.map_matches(match, modelmatch, interface.MAP_DIR['engine-to-model'])
-        return render(request, 'kate/analyze.html', { 'match': modelmatch, 'searchmoves': searchmoves, 'threadidx': thridx, 'rcount': rcnt, 'movesrc': movesrc, 'movedst': movedst, } )
-    else:
-        return HttpResponseRedirect('kate')
-
-
 def add_comment(request, matchid):
     context = RequestContext(request)
     switch = request.GET.get('switch', '0')
@@ -349,6 +223,7 @@ def add_comment(request, matchid):
             comment.match_id = modelmatch.id
             comment.text = newcomment
             comment.save()
+
         return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
 
@@ -361,6 +236,7 @@ def fetch_comments(request):
         data = ""
         for comment in reversed(comments):
             data += "<p>" + comment.text + "</p>"
+
         return HttpResponse(data)
 
 
@@ -370,7 +246,8 @@ def fetch_match(request):
     movecnt = request.GET['movecnt']
 
     modelmatch = ModelMatch.objects.get(id=matchid)
-    if(modelmatch and modelmatch.count > int(movecnt)):
+    lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
+    if(modelmatch and lastmove and lastmove.count > int(movecnt)):
         data = "1"
     else:
         data = ""

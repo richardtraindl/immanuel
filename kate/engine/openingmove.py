@@ -6,7 +6,7 @@ from .helper import coord_to_index, index_to_coord
 
 
 def retrieve_move(match):
-    if(match.count >= DEPTH):
+    if(match.movecnt >= DEPTH):
         print("############ depth not supported ############")
         return None
         
@@ -20,11 +20,11 @@ def retrieve_move(match):
     lastmoves = lastmoves[:-1]
     print("lastmoves: " + lastmoves)
 
-    if(match.count == 0):
+    if(match.movecnt == 0):
         omovelist = FIRST
-    elif(match.count == 1):
+    elif(match.movecnt == 1):
         omovelist = SECOND
-    elif(match.count == 2):
+    elif(match.movecnt == 2):
         omovelist = THIRD
     else:
         omovelist = FOURTH

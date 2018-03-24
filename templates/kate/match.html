@@ -7,7 +7,7 @@
 {% block header %}
     <h1><a href="{% url 'kate:match' match.id %}?switch={{ switch }}">Game</a></h1>
 
-    <h2>{{ match.white_player }} &nbsp; : &nbsp; {{ match.black_player }}</h2>
+    <h2>{{ match.white_player_name }} &nbsp; : &nbsp; {{ match.black_player_name }}</h2>
 
     <p>Level: &nbsp; {{ match.level|matchlevel }}</p>
 
@@ -31,7 +31,7 @@
 
 
 {% block content %}
-    {% if match.white_player_human and match.black_player_human %}
+    {% if match.is_white_player_human and match.is_black_player_human %}
         <div id="chat">
             {% include "kate/_chat.html" with match=match %}
         </div>
@@ -42,9 +42,9 @@
         <p id="msg">{{ msg|safe }}</p>
 
         {% if switch == '0' %}
-            {% include "kate/_chessboard.html" with match=match %}
+            {% include "kate/_chessboard.html" with match=match board=board %}
         {% else %}
-            {% include "kate/_reversed_chessboard.html" with match=match %}
+            {% include "kate/_reversed_chessboard.html" with match=match board=board %}
         {% endif %}
 
         <table id="promotion">
@@ -79,7 +79,7 @@
     </div>
 
     {% if debug == 'true' %}
-        <p>{{ debug_data }}</p>
+        <p>{{ debug_data|safe }}</p>
     {% endif %}
 
     <script>

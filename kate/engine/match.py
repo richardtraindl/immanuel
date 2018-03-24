@@ -1,3 +1,4 @@
+from datetime import datetime
 
 
 STATUS = {
@@ -60,13 +61,76 @@ PIECES_COLOR = {
         PIECES['bQu'] : COLORS['black'] }
 
 
-E1_X = 3
+PIECES_RANK = {
+        PIECES['blk'] : 0,
+        PIECES['wPw'] : 1,
+        PIECES['bPw'] : 1,
+        PIECES['wKn'] : 2,
+        PIECES['bKn'] : 2,
+        PIECES['wBp'] : 2,
+        PIECES['bBp'] : 2,
+        PIECES['wRk'] : 4,
+        PIECES['bRk'] : 4,
+        PIECES['wQu'] : 5,
+        PIECES['bQu'] : 5,
+        PIECES['wKg'] : 6,
+        PIECES['bKg'] : 6 }
+
+
+SCORES = { 
+        PIECES['blk'] : 0,
+        PIECES['wKg'] : -20000,
+        PIECES['wPw'] : -100,
+        PIECES['wRk'] : -500,
+        PIECES['wKn'] : -336,
+        PIECES['wBp'] : -340,
+        PIECES['wQu'] : -950,
+        PIECES['bKg'] : 20000,
+        PIECES['bPw'] : 100,
+        PIECES['bRk'] : 500,
+        PIECES['bKn'] : 336,
+        PIECES['bBp'] : 340,
+        PIECES['bQu'] : 950 }
+
+
+ATTACKED_SCORES = {
+        PIECES['blk'] : 0,
+        PIECES['wKg'] : 0,
+        PIECES['wPw'] : -4,
+        PIECES['wRk'] : -10,
+        PIECES['wKn'] : -8,
+        PIECES['wBp'] : -8,
+        PIECES['wQu'] : -16,
+        PIECES['bKg'] : 0,
+        PIECES['bPw'] : 4,
+        PIECES['bRk'] : 10,
+        PIECES['bKn'] : 8,
+        PIECES['bBp'] : 8,
+        PIECES['bQu'] : 16 }
+
+
+SUPPORTED_SCORES = {
+        PIECES['blk'] : 0,
+        PIECES['wKg'] : 0,
+        PIECES['wPw'] : 4,
+        PIECES['wRk'] : 10,
+        PIECES['wKn'] : 8,
+        PIECES['wBp'] : 8,
+        PIECES['wQu'] : 16,
+        PIECES['bKg'] : 0,
+        PIECES['bPw'] : -4,
+        PIECES['bRk'] : -10,
+        PIECES['bKn'] : -8,
+        PIECES['bBp'] : -8,
+        PIECES['bQu'] : -16 }
+
+E1_X = 4
 E1_Y = 0
 A1_X = 0
 A1_Y = 0
 H1_X = 7
 H1_Y = 0
-E8_X = 3
+E8_X = 4
 E8_Y = 7
 A8_X = 0
 A8_Y = 7
@@ -77,16 +141,16 @@ H8_Y = 7
 class Match:
     def __init__(self):
         self.status = STATUS['open']
-        self.count = 0
+        self.movecnt = 0
         self.score = 0
-        self.white_player = ""
-        self.white_player_human = True
-        self.elapsed_time_white = 0
-        self.black_player = ""
-        self.black_player_human = True
-        self.elapsed_time_black = 0
         self.level = LEVELS['blitz']
-        #self.board = [[0 for x in range(8)] for x in range(8)]
+        self.begin = datetime.now()
+        self.white_player_name = ""
+        self.is_white_player_human = True
+        self.elapsed_time_white = 0
+        self.black_player_name = ""
+        self.is_black_player_human = True
+        self.elapsed_time_black = 0
         self.board = [ [PIECES['wRk'], PIECES['wKn'], PIECES['wBp'], PIECES['wQu'], PIECES['wKg'], PIECES['wBp'], PIECES['wKn'], PIECES['wRk']],
                        [PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw']],
                        [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
@@ -96,14 +160,14 @@ class Match:
                        [PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw']],
                        [PIECES['bRk'], PIECES['bKn'], PIECES['bBp'], PIECES['bQu'], PIECES['bKg'], PIECES['bBp'], PIECES['bKn'], PIECES['bRk']] ]
         self.fifty_moves_count = 0
+        self.white_movecnt_short_castling_lost = 0
+        self.white_movecnt_long_castling_lost = 0
+        self.black_movecnt_short_castling_lost = 0
+        self.black_movecnt_long_castling_lost = 0
         self.wKg_x = E1_X
         self.wKg_y = E1_Y
         self.bKg_x = E8_X
         self.bKg_y = E8_Y
-        self.white_movecnt_short_castling_lost = -1
-        self.white_movecnt_long_castling_lost = -1
-        self.black_movecnt_short_castling_lost = -1
-        self.black_movecnt_long_castling_lost = -1
         self.wQu_cnt = 1
         self.bQu_cnt = 1
         self.wOfficer_cnt = 6
@@ -112,45 +176,53 @@ class Match:
 
 
     def update_attributes(self):
-        if(len(self.move_list) > 0):
+        self.movecnt = len(self.move_list)
+        if(self.movecnt > 0):
             move = self.move_list[-1]
             fifty_moves_count = move.fifty_moves_count
-        
+
             for move in self.move_list:
-                if(move.count % 2 == 0):
-                    if(self.white_movecnt_short_castling_lost == -1):
+                if(move.count % 2 == 1):
+                    if(self.white_movecnt_short_castling_lost == 0):
                         if(move.srcx == E1_X and move.srcy == E1_Y):
                             self.white_movecnt_short_castling_lost = move.count
-                            continue
                         elif(move.srcx == A1_X and move.srcy == A1_Y):
                             self.white_movecnt_short_castling_lost = move.count
                             continue
-                    if(self.white_movecnt_long_castling_lost == -1):
+                    if(self.white_movecnt_long_castling_lost == 0):
                         if(move.srcx == E1_X and move.srcy == E1_Y):
                             self.white_movecnt_long_castling_lost = move.count
-                            continue
                         elif(move.srcx == H1_X and move.srcy == H1_Y):
                             self.white_movecnt_long_castling_lost = move.count
                             continue
                 else:
-                    if(self.black_movecnt_short_castling_lost == -1):
+                    if(self.black_movecnt_short_castling_lost == 0):
                         if(move.srcx == E8_X and move.srcy == E8_Y):
                             self.black_movecnt_short_castling_lost = move.count
-                            continue
                         elif(move.srcx == A8_X and move.srcy == A8_Y):
                             self.black_movecnt_short_castling_lost = move.count
                             continue
-                    if(self.black_movecnt_long_castling_lost == -1):
+                    if(self.black_movecnt_long_castling_lost == 0):
                         if(move.srcx == E8_X and move.srcy == E8_Y):
                             self.black_movecnt_long_castling_lost = move.count
-                            continue
                         elif(move.srcx == H8_X and move.srcy == H8_Y):
                             self.black_movecnt_long_castling_lost = move.count
                             continue
 
+        self.score = 0
+        self.wQu_cnt = 0
+        self.bQu_cnt = 0
+        self.wOfficer_cnt = 0
+        self.bOfficer_cnt = 0
         for y in range(8):
             for x in range(8):
                 piece = self.readfield(x, y)
+
+                if(piece == PIECES['blk']):
+                    continue
+                else:
+                    self.score += SCORES[piece]
+
                 if(piece == PIECES['wKg']):
                     self.wKg_x = x
                     self.wKg_y = y
@@ -161,10 +233,10 @@ class Match:
                     self.wQu_cnt += 1
                 elif(piece == PIECES['bQu']):
                     self.bQu_cnt += 1        
-                elif(piece == PIECES['wRk'] or piece == PIECES['wBp'] or piece == PIECES['wPw']):
+                elif(piece == PIECES['wRk'] or piece == PIECES['wBp'] or piece == PIECES['wKn']):
                     self.wOfficer_cnt += 1
-                elif(piece == PIECES['bRk'] or piece == PIECES['bBp'] or piece == PIECES['bPw']):
-                    self.bOfficer_cnt + 1
+                elif(piece == PIECES['bRk'] or piece == PIECES['bBp'] or piece == PIECES['bKn']):
+                    self.bOfficer_cnt += 1
 
 
     def writefield(self, x, y, value):
@@ -175,8 +247,15 @@ class Match:
         return self.board[y][x]
 
 
+    def is_next_color_human(self):
+        if(self.movecnt % 2 == 0 ):
+            return self.is_white_player_human
+        else:
+            return self.is_black_player_human
+
+
     def next_color(self):
-        if(self.count % 2 == 0 ):
+        if(self.movecnt % 2 == 0 ):
             return COLORS['white']
         else:
             return COLORS['black']

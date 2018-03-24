@@ -333,10 +333,10 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
         return False
 
     if(color == COLORS['white']):
-        if(match.white_movecnt_short_castling_lost > -1 or rook != PIECES['wRk']):
+        if(match.white_movecnt_short_castling_lost > 0 or rook != PIECES['wRk']):
             return False
     else:
-        if(match.black_movecnt_short_castling_lost > -1 or rook != PIECES['bRk']):
+        if(match.black_movecnt_short_castling_lost > 0 or rook != PIECES['bRk']):
             return False            
 
     king = match.readfield(srcx, srcy)
@@ -368,10 +368,10 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
         return False
 
     if(color == COLORS['white']):
-        if(match.white_movecnt_long_castling_lost > -1 or rook != PIECES['wRk']):
+        if(match.white_movecnt_long_castling_lost > 0 or rook != PIECES['wRk']):
             return False
     else:
-        if(match.black_movecnt_long_castling_lost > -1 or rook != PIECES['bRk']):
+        if(match.black_movecnt_long_castling_lost > 0 or rook != PIECES['bRk']):
             return False
 
     king = match.readfield(srcx, srcy)

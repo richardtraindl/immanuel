@@ -1,4 +1,4 @@
-#from .. match import *
+from .. match import *
 #from .. import rules
 from .. cvalues import *
 

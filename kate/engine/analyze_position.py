@@ -143,180 +143,101 @@ def score_controled_vertical_files(match):
     return score
 
 
-
-"""def check_mobility_move(match, srcx, srcy, dstx, dsty, prom_piece):
-    if(not is_move_inbounds(srcx, srcy, dstx, dsty)):
-        return False
-
-    piece = match.readfield(srcx, srcy)
-
-    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        if(pawn.is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece)):
-            return True
-        else:
-            return False
-    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        if(rook.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
-            return True
-        else:
-            return False
-    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        if(knight.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
-            return True
-        else:
-            return False
-    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        if(bishop.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
-            return True
-        else:
-            return False
-    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        if(queen.is_move_valid(match, srcx, srcy, dstx, dsty, piece)):
-            return True
-        else:
-            return False
-    else:
-        return False
-
-def count_mobility(match, srcx, srcy, excludedpieces):
-    piece = match.readfield(srcx, srcy)
-    movecnt = 0
-
-    for expiece in excludedpieces:
-        if(piece == expiece):
-            return movecnt
-
-    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
-        dircnt = 8
-        stepcnt = 1
-    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
-        dircnt = 8
-        stepcnt = 7
-    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        dirs = [ [0, 1], [0, -1], [1, 0], [-1, 0] ]
-        dircnt = 4
-        stepcnt = 7
-    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        dirs = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
-        dircnt = 4
-        stepcnt = 7
-    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        dirs =  [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
-        dircnt = 8
-        stepcnt = 1
-    else:
-        return movecnt
-
-    for j in range(dircnt):
-        stepx = dirs[j][0]
-        stepy = dirs[j][1]
-        dstx = srcx
-        dsty = srcy
-        for i in range(stepcnt):
-            dstx += stepx
-            dsty += stepy
-            if(check_mobility_move(match, srcx, srcy, dstx, dsty, PIECES['blk'])):
-                movecnt += 1
-            else:
-                break
-
-    return movecnt"""
-
-
 def is_opening(match):
-    return match.count < 30
+    return match.movecnt <= 30
 
 
 def is_endgame(match):
-    return match.count >= 40
+    white_cnt = match.wQu_cnt + match.wOfficer_cnt
+    black_cnt = match.bQu_cnt + match.bOfficer_cnt
+    return (white_cnt <= 3 and black_cnt <= 3)
 
 
-def is_king_defended_by_pawns(match, color):
+def is_king_guarded(match, color):
     if(color == COLORS['white']):
-        y = 1
         Kg_x = match.wKg_x
         Kg_y = match.wKg_y
         pawn = PIECES['wPw']
     else:
-        y= 6
         Kg_x = match.bKg_x
         Kg_y = match.bKg_y
         pawn = PIECES['bPw']
     
     count = 0
-    for x in range(8):
-        if(x == Kg_x or x - 1 == Kg_x or x + 1 == Kg_x):
-            if(match.readfield(x, y) == pawn):
+    
+    for i in range(8):
+        x1 = Kg_x + king.STEPS[i][0]
+        y1 = Kg_y + king.STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+            if(piece == pawn):
+                count += 2
+            elif(Match.color_of_piece(piece) == color):
                 count += 1
 
-    if(count >= 2):
+    if(count >= 3):
         return True
     else:
         return False
+
 
 def is_king_centered(match, color):
     if(color == COLORS['white']):
-        if(wKg_y >= 2):
-            return True
-
         x = match.wKg_x
     else:
-        if(bKg_y <= 5):
-            return True
-
         x = match.bKg_x
 
-    if(x == 3 or x == 4 or x == 5):
+    if(x == 3 or x == 4):
         return True
-    
-    return False
+    else:
+        return False
 
-def is_rook_trapped(match, color):
+
+def is_rook_locked(match, color):
     if(color == COLORS['white']):
         y = 0
-        Kg_x = match.wKg_x
-        Kg_y = match.wKg_y
         rook = PIECES['wRk']
+        king = PIECES['wKg']
     else:
-        y= 7
-        Kg_x = match.bKg_x
-        Kg_y = match.bKg_y
+        y = 7
         rook = PIECES['bRk']
+        king = PIECES['bKg']
 
-    rook_leftcnt = 0
-    piece_leftcnt = 0
-    rook_rightcnt = 0
-    piece_rightcnt = 0
+    for i in range(2):
+        if(i == 0):
+            start = 0
+            end = 3
+            step = 1
+        else:
+            start = 7
+            end = 4
+            step = -1
 
-    if(Kg_x > 0):
-        for x in range(0, Kg_x, 1):
+        first = None
+        second = None
+        for x in range(start, end, step):
             piece = match.readfield(x, y)
 
             if(piece == PIECES['blk']):
                 continue
             elif(piece == rook):
-                rook_leftcnt += 1
-            else:
-                piece_leftcnt += 1
+                if(first is None):
+                    first = rook
+                elif(second is None):
+                    second = rook
+            elif(piece == king):
+                if(first is None):
+                    first = king
+                elif(second is None):
+                    second = king
+                else:
+                    return True
 
-    if(Kg_x < 7):
-        for x in range(Kg_x + 1, 8, 1):
-            piece = match.readfield(x, y)
+        if(first == rook and second == king):
+            return True
 
-            if(piece == PIECES['blk']):
-                continue
-            elif(piece == rook):
-                rook_rightcnt += 1
-            else:
-                piece_rightcnt += 1
+    return False
 
-    if((rook_leftcnt == 0 and piece_leftcnt == 0) or 
-       (rook_rightcnt == 0 and piece_rightcnt == 0)):
-        return False
-    else:
-        return True
 
 """def score_baseline_pieces(match):
     score = 0
@@ -341,6 +262,7 @@ def is_rook_trapped(match, color):
 
     return score"""
 
+
 def score_opening(match):
     value = 0
 
@@ -355,13 +277,8 @@ def score_opening(match):
         piece = match.readfield(x, y)
         if(piece == PIECES['wKn'] or piece == PIECES['wBp']):
             cnt += 1
-    value += cnt * blackrate
-
-    if(match.readfield(1, 1) == PIECES['blk'] or match.readfield(3, 1) == PIECES['blk']):
-        value += whiterate
-
-    if(match.readfield(4, 1) == PIECES['blk'] or match.readfield(6, 1) == PIECES['blk']):
-        value += whiterate
+    if(cnt > 1):
+        value += cnt * blackrate
 
     # black position
     y = 7
@@ -370,37 +287,32 @@ def score_opening(match):
         piece = match.readfield(x, y)
         if(piece == PIECES['bKn'] or piece == PIECES['bBp']):
             cnt += 1
-    value += cnt * whiterate
-
-    if(match.readfield(1, 6) == PIECES['blk'] or match.readfield(3, 6) == PIECES['blk']):
-        value += blackrate
-
-    if(match.readfield(4, 6) == PIECES['blk'] or match.readfield(6, 6) == PIECES['blk']):
-        value += blackrate
+    if(cnt > 1):
+        value += cnt * whiterate
 
     # white king
-    if(is_king_defended_by_pawns(match, COLORS['white'])):
-        value += whiterate * 3
+    if(is_king_guarded(match, COLORS['white'])):
+        value += whiterate
 
-    if(is_rook_trapped(match, COLORS['white'])):
-        value += blackrate * 3
-    else:
-        value += whiterate * 3
+    if(match.white_movecnt_short_castling_lost > -1 and 
+       match.white_movecnt_long_castling_lost > -1 and 
+       is_king_centered(match, COLORS['white'])):
+        value += blackrate
 
-    if(is_king_centered == False):
-        value += whiterate * 3
+    if(is_rook_locked(match, COLORS['white'])):
+        value += blackrate
 
     # black king
-    if(is_king_defended_by_pawns(match, COLORS['black'])):
-        value += blackrate * 3
+    if(is_king_guarded(match, COLORS['black'])):
+        value += blackrate
 
-    if(is_rook_trapped(match, COLORS['black'])):
-        value += whiterate * 3
-    else:
-        value += blackrate * 3
+    if(match.black_movecnt_short_castling_lost > -1 and
+       match.black_movecnt_long_castling_lost > -1 and 
+       is_king_centered(match, COLORS['black'])):
+        value += whiterate
 
-    if(is_king_centered == False):
-        value += blackrate * 3
+    if(is_rook_locked(match, COLORS['black'])):
+        value += whiterate
 
     return value
 
@@ -429,14 +341,44 @@ def score_endgame(match):
     return value
 
 
+def score_game(match):
+    value = 0
+
+    whiterate = ATTACKED_SCORES[PIECES['bKn']]
+
+    blackrate = ATTACKED_SCORES[PIECES['wKn']]
+
+    # white
+    if(is_king_guarded(match, COLORS['white'])):
+        value += whiterate
+
+    if(is_king_centered(match, COLORS['white'])):
+        value += blackrate
+
+    if(is_rook_locked(match, COLORS['white'])):
+        value += blackrate
+
+    # black
+    if(is_king_guarded(match, COLORS['black'])):
+        value += blackrate
+
+    if(is_king_centered(match, COLORS['black'])):
+        value += whiterate
+
+    if(is_rook_locked(match, COLORS['black'])):
+        value += whiterate
+
+    return value
+
+
 def score_position(match, movecnt):
     status = rules.status(match)
 
     if(movecnt == 0 and status != STATUS['open']):
         if(status == STATUS['winner_black']):
-            return ( SCORES[PIECES['wKg']] + match.count )
+            return ( SCORES[PIECES['wKg']] + match.movecnt )
         elif(status == STATUS['winner_white']):
-            return ( SCORES[PIECES['bKg']] - match.count )
+            return ( SCORES[PIECES['bKg']] - match.movecnt )
         else: # draw
             return SCORES[PIECES['blk']]
     else:
@@ -454,9 +396,10 @@ def score_position(match, movecnt):
 
         if(is_opening(match)):
             score += score_opening(match)
-
-        if(is_endgame(match)):
+        elif(is_endgame(match)):
             score += score_endgame(match)
+        else:
+            score += score_game(match)
 
         return score
 
