@@ -9,10 +9,10 @@ class Match(models.Model):
     status = models.PositiveSmallIntegerField(null=False, default=STATUS['open'])
     begin = models.DateTimeField(default=timezone.now)
     white_player_name = models.CharField(max_length=100, blank=False)
-    is_white_player_human = models.BooleanField(null=False, default=True)
+    white_player_is_human = models.BooleanField(null=False, default=True)
     elapsed_time_white = models.IntegerField(null=False, default=0)
     black_player_name = models.CharField(max_length=100, blank=False)
-    is_black_player_human = models.BooleanField(null=False, default=True)
+    black_player_is_human = models.BooleanField(null=False, default=True)
     elapsed_time_black = models.IntegerField(null=False, default=0)
     level = models.SmallIntegerField(null=False, default=LEVELS['blitz'])
     board = models.CharField(max_length=256, blank=False, default='wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;' \
@@ -44,7 +44,7 @@ class Match(models.Model):
 
 
     def is_immanuel(self):
-        return (self.is_white_player_human == False or self.is_black_player_human == False)
+        return (self.white_player_is_human == False or self.black_player_is_human == False)
 
 
     @classmethod

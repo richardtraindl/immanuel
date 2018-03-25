@@ -33,10 +33,10 @@ def str_attributes(match, delimiter):
            "level: " + str(match.level) + delimiter + \
            "begin: " + match.begin.strftime("%Y-%m-%d-%H:%M:%S") + delimiter + \
            "white_player_name: " + match.white_player_name + delimiter + \
-           "is_white_player_human: " + str(match.is_white_player_human) + delimiter + \
+           "white_player_is_human: " + str(match.white_player_is_human) + delimiter + \
            "elapsed_time_white: " + str(match.elapsed_time_white) + delimiter + \
            "black_player_name: " + match.black_player_name + delimiter + \
-           "is_black_player_human: " + str(match.is_black_player_human) + delimiter + \
+           "black_player_is_human: " + str(match.black_player_is_human) + delimiter + \
            "elapsed_time_black: " + str(match.elapsed_time_black) + delimiter + \
            "fifty_moves_count: " + str(match.fifty_moves_count) + delimiter + \
            "white_movecnt_short_castling_lost: " + str(match.white_movecnt_short_castling_lost) + delimiter + \
@@ -86,10 +86,10 @@ def write_searchmoves(match, debug_candidates, path):
     fobject.write(str(match.movecnt) + "\n")
     fobject.write(str(match.score) + "\n")
     fobject.write(str(match.white_player_name) + "\n")
-    fobject.write(str(match.is_white_player_human) + "\n")
+    fobject.write(str(match.white_player_is_human) + "\n")
     fobject.write(str(match.elapsed_time_white) + "\n")
     fobject.write(str(match.black_player_name) + "\n")
-    fobject.write(str(match.is_black_player_human) + "\n")
+    fobject.write(str(match.black_player_is_human) + "\n")
     fobject.write(str(match.elapsed_time_black) + "\n")
     
     for y in range(8):
@@ -161,10 +161,10 @@ def read_searchmoves(path):
     match.movecnt = int(lines[2].rstrip('\n'))
     match.score = int(lines[3].rstrip('\n'))
     match.white_player_name = lines[4].rstrip('\n')
-    match.is_white_player_human = bool(lines[5].rstrip('\n'))
+    match.white_player_is_human = bool(lines[5].rstrip('\n'))
     match.elapsed_time_white = int(lines[6].rstrip('\n'))
     match.black_player_name = lines[7].rstrip('\n')
-    match.is_black_player_human = bool(lines[8].rstrip('\n'))
+    match.black_player_is_human = bool(lines[8].rstrip('\n'))
     match.elapsed_time_black = int(lines[9].rstrip('\n'))
 
     y = 0

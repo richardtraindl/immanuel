@@ -20,10 +20,10 @@ def map_matches(src, dst, map_dir):
     dst.level = src.level
     dst.begin = src.begin
     dst.white_player_name = src.white_player_name
-    dst.is_white_player_human = src.is_white_player_human
+    dst.white_player_is_human = src.white_player_is_human
     dst.elapsed_time_white = src.elapsed_time_white
     dst.black_player_name = src.black_player_name
-    dst.is_black_player_human = src.is_black_player_human
+    dst.black_player_is_human = src.black_player_is_human
     dst.elapsed_time_black = src.elapsed_time_black
 
     for y in range(0, 8, 1):
@@ -73,9 +73,9 @@ def movecnt(modelmatch):
 def is_next_color_human(modelmatch):
     moves = ModelMove.objects.filter(match_id=modelmatch.id)
     if(len(moves) % 2 == 0):
-        return modelmatch.is_white_player_human
+        return modelmatch.white_player_is_human
     else:
-        return modelmatch.is_black_player_human
+        return modelmatch.black_player_is_human
 
 
 def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):

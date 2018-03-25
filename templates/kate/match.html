@@ -31,7 +31,7 @@
 
 
 {% block content %}
-    {% if match.is_white_player_human and match.is_black_player_human %}
+    {% if match.white_player_is_human and match.black_player_is_human %}
         <div id="chat">
             {% include "kate/_chat.html" with match=match %}
         </div>

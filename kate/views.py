@@ -115,9 +115,9 @@ def settings(request, matchid=None):
         form = MatchForm(request.POST)
         if(form.is_valid()):
             modelmatch.white_player_name = form.white_player_name
-            modelmatch.is_white_player_human = form.is_white_player_human
+            modelmatch.white_player_is_human = form.white_player_is_human
             modelmatch.black_player_name = form.black_player_name
-            modelmatch.is_black_player_human = form.is_black_player_human
+            modelmatch.black_player_is_human = form.black_player_is_human
             modelmatch.level = form.level
             modelmatch.save()
             
@@ -135,9 +135,9 @@ def settings(request, matchid=None):
             form = MatchForm(initial={
                 'level': modelmatch.level,
                 'white_player_name': modelmatch.white_player_name, 
-                'is_white_player_human': modelmatch.is_white_player_human, 
+                'white_player_is_human': modelmatch.white_player_is_human, 
                 'black_player_name': modelmatch.black_player_name, 
-                'is_black_player_human': modelmatch.is_black_player_human })
+                'black_player_is_human': modelmatch.black_player_is_human })
 
             return render(request, 'kate/settings.html', { 'form': form, 'matchid': matchid, 'switch': switch } )
 

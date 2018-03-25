@@ -146,10 +146,10 @@ class Match:
         self.level = LEVELS['blitz']
         self.begin = datetime.now()
         self.white_player_name = ""
-        self.is_white_player_human = True
+        self.white_player_is_human = True
         self.elapsed_time_white = 0
         self.black_player_name = ""
-        self.is_black_player_human = True
+        self.black_player_is_human = True
         self.elapsed_time_black = 0
         self.board = [ [PIECES['wRk'], PIECES['wKn'], PIECES['wBp'], PIECES['wQu'], PIECES['wKg'], PIECES['wBp'], PIECES['wKn'], PIECES['wRk']],
                        [PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw']],
@@ -249,9 +249,9 @@ class Match:
 
     def is_next_color_human(self):
         if(self.movecnt % 2 == 0 ):
-            return self.is_white_player_human
+            return self.white_player_is_human
         else:
-            return self.is_black_player_human
+            return self.black_player_is_human
 
 
     def next_color(self):

@@ -161,6 +161,10 @@ def disclosures(match, move, disclosed_attacked):
 
 def flees(match, move):
     token = 0x0
+    old_lower_cnt = 0
+    old_higher_cnt = 0
+    new_lower_cnt = 0
+    new_higher_cnt = 0
 
     piece = match.readfield(move.srcx, move.srcy)
 
@@ -168,19 +172,29 @@ def flees(match, move):
     opp_color = Match.oppcolor_of_piece(piece)
 
     enmycontacts = list_field_touches(match, opp_color, move.srcx, move.srcy)
-    old_cnt = len(enmycontacts)
+    for enmy in enmycontacts:
+        if(PIECES_RANK[enmy[0]] < PIECES_RANK[piece]):
+            old_lower_cnt += 1
+        else:
+            old_higher_cnt += 1
     enmycontacts.clear()
 
     ###
     do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
     enmycontacts = list_field_touches(match, opp_color, move.dstx, move.dsty)
-    new_cnt = len(enmycontacts)
+    for enmy in enmycontacts:
+        if(PIECES_RANK[enmy[0]] < PIECES_RANK[piece]):
+            new_lower_cnt += 1
+        else:
+            new_higher_cnt += 1
 
     undo_move(match)
     ###
 
-    if(new_cnt < old_cnt):
+    if((old_lower_cnt + old_higher_cnt) > 0 and 
+       (new_lower_cnt < old_lower_cnt or 
+        new_lower_cnt + new_higher_cnt < old_lower_cnt + old_higher_cnt)):
         token = token | MV_IS_FLEE
 
     return token
