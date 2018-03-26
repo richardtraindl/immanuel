@@ -107,48 +107,42 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
         return False
 
 
-def is_fork_field(match, piece, srcx, srcy, forkx, forky):
+def is_fork_field(match, piece, forkx, forky):
     color = Match.color_of_piece(piece)
     opp_color = Match.oppcolor_of_piece(piece)
     
-    #if(is_field_touched(match, color, forkx, forky) == True):
-    #    return False
+    fork_piece = match.readfield(forkx, forky)
+    if(Match.color_of_piece(fork_piece) == opp_color):
+        return False
+
     frdlytouches, enmytouches = field_touches(match, color, forkx, forky)
     if(len(frdlytouches) >= len(enmytouches)):
-        return False      
+        return False
 
-    match.writefield(srcx, srcy, PIECES['blk'])
     if(queen.is_field_touched(match, opp_color, forkx, forky)):
         if(queen.count_touches(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
             return True
 
     if(rook.is_field_touched(match, opp_color, forkx, forky)):
         if(rook.count_touches(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
             return True
 
     if(bishop.is_field_touched(match, opp_color, forkx, forky)):
         if(bishop.count_touches(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
             return True
 
     if(knight.is_field_touched(match, opp_color, forkx, forky)):
         if(knight.count_touches(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
             return True
 
     if(pawn.is_field_touched(match, opp_color, forkx, forky)):
         if(pawn.count_touches(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
             return True
 
     if(king.is_field_touched(match, opp_color, forkx, forky)):
         if(king.count_touches(match, color, forkx, forky) > 1):
-            match.writefield(srcx, srcy, piece)
             return True
 
-    match.writefield(srcx, srcy, piece)
     return False
 
 

@@ -222,9 +222,10 @@ def count_touches(match, color, fieldx, fieldy):
             if(piece == PIECES['blk']):
                 continue
             elif(match.color_of_piece(piece) == color):
-                count += 1
-            else:
-                count -= 1
+                if(rules.is_field_touched(match, color, x1, y1) == False):
+                    count += 1
+            """else:
+                count -= 1"""
 
     return count
 
@@ -235,7 +236,7 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
         if(x1 != rules.UNDEF_X):
-            if(analyze_helper.is_fork_field(match, piece, srcx, srcy, x1, y1)):
+            if(analyze_helper.is_fork_field(match, piece, x1, y1)):
                 forked.append([srcx, srcy, dstx, dsty,  x1, y1])
                 return True
 
