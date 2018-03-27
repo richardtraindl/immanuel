@@ -244,8 +244,7 @@ def score_attacks(match, srcx, srcy):
                     continue
                 elif(piece != PIECES['wBp'] and piece != PIECES['bBp']):
                     score += ATTACKED_SCORES[piece]
-                elif(piece != PIECES['wBp'] and piece != PIECES['bBp'] and 
-                     enmy_pin != bp_direction and enmy_pin != rules.REVERSE_DIRS[bp_direction]):
+                elif(enmy_pin != bp_direction and enmy_pin != rules.REVERSE_DIRS[bp_direction]):
                     score += ATTACKED_SCORES[piece]
 
     return score

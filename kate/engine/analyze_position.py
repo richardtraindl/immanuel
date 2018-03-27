@@ -158,13 +158,19 @@ def is_king_guarded(match, color):
         Kg_x = match.wKg_x
         Kg_y = match.wKg_y
         pawn = PIECES['wPw']
+
+        if(is_endgame(match) == False and Kg_y > 0):
+            return False
     else:
         Kg_x = match.bKg_x
         Kg_y = match.bKg_y
         pawn = PIECES['bPw']
-    
+
+        if(is_endgame(match) == False and Kg_y < 7):
+            return False
+
     count = 0
-    
+
     for i in range(8):
         x1 = Kg_x + king.STEPS[i][0]
         y1 = Kg_y + king.STEPS[i][1]
@@ -239,6 +245,24 @@ def is_rook_locked(match, color):
     return False
 
 
+def piece_movecnt(match, gmove):
+    
+    if(gmove is None):
+        return 0
+
+    cnt = 1
+    last_srcx = gmove.srcx
+    last_srcy = gmove.srcy
+
+    for move in match.move_list:
+        if(last_srcx == move.dstx and last_srcy == move.dsty):
+            cnt += 1
+            last_srcx = move.srcx
+            last_srcy = move.srcy
+
+    return cnt
+
+
 """def score_baseline_pieces(match):
     score = 0
 
@@ -269,7 +293,7 @@ def score_opening(match):
     whiterate = ATTACKED_SCORES[PIECES['bKn']]
 
     blackrate = ATTACKED_SCORES[PIECES['wKn']]
-
+    
     # white position
     y = 0
     cnt = 0
@@ -279,6 +303,19 @@ def score_opening(match):
             cnt += 1
     if(cnt > 1):
         value += cnt * blackrate
+
+    # white king
+    if(is_king_guarded(match, COLORS['white'])):
+        value += whiterate
+
+    if(match.white_movecnt_short_castling_lost > 0 and 
+       match.white_movecnt_long_castling_lost > 0 and 
+       is_king_centered(match, COLORS['white'])):
+        value += blackrate
+
+    # white rook
+    if(is_rook_locked(match, COLORS['white'])):
+        value += blackrate
 
     # black position
     y = 7
@@ -290,27 +327,16 @@ def score_opening(match):
     if(cnt > 1):
         value += cnt * whiterate
 
-    # white king
-    if(is_king_guarded(match, COLORS['white'])):
-        value += whiterate
-
-    if(match.white_movecnt_short_castling_lost > -1 and 
-       match.white_movecnt_long_castling_lost > -1 and 
-       is_king_centered(match, COLORS['white'])):
-        value += blackrate
-
-    if(is_rook_locked(match, COLORS['white'])):
-        value += blackrate
-
     # black king
     if(is_king_guarded(match, COLORS['black'])):
         value += blackrate
 
-    if(match.black_movecnt_short_castling_lost > -1 and
-       match.black_movecnt_long_castling_lost > -1 and 
+    if(match.black_movecnt_short_castling_lost > 0 and
+       match.black_movecnt_long_castling_lost > 0 and 
        is_king_centered(match, COLORS['black'])):
         value += whiterate
 
+    # black rook
     if(is_rook_locked(match, COLORS['black'])):
         value += whiterate
 
@@ -371,10 +397,10 @@ def score_game(match):
     return value
 
 
-def score_position(match, movecnt):
+def score_position(match, gmove):
     status = rules.status(match)
 
-    if(movecnt == 0 and status != STATUS['open']):
+    if(gmove is None == 0 and status != STATUS['open']):
         if(status == STATUS['winner_black']):
             return ( SCORES[PIECES['wKg']] + match.movecnt )
         elif(status == STATUS['winner_white']):
@@ -386,7 +412,7 @@ def score_position(match, movecnt):
         
         color = match.next_color()
 
-        score += score_attacks(match, color)
+        #score += score_attacks(match, color)
 
         #score += score_supports(match, REVERSED_COLORS[color])
 
@@ -396,6 +422,15 @@ def score_position(match, movecnt):
 
         if(is_opening(match)):
             score += score_opening(match)
+            
+            movecnt = piece_movecnt(match, gmove)
+            if(match.movecnt <= 16 and movecnt >= 3):
+                piece = match.readfield(gmove.srcx, gmove.srcy)
+                if(Match.oppcolor_of_piece(piece) == COLORS['white']):
+                    score += ATTACKED_SCORES[PIECES['wRk']]
+                else:
+                    score += ATTACKED_SCORES[PIECES['bRk']]
+
         elif(is_endgame(match)):
             score += score_endgame(match)
         else:

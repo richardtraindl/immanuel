@@ -251,11 +251,11 @@ def calc_max(match, depth, alpha, beta, last_priomove):
             pmove = priomoves[0]
             candidates.append(pmove.gmove)
             candidates.append(None)
-            return score_position(match, len(priomoves)), candidates
+            return score_position(match, pmove.gmove), candidates
 
     if(len(priomoves) == 0 or maxcnt == 0):
         candidates.append(None)
-        return score_position(match, len(priomoves)), candidates
+        return score_position(match, None), candidates
 
     for priomove in priomoves:
         newmove = priomove.gmove
@@ -315,11 +315,11 @@ def calc_min(match, depth, alpha, beta, last_priomove):
             pmove = priomoves[0]
             candidates.append(pmove.gmove)
             candidates.append(None)
-            return score_position(match, len(priomoves)), candidates
+            return score_position(match, pmove.gmove), candidates
 
     if(len(priomoves) == 0 or maxcnt == 0):
         candidates.append(None)
-        return score_position(match, len(priomoves)), candidates
+        return score_position(match, None), candidates
 
     for priomove in priomoves:
         newmove = priomove.gmove
