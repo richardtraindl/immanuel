@@ -245,24 +245,6 @@ def is_rook_locked(match, color):
     return False
 
 
-def piece_movecnt(match, gmove):
-    
-    if(gmove is None):
-        return 0
-
-    cnt = 1
-    last_srcx = gmove.srcx
-    last_srcy = gmove.srcy
-
-    for move in match.move_list:
-        if(last_srcx == move.dstx and last_srcy == move.dsty):
-            cnt += 1
-            last_srcx = move.srcx
-            last_srcy = move.srcy
-
-    return cnt
-
-
 """def score_baseline_pieces(match):
     score = 0
 
@@ -422,15 +404,6 @@ def score_position(match, gmove):
 
         if(is_opening(match)):
             score += score_opening(match)
-            
-            movecnt = piece_movecnt(match, gmove)
-            if(match.movecnt <= 16 and movecnt >= 3):
-                piece = match.readfield(gmove.srcx, gmove.srcy)
-                if(Match.oppcolor_of_piece(piece) == COLORS['white']):
-                    score += ATTACKED_SCORES[PIECES['wRk']]
-                else:
-                    score += ATTACKED_SCORES[PIECES['bRk']]
-
         elif(is_endgame(match)):
             score += score_endgame(match)
         else:
