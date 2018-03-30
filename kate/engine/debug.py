@@ -18,10 +18,10 @@ def prnt_minutes(match):
     print("------------------------------------------------------")
 
 
-def prnt_attributes(match):
+def prnt_attributes(match, delimiter):
     print("------------------------------------------------------")
     
-    str_attributes(match, "<br>")
+    print(str_attributes(match, delimiter))
 
     print("------------------------------------------------------")
 

@@ -207,11 +207,11 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     if(match.level == LEVELS['blitz']):
         cnt = 8
         dpth = 2
-        max_dpth = 5
+        max_dpth = 7
     elif(match.level == LEVELS['low']):
         cnt = 12
         dpth = 3
-        max_dpth = 5
+        max_dpth = 7
     elif(match.level == LEVELS['medium']):
         cnt = 16
         dpth = 4
@@ -228,8 +228,8 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
         return max(cnt, prio1_mvcnt), False
     elif(depth <= max_dpth and is_stormy(match)):
         return prio_urgent_mvcnt, True
-    elif(match.level != LEVELS['blitz'] and depth <= max_dpth + 2 and is_stormy(match) and is_last_move_stormy(last_prio)): #  or is_last_move_very_stormy(match, last_priomove))
-        return prio_urgent_mvcnt, True
+    # elif(depth <= max_dpth + 2 and is_stormy(match) and is_last_move_stormy(last_prio)): #  or is_last_move_very_stormy(match, last_priomove)) # match.level != LEVELS['blitz'] and 
+        #return prio_urgent_mvcnt, True
     else:
         return 0, False
 
@@ -251,11 +251,11 @@ def calc_max(match, depth, alpha, beta, last_priomove):
             pmove = priomoves[0]
             candidates.append(pmove.gmove)
             candidates.append(None)
-            return score_position(match, pmove.gmove), candidates
+            return score_position(match, len(priomoves)), candidates
 
     if(len(priomoves) == 0 or maxcnt == 0):
         candidates.append(None)
-        return score_position(match, None), candidates
+        return score_position(match, len(priomoves)), candidates
 
     for priomove in priomoves:
         newmove = priomove.gmove
@@ -270,9 +270,22 @@ def calc_max(match, depth, alpha, beta, last_priomove):
             token = priomove.tokens[0]
             print("token: " + hex(token) + " " + token_to_text(token))
 
-        matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
+        move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
         newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, priomove) # , dbginfo
+
+        if(move.captured_piece != PIECES['blk']):
+            if(color == COLORS['white']):
+                newscore += ATTACKED_SCORES[PIECES['bRk']]
+            else:
+                newscore += ATTACKED_SCORES[PIECES['wRk']]
+
+        if(match.movecnt <= 16):
+            if(piece_movecnt(match, move) >= 3):
+                if(color == COLORS['white']):
+                    newscore += ATTACKED_SCORES[PIECES['bPw']]
+                else:
+                    newscore += ATTACKED_SCORES[PIECES['wPw']]
 
         score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
@@ -315,11 +328,11 @@ def calc_min(match, depth, alpha, beta, last_priomove):
             pmove = priomoves[0]
             candidates.append(pmove.gmove)
             candidates.append(None)
-            return score_position(match, pmove.gmove), candidates
+            return score_position(match, len(priomoves)), candidates
 
     if(len(priomoves) == 0 or maxcnt == 0):
         candidates.append(None)
-        return score_position(match, None), candidates
+        return score_position(match, len(priomoves)), candidates
 
     for priomove in priomoves:
         newmove = priomove.gmove
@@ -334,9 +347,22 @@ def calc_min(match, depth, alpha, beta, last_priomove):
             token = priomove.tokens[0]
             print("token: " + hex(token) + " " + token_to_text(token))
 
-        matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
+        move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
         newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, priomove) # , dbginfo
+
+        if(move.captured_piece != PIECES['blk']):
+            if(color == COLORS['white']):
+                newscore += ATTACKED_SCORES[PIECES['bRk']]
+            else:
+                newscore += ATTACKED_SCORES[PIECES['wRk']]
+
+        if(match.movecnt <= 16):
+            if(piece_movecnt(match, move) >= 3):
+                if(color == COLORS['white']):
+                    newscore += ATTACKED_SCORES[PIECES['bPw']]
+                else:
+                    newscore += ATTACKED_SCORES[PIECES['wPw']]
 
         score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
 
@@ -363,7 +389,7 @@ def calc_min(match, depth, alpha, beta, last_priomove):
 
 
 def calc_move(match):
-    prnt_attributes(match)
+    prnt_attributes(match, "\n")
 
     candidates = []
 
@@ -383,6 +409,6 @@ def calc_move(match):
     
     end = time.time()
     prnt_fmttime("\ncalc-time: ", end - start)
-    prnt_attributes(match)
+    prnt_attributes(match, "\n")
     return candidates
 

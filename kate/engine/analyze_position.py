@@ -379,10 +379,10 @@ def score_game(match):
     return value
 
 
-def score_position(match, gmove):
+def score_position(match, movecnt):
     status = rules.status(match)
 
-    if(gmove is None == 0 and status != STATUS['open']):
+    if(movecnt == 0 and status != STATUS['open']):
         if(status == STATUS['winner_black']):
             return ( SCORES[PIECES['wKg']] + match.movecnt )
         elif(status == STATUS['winner_white']):

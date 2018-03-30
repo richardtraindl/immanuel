@@ -221,7 +221,7 @@ class Match:
                 if(piece == PIECES['blk']):
                     continue
                 else:
-                    self.score += SCORES[piece]
+                    self.score -= SCORES[piece]
 
                 if(piece == PIECES['wKg']):
                     self.wKg_x = x

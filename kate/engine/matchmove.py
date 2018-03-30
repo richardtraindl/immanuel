@@ -63,12 +63,6 @@ def generic_do_move(match, move, srcpiece, dstpiece):
             match.black_movecnt_short_castling_lost == match.movecnt
 
     match.score += SCORES[dstpiece]
-    if(srcpiece != PIECES['wKg'] and srcpiece != PIECES['bKg']):
-        addscore = PIECES_RANK[srcpiece] - PIECES_RANK[dstpiece]
-        if(Match.color_of_piece(srcpiece) == COLORS['white']):
-            match.score += ATTACKED_SCORES[PIECES['wPw']] * addscore
-        else:
-            match.score += ATTACKED_SCORES[PIECES['bPw']] * addscore
 
     match.move_list.append(move)
 
@@ -199,12 +193,6 @@ def generic_undo_move(match, move):
     match.writefield(move.dstx, move.dsty, move.captured_piece)
 
     match.score -= SCORES[move.captured_piece]
-    if(piece != PIECES['wKg'] and piece != PIECES['bKg']):
-        subscore = PIECES_RANK[piece] - PIECES_RANK[move.captured_piece]
-        if(Match.color_of_piece(piece) == COLORS['white']):
-            match.score -= ATTACKED_SCORES[PIECES['wPw']] * subscore
-        else:
-            match.score -= ATTACKED_SCORES[PIECES['bPw']] * subscore
 
     if(piece == PIECES['wKg']):
         match.wKg_x = move.srcx
