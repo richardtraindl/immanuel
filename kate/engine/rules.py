@@ -169,23 +169,23 @@ def pin_dir(match, color, scrx, srcy):
     return DIRS['undefined']
 
 
-def is_field_touched(match, color, srcx, srcy):
-    if(queen.is_field_touched(match, color, srcx, srcy)):
+def is_field_touched(match, color, srcx, srcy, mode):
+    if(queen.is_field_touched(match, color, srcx, srcy, mode)):
         return True
 
-    if(rook.is_field_touched(match, color, srcx, srcy)):
+    if(rook.is_field_touched(match, color, srcx, srcy, mode)):
         return True
 
-    if(bishop.is_field_touched(match, color, srcx, srcy)):
+    if(bishop.is_field_touched(match, color, srcx, srcy, mode)):
         return True
 
-    if(knight.is_field_touched(match, color, srcx, srcy)):
+    if(knight.is_field_touched(match, color, srcx, srcy, mode)):
         return True
 
     if(king.is_field_touched(match, color, srcx, srcy)):
         return True
 
-    if(pawn.is_field_touched(match, color, srcx, srcy)):
+    if(pawn.is_field_touched(match, color, srcx, srcy, mode)):
         return True
 
     return False
@@ -199,7 +199,7 @@ def is_king_attacked(match, x1, y1):
 
     color = match.color_of_piece(king)
 
-    return is_field_touched(match, REVERSED_COLORS[color], x1, y1)
+    return is_field_touched(match, REVERSED_COLORS[color], x1, y1, 0)
 
 
 def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
@@ -223,9 +223,9 @@ def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
     color = match.color_of_piece(piece)
 
     if(color == COLORS['white']):
-        flag = is_field_touched(match, COLORS['black'], match.wKg_x, match.wKg_y)
+        flag = is_field_touched(match, COLORS['black'], match.wKg_x, match.wKg_y, 0)
     else:
-        flag = is_field_touched(match,  COLORS['white'], match.bKg_x, match.bKg_y)
+        flag = is_field_touched(match,  COLORS['white'], match.bKg_x, match.bKg_y, 0)
         
     match.writefield(dstx, dsty, dstpiece)
     match.writefield(srcx, srcy, piece)
@@ -260,10 +260,10 @@ def status(match):
         return STATUS['open']
     else:
         if(match.next_color() == COLORS['white']):
-            if(is_field_touched(match, COLORS['black'], match.wKg_x, match.wKg_y)):
+            if(is_field_touched(match, COLORS['black'], match.wKg_x, match.wKg_y, 0)):
                 return STATUS['winner_black']
         else:
-            if(is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)):
+            if(is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y, 0)):
                 return STATUS['winner_white']
 
     return STATUS['draw']

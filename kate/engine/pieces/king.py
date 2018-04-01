@@ -2,7 +2,7 @@ from .. match import *
 from .. cvalues import *
 from .. import rules
 from .. import analyze_helper
-from .generic_piece import cTouch
+from .generic_piece import cTouch, cFork
 
 
 STEP_1N_X = 0
@@ -222,7 +222,7 @@ def count_touches(match, color, fieldx, fieldy):
             if(piece == PIECES['blk']):
                 continue
             elif(match.color_of_piece(piece) == color):
-                if(rules.is_field_touched(match, color, x1, y1) == False):
+                if(rules.is_field_touched(match, color, x1, y1, 1) == False):
                     count += 1
             """else:
                 count -= 1"""
@@ -231,13 +231,31 @@ def count_touches(match, color, fieldx, fieldy):
 
 
 def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
+    color = Match.color_of_piece(piece)
+    opp_color = Match.oppcolor_of_piece(piece)
+
     for i in range(8):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
+
+        x1 = dstx + stepx
+        y1 = dsty + stepy
+        
+        if(x1 == srcx and y1 == srcy):
+            continue
+
+        if(rules.is_inbounds(x1, y1)):
+            if(rules.is_king_attacked(match, x1, y1)):
+                continue
+
+            fork_field = match.readfield(x1, y1)
+
+            if(Match.color_of_piece(fork_field) == opp_color):
+                continue
+
             if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
+                cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
+                forked.append(cfork)
                 return True
 
     return False
@@ -344,7 +362,7 @@ def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     match.writefield(srcx, srcy, PIECES['blk'])
     for i in range(3):
         castlingx = srcx + i
-        attacked = rules.is_field_touched(match, opp_color, castlingx, srcy)
+        attacked = rules.is_field_touched(match, opp_color, castlingx, srcy, 0)
         if(attacked == True):            
             match.writefield(srcx, srcy, king)
             return False
@@ -379,7 +397,7 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
     match.writefield(srcx, srcy, PIECES['blk'])
     for i in range(0, -3, -1):
         castlingx = srcx + i
-        attacked = rules.is_field_touched(match, opp_color, castlingx, srcy)
+        attacked = rules.is_field_touched(match, opp_color, castlingx, srcy, 0)
         if(attacked == True):
             match.writefield(srcx, srcy, king)
             return False
@@ -406,7 +424,7 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
     captured = match.readfield(dstx, dsty)
     match.writefield(srcx, srcy, PIECES['blk'])
     match.writefield(dstx, dsty, king)
-    attacked = rules.is_field_touched(match, opp_color, dstx, dsty)
+    attacked = rules.is_field_touched(match, opp_color, dstx, dsty, 0)
     match.writefield(srcx, srcy, king)
     match.writefield(dstx, dsty, captured)
     if(attacked == True):

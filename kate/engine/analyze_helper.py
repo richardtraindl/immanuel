@@ -34,7 +34,9 @@ def is_soft_pin(match, srcx, srcy):
         x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             friend = match.readfield(x1, y1)
-            if(match.color_of_piece(friend) == color and PIECES_RANK[friend] > PIECES_RANK[piece]):
+            if(match.color_of_piece(friend) == color and 
+               PIECES_RANK[friend] > PIECES_RANK[piece] and 
+               PIECES_RANK[friend] > PIECES_RANK[enemy[0]]):
                 return True
 
     enemies.clear()
@@ -45,7 +47,9 @@ def is_soft_pin(match, srcx, srcy):
         x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             friend = match.readfield(x1, y1)
-            if(match.color_of_piece(friend) == color and PIECES_RANK[friend] > PIECES_RANK[piece]):
+            if(match.color_of_piece(friend) == color and 
+               PIECES_RANK[friend] > PIECES_RANK[piece] and 
+               PIECES_RANK[friend] > PIECES_RANK[enemy[0]]):
                 return True
 
     return False
@@ -137,23 +141,23 @@ def is_fork_field(match, piece, forkx, forky):
     if(len(frdlytouches) >= len(enmytouches)):
         return False
 
-    if(queen.is_field_touched(match, opp_color, forkx, forky)):
+    if(queen.is_field_touched(match, opp_color, forkx, forky, 2)):
         if(queen.count_touches(match, color, forkx, forky) > 1):
             return True
 
-    if(rook.is_field_touched(match, opp_color, forkx, forky)):
+    if(rook.is_field_touched(match, opp_color, forkx, forky, 2)):
         if(rook.count_touches(match, color, forkx, forky) > 1):
             return True
 
-    if(bishop.is_field_touched(match, opp_color, forkx, forky)):
+    if(bishop.is_field_touched(match, opp_color, forkx, forky, 2)):
         if(bishop.count_touches(match, color, forkx, forky) > 1):
             return True
 
-    if(knight.is_field_touched(match, opp_color, forkx, forky)):
+    if(knight.is_field_touched(match, opp_color, forkx, forky, 2)):
         if(knight.count_touches(match, color, forkx, forky) > 1):
             return True
 
-    if(pawn.is_field_touched(match, opp_color, forkx, forky)):
+    if(pawn.is_field_touched(match, opp_color, forkx, forky, 2)):
         if(pawn.count_touches(match, color, forkx, forky) > 1):
             return True
 

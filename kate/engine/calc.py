@@ -137,9 +137,9 @@ def generate_moves(match):
                         break
 
     if(match.next_color() == COLORS['white']):
-        kg_attacked = rules.is_field_touched(match, COLORS['black'], match.wKg_x, match.wKg_y)
+        kg_attacked = rules.is_field_touched(match, COLORS['black'], match.wKg_x, match.wKg_y, 0)
     else:
-        kg_attacked = rules.is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y)
+        kg_attacked = rules.is_field_touched(match, COLORS['white'], match.bKg_x, match.bKg_y, 0)
 
     if(kg_attacked):
         for priomove in priomoves:
@@ -178,25 +178,26 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         return newscore
 
 
-def is_last_move_stormy(last_prio):
-    if(last_prio <= PRIO_URGENT_LIMES):
+def was_last_move_stormy(last_prio):
+    if(last_prio == PRIO['promotion'] or
+       last_prio == PRIO['capture-good-deal'] or
+       last_prio == PRIO['capture-bad-deal'] or
+       last_prio == PRIO['attack-king-good-deal'] or 
+       last_prio == PRIO['attack-king-bad-deal']): # last_prio == PRIO['attack-good-deal'] or last_prio == PRIO['disclosed-attack']):
         return True
     else:
         return False
-
-#def is_last_move_very_stormy(match, last_priomove):
-#    return is_fork_field(match, last_priomove.piece, last_priomove.gmove.dstx, last_priomove.gmove.dsty)
 
 def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     mvcnt = len(priomoves)
     prio_urgent_mvcnt = 0
     prio1_mvcnt = 0
 
-    for i in range(PRIO_URGENT_LIMES):
+    for i in range(PRIO_URGENT_LIMES + 1):
         prio_urgent_mvcnt += priocnts[i]
 
     prio1_mvcnt = prio_urgent_mvcnt
-    for i in range(PRIO_URGENT_LIMES, PRIO1_LIMES):
+    for i in range(PRIO_URGENT_LIMES + 1, PRIO1_LIMES + 1):
         prio1_mvcnt += priocnts[i]
 
     if(last_priomove):
@@ -207,31 +208,29 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     if(match.level == LEVELS['blitz']):
         cnt = 8
         dpth = 2
-        max_dpth = 7
+        max_dpth = 12
     elif(match.level == LEVELS['low']):
         cnt = 12
         dpth = 3
-        max_dpth = 7
+        max_dpth = 12
     elif(match.level == LEVELS['medium']):
         cnt = 16
         dpth = 4
-        max_dpth = 7
+        max_dpth = 14
     else:
         cnt = 20
         dpth = 5
-        max_dpth = 9
+        max_dpth = 14
 
     if(is_endgame(match)):
         dpth += 1
 
     if(depth <= dpth):
-        return max(cnt, prio1_mvcnt), False
-    elif(depth <= max_dpth and is_stormy(match)):
-        return prio_urgent_mvcnt, True
-    # elif(depth <= max_dpth + 2 and is_stormy(match) and is_last_move_stormy(last_prio)): #  or is_last_move_very_stormy(match, last_priomove)) # match.level != LEVELS['blitz'] and 
-        #return prio_urgent_mvcnt, True
+        return max(cnt, prio1_mvcnt)
+    elif(depth <= max_dpth and was_last_move_stormy(last_prio)):
+        return prio_urgent_mvcnt
     else:
-        return 0, False
+        return 0
 
 
 def calc_max(match, depth, alpha, beta, last_priomove):
@@ -243,7 +242,7 @@ def calc_max(match, depth, alpha, beta, last_priomove):
 
     priomoves, priocnts = generate_moves(match)
     
-    maxcnt, urgent = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
+    maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):
         prnt_priorities(priomoves, priocnts)
@@ -303,9 +302,7 @@ def calc_max(match, depth, alpha, beta, last_priomove):
             if(maxscore > beta):
                 return maxscore, candidates
 
-        if(urgent and len(priomoves) > count and priomove.prio <= PRIO_URGENT_LIMES):
-            continue
-        elif(count >= maxcnt):
+        if(count >= maxcnt):
             return maxscore, candidates
 
     return maxscore, candidates
@@ -320,7 +317,7 @@ def calc_min(match, depth, alpha, beta, last_priomove):
 
     priomoves, priocnts = generate_moves(match)
 
-    maxcnt, urgent = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
+    maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_priomove)
 
     if(depth == 1):
         prnt_priorities(priomoves, priocnts)
@@ -380,9 +377,7 @@ def calc_min(match, depth, alpha, beta, last_priomove):
             if(minscore < alpha):
                 return minscore, candidates
 
-        if(urgent and len(priomoves) > count and priomove.prio <= PRIO_URGENT_LIMES):
-            continue
-        elif(count >= maxcnt):
+        if(count >= maxcnt):
             return minscore, candidates
 
     return minscore, candidates

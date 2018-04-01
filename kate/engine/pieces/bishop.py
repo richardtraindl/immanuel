@@ -2,7 +2,7 @@ from .. match import *
 from .. cvalues import *
 from .. import rules
 from .. import analyze_helper
-from .generic_piece import cTouch
+from .generic_piece import cTouch, cFork
 
 
 NEAST_X = 1
@@ -16,6 +16,10 @@ SEAST_Y = -1
 
 STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
 
+NE_SW_STEPS = [ [1, 1], [-1, -1] ]
+
+NW_SE_STEPS = [ [-1, 1], [1, -1] ]
+
 blank = PIECES['blk']
 GEN_STEPS = [ [[1, 1, blank], [2, 2, blank], [3, 3, blank], [4, 4, blank], [5, 5, blank], [6, 6, blank], [7, 7, blank]],
               [[-1, -1, blank], [-2, -2, blank], [-3, -3, blank], [-4, -4, blank], [-5, -5, blank], [-6, -6, blank], [-7, -7, blank]],
@@ -23,7 +27,7 @@ GEN_STEPS = [ [[1, 1, blank], [2, 2, blank], [3, 3, blank], [4, 4, blank], [5, 5
               [[-1, 1, blank], [-2, 2, blank], [-3, 3, blank], [-4, 4, blank], [-5, 5, blank], [-6, 6, blank], [-7, 7, blank]] ]
 
 
-def is_field_touched(match, color, fieldx, fieldy):
+def is_field_touched(match, color, fieldx, fieldy, mode):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
@@ -32,7 +36,18 @@ def is_field_touched(match, color, fieldx, fieldy):
             piece = match.readfield(x1, y1)
             if( (color == COLORS['white'] and piece == PIECES['wBp']) or
                 (color == COLORS['black'] and piece == PIECES['bBp']) ):
-                return True
+                if(mode == 0):
+                    return True
+                elif(mode == 1):
+                    if(is_move_stuck(match, fieldx, fieldy, x1, y1)):
+                        continue
+                    else:
+                        return True
+                else: #mode == 2
+                    if(is_move_stuck(match, fieldx, fieldy, x1, y1) or analyze_helper.is_soft_pin(match, x1, y1)):
+                        continue
+                    else:
+                        return True
 
     return False
 
@@ -266,13 +281,13 @@ def score_supports(match, srcx, srcy):
             if(x1 == srcx and y1 == srcy):
                 continue
 
-            if(is_move_stuck(match, srcx, srcy, x1, y1)):
+            if(is_move_stuck(match, srcx, srcy, x1, y1, 1)):
                 continue
 
             piece = match.readfield(x1, y1)
 
             if(Match.color_of_piece(piece) == color):
-                if(rules.is_field_touched(match, opp_color, x1, y1)):
+                if(rules.is_field_touched(match, opp_color, x1, y1, 1)):
                     score += SUPPORTED_SCORES[piece]
 
     return score 
@@ -293,7 +308,7 @@ def count_touches(match, color, fieldx, fieldy):
             if(piece == PIECES['blk']):
                 continue
             elif(match.color_of_piece(piece) == color):
-                if(rules.is_field_touched(match, color, x1, y1) == False):
+                if(rules.is_field_touched(match, color, x1, y1, 1) == False):
                     count += 1
                 elif(PIECES_RANK[piece] > PIECES_RANK[PIECES['wBp']]):
                     count += 1
@@ -307,17 +322,37 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     if(is_move_stuck(match, srcx, srcy, dstx, dsty)):
         return False
 
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, dstx, dsty, stepx , stepy)
-        if(x1 != rules.UNDEF_X):
-            if(is_move_stuck(match, dstx, dsty, x1, y1)):
-                continue
+    color = Match.color_of_piece(piece)
+    opp_color = Match.oppcolor_of_piece(piece)
+
+    direction = bp_dir(srcx, srcy, dstx, dsty)
+    if(direction == rules.DIRS['north-east'] or direction == rules.DIRS['south-west']):
+        BP_STEPS = NW_SE_STEPS
+    else:
+        BP_STEPS = NE_SW_STEPS
+
+    for i in range(2):
+        stepx = BP_STEPS[i][0]
+        stepy = BP_STEPS[i][1]
+
+        x1 = dstx + stepx
+        y1 = dsty + stepy
+        while(rules.is_inbounds(x1, y1)):
+            fork_field = match.readfield(x1, y1)
+
+            if(Match.color_of_piece(fork_field) == opp_color):
+                break
 
             if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
+                cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
+                forked.append(cfork)
                 return True
+
+            if(Match.color_of_piece(fork_field) == color):
+                break
+
+            x1 += stepx
+            y1 += stepy
 
     return False
 

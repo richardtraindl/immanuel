@@ -2,7 +2,7 @@ from .. match import *
 from .. cvalues import *
 from .. import rules
 from .. import analyze_helper
-from .generic_piece import cTouch
+from .generic_piece import cTouch, cFork
 
 
 STEP_2N1E_X = 1
@@ -35,7 +35,7 @@ GEN_STEPS = [ [[1, 2, blank]],
               [[-1, 2, blank]] ]
 
 
-def is_field_touched(match, color, fieldx, fieldy):
+def is_field_touched(match, color, fieldx, fieldy, mode):
     for i in range(8):
         x1 = fieldx + STEPS[i][0]
         y1 = fieldy + STEPS[i][1]
@@ -43,7 +43,18 @@ def is_field_touched(match, color, fieldx, fieldy):
             piece = match.readfield(x1, y1)
             if( (color == COLORS['white'] and piece == PIECES['wKn']) or
                 (color == COLORS['black'] and piece == PIECES['bKn']) ):
-                return True
+                if(mode == 0):
+                    return True
+                elif(mode == 1):
+                    if(is_stuck(match, x1, y1)):
+                        continue
+                    else:
+                        return True
+                else: #mode == 2
+                    if(is_stuck(match, x1, y1) or analyze_helper.is_soft_pin(match, x1, y1)):
+                        continue
+                    else:
+                        return True
 
     return False
 
@@ -231,7 +242,7 @@ def score_supports(match, srcx, srcy):
             piece = match.readfield(x1, y1)
 
             if(Match.color_of_piece(piece) == color):
-                if(rules.is_field_touched(match, opp_color, x1, y1)):
+                if(rules.is_field_touched(match, opp_color, x1, y1, 1)):
                     score += SUPPORTED_SCORES[piece]
 
     return score 
@@ -239,9 +250,6 @@ def score_supports(match, srcx, srcy):
 
 def count_touches(match, color, fieldx, fieldy):
     count = 0
-
-    if(is_stuck(match, fieldx, fieldy)):
-        return count
 
     for i in range(8):
         x1 = fieldx + STEPS[i][0]
@@ -251,7 +259,7 @@ def count_touches(match, color, fieldx, fieldy):
             if(piece == PIECES['blk']):
                 continue
             elif(match.color_of_piece(piece) == color):
-                if(rules.is_field_touched(match, color, x1, y1) == False):
+                if(rules.is_field_touched(match, color, x1, y1, 1) == False):
                     count += 1
                 elif(PIECES_RANK[piece] > PIECES_RANK[PIECES['wKn']]):
                     count += 1
@@ -262,16 +270,28 @@ def count_touches(match, color, fieldx, fieldy):
 
 
 def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
-    if(is_stuck(match, srcx, srcy)):
-        return False
+    color = Match.color_of_piece(piece)
+    opp_color = Match.oppcolor_of_piece(piece)
 
-    for i in range(4):
+    for i in range(8):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
+
+        x1 = dstx + stepx
+        y1 = dsty + stepy
+
+        if(x1 == srcx and y1 == srcy):
+            continue
+
+        if(rules.is_inbounds(x1, y1)):
+            fork_field = match.readfield(x1, y1)
+
+            if(Match.color_of_piece(fork_field) == opp_color):
+                continue
+
             if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                forked.append([srcx, srcy, dstx, dsty,  x1, y1])
+                cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
+                forked.append(cfork)
                 return True
 
     return False
