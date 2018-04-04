@@ -183,6 +183,9 @@ def score_attacks(match, srcx, srcy):
                 if(enmy_pin != rules.DIRS['undefined']):
                     score += ATTACKED_SCORES[piece]
 
+                if(analyze_helper.is_soft_pin(match, x1, y1)):
+                    score += ATTACKED_SCORES[piece]
+
     return score
 
 
@@ -201,11 +204,23 @@ def score_supports(match, srcx, srcy):
             if(x1 == srcx and y1 == srcy):
                 continue
 
+            frdlytouches, enmytouches = analyze_helper.field_touches(match, color, x1, y1)
+            if(len(frdlytouches) < len(enmytouches)):
+                continue
+
             piece = match.readfield(x1, y1)
 
             if(Match.color_of_piece(piece) == color):
-                if(rules.is_field_touched(match, opp_color, x1, y1)):
-                    score += SUPPORTED_SCORES[piece]
+                if(len(enmytouches) == 0):
+                    score += ATTACKED_SCORES[piece]
+
+                # extra score if attacked is pinned
+                enmy_pin = rules.pin_dir(match, opp_color, x1, y1)
+                if(enmy_pin != rules.DIRS['undefined']):
+                    score += ATTACKED_SCORES[piece]
+
+                if(analyze_helper.is_soft_pin(match, x1, y1)):
+                    score += ATTACKED_SCORES[piece]
 
     return score 
 

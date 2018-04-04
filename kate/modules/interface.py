@@ -4,6 +4,8 @@ from .. models import Match as ModelMatch, Move as ModelMove
 from .. engine.match import *
 from .. engine.move import *
 from .. engine import matchmove, rules, calc
+from .. engine.analyze_position import score_position
+
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
 
@@ -151,4 +153,12 @@ def calc_move_for_immanuel(modelmatch):
 
 def read_searchmoves(): 
     return debug.read_searchmoves(settings.BASE_DIR + "/kate/engine")
+
+
+def debug_score_position(modelmatch):
+    match = Match()
+    map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+    score = score_position(match, movecnt)
+    print("from function score_position")
+    print("match.score: " + str(match.score) + " score: " + str(score))
 

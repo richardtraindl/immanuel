@@ -238,23 +238,40 @@ def score_attacks(match, srcx, srcy):
     color = Match.color_of_piece(rook)
     opp_color = Match.oppcolor_of_piece(rook)
 
+    frdlytouches, enmytouches = analyze_helper.field_touches(match, color, srcx, srcy)
+    if(len(frdlytouches) < len(enmytouches)):
+        return score
+
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
         x1, y1 = rules.search(match, srcx, srcy, stepx , stepy)
         if(x1 != rules.UNDEF_X):
-            piece = match.readfield(x1, y1)
-            if(Match.color_of_piece(piece) == opp_color):
-                score += ATTACKED_SCORES[piece]
+            if(is_move_stuck(match, srcx, srcy, x1, y1)):
+                continue
+            
+            frdlytouches, enmytouches = analyze_helper.field_touches(match, color, x1, y1)
+            #if(len(frdlytouches) < len(enmytouches)):
+                #continue
                 
-                # extra score if attacked is pinned
-                rk_direction = rk_dir(srcx, srcy, x1, y1)
-                enmy_pin = rules.pin_dir(match, opp_color, x1, y1)
-                if(enmy_pin == rules.DIRS['undefined']):
-                    continue
-                elif(piece != PIECES['wRk'] and piece != PIECES['bRk']):
+            piece = match.readfield(x1, y1)
+
+            if(Match.color_of_piece(piece) == opp_color):
+                if(len(enmytouches) == 0 or PIECES_RANK[rook] <= PIECES_RANK[piece]):
                     score += ATTACKED_SCORES[piece]
-                elif(enmy_pin != rk_direction and enmy_pin != rules.REVERSE_DIRS[rk_direction]):
+
+                # extra score if attacked is pinned
+                direction = rk_dir(srcx, srcy, x1, y1)
+                enmy_pin = rules.pin_dir(match, opp_color, x1, y1)
+                if(enmy_pin != rules.DIRS['undefined']):
+                    if(enmy_pin != direction and enmy_pin != rules.REVERSE_DIRS[direction]):
+                        score += ATTACKED_SCORES[piece]
+                    else:
+                        if(piece != PIECES['wRk'] and piece != PIECES['bRk'] and
+                           piece != PIECES['wPw'] and piece != PIECES['bPw']):
+                            score += ATTACKED_SCORES[piece]
+
+                if(analyze_helper.is_soft_pin(match, x1, y1)):
                     score += ATTACKED_SCORES[piece]
 
     return score

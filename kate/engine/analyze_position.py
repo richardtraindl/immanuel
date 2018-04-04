@@ -44,8 +44,8 @@ def score_attacks(match, color):
 
             if(piece == PIECES['blk']):
                 continue
-            elif(Match.color_of_piece(piece) != color):
-                continue
+            #elif(Match.color_of_piece(piece) != color):
+                #continue
             elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                 score += pawn.score_attacks(match, x, y)
             elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
@@ -394,7 +394,7 @@ def score_position(match, movecnt):
         
         color = match.next_color()
 
-        #score += score_attacks(match, color)
+        score += score_attacks(match, color)
 
         #score += score_supports(match, REVERSED_COLORS[color])
 
@@ -468,8 +468,9 @@ def is_stormy(match):
     color = match.next_color()
 
     # is attacked
-    if(are_attacks_or_captures_possible(match)):
-        return True
+    """score = score_attacks(match, color)
+    if(score > ATTACKED_SCORES[PIECES['bQu']] or score < ATTACKED_SCORES[PIECES['wQu']]):
+        return True"""
     ###
 
     # is pawn on last row before promotion
@@ -486,14 +487,26 @@ def is_stormy(match):
     ###
 
     # is pinned enemy attacked
-    """for y in range(8):
+    for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
             if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
 
-            if(is_soft_pin(match, x, y)):
-                return True"""
+            piece_color = Match.color_of_piece(piece)
+            direction = rules.pin_dir(match, piece_color, x, y)
+            frdlytouches, enmytouches = field_touches(match, piece_color, x, y)
+            
+            if(len(frdlytouches) < len(enmytouches)):
+                return True
+
+            if(direction != rules.DIRS['undefined'] or is_soft_pin(match, x, y)):
+                if(len(enmytouches) >= 2):
+                    return True
+
+            for enmy in enmytouches:
+                if(PIECES_RANK[enmy] < PIECES_RANK[piece]):
+                    return True
 
     return False
 

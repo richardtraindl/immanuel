@@ -384,6 +384,17 @@ def is_attacked_pinned(match, attacked):
     return False
 
 
+def is_attacked_soft_pinned(match, attacked):
+    if(len(attacked) == 0):
+        return None
+
+    for ctouch in attacked:
+        if(is_soft_pin(match, ctouch.fieldx, ctouch.fieldy)):
+            return True
+
+    return False
+
+
 def is_attacked_add_attacked(attacked):
     if(len(attacked) == 0):
         return None

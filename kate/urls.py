@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^addcomment/(?P<matchid>[0-9]+)/$', views.add_comment, name='addcomment'),
     url(r'^fetchcomments/$', views.fetch_comments, name='fetchcomments'),
     url(r'^fetchmatch/$', views.fetch_match, name='fetchmatch'),
+    url(r'^debug/(?P<matchid>[0-9]+)/$', views.debug, name='debug'),
 ]

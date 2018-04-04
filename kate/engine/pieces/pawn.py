@@ -232,6 +232,10 @@ def score_attacks(match, srcx, srcy):
     color = Match.color_of_piece(pawn)
     opp_color = Match.oppcolor_of_piece(pawn)
 
+    frdlytouches, enmytouches = analyze_helper.field_touches(match, color, srcx, srcy)
+    if(len(frdlytouches) < len(enmytouches)):
+        return score
+
     if(color == COLORS['white']):
         STEPS = WPW_STEPS
     else:
@@ -244,13 +248,21 @@ def score_attacks(match, srcx, srcy):
             if(is_move_stuck(match, pawn, srcx, srcy, x1, y1)):
                 continue
 
+            frdlytouches, enmytouches = analyze_helper.field_touches(match, color, x1, y1)
+            #if(len(frdlytouches) < len(enmytouches)):
+                #continue
+
             piece = match.readfield(x1, y1)
+
             if(match.color_of_piece(piece) == opp_color):
                 score += ATTACKED_SCORES[piece]
 
                 # extra score if attacked is pinned
                 enmy_pin = rules.pin_dir(match, opp_color, x1, y1)
                 if(enmy_pin != rules.DIRS['undefined']):
+                    score += ATTACKED_SCORES[piece]
+
+                if(analyze_helper.is_soft_pin(match, x1, y1)):
                     score += ATTACKED_SCORES[piece]
 
     return score

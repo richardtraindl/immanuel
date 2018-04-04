@@ -186,26 +186,26 @@ class Match:
                     if(self.white_movecnt_short_castling_lost == 0):
                         if(move.srcx == E1_X and move.srcy == E1_Y):
                             self.white_movecnt_short_castling_lost = move.count
-                        elif(move.srcx == A1_X and move.srcy == A1_Y):
+                        elif(move.srcx == H1_X and move.srcy == H1_Y):
                             self.white_movecnt_short_castling_lost = move.count
                             continue
                     if(self.white_movecnt_long_castling_lost == 0):
                         if(move.srcx == E1_X and move.srcy == E1_Y):
                             self.white_movecnt_long_castling_lost = move.count
-                        elif(move.srcx == H1_X and move.srcy == H1_Y):
+                        elif(move.srcx == A1_X and move.srcy == A1_Y):
                             self.white_movecnt_long_castling_lost = move.count
                             continue
                 else:
                     if(self.black_movecnt_short_castling_lost == 0):
                         if(move.srcx == E8_X and move.srcy == E8_Y):
                             self.black_movecnt_short_castling_lost = move.count
-                        elif(move.srcx == A8_X and move.srcy == A8_Y):
+                        elif(move.srcx == H8_X and move.srcy == H8_Y):
                             self.black_movecnt_short_castling_lost = move.count
                             continue
                     if(self.black_movecnt_long_castling_lost == 0):
                         if(move.srcx == E8_X and move.srcy == E8_Y):
                             self.black_movecnt_long_castling_lost = move.count
-                        elif(move.srcx == H8_X and move.srcy == H8_Y):
+                        elif(move.srcx == A8_X and move.srcy == A8_Y):
                             self.black_movecnt_long_castling_lost = move.count
                             continue
 

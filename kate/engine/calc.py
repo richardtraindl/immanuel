@@ -183,7 +183,8 @@ def was_last_move_stormy(last_prio):
        last_prio == PRIO['capture-good-deal'] or
        last_prio == PRIO['capture-bad-deal'] or
        last_prio == PRIO['attack-king-good-deal'] or 
-       last_prio == PRIO['attack-king-bad-deal']): # last_prio == PRIO['attack-good-deal'] or last_prio == PRIO['disclosed-attack']):
+       last_prio == PRIO['attack-king-bad-deal'] or
+       last_prio == PRIO['attack-stormy']):
         return True
     else:
         return False
@@ -208,25 +209,27 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
     if(match.level == LEVELS['blitz']):
         cnt = 8
         dpth = 2
-        max_dpth = 12
+        max_dpth = 8
     elif(match.level == LEVELS['low']):
-        cnt = 12
+        cnt = 10
         dpth = 3
-        max_dpth = 12
+        max_dpth = 10
     elif(match.level == LEVELS['medium']):
-        cnt = 16
+        cnt = 12
         dpth = 4
-        max_dpth = 14
+        max_dpth = 12
     else:
-        cnt = 20
+        cnt = 16
         dpth = 5
         max_dpth = 14
 
     if(is_endgame(match)):
-        dpth += 1
+        dpth += 2
 
     if(depth <= dpth):
         return max(cnt, prio1_mvcnt)
+    elif(depth <= dpth + 2 and (is_stormy(match) or was_last_move_stormy(last_prio))):
+        return prio_urgent_mvcnt
     elif(depth <= max_dpth and was_last_move_stormy(last_prio)):
         return prio_urgent_mvcnt
     else:
@@ -273,13 +276,13 @@ def calc_max(match, depth, alpha, beta, last_priomove):
 
         newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, priomove) # , dbginfo
 
-        if(move.captured_piece != PIECES['blk']):
+        """if(move.captured_piece != PIECES['blk']):
             if(color == COLORS['white']):
                 newscore += ATTACKED_SCORES[PIECES['bRk']]
             else:
-                newscore += ATTACKED_SCORES[PIECES['wRk']]
+                newscore += ATTACKED_SCORES[PIECES['wRk']]"""
 
-        if(match.movecnt <= 16):
+        if(match.movecnt <= 20):
             if(piece_movecnt(match, move) >= 3):
                 if(color == COLORS['white']):
                     newscore += ATTACKED_SCORES[PIECES['bPw']]
@@ -348,13 +351,13 @@ def calc_min(match, depth, alpha, beta, last_priomove):
 
         newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, priomove) # , dbginfo
 
-        if(move.captured_piece != PIECES['blk']):
+        """if(move.captured_piece != PIECES['blk']):
             if(color == COLORS['white']):
                 newscore += ATTACKED_SCORES[PIECES['bRk']]
             else:
-                newscore += ATTACKED_SCORES[PIECES['wRk']]
+                newscore += ATTACKED_SCORES[PIECES['wRk']]"""
 
-        if(match.movecnt <= 16):
+        if(match.movecnt <= 20):
             if(piece_movecnt(match, move) >= 3):
                 if(color == COLORS['white']):
                     newscore += ATTACKED_SCORES[PIECES['bPw']]

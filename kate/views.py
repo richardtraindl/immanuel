@@ -254,3 +254,22 @@ def fetch_match(request):
 
     return HttpResponse(data)
 
+
+def debug(request, matchid=None):
+    context = RequestContext(request)
+    fcode = request.GET.get('fcode', None)
+
+    if(matchid == None or fcode == None):
+        return HttpResponseRedirect('/kate')
+    else:
+        try:
+            modelmatch = ModelMatch.objects.get(id=matchid)
+        except ObjectDoesNotExist:
+            return HttpResponseRedirect('/kate')
+
+    functioncode = int(fcode)
+    if(functioncode == 0):
+        interface.debug_score_position(modelmatch)
+
+    return HttpResponseRedirect('/kate')
+

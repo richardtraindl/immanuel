@@ -204,17 +204,30 @@ def score_attacks(match, srcx, srcy):
     color = Match.color_of_piece(knight)
     opp_color = Match.oppcolor_of_piece(knight)
 
+    frdlytouches, enmytouches = analyze_helper.field_touches(match, color, srcx, srcy)
+    if(len(frdlytouches) < len(enmytouches)):
+        return score
+
     for i in range(8):
         x1 = srcx + STEPS[i][0]
         y1 = srcy + STEPS[i][1]
         if(rules.is_inbounds(x1, y1)):
+            frdlytouches, enmytouches = analyze_helper.field_touches(match, color, x1, y1)
+            #if(len(frdlytouches) < len(enmytouches)):
+                #continue
+
             piece = match.readfield(x1, y1)
+
             if(Match.color_of_piece(piece) == opp_color):
-                score += ATTACKED_SCORES[piece]
+                if(len(enmytouches) == 0 or PIECES_RANK[knight] <= PIECES_RANK[piece]):
+                    score += ATTACKED_SCORES[piece]
 
                 # extra score if attacked is pinned
                 enmy_pin = rules.pin_dir(match, opp_color, x1, y1)
                 if(enmy_pin != rules.DIRS['undefined']):
+                    score += ATTACKED_SCORES[piece]
+
+                if(analyze_helper.is_soft_pin(match, x1, y1)):
                     score += ATTACKED_SCORES[piece]
 
     return score
