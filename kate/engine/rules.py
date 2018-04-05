@@ -107,11 +107,19 @@ def search(match, srcx, srcy, stepx, stepy):
     return UNDEF_X, UNDEF_Y
 
 
+def is_pinned(match, x, y):
+    piece = match.readfield(x, y)
+    color = Match.color_of_piece(piece)
+
+    direction = pin_dir(match, color, x, y)
+    return direction != DIRS['undefined'], direction
+
+
 def pin_dir(match, color, scrx, srcy):
     piece = match.readfield(scrx, srcy)
     
     if(color == None):
-        color = match.color_of_piece(piece)
+        color = Match.color_of_piece(piece)
 
     if(color == COLORS['white']):
         kgx = match.wKg_x
@@ -213,7 +221,6 @@ def is_king_after_move_attacked(match, srcx, srcy, dstx, dsty):
     elif(piece == PIECES['bPw']):
         if(pawn.is_black_ep_move_ok(match, srcx, srcy, dstx, dsty)):
             pawnenmy = match.readfield(dstx, srcy)
-            # print("pawnenmy " + str(pawnenmy))
             match.writefield(dstx, srcy, PIECES['blk'])
 
     match.writefield(srcx, srcy, PIECES['blk'])
