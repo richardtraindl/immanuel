@@ -505,11 +505,15 @@ def is_stormy(match):
                     if(len(frdlytouches) < len(enmytouches)):
                         return True
                 else:
-                    if(len(enmytouches) > 0):
+                    if(len(enmytouches) <= len(frdlytouches)):
                         return True
 
             for enmy in enmytouches:
-                if(PIECES_RANK[enmy] < PIECES_RANK[piece]):
+                if(PIECES_RANK[enmy[0]] < PIECES_RANK[piece]):
+                    return True
+
+                enmyfriends, enmyenemies = field_touches(match, Match.color_of_piece(enmy[0]), enmy[1], enmy[2])
+                if(len(enmyenemies) == 0):
                     return True
 
     return False
