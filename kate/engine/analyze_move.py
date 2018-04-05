@@ -415,6 +415,8 @@ def rank_moves(match, priomoves):
                 else:
                     priomove.prio = min(priomove.prio, PRIO['support-bad-deal'])
             else:
+                token = token ^ MV_IS_SUPPORT
+                token = token | MV_IS_SUPPORT                
                 priomove.prio = min(priomove.prio, PRIO['support-unattacked'])
 
 
