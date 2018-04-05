@@ -316,6 +316,8 @@ def analyze_move(match, move):
     tokens[TOKENS['forked']] = forked
     return tokens
 
+def sort_priomove(iterable):
+    return iterable.prio, iterable.tokens[TOKENS['token']]
 
 def rank_moves(match, priomoves):
     all_attacked = []
@@ -415,8 +417,10 @@ def rank_moves(match, priomoves):
                 else:
                     priomove.prio = min(priomove.prio, PRIO['support-bad-deal'])
             else:
-                token = token ^ MV_IS_SUPPORT
-                token = token | MV_IS_SUPPORT                
+                mask =  0x0 ^ MV_IS_SUPPORT #FFFFFFFFFFFFFFFFF
+                token = token & mask
+                token = token | MV_IS_SUPPORT_UNATTACKED
+                priomove.tokens[TOKENS['token']] = token
                 priomove.prio = min(priomove.prio, PRIO['support-unattacked'])
 
 
@@ -436,7 +440,7 @@ def rank_moves(match, priomoves):
             priomove.prio = min(priomove.prio, PRIO['good'])
 
 
-    list_attacked.sort(key=attrgetter('prio'))
+    list_attacked.sort(key=sort_priomove) #key=attrgetter('prio')
     for pmove in list_attacked:
         for attack in all_attacked:
             if(pmove.gmove.srcx == attack.agent_srcx and pmove.gmove.srcy == attack.agent_srcy and 
@@ -448,7 +452,7 @@ def rank_moves(match, priomoves):
                     pmove.prio = PRIO['good']
 
     excludes.clear()
-    list_supported.sort(key=attrgetter('prio'))
+    list_supported.sort(key=sort_priomove) #key=attrgetter('prio')
     for pmove in list_supported:
         for support in all_supported:
             if(pmove.gmove.srcx == support.agent_srcx and pmove.gmove.srcy == support.agent_srcy and 
@@ -460,7 +464,7 @@ def rank_moves(match, priomoves):
                     pmove.prio = PRIO['good']
 
     excludes.clear()
-    list_forked.sort(key=attrgetter('prio'))
+    list_forked.sort(key=sort_priomove) #key=attrgetter('prio')
     for pmove in list_forked:
         for fork in all_forked:
             if(pmove.gmove.srcx == fork.agent_srcx and pmove.gmove.srcy == fork.agent_srcy and 
@@ -472,7 +476,7 @@ def rank_moves(match, priomoves):
                     pmove.prio = PRIO['good']
 
     excludes.clear()
-    list_flee.sort(key=attrgetter('prio'))
+    list_flee.sort(key=sort_priomove) #key=attrgetter('prio')
     for pmove in list_flee:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
