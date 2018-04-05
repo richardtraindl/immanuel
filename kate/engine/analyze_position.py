@@ -486,23 +486,27 @@ def is_stormy(match):
             return True
     ###
 
-    # is pinned enemy attacked
+    # attacks
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
+            if(piece == PIECES['blk']):
+                continue
+
             if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 continue
 
             piece_color = Match.color_of_piece(piece)
-            direction = rules.pin_dir(match, piece_color, x, y)
-            frdlytouches, enmytouches = field_touches(match, piece_color, x, y)
-            
-            if(len(frdlytouches) < len(enmytouches)):
-                return True
 
-            if(direction != rules.DIRS['undefined'] or is_soft_pin(match, x, y)):
-                if(len(enmytouches) >= 2):
-                    return True
+            frdlytouches, enmytouches = field_touches(match, piece_color, x, y)
+
+            if(is_pinned(match, x, y)[0] or is_soft_pin(match, x, y)):
+                if(color == piece_color):
+                    if(len(frdlytouches) < len(enmytouches)):
+                        return True
+                else:
+                    if(len(enmytouches) > 0):
+                        return True
 
             for enmy in enmytouches:
                 if(PIECES_RANK[enmy] < PIECES_RANK[piece]):
