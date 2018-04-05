@@ -500,7 +500,7 @@ def is_stormy(match):
 
             frdlytouches, enmytouches = field_touches(match, piece_color, x, y)
 
-            if(is_pinned(match, x, y)[0] or is_soft_pin(match, x, y)):
+            if(rules.is_pinned(match, x, y)[0] or is_soft_pin(match, x, y)):
                 if(color == piece_color):
                     if(len(frdlytouches) < len(enmytouches)):
                         return True
