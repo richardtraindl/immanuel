@@ -139,7 +139,11 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ctouch = cTouch(srcx, srcy, dstx, dsty, piece, x1, y1)
                 supported.append(ctouch)
 
-                token = token | MV_IS_SUPPORT
+                if(rules.is_field_touched(match, opp_color, x1, y1, 0)):
+                    token = token | MV_IS_SUPPORT
+                else:
+                    token = token | MV_IS_SUPPORT_UNATTACKED
+
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                     token = token | SUPPORTED_IS_PW
                 elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):

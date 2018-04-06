@@ -64,11 +64,12 @@ def read_steps(steps, dir_idx, step_idx):
     return stepx, stepy, prom_piece
 
 class PrioMove:
-    def __init__(self, gmove=None, piece=None, tokens=None, prio=None):
+    def __init__(self, gmove=None, piece=None, tokens=None, prio=None, prio_sec=None):
         self.gmove = gmove
         self.piece = piece
         self.tokens = tokens
         self.prio = prio
+        self.prio_sec = prio_sec
 
 def generate_moves(match):
     color = match.next_color()
@@ -131,7 +132,7 @@ def generate_moves(match):
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         tokens = analyze_move(match, gmove)
-                        priomove = PrioMove(gmove, piece, tokens, PRIO['last'])
+                        priomove = PrioMove(gmove, piece, tokens, PRIO['last'], PRIO['last'])
                         priomoves.append(priomove)
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
@@ -152,7 +153,7 @@ def generate_moves(match):
         priocnts[0] = len(priomoves)
     else:
         rank_moves(match, priomoves)
-        priomoves.sort(key=attrgetter('prio'))
+        priomoves.sort(key=attrgetter('prio', 'prio_sec'))
 
         for priomove in priomoves:
             priocnts[priomove.prio] += 1
@@ -228,8 +229,8 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_priomove):
 
     if(depth <= dpth):
         return max(cnt, prio1_mvcnt)
-    elif(depth <= dpth + 2 and (is_stormy(match) or was_last_move_stormy(last_prio))):
-        return prio_urgent_mvcnt
+    #elif(depth <= dpth + 2 and (was_last_move_stormy(last_prio) or is_stormy(match))):
+        #return prio_urgent_mvcnt
     elif(depth <= max_dpth and was_last_move_stormy(last_prio)):
         return prio_urgent_mvcnt
     else:
