@@ -447,8 +447,8 @@ def rank_moves(match, priomoves):
 
 
 
-        if(token & MV_CONTROLES_FILE > 0):
-            min_prio(priomove, PRIO['good'])
+        #if(token & MV_CONTROLES_FILE > 0):
+            #min_prio(priomove, PRIO['good'])
 
 
     list_attacked.sort(key=attrgetter('prio', 'prio_sec'))
