@@ -2,7 +2,7 @@ from .match import *
 from .cvalues import *
 from . import rules
 from .pieces import pawn, knight, bishop, rook, king 
-from .pieces.generic_piece import cTouch
+from .pieces.generic_piece import cTouchBeyond
 from .analyze_helper import field_touches_beyond, field_touches, is_soft_pin
 
 
@@ -329,10 +329,10 @@ def score_endgame(match):
     value = 0
 
     whiterate = ATTACKED_SCORES[PIECES['bPw']]
-    whitesteprate = whiterate / 2
+    whitesteprate = whiterate // 2
 
     blackrate = ATTACKED_SCORES[PIECES['wPw']]
-    blacksteprate = blackrate / 2
+    blacksteprate = blackrate // 2
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -458,7 +458,7 @@ def are_attacks_or_captures_possible(match):
                     return True
                 else:
                     for enemy in enemies:
-                        if(PIECES_RANK[enemy[0]] <= PIECES_RANK[piece]):
+                        if(PIECES_RANK[enemy.piece] <= PIECES_RANK[piece]):
                             return True
 
     return False
@@ -505,10 +505,10 @@ def is_stormy(match):
                     return True
 
             for enmy in enmytouches:
-                if(PIECES_RANK[enmy[0]] < PIECES_RANK[piece]):
+                if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
                     return True
 
-                enmyfriends, enmyenemies = field_touches(match, Match.color_of_piece(enmy[0]), enmy[1], enmy[2])
+                enmyfriends, enmyenemies = field_touches(match, Match.color_of_piece(enmy.piece), enmy.fieldx, enmy.fieldy)
                 if(len(enmyenemies) == 0):
                     return True
 

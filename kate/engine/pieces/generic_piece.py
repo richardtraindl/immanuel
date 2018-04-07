@@ -12,7 +12,7 @@ def count_contacts(contacts):
     kg_cnt = 0
 
     for contact in contacts:
-        piece = contact[0]
+        piece = contact.piece
 
         if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
             pw_cnt += 1
@@ -93,6 +93,13 @@ def contacts_to_token(frdlycontacts, enmycontacts, mode):
 
 
 class cTouch:
+    def __init__(self, piece, fieldx, fieldy):
+        self.piece = piece
+        self.fieldx = fieldx
+        self.fieldy = fieldy
+
+
+class cTouchBeyond:
     def __init__(self, srcx, srcy, dstx, dsty, piece, fieldx, fieldy):
         self.agent_srcx = srcx
         self.agent_srcy = srcy

@@ -150,8 +150,8 @@ def disclosures(match, move, disclosed_attacked):
     ###
     match.writefield(move.srcx, move.srcy, PIECES['blk'])
 
-    for ctouch in disclosed_attacked:
-        field_touches_beyond(match, color, ctouch)
+    for ctouch_beyond in disclosed_attacked:
+        field_touches_beyond(match, color, ctouch_beyond)
 
     match.writefield(move.srcx, move.srcy, piece)
     ###
@@ -173,7 +173,7 @@ def flees(match, move):
 
     enmycontacts = list_field_touches(match, opp_color, move.srcx, move.srcy)
     for enmy in enmycontacts:
-        if(PIECES_RANK[enmy[0]] < PIECES_RANK[piece]):
+        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
             old_lower_cnt += 1
         else:
             old_higher_cnt += 1
@@ -184,7 +184,7 @@ def flees(match, move):
 
     enmycontacts = list_field_touches(match, opp_color, move.dstx, move.dsty)
     for enmy in enmycontacts:
-        if(PIECES_RANK[enmy[0]] < PIECES_RANK[piece]):
+        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
             new_lower_cnt += 1
         else:
             new_higher_cnt += 1
@@ -211,8 +211,8 @@ def progress(match, move):
 
     value += score_supports(match, REVERSED_COLORS[color])
 
-    if((value >= (SCORES[PIECES['bPw']] / 10) and color == COLORS['white']) or 
-       (value <= (SCORES[PIECES['wPw']] / 10) and color == COLORS['black'])):
+    if((value >= (SCORES[PIECES['bPw']] // 10) and color == COLORS['white']) or 
+       (value <= (SCORES[PIECES['wPw']] // 10) and color == COLORS['black'])):
         return token | MV_IS_PROGRESS
     else:
         return token

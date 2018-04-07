@@ -2,7 +2,7 @@ from .. match import *
 from .. cvalues import *
 from .. import rules
 from .. import analyze_helper
-from .generic_piece import cTouch, cFork
+from .generic_piece import cTouch, cTouchBeyond, cFork
 
 
 NEAST_X = 1
@@ -73,26 +73,26 @@ def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
                     continue
 
                 if(Match.color_of_piece(piece) == color):
-                    frdlytouches.append([piece, x1, y1])
+                    frdlytouches.append(cTouch(piece, x1, y1))
                 else:
-                    enmytouches.append([piece, x1, y1])
+                    enmytouches.append(cTouch(piece, x1, y1))
 
 
-def field_color_touches_beyond(match, color, ctouch):
+def field_color_touches_beyond(match, color, ctouch_beyond):
     for i in range(4):
         stepx = STEPS[i][0]
         stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, ctouch.fieldx, ctouch.fieldy, stepx, stepy)
+        x1, y1 = rules.search(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy, stepx, stepy)
         if(x1 != rules.UNDEF_X):
             piece = match.readfield(x1, y1)
             if(piece == PIECES['wQu'] or piece == PIECES['bQu'] or piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                if(is_move_stuck(match, x1, y1, ctouch.fieldx, ctouch.fieldy)):
+                if(is_move_stuck(match, x1, y1, ctouch_beyond.fieldx, ctouch_beyond.fieldy)):
                     continue
 
                 if(Match.color_of_piece(piece) == color):
-                    ctouch.supporter_beyond.append([piece, x1, y1])
+                    ctouch_beyond.supporter_beyond.append(cTouch(piece, x1, y1))
                 else:
-                    ctouch.attacker_beyond.append([piece, x1, y1])
+                    ctouch_beyond.attacker_beyond.append(cTouch(piece, x1, y1))
 
 
 def list_field_touches(match, color, fieldx, fieldy):
@@ -109,7 +109,7 @@ def list_field_touches(match, color, fieldx, fieldy):
             piece = match.readfield(x1, y1)
             if( (color == COLORS['white'] and (piece == PIECES['wQu'] or piece == PIECES['wBp'])) or
                 (color == COLORS['black'] and (piece == PIECES['bQu'] or piece == PIECES['bBp'])) ):
-                touches.append([piece, x1, y1])
+                touches.append(cTouch(piece, x1, y1))
 
     return touches
 
@@ -136,8 +136,8 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
             piece = match.readfield(x1, y1)
             
             if(Match.color_of_piece(piece) == opp_color):
-                ctouch = cTouch(srcx, srcy, dstx, dsty, piece, x1, y1)
-                attacked.append(ctouch)
+                ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
+                attacked.append(ctouch_beyond)
 
                 token = token | MV_IS_ATTACK
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
@@ -156,7 +156,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                analyze_helper.field_touches_beyond(match, opp_color, ctouch)
+                analyze_helper.field_touches_beyond(match, opp_color, ctouch_beyond)
 
                 match.writefield(srcx, srcy, bishop)
                 ###
@@ -164,8 +164,8 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     continue
 
-                ctouch = cTouch(srcx, srcy, dstx, dsty, piece, x1, y1)
-                supported.append(ctouch)
+                ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
+                supported.append(ctouch_beyond)
 
                 if(rules.is_field_touched(match, opp_color, x1, y1, 0)):
                     token = token | MV_IS_SUPPORT
@@ -186,7 +186,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
-                analyze_helper.field_touches_beyond(match, color, ctouch)
+                analyze_helper.field_touches_beyond(match, color, ctouch_beyond)
 
                 match.writefield(srcx, srcy, bishop)
                 ###
@@ -196,8 +196,8 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
 def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked):
     for j in range(0, 4, 2):
-        first = cTouch(None, None, None, None, PIECES['blk'], 0, 0)
-        second = cTouch(None, None, None, None, PIECES['blk'], 0, 0)
+        first = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
+        second = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
 
         for i in range(0, 2, 1):
             stepx = STEPS[j+i][0]

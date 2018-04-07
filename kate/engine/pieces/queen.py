@@ -3,7 +3,7 @@ from .. cvalues import *
 from .. import rules
 from .. import analyze_helper
 from . import rook, bishop
-from .generic_piece import cTouch, cFork
+from .generic_piece import cFork
 
 
 STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]

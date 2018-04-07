@@ -15,7 +15,7 @@ from .engine.helper import index_to_coord, coord_to_index
 from .engine.debug import str_attributes
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
 from .modules.interface import read_searchmoves
-
+from .engine.analyze_position import score_position, is_stormy
 
 def index(request):
     context = RequestContext(request)
@@ -267,9 +267,18 @@ def debug(request, matchid=None):
         except ObjectDoesNotExist:
             return HttpResponseRedirect('/kate')
 
+    match = Match()
+    interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
+
     functioncode = int(fcode)
     if(functioncode == 0):
-        interface.debug_score_position(modelmatch)
+        #interface.debug_score_position(modelmatch)
+        score = score_position(match, 1)
+        print("from function score_position")
+        print("match.score: " + str(match.score) + " score: " + str(score))
+    elif(functioncode == 1):
+        print("from function is_stormy")
+        print(str(is_stormy(match)))
 
     return HttpResponseRedirect('/kate')
 
