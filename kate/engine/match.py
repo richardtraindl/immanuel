@@ -144,6 +144,7 @@ class Match:
         self.movecnt = 0
         self.score = 0
         self.level = LEVELS['blitz']
+        self.calc_time_start = 0
         self.begin = datetime.now()
         self.white_player_name = ""
         self.white_player_is_human = True

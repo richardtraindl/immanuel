@@ -182,25 +182,33 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 def was_last_move_stormy(last_prio):
     if(last_prio == PRIO['promotion'] or
        last_prio == PRIO['capture-good-deal'] or
-       last_prio == PRIO['attack-stormy'] or
-       last_prio == PRIO['capture-bad-deal'] or
        last_prio == PRIO['attack-king-good-deal'] or 
-       last_prio == PRIO['attack-king-bad-deal']):
+       last_prio == PRIO['capture-bad-deal'] or       
+       last_prio == PRIO['attack-king-bad-deal'] or
+       last_prio == PRIO['attack-stormy']):
         return True
     else:
         return False
 
 def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
     mvcnt = len(priomoves)
-    prio_urgent_mvcnt = 0
-    prio1_mvcnt = 0
+    prio_mvcnt1 = 0
+    prio_mvcnt2 = 0
+    prio_mvcnt3 = 0
+    time_exceeded = False
 
-    for i in range(PRIO_URGENT_LIMES + 1):
-        prio_urgent_mvcnt += priocnts[i]
+    calc_time = time.time() - match.calc_time_start
 
-    prio1_mvcnt = prio_urgent_mvcnt
-    for i in range(PRIO_URGENT_LIMES + 1, PRIO1_LIMES + 1):
-        prio1_mvcnt += priocnts[i]
+    for i in range(PRIO_LIMES3 + 1):
+        prio_mvcnt3 += priocnts[i]
+
+    prio_mvcnt2 = prio_mvcnt3
+    for i in range(PRIO_LIMES3 + 1, PRIO_LIMES2 + 1):
+        prio_mvcnt2 += priocnts[i]
+
+    prio_mvcnt1 = prio_mvcnt2
+    for i in range(PRIO_LIMES2 + 1, PRIO_LIMES1 + 1):
+        prio_mvcnt1 += priocnts[i]
 
     if(last_pmove):
         last_prio = last_pmove.prio
@@ -211,28 +219,39 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
         cnt = 8
         dpth = 2
         max_dpth = 8
+        if(calc_time > 30):
+            time_exceeded = True
     elif(match.level == LEVELS['low']):
         cnt = 10
         dpth = 3
         max_dpth = 10
+        if(calc_time > 60):
+            time_exceeded = True
     elif(match.level == LEVELS['medium']):
         cnt = 12
         dpth = 4
         max_dpth = 12
+        if(calc_time > 90):
+            time_exceeded = True
     else:
         cnt = 16
         dpth = 5
         max_dpth = 14
+        if(calc_time > 120):
+            time_exceeded = True
 
     if(is_endgame(match)):
         dpth += 2
 
     if(depth <= dpth):
-        return max(cnt, prio1_mvcnt)
-    elif(depth <= dpth + 2 and (was_last_move_stormy(last_prio) or is_stormy(match))):
-        return prio_urgent_mvcnt
+        if(time_exceeded):
+            return min(cnt, prio_mvcnt1)
+        else:
+            return max(cnt, prio_mvcnt1)
+    elif(depth <= dpth + 3 and (was_last_move_stormy(last_prio) or is_stormy(match))):
+        return prio_mvcnt2
     elif(depth <= max_dpth and was_last_move_stormy(last_prio)):
-        return prio_urgent_mvcnt
+        return prio_mvcnt3
     else:
         return 0
 
@@ -294,6 +313,20 @@ def calc_max(match, depth, alpha, beta, last_pmove):
 
             prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+
+            calc_time = time.time() - match.calc_time_start
+            if(match.level == LEVELS['blitz']):
+                if(calc_time > 30):
+                    maxcnt = 8
+            elif(match.level == LEVELS['low']):
+                if(calc_time > 60):
+                    maxcnt = 10
+            elif(match.level == LEVELS['medium']):
+                if(calc_time > 90):
+                    maxcnt = 12
+            else:
+                if(calc_time > 120):
+                    maxcnt = 16
 
         if(score > maxscore):
             maxscore = score
@@ -364,6 +397,20 @@ def calc_min(match, depth, alpha, beta, last_pmove):
             prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
+            calc_time = time.time() - match.calc_time_start
+            if(match.level == LEVELS['blitz']):
+                if(calc_time > 30):
+                    maxcnt = 8
+            elif(match.level == LEVELS['low']):
+                if(calc_time > 60):
+                    maxcnt = 10
+            elif(match.level == LEVELS['medium']):
+                if(calc_time > 90):
+                    maxcnt = 12
+            else:
+                if(calc_time > 120):
+                    maxcnt = 16
+
         if(score < minscore):
             minscore = score
             if(minscore < alpha):
@@ -380,7 +427,7 @@ def calc_move(match):
 
     candidates = []
 
-    start = time.time()
+    match.calc_time_start = time.time()
 
     gmove = retrieve_move(match)
     if(gmove):
@@ -390,12 +437,16 @@ def calc_move(match):
         score, candidates = calc_max(match, 1, SCORES[PIECES['bKg']] * 2, SCORES[PIECES['bKg']] * 2, None) # , dbginfo
     else:
         score, candidates = calc_min(match, 1, SCORES[PIECES['wKg']] * 2, SCORES[PIECES['bKg']] * 2, None) # , dbginfo
+    
+    calc_time = time.time() - match.calc_time_start
+    if(match.next_color() == COLORS['white']):
+        match.elapsed_time_white += calc_time
+    else:
+        match.elapsed_time_black += calc_time
 
     msg = "result: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, candidates)
-    
-    end = time.time()
-    prnt_fmttime("\ncalc-time: ", end - start)
+    prnt_fmttime("\ncalc-time: ", calc_time)
     prnt_attributes(match, "\n")
     return candidates
 

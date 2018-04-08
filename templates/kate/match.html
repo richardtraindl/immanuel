@@ -71,8 +71,21 @@
 
       <div id="minutes">
         <p>Score: &nbsp; {{ match.score }}</p>
+        
+        <div class="small-gap"></div>
+         
+        <table>
+            <tr>
+                <td>Time White: {{ match.elapsed_time_white|fmttime }}</td>
+                <td>Time Black: {{ match.elapsed_time_black|fmttime }}</td>
+            </tr>
+        </table>
 
-        <p> &nbsp; {{ running }}</p>
+        <div class="small-gap"></div>
+
+        <p>{{ running }}</p>
+
+        <div class="small-gap"></div>
 
         {% include "kate/_minutes.html" with match=match %}
       </div>

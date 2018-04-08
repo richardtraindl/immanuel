@@ -338,6 +338,7 @@ def rank_moves(match, priomoves):
     all_forked = []
     
     list_attacked = []
+    list_disclosed_attacked = []
     list_supported = []
     list_forked = []
     list_flee = []
@@ -437,7 +438,7 @@ def rank_moves(match, priomoves):
         if(token & MV_IS_DISCLOSURE > 0):
             if(is_disclosed_attacked_supported(disclosed_attacked) == False):
                 min_prio(priomove, PRIO['attack-good-deal'])
-                list_attacked.append(priomove)
+                list_disclosed_attacked.append(priomove)
             else:
                 min_prio(priomove, PRIO['attack-bad-deal'])
 
@@ -456,11 +457,17 @@ def rank_moves(match, priomoves):
         for attack in all_attacked:
             if(pmove.gmove.srcx == attack.agent_srcx and pmove.gmove.srcy == attack.agent_srcy and 
                pmove.gmove.dstx == attack.agent_dstx and pmove.gmove.dsty == attack.agent_dsty):
-                if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy and  
-                       e[2] == attack.fieldx and e[3] == attack.fieldy for e in excludes) == False):
-                    excludes.append([attack.agent_srcx, attack.agent_srcy, attack.fieldx, attack.fieldy])
+                if(any(e[0] == attack.fieldx and e[1] == attack.fieldy for e in excludes) == False): # e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy and 
+                    excludes.append([attack.fieldx, attack.fieldy]) # attack.agent_srcx, attack.agent_srcy, 
                 else:
                     max_prio(priomove, PRIO['good'])
+
+    list_disclosed_attacked.sort(key=attrgetter('prio', 'prio_sec'))
+    for pmove in list_disclosed_attacked:
+        if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
+            excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
+        else:
+            max_prio(priomove, PRIO['good'])
 
     excludes.clear()
     list_supported.sort(key=attrgetter('prio', 'prio_sec'))
@@ -468,9 +475,8 @@ def rank_moves(match, priomoves):
         for support in all_supported:
             if(pmove.gmove.srcx == support.agent_srcx and pmove.gmove.srcy == support.agent_srcy and 
                pmove.gmove.dstx == support.agent_dstx and pmove.gmove.dsty == support.agent_dsty):
-                if(any(e[0] == support.agent_srcx and e[1] == support.agent_srcy and  
-                       e[2] == support.fieldx and e[3] == support.fieldy for e in excludes) == False):
-                    excludes.append([support.agent_srcx, support.agent_srcy, support.fieldx, support.fieldy])
+                if(any(e[0] == support.fieldx and e[1] == support.fieldy for e in excludes) == False): # e[0] == support.agent_srcx and e[1] == support.agent_srcy and
+                    excludes.append([support.fieldx, support.fieldy]) # support.agent_srcx, support.agent_srcy, 
                 else:
                     max_prio(priomove, PRIO['good'])
 
@@ -480,9 +486,8 @@ def rank_moves(match, priomoves):
         for fork in all_forked:
             if(pmove.gmove.srcx == fork.agent_srcx and pmove.gmove.srcy == fork.agent_srcy and 
                pmove.gmove.dstx == fork.agent_dstx and pmove.gmove.dsty == fork.agent_dsty):
-                if(any(e[0] == fork.agent_srcx and e[1] == fork.agent_srcy and
-                       e[2] == fork.forkx and e[3] == fork.forky for e in excludes) == False):
-                    excludes.append([fork.agent_srcx, fork.agent_srcy, fork.forkx, fork.forky])
+                if(any(e[0] == fork.forkx and e[1] == fork.forky for e in excludes) == False): # e[0] == fork.agent_srcx and e[1] == fork.agent_srcy and
+                    excludes.append([fork.forkx, fork.forky]) # 
                 else:
                     max_prio(priomove, PRIO['good'])
 

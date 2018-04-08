@@ -3,14 +3,14 @@ PRIO = {
     'defend-check' : 0,
     'promotion' : 1,
     'capture-good-deal' : 2,
-    'attack-stormy' : 3,
-    'defend-fork' : 4,
+    'attack-king-good-deal' : 3,
+    'single-silent-move' : 4,
     'capture-bad-deal' : 5,
-    'single-silent-move' : 6,
-    'flee-urgent' : 7,
-    'support-good-deal' : 8,
-    'attack-king-good-deal' : 9,
-    'attack-king-bad-deal' : 10,    
+    'attack-king-bad-deal' : 6,
+    'attack-stormy' : 7,
+    'defend-fork' : 8,
+    'flee-urgent' : 9,
+    'support-good-deal' : 10,
     'attack-good-deal' : 11,
     'castling' : 12,
     'flee' : 13,
@@ -21,8 +21,9 @@ PRIO = {
     'bad' : 18,
     'last' : 19 }
 
-PRIO_URGENT_LIMES = PRIO['single-silent-move']
-PRIO1_LIMES = PRIO['castling']
+PRIO_LIMES3 = PRIO['single-silent-move'] # attack-king-bad-deal
+PRIO_LIMES2 = PRIO['attack-stormy']
+PRIO_LIMES1 = PRIO['castling']
 
 
 MV_IS_PROMOTION                        = 0x8000000000000000

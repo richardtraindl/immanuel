@@ -86,3 +86,10 @@ def field_x(value):
 def readfield(value, arg):
     pos = int(arg)
     return value[pos:(pos+3)]
+
+@register.filter(name='fmttime')
+def fmttime(seconds):
+    minutes, seconds = divmod(seconds, 60)
+    hour, minutes = divmod(minutes, 60)
+    return "%02d:%02d:%02d" % (hour, minutes, seconds)
+
