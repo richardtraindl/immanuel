@@ -153,6 +153,17 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     token = token | ATTACKED_IS_KG
 
+                # attacked piece behind
+                x2, y2 = rules.search(match, x1, y1, stepx, stepy)
+                if(x2 != rules.UNDEF_X):
+                    piece_behind = match.readfield(x2, y2)
+                    if(Match.color_of_piece(piece_behind) == opp_color):
+                        if(PIECES_RANK[piece_behind] > PIECES_RANK[bishop]):
+                            if(piece_behind == PIECES['wKg'] or piece_behind == PIECES['bKg']):
+                                token = token | ATTACK_IS_PIN
+                            else:
+                                token = token | ATTACK_IS_SOFT_PIN
+
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
 
@@ -160,6 +171,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
                 match.writefield(srcx, srcy, bishop)
                 ###
+
             else:
                 if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                     continue
