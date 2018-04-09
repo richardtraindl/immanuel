@@ -32,12 +32,13 @@ def str_attributes(match, delimiter):
            "score: " + str(match.score) + delimiter + \
            "level: " + str(match.level) + delimiter + \
            "begin: " + match.begin.strftime("%Y-%m-%d-%H:%M:%S") + delimiter + \
+           "time_start: " + str(match.time_start) + delimiter + \
            "white_player_name: " + match.white_player_name + delimiter + \
            "white_player_is_human: " + str(match.white_player_is_human) + delimiter + \
-           "elapsed_time_white: " + str(match.elapsed_time_white) + delimiter + \
+           "white_elapsed_seconds: " + str(match.white_elapsed_seconds) + delimiter + \
            "black_player_name: " + match.black_player_name + delimiter + \
            "black_player_is_human: " + str(match.black_player_is_human) + delimiter + \
-           "elapsed_time_black: " + str(match.elapsed_time_black) + delimiter + \
+           "black_elapsed_seconds: " + str(match.black_elapsed_seconds) + delimiter + \
            "fifty_moves_count: " + str(match.fifty_moves_count) + delimiter + \
            "white_movecnt_short_castling_lost: " + str(match.white_movecnt_short_castling_lost) + delimiter + \
            "white_movecnt_long_castling_lost: " + str(match.white_movecnt_long_castling_lost) + delimiter + \

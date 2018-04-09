@@ -166,6 +166,7 @@ def do_move(request, matchid=None):
                 valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
                 if(valid):
                     interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+
                     interface.calc_move_for_immanuel(modelmatch)
                     status = interface.status(modelmatch)
                     if(status != STATUS['open']):

@@ -7,14 +7,15 @@ import threading
 
 class Match(models.Model):
     status = models.PositiveSmallIntegerField(null=False, default=STATUS['open'])
+    level = models.SmallIntegerField(null=False, default=LEVELS['blitz'])
     begin = models.DateTimeField(default=timezone.now)
+    time_start = models.IntegerField(null=False, default=0)
     white_player_name = models.CharField(max_length=100, blank=False)
     white_player_is_human = models.BooleanField(null=False, default=True)
-    elapsed_time_white = models.IntegerField(null=False, default=0)
+    white_elapsed_seconds = models.IntegerField(null=False, default=0)
     black_player_name = models.CharField(max_length=100, blank=False)
     black_player_is_human = models.BooleanField(null=False, default=True)
-    elapsed_time_black = models.IntegerField(null=False, default=0)
-    level = models.SmallIntegerField(null=False, default=LEVELS['blitz'])
+    black_elapsed_seconds = models.IntegerField(null=False, default=0)
     board = models.CharField(max_length=256, blank=False, default='wRk;wKn;wBp;wQu;wKg;wBp;wKn;wRk;' \
                                                                   'wPw;wPw;wPw;wPw;wPw;wPw;wPw;wPw;' \
                                                                   'blk;blk;blk;blk;blk;blk;blk;blk;' \

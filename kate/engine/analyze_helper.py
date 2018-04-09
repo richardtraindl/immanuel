@@ -205,124 +205,74 @@ def piece_is_lower_equal_than_enemy_on_srcfield(token):
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):
-        if(token & SRCFLD_IS_ENM_TOU_BY_QU > 0 and 
-           token & SRCFLD_IS_ENM_TOU_BY_RK == 0 and
-           token & SRCFLD_IS_ENM_TOU_BY_BP == 0 and
-           token & SRCFLD_IS_ENM_TOU_BY_KN == 0 and
-           token & SRCFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_RK > 0):
-        if((token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
-            token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
-            token & SRCFLD_IS_ENM_TOU_BY_RK > 0) and
-           token & SRCFLD_IS_ENM_TOU_BY_BP == 0 and
-           token & SRCFLD_IS_ENM_TOU_BY_KN == 0 and
-           token & SRCFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if((token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
-            token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
-            token & SRCFLD_IS_ENM_TOU_BY_RK > 0 or
-            token & SRCFLD_IS_ENM_TOU_BY_BP > 0 or
-            token & SRCFLD_IS_ENM_TOU_BY_KN > 0) and 
-           token & SRCFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    else: # MV_PIECE_IS_PW
-        if(token & SRCFLD_IS_ENM_TOU_BY_KG > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_QU > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_RK > 0 or 
+        if(token & SRCFLD_IS_ENM_TOU_BY_RK > 0 or
            token & SRCFLD_IS_ENM_TOU_BY_BP > 0 or 
            token & SRCFLD_IS_ENM_TOU_BY_KN > 0 or
            token & SRCFLD_IS_ENM_TOU_BY_PW > 0):
-            return True
-        else:
             return False
+        else:
+            return True
+    elif(token & MV_PIECE_IS_RK > 0):
+        if(token & SRCFLD_IS_ENM_TOU_BY_BP > 0 or 
+           token & SRCFLD_IS_ENM_TOU_BY_KN > 0 or 
+           token & SRCFLD_IS_ENM_TOU_BY_PW > 0):
+            return False
+        else:
+            return True
+    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
+        if(token & SRCFLD_IS_ENM_TOU_BY_PW > 0):
+            return False
+        else:
+            return True
+    else: # MV_PIECE_IS_PW
+        return True
 
 
 def piece_is_lower_equal_than_enemy_on_dstfield(token):
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):
-        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0) and 
-           token & DSTFLD_IS_ENM_TOU_BY_RK == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_RK > 0):
-        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_RK > 0) and
-           token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_KN > 0) and 
-           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    else: # MV_PIECE_IS_PW
-        if(token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or 
+        if(token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
+           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
            token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or
            token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
-            return True
-        else:
             return False
+        else:
+            return True
+    elif(token & MV_PIECE_IS_RK > 0):
+        if(token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
+           token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or
+           token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
+            return False
+        else:
+            return True
+    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
+        if(token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
+            return False
+        else:
+            return True
+    else: # MV_PIECE_IS_PW
+        return True
 
 
 def piece_is_lower_fairy_equal_than_enemy_on_dstfield(token):
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):
-        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0) and
-           token & DSTFLD_IS_ENM_TOU_BY_RK == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_BP == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_KN == 0 and
-           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_RK > 0 or token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if((token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-            token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
-            token & DSTFLD_IS_ENM_TOU_BY_KN > 0) and
-           token & DSTFLD_IS_ENM_TOU_BY_PW == 0):
-            return True
-        else:
-            return False
-    else: # MV_PIECE_IS_PW
-        if(token & DSTFLD_IS_ENM_TOU_BY_KG > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or 
-           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or 
+        if(token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
+           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
            token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or
            token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
-            return True
-        else:
             return False
+        else:
+            return True
+    elif(token & MV_PIECE_IS_RK > 0 or token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
+        if(token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
+            return False
+        else:
+            return True
+    else: # MV_PIECE_IS_PW
+        return True
 
 
 def srcfield_is_supported(token):

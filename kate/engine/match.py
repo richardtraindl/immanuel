@@ -144,14 +144,14 @@ class Match:
         self.movecnt = 0
         self.score = 0
         self.level = LEVELS['blitz']
-        self.calc_time_start = 0
         self.begin = datetime.now()
+        self.time_start = 0
         self.white_player_name = ""
         self.white_player_is_human = True
-        self.elapsed_time_white = 0
+        self.white_elapsed_seconds= 0
         self.black_player_name = ""
         self.black_player_is_human = True
-        self.elapsed_time_black = 0
+        self.black_elapsed_seconds = 0
         self.board = [ [PIECES['wRk'], PIECES['wKn'], PIECES['wBp'], PIECES['wQu'], PIECES['wKg'], PIECES['wBp'], PIECES['wKn'], PIECES['wRk']],
                        [PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw']],
                        [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],

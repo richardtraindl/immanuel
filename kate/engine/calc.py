@@ -197,7 +197,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
     prio_mvcnt3 = 0
     time_exceeded = False
 
-    calc_time = time.time() - match.calc_time_start
+    elapsed_time = time.time() - match.time_start
 
     for i in range(PRIO_LIMES3 + 1):
         prio_mvcnt3 += priocnts[i]
@@ -219,25 +219,25 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
         cnt = 8
         dpth = 2
         max_dpth = 8
-        if(calc_time > 30):
+        if(elapsed_time > 30):
             time_exceeded = True
     elif(match.level == LEVELS['low']):
         cnt = 10
         dpth = 3
         max_dpth = 10
-        if(calc_time > 60):
+        if(elapsed_time > 60):
             time_exceeded = True
     elif(match.level == LEVELS['medium']):
         cnt = 12
         dpth = 4
         max_dpth = 12
-        if(calc_time > 90):
+        if(elapsed_time > 90):
             time_exceeded = True
     else:
         cnt = 16
         dpth = 5
         max_dpth = 14
-        if(calc_time > 120):
+        if(elapsed_time > 120):
             time_exceeded = True
 
     if(is_endgame(match)):
@@ -314,18 +314,18 @@ def calc_max(match, depth, alpha, beta, last_pmove):
             prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
-            calc_time = time.time() - match.calc_time_start
+            elapsed_time = time.time() - match.time_start
             if(match.level == LEVELS['blitz']):
-                if(calc_time > 30):
+                if(elapsed_time > 30):
                     maxcnt = 8
             elif(match.level == LEVELS['low']):
-                if(calc_time > 60):
+                if(elapsed_time > 60):
                     maxcnt = 10
             elif(match.level == LEVELS['medium']):
-                if(calc_time > 90):
+                if(elapsed_time > 90):
                     maxcnt = 12
             else:
-                if(calc_time > 120):
+                if(elapsed_time > 120):
                     maxcnt = 16
 
         if(score > maxscore):
@@ -397,18 +397,18 @@ def calc_min(match, depth, alpha, beta, last_pmove):
             prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
-            calc_time = time.time() - match.calc_time_start
+            elapsed_time = time.time() - match.time_start
             if(match.level == LEVELS['blitz']):
-                if(calc_time > 30):
+                if(elapsed_time > 30):
                     maxcnt = 8
             elif(match.level == LEVELS['low']):
-                if(calc_time > 60):
+                if(elapsed_time > 60):
                     maxcnt = 10
             elif(match.level == LEVELS['medium']):
-                if(calc_time > 90):
+                if(elapsed_time > 90):
                     maxcnt = 12
             else:
-                if(calc_time > 120):
+                if(elapsed_time > 120):
                     maxcnt = 16
 
         if(score < minscore):
@@ -427,7 +427,7 @@ def calc_move(match):
 
     candidates = []
 
-    match.calc_time_start = time.time()
+    match.time_start = time.time()
 
     gmove = retrieve_move(match)
     if(gmove):
@@ -437,16 +437,20 @@ def calc_move(match):
         score, candidates = calc_max(match, 1, SCORES[PIECES['bKg']] * 2, SCORES[PIECES['bKg']] * 2, None) # , dbginfo
     else:
         score, candidates = calc_min(match, 1, SCORES[PIECES['wKg']] * 2, SCORES[PIECES['bKg']] * 2, None) # , dbginfo
-    
-    calc_time = time.time() - match.calc_time_start
+
+    ### time
+    elapsed_time = time.time() - match.time_start
     if(match.next_color() == COLORS['white']):
-        match.elapsed_time_white += calc_time
+        match.white_elapsed_seconds += elapsed_time
     else:
-        match.elapsed_time_black += calc_time
+        match.black_elapsed_seconds += elapsed_time
+
+    match.time_start = 0
+    ###
 
     msg = "result: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, candidates)
-    prnt_fmttime("\ncalc-time: ", calc_time)
+    prnt_fmttime("\ncalc-time: ", elapsed_time)
     prnt_attributes(match, "\n")
     return candidates
 

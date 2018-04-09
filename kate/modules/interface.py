@@ -1,4 +1,4 @@
-import random, threading, copy
+import random, threading, copy, time
 from django.conf import settings
 from .. models import Match as ModelMatch, Move as ModelMove
 from .. engine.match import *
@@ -20,12 +20,13 @@ def map_matches(src, dst, map_dir):
     dst.status = src.status
     dst.level = src.level
     dst.begin = src.begin
+    dst.time_start = src.time_start
     dst.white_player_name = src.white_player_name
     dst.white_player_is_human = src.white_player_is_human
-    dst.elapsed_time_white = src.elapsed_time_white
+    dst.white_elapsed_seconds = src.white_elapsed_seconds
     dst.black_player_name = src.black_player_name
     dst.black_player_is_human = src.black_player_is_human
-    dst.elapsed_time_black = src.elapsed_time_black
+    dst.black_elapsed_seconds = src.black_elapsed_seconds
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -82,6 +83,21 @@ def is_next_color_human(modelmatch):
 def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+    
+    ### time
+    if(match.time_start > 0):
+        elapsed_time = time.time() - match.time_start
+        if(match.next_color() == COLORS['white']):
+            match.white_elapsed_seconds += elapsed_time
+        else:
+            match.black_elapsed_seconds += elapsed_time
+
+    if(match.is_next_color_human()):
+        match.time_start = time.time()
+    else:
+        match.time_start = 0
+    ###
+
     move = matchmove.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
     map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
     modelmatch.save()
