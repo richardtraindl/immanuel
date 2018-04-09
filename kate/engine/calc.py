@@ -445,7 +445,7 @@ def calc_move(match):
     else:
         match.black_elapsed_seconds += elapsed_time
 
-    match.time_start = 0
+    match.time_start = time.time()
     ###
 
     msg = "result: " + str(score) + " match.id: " + str(match.id) + " "
