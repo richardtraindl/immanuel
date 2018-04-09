@@ -287,7 +287,7 @@ def calc_max(match, depth, alpha, beta, last_pmove):
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   " + reverse_lookup(PRIO, priomove.prio))
+            print("   " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
             token = priomove.tokens[0]
             print("token: " + hex(token) + " " + token_to_text(token))
@@ -370,7 +370,7 @@ def calc_min(match, depth, alpha, beta, last_pmove):
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   " + reverse_lookup(PRIO, priomove.prio))
+            print("   " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
             token = priomove.tokens[0]
             print("token: " + hex(token) + " " + token_to_text(token))

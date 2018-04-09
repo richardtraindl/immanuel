@@ -407,7 +407,8 @@ def rank_moves(match, priomoves):
             else:
                 if(dstfield_is_attacked(token) == False or 
                    (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                    if(is_attacked_pinned(match, attacked) or is_attacked_soft_pinned(match, attacked)):
+                    if(token & ATTACK_IS_PIN > 0 or token & ATTACK_IS_SOFT_PIN > 0 or 
+                       is_attacked_pinned(match, attacked) or is_attacked_soft_pinned(match, attacked)):
                         min_prio(priomove, PRIO['attack-stormy'])
                         list_attacked.append(priomove)
                     elif(is_attacked_supported(attacked) == False or is_attacked_higher_than_piece(match, attacked)):
