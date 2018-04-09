@@ -241,7 +241,7 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
             time_exceeded = True
 
     if(is_endgame(match)):
-        dpth += 2
+        dpth += 1
 
     if(depth <= dpth):
         if(time_exceeded):
