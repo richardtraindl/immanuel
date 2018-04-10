@@ -448,10 +448,10 @@ def rank_moves(match, priomoves):
             #min_prio(priomove, PRIO['good'])
 
 
-        if(token & MV_CONTROLES_FILE > 0):
+        """if(token & MV_CONTROLES_FILE > 0):
             if(dstfield_is_attacked(token) == False or 
                (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                min_prio(priomove, PRIO['controles-file-good-deal'])
+                min_prio(priomove, PRIO['controles-file-good-deal'])"""
 
 
     list_attacked.sort(key=attrgetter('prio', 'prio_sec'))
