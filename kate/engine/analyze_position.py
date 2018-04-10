@@ -304,7 +304,7 @@ def score_opening(match):
 
     if(match.white_movecnt_short_castling_lost > 0 and 
        match.white_movecnt_long_castling_lost > 0 and 
-       is_king_centered(match, COLORS['white'])):
+       is_king_exposed(match, COLORS['white'])):
         value += blackrate
 
     # white rook
@@ -327,10 +327,40 @@ def score_opening(match):
 
     if(match.black_movecnt_short_castling_lost > 0 and
        match.black_movecnt_long_castling_lost > 0 and 
-       is_king_centered(match, COLORS['black'])):
+       is_king_exposed(match, COLORS['black'])):
         value += whiterate
 
     # black rook
+    if(is_rook_locked(match, COLORS['black'])):
+        value += whiterate
+
+    return value
+
+
+def score_game(match):
+    value = 0
+
+    whiterate = ATTACKED_SCORES[PIECES['bKn']]
+
+    blackrate = ATTACKED_SCORES[PIECES['wKn']]
+
+    # white
+    if(is_king_guarded(match, COLORS['white'])):
+        value += whiterate
+
+    if(is_king_exposed(match, COLORS['white'])):
+        value += blackrate
+
+    if(is_rook_locked(match, COLORS['white'])):
+        value += blackrate
+
+    # black
+    if(is_king_guarded(match, COLORS['black'])):
+        value += blackrate
+
+    if(is_king_exposed(match, COLORS['black'])):
+        value += whiterate
+
     if(is_rook_locked(match, COLORS['black'])):
         value += whiterate
 
@@ -363,36 +393,6 @@ def score_endgame(match):
 
     if(is_king_centered(match, COLORS['black']):
           value += blackrate
-
-    return value
-
-
-def score_game(match):
-    value = 0
-
-    whiterate = ATTACKED_SCORES[PIECES['bKn']]
-
-    blackrate = ATTACKED_SCORES[PIECES['wKn']]
-
-    # white
-    if(is_king_guarded(match, COLORS['white'])):
-        value += whiterate
-
-    if(is_king_centered(match, COLORS['white'])):
-        value += blackrate
-
-    if(is_rook_locked(match, COLORS['white'])):
-        value += blackrate
-
-    # black
-    if(is_king_guarded(match, COLORS['black'])):
-        value += blackrate
-
-    if(is_king_centered(match, COLORS['black'])):
-        value += whiterate
-
-    if(is_rook_locked(match, COLORS['black'])):
-        value += whiterate
 
     return value
 
