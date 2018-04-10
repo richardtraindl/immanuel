@@ -199,6 +199,18 @@ def is_king_centered(match, color):
         return False
 
 
+def is_king_exposed(match, color):
+    if(color == COLORS['white']):
+        x = match.wKg_x
+    else:
+        x = match.bKg_x
+
+    if(x == 3 or x == 4):
+        return True
+    else:
+        return False
+
+
 def is_rook_locked(match, color):
     if(color == COLORS['white']):
         y = 0
