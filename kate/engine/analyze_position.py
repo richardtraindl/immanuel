@@ -193,7 +193,7 @@ def is_king_centered(match, color):
     else:
         x = match.bKg_x
 
-    if(x == 3 or x == 4):
+    if(x >= 2 and x <= 5 and y >= 2 and y <= 5):
         return True
     else:
         return False
