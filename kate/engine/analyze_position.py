@@ -190,8 +190,10 @@ def is_king_guarded(match, color):
 def is_king_centered(match, color):
     if(color == COLORS['white']):
         x = match.wKg_x
+        y = match.wKg_y
     else:
         x = match.bKg_x
+        y = match.bKg_y
 
     if(x >= 2 and x <= 5 and y >= 2 and y <= 5):
         return True
