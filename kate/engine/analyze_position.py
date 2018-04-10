@@ -388,10 +388,10 @@ def score_endgame(match):
                     value += blackrate
                     value += black_step_rate * (7 - y)
 
-    if(is_king_centered(match, COLORS['white']):
+    if(is_king_centered(match, COLORS['white'])):
         value += whiterate
 
-    if(is_king_centered(match, COLORS['black']):
+    if(is_king_centered(match, COLORS['black'])):
           value += blackrate
 
     return value
