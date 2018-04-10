@@ -341,10 +341,10 @@ def score_endgame(match):
     value = 0
 
     whiterate = ATTACKED_SCORES[PIECES['bPw']]
-    whitesteprate = whiterate // 2
+    white_step_rate = whiterate // 2
 
     blackrate = ATTACKED_SCORES[PIECES['wPw']]
-    blacksteprate = blackrate // 2
+    black_step_rate = blackrate // 2
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
@@ -352,11 +352,17 @@ def score_endgame(match):
             if(piece == PIECES['wPw']):
                 if(pawn.is_running(match, x, y)):
                     value += whiterate
-                    value += whitesteprate * y
+                    value += white_step_rate * y
             elif(piece == PIECES['bPw']):
                 if(pawn.is_running(match, x, y)):
                     value += blackrate
-                    value += blacksteprate * (7 - y)
+                    value += black_step_rate * (7 - y)
+
+    if(is_king_centered(match, COLORS['white']):
+        value += whiterate
+
+    if(is_king_centered(match, COLORS['black']):
+          value += blackrate
 
     return value
 
