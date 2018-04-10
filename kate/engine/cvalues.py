@@ -12,14 +12,15 @@ PRIO = {
     'flee-urgent' : 9,
     'support-good-deal' : 10,
     'attack-good-deal' : 11,
-    'castling' : 12,
-    'flee' : 13,
-    'good' : 14,
-    'support-unattacked' : 15,
-    'attack-bad-deal' : 16,
-    'support-bad-deal' : 17,
-    'bad' : 18,
-    'last' : 19 }
+    'controles-file-good-deal' : 12,
+    'castling' : 13,
+    'flee' : 14,
+    'good' : 15,
+    'support-unattacked' : 16,
+    'attack-bad-deal' : 17,
+    'support-bad-deal' : 18,
+    'bad' : 19,
+    'last' : 20 }
 
 PRIO_LIMES3 = PRIO['single-silent-move'] # attack-king-bad-deal
 PRIO_LIMES2 = PRIO['attack-stormy']
