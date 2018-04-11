@@ -333,7 +333,9 @@ def calc_max(match, depth, alpha, beta, last_pmove):
             if(maxscore > beta):
                 return maxscore, candidates
 
-        if(count >= maxcnt):
+        diff = abs(maxscore) - abs(match.score)
+        max_diff = abs(SCORES[PIECES['wPw']]) * 1.5
+        if(count >= maxcnt and abs(diff) < max_diff):
             return maxscore, candidates
 
     return maxscore, candidates
@@ -416,7 +418,9 @@ def calc_min(match, depth, alpha, beta, last_pmove):
             if(minscore < alpha):
                 return minscore, candidates
 
-        if(count >= maxcnt):
+        diff = abs(minscore) - abs(match.score)
+        max_diff = abs(SCORES[PIECES['wPw']]) * 1.5
+        if(count >= maxcnt and abs(diff) < max_diff):
             return minscore, candidates
 
     return minscore, candidates
