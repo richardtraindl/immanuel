@@ -414,7 +414,7 @@ def score_position(match, movecnt):
         
         color = match.next_color()
 
-        score += score_attacks(match, color)
+        #score += score_attacks(match, color)
 
         #score += score_supports(match, REVERSED_COLORS[color])
 
