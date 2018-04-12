@@ -205,10 +205,11 @@ def progress(match, move):
 
     piece = match.readfield(move.srcx, move.srcy)
 
-    if(is_endgame(match) and (piece == PIECES['wPw'] or piece == PIECES['bPw'])):
+    if(is_endgame(match) and 
+       (piece == PIECES['wPw'] or piece == PIECES['bPw'] or piece == PIECES['wKg'] or piece == PIECES['bKg'])):
         return token | MV_IS_PROGRESS
-    else:
-        return token
+
+    return token
 
 
     """color = Match.color_of_piece(piece)
