@@ -5,7 +5,7 @@ from .matchmove import do_move, undo_move
 #from .move import *
 #from .calc import *
 from . import rules
-from .analyze_position import score_supports, score_attacks, score_opening, score_endgame
+from .analyze_position import score_supports, score_attacks, score_opening, score_endgame, is_endgame
 from .analyze_helper import *
 from .pieces import pawn, knight, bishop, rook, king
 from .pieces.generic_piece import contacts_to_token
@@ -202,8 +202,14 @@ def flees(match, move):
 
 def progress(match, move):
     token = 0x0
+
     piece = match.readfield(move.srcx, move.srcy)
-    color = Match.color_of_piece(piece)
+
+    if(is_endgame(match) and (piece == PIECES['wPw'] or piece == PIECES['bPw'])):
+        return token | MV_IS_PROGRESS
+
+
+    """color = Match.color_of_piece(piece)
 
     value = match.score
 
@@ -215,7 +221,7 @@ def progress(match, move):
        (value <= (SCORES[PIECES['wPw']] // 10) and color == COLORS['black'])):
         return token | MV_IS_PROGRESS
     else:
-        return token
+        return token"""
 
 
 def controles_file(match, move):
@@ -305,7 +311,7 @@ def analyze_move(match, move):
 
     token = token | flees(match, move)
 
-    # token = token | progress(match, move)
+    token = token | progress(match, move)
     
     token = token | controles_file(match, move)
 
@@ -444,8 +450,8 @@ def rank_moves(match, priomoves):
                 min_prio(priomove, PRIO['attack-bad-deal'])
 
 
-        #if(token & MV_IS_PROGRESS > 0):
-            #min_prio(priomove, PRIO['good'])
+        if(token & MV_IS_PROGRESS > 0):
+            min_prio(priomove, PRIO['good'])
 
 
         """if(token & MV_CONTROLES_FILE > 0):
