@@ -207,6 +207,8 @@ def progress(match, move):
 
     if(is_endgame(match) and (piece == PIECES['wPw'] or piece == PIECES['bPw'])):
         return token | MV_IS_PROGRESS
+    else:
+        return token
 
 
     """color = Match.color_of_piece(piece)
