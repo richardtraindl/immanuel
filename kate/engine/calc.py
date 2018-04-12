@@ -438,6 +438,8 @@ def calc_min(match, depth, alpha, beta, last_pmove):
 
 def calc_move(match):
     prnt_attributes(match, "\n")
+    
+    print("is opening: " + str(is_opening(match)) + " is endgame: " + str(is_endgame(match)))
 
     candidates = []
 
