@@ -205,9 +205,11 @@ def progress(match, move):
 
     piece = match.readfield(move.srcx, move.srcy)
 
-    if(is_endgame(match) and 
-       (piece == PIECES['wPw'] or piece == PIECES['bPw'] or piece == PIECES['wKg'] or piece == PIECES['bKg'])):
-        return token | MV_IS_PROGRESS
+    if(is_endgame(match):
+        if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+            return token | MV_IS_RUNNING_PAWN
+        elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+            return token | MV_IS_PROGRESS
 
     return token
 
@@ -454,6 +456,10 @@ def rank_moves(match, priomoves):
 
 
         if(token & MV_IS_PROGRESS > 0): #and is_endgame(match)
+            min_prio(priomove, PRIO['good'])
+
+
+        if(token & MV_IS_RUNNING_PAWN > 0):
             min_prio(priomove, PRIO['running-pawn-in-endgame'])
 
 
