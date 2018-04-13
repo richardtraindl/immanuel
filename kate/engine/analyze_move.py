@@ -205,7 +205,7 @@ def progress(match, move):
 
     piece = match.readfield(move.srcx, move.srcy)
 
-    if(is_endgame(match):
+    if(is_endgame(match)):
         if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
             return token | MV_IS_RUNNING_PAWN
         elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
