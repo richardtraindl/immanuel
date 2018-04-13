@@ -453,8 +453,8 @@ def rank_moves(match, priomoves):
                 min_prio(priomove, PRIO['attack-bad-deal'])
 
 
-        if(token & MV_IS_PROGRESS > 0):
-            min_prio(priomove, PRIO['good'])
+        if(token & MV_IS_PROGRESS > 0): #and is_endgame(match)
+            min_prio(priomove, PRIO['running-pawn-in-endgame'])
 
 
         """if(token & MV_CONTROLES_FILE > 0):
