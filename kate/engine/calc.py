@@ -296,12 +296,14 @@ def calc_max(match, depth, alpha, beta, last_pmove):
 
         newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, priomove) # , dbginfo
 
+        ### todo move code to other module
         if(match.movecnt <= 20):
             if(piece_movecnt(match, move) >= 3):
                 if(color == COLORS['white']):
                     newscore += ATTACKED_SCORES[PIECES['bPw']]
                 else:
                     newscore += ATTACKED_SCORES[PIECES['wPw']]
+        ###
 
         score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
@@ -335,6 +337,8 @@ def calc_max(match, depth, alpha, beta, last_pmove):
 
         if(count >= maxcnt):
             if(depth > 2):
+                return maxscore, candidates
+            elif(priomove.prio < PRIO['good']):
                 return maxscore, candidates
             else:
                 diff = abs(maxscore) - abs(match.score)
@@ -387,12 +391,14 @@ def calc_min(match, depth, alpha, beta, last_pmove):
 
         newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, priomove) # , dbginfo
 
+        ### todo move code to other module
         if(match.movecnt <= 20):
             if(piece_movecnt(match, move) >= 3):
                 if(color == COLORS['white']):
                     newscore += ATTACKED_SCORES[PIECES['bPw']]
                 else:
                     newscore += ATTACKED_SCORES[PIECES['wPw']]
+        ###
 
         score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
 
@@ -426,6 +432,8 @@ def calc_min(match, depth, alpha, beta, last_pmove):
 
         if(count >= maxcnt):
             if(depth > 2):
+                return minscore, candidates
+            elif(priomove.prio < PRIO['good']):
                 return minscore, candidates
             else:
                 diff = abs(minscore) - abs(match.score)
