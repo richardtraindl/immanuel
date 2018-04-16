@@ -466,6 +466,8 @@ def eval_tactics(match, priomoves):
         else:
              downgrade(pmove, TACTICS['attack-good-deal'], TACTICS['attack-downgraded'])
              priomove.tactics.sort()
+             priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
+             priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
 
     excludes.clear()
     #all_disclosed_attacking.sort(key = len_tactics, reverse=True)
@@ -476,6 +478,8 @@ def eval_tactics(match, priomoves):
         else:
             downgrade(pmove, TACTICS['disclosed-attack-good-deal'], TACTICS['attack-downgraded'])
             priomove.tactics.sort()
+            priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
+            priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
 
     excludes.clear()
     #all_supporting.sort(key = len_tactics, reverse=True)
@@ -486,6 +490,8 @@ def eval_tactics(match, priomoves):
         else:
             downgrade(pmove, TACTICS['support-good-deal'], TACTICS['support-downgraded'])
             priomove.tactics.sort()
+            priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
+            priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
 
     excludes.clear()
     #all_fork_defending.sort(key = len_tactics, reverse=True)
@@ -496,6 +502,8 @@ def eval_tactics(match, priomoves):
         else:
             downgrade(pmove, TACTICS['defend-fork'], TACTICS['defend-fork-downgraded'])
             priomove.tactics.sort()
+            priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
+            priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
 
     excludes.clear()
     #all_fleeing.sort(key = len_tactics, reverse=True)
@@ -506,6 +514,8 @@ def eval_tactics(match, priomoves):
         else:
             downgrade(pmove, TACTICS['flee-urgent'], TACTICS['flee-downgraded'])
             priomove.tactics.sort()
+            priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
+            priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
 
     for priomove in priomoves:
         if(fetch_tactics(priomove, 0) >= TACTICS['support-good-deal'] and 
