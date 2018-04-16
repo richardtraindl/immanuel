@@ -155,8 +155,7 @@ def generate_moves(match):
         priocnts[0] = len(priomoves)
     else:
         eval_tactics(match, priomoves)
-        priomoves.sort(key=fetch_first_tactics)
-        #priomoves.sort(key=attrgetter('prio', 'prio_sec'))
+        priomoves.sort(key=attrgetter('prio', 'prio_sec'))
 
         for priomove in priomoves:
             priocnts[priomove.prio] += 1
@@ -181,17 +180,6 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         candidates.append(None)
         return newscore
 
-
-"""def was_last_move_stormy2(last_prio):
-    if(last_prio == PRIO['promotion'] or
-       last_prio == PRIO['capture-good-deal'] or
-       last_prio == PRIO['attack-king-good-deal'] or 
-       last_prio == PRIO['capture-bad-deal'] or       
-       last_prio == PRIO['attack-king-bad-deal'] or
-       last_prio == PRIO['attack-stormy']):
-        return True
-    else:
-        return False"""
 
 def was_last_move_stormy(last_pmove):
     if(fetch_tactics(last_pmove, 0) == TACTICS['promotion'] or
