@@ -154,11 +154,9 @@ def generate_moves(match):
             priocnts[i] = 0
         priocnts[0] = len(priomoves)
     else:
-        #rank_moves(match, priomoves)
-        #priomoves.sort(key=attrgetter('prio', 'prio_sec'))
         eval_tactics(match, priomoves)
-        priomoves.sort(key=attrgetter('prio', 'prio_sec'))
-        #priomoves.sort(key=fetch_tactics, 0)
+        priomoves.sort(key=fetch_first_tactics)
+        #priomoves.sort(key=attrgetter('prio', 'prio_sec'))
 
         for priomove in priomoves:
             priocnts[priomove.prio] += 1
