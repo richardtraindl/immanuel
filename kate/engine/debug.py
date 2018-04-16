@@ -31,6 +31,7 @@ def str_attributes(match, delimiter):
            "movecnt: " + str(match.movecnt) + delimiter + \
            "score: " + str(match.score) + delimiter + \
            "level: " + str(match.level) + delimiter + \
+           "seconds_per_move " + str(match.seconds_per_move) + delimiter + \
            "begin: " + match.begin.strftime("%Y-%m-%d-%H:%M:%S") + delimiter + \
            "time_start: " + str(match.time_start) + delimiter + \
            "white_player_name: " + match.white_player_name + delimiter + \

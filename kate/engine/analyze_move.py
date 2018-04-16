@@ -343,6 +343,190 @@ def max_prio(priomove, prio):
         priomove.prio_sec = priomove.prio
         priomove.prio = prio
 
+def downgrade(priomove, old_tactic, new_tactic):
+    priomove.prio = TACTICS_TO_PRIO[new_tactic]
+    for idx in range(len(priomove.tactics)):
+        if(priomove.tactics[idx] == old_tactic):
+            priomove.tactics[idx] = new_tactic
+            return
+
+def len_tactics(priomove):
+    return len(priomove.tactics)
+    
+"""def first_tactics(priomove):
+    if(len(priomove.tactics) > 0):
+        return priomove.tactics[0]
+    else:
+        return TACTICS['undefined']"""
+
+def fetch_tactics(priomove, idx):
+    if(len(priomove.tactics) > idx):
+        return priomove.tactics[idx]
+    else:
+        return TACTICS['undefined']
+
+def eval_tactics(match, priomoves):
+    all_attacking = []
+    all_disclosed_attacking = []
+    all_supporting = []
+    all_fork_defending = []
+    all_fleeing = []
+    excludes = []
+
+    for priomove in priomoves:
+        token = priomove.tokens[TOKENS['token']]
+        attacked = priomove.tokens[TOKENS['attacked']]
+        supported = priomove.tokens[TOKENS['supported']]
+        disclosed_attacked = priomove.tokens[TOKENS['disclosed_attacked']]
+        forked = priomove.tokens[TOKENS['forked']]
+
+        if(token & MV_IS_CASTLING > 0):
+            priomove.tactics.append(TACTICS['castling'])
+
+        if(token & MV_IS_PROMOTION > 0):
+            priomove.tactics.append(TACTICS['promotion'])
+
+        if(token & MV_IS_CAPTURE > 0):
+            if(piece_is_lower_equal_than_captured(token) or
+               dstfield_is_attacked(token) == False or
+               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                priomove.tactics.append(TACTICS['capture-good-deal'])
+            else:
+                priomove.tactics.append(TACTICS['capture-bad-deal'])
+
+        if(token & MV_IS_FORK_DEFENSE > 0):
+            if(dstfield_is_attacked(token) == False or 
+               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                priomove.tactics.append(TACTICS['defend-fork'])
+                all_fork_defending.append(priomove)
+            else:
+                priomove.tactics.append(TACTICS['support-bad-deal'])
+
+        if(token & MV_IS_FLEE > 0):
+            if(dstfield_is_attacked(token) == False or
+                (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token))):
+                if(piece_is_lower_equal_than_enemy_on_srcfield(token) == False):
+                    priomove.tactics.append(TACTICS['flee-urgent'])
+                    all_fleeing.append(priomove)
+                elif(srcfield_is_supported(token) == False):
+                    priomove.tactics.append(TACTICS['flee'])
+
+        if(token & MV_IS_ATTACK > 0):
+            if(token & ATTACKED_IS_KG > 0):
+                if(dstfield_is_attacked(token) == False or 
+                   (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                    priomove.tactics.append(TACTICS['attack-king-good-deal'])
+                else:
+                    priomove.tactics.append(TACTICS['attack-king-bad-deal'])
+            else:
+                if(dstfield_is_attacked(token) == False or 
+                   (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                    if(token & ATTACK_IS_PIN > 0 or token & ATTACK_IS_SOFT_PIN > 0 or 
+                       is_attacked_pinned(match, attacked) or is_attacked_soft_pinned(match, attacked)):
+                        priomove.tactics.append(TACTICS['attack-stormy'])
+                        #all_attacking.append(priomove)
+                    elif(is_attacked_supported(attacked) == False or is_attacked_higher_than_piece(match, attacked)):
+                        priomove.tactics.append(TACTICS['attack-good-deal'])
+                        all_attacking.append(priomove)
+                    else:
+                        priomove.tactics.append(TACTICS['attack-bad-deal'])
+                else:
+                    priomove.tactics.append(TACTICS['attack-bad-deal'])
+
+        if(token & MV_IS_SUPPORT > 0):
+            if(is_supported_attacked(supported)):
+                if(dstfield_is_attacked(token) == False or 
+                   (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                    if(is_supported_lower_equal_than_attacker(supported)):
+                        priomove.tactics.append(TACTICS['support-good-deal'])
+                        all_supporting.append(priomove)
+                    else:
+                        priomove.tactics.append(TACTICS['support-bad-deal'])
+                else:
+                    priomove.tactics.append(TACTICS['support-bad-deal'])
+
+        if(token & MV_IS_SUPPORT_UNATTACKED > 0):
+            priomove.tactics.append(TACTICS['support-unattacked'])
+
+        if(token & MV_IS_DISCLOSURE > 0):
+            if(is_disclosed_attacked_supported(disclosed_attacked) == False):
+                priomove.tactics.append(TACTICS['attack-good-deal'])
+                all_disclosed_attacking.append(priomove)
+            else:
+                priomove.tactics.append(TACTICS['attack-bad-deal'])
+
+
+        if(token & MV_IS_PROGRESS > 0): #and is_endgame(match)
+            priomove.tactics.append(TACTICS['progress'])
+
+        if(token & MV_IS_RUNNING_PAWN > 0):
+            priomove.tactics.append(TACTICS['running-pawn-in-endgame'])
+
+        """if(token & MV_CONTROLES_FILE > 0):
+            if(dstfield_is_attacked(token) == False or 
+               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+               priomove.tactics.append(TACTICS['controles-file-good-deal'])"""
+
+        if(len(priomove.tactics) > 0):
+            priomove.tactics.sort()
+            priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
+        else:
+            priomove.tactics.append(TACTICS['undefined'])
+            priomove.prio = PRIO['prio10']
+
+
+    all_attacking.sort(key = len_tactics, reverse=True)
+    for pmove in all_attacking:
+        if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
+            excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
+        else:
+             downgrade(pmove, TACTICS['attack-good-deal'], TACTICS['attack-downgraded'])
+             priomove.tactics.sort()
+
+    excludes.clear()
+    all_disclosed_attacking.sort(key = len_tactics, reverse=True)
+    for pmove in all_disclosed_attacking:
+        if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
+            excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
+        else:
+            downgrade(pmove, TACTICS['disclosed-attack-good-deal'], TACTICS['attack-downgraded'])
+            priomove.tactics.sort()
+
+    excludes.clear()
+    all_supporting.sort(key = len_tactics, reverse=True)
+    for pmove in all_supporting:
+        if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
+            excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
+        else:
+            downgrade(pmove, TACTICS['support-good-deal'], TACTICS['support-downgraded'])
+            priomove.tactics.sort()
+
+    excludes.clear()
+    all_fork_defending.sort(key = len_tactics, reverse=True)
+    for pmove in all_fork_defending:
+        if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
+            excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
+        else:
+            downgrade(pmove, TACTICS['defend-fork'], TACTICS['defend-fork-downgraded'])
+            priomove.tactics.sort()
+
+    excludes.clear()
+    all_fleeing.sort(key = len_tactics, reverse=True)
+    for pmove in all_fleeing:
+        if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
+            excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
+        else:
+            downgrade(pmove, TACTICS['flee-urgent'], TACTICS['flee-downgraded'])
+            priomove.tactics.sort()
+
+    for priomove in priomoves:
+        if(fetch_tactics(priomove, 0) >= TACTICS['support-good-deal'] and 
+           fetch_tactics(priomove, 0) <= TACTICS['support-unattacked']):
+            priomove.tactics.append(TACTICS['single-silent-move'])
+            priomove.prio = TACTICS_TO_PRIO[TACTICS['single-silent-move']] #PRIO['prio2']
+            break
+
+
 def rank_moves(match, priomoves):
     all_attacked = []
     all_supported = []
@@ -390,8 +574,8 @@ def rank_moves(match, priomoves):
         if(token & MV_IS_FORK_DEFENSE > 0):
             if(dstfield_is_attacked(token) == False or 
                (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                list_forked.append([priomove, priomove.prio])
                 min_prio(priomove, PRIO['defend-fork'])
-                list_forked.append(priomove)
             else:
                 min_prio(priomove, PRIO['support-bad-deal'])
 
@@ -400,11 +584,11 @@ def rank_moves(match, priomoves):
             if(dstfield_is_attacked(token) == False or
                 (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token))):
                 if(piece_is_lower_equal_than_enemy_on_srcfield(token) == False):
+                    list_flee.append([priomove, priomove.prio])
                     min_prio(priomove, PRIO['flee-urgent'])
-                    list_flee.append(priomove)
                 elif(srcfield_is_supported(token) == False):
+                    list_flee.append([priomove, priomove.prio])
                     min_prio(priomove, PRIO['flee'])
-                    list_flee.append(priomove)
 
 
         if(token & MV_IS_ATTACK > 0):
@@ -420,11 +604,11 @@ def rank_moves(match, priomoves):
                    (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
                     if(token & ATTACK_IS_PIN > 0 or token & ATTACK_IS_SOFT_PIN > 0 or 
                        is_attacked_pinned(match, attacked) or is_attacked_soft_pinned(match, attacked)):
+                        list_attacked.append([priomove, priomove.prio])
                         min_prio(priomove, PRIO['attack-stormy'])
-                        list_attacked.append(priomove)
                     elif(is_attacked_supported(attacked) == False or is_attacked_higher_than_piece(match, attacked)):
+                        list_attacked.append([priomove, priomove.prio])
                         min_prio(priomove, PRIO['attack-good-deal'])
-                        list_attacked.append(priomove)
                     else:
                         min_prio(priomove, PRIO['attack-bad-deal'])
                 else:
@@ -436,8 +620,8 @@ def rank_moves(match, priomoves):
                 if(dstfield_is_attacked(token) == False or 
                    (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
                     if(is_supported_lower_equal_than_attacker(supported)):
+                        list_supported.append([priomove, priomove.prio])
                         min_prio(priomove, PRIO['support-good-deal'])
-                        list_supported.append(priomove)
                     else:
                         min_prio(priomove, PRIO['support-bad-deal'])
                 else:
@@ -449,8 +633,8 @@ def rank_moves(match, priomoves):
 
         if(token & MV_IS_DISCLOSURE > 0):
             if(is_disclosed_attacked_supported(disclosed_attacked) == False):
+                list_disclosed_attacked.append([priomove, priomove.prio])
                 min_prio(priomove, PRIO['attack-good-deal'])
-                list_disclosed_attacked.append(priomove)
             else:
                 min_prio(priomove, PRIO['attack-bad-deal'])
 
@@ -469,52 +653,60 @@ def rank_moves(match, priomoves):
                 min_prio(priomove, PRIO['controles-file-good-deal'])"""
 
 
-    list_attacked.sort(key=attrgetter('prio', 'prio_sec'))
-    for pmove in list_attacked:
+    #list_attacked.sort(key=attrgetter('prio', 'prio_sec'))
+    for element in list_attacked:
+        pmove = element[0]
         for attack in all_attacked:
-            if(pmove.gmove.srcx == attack.agent_srcx and pmove.gmove.srcy == attack.agent_srcy and 
-               pmove.gmove.dstx == attack.agent_dstx and pmove.gmove.dsty == attack.agent_dsty):
-                if(any(e[0] == attack.fieldx and e[1] == attack.fieldy for e in excludes) == False): # e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy and 
-                    excludes.append([attack.fieldx, attack.fieldy]) # attack.agent_srcx, attack.agent_srcy, 
+            if(pmove.gmove.srcx == attack.agent_srcx and pmove.gmove.srcy == attack.agent_srcy):
+                if(any(e[0] == attack.fieldx and e[1] == attack.fieldy for e in excludes) == False):
+                    excludes.append([attack.fieldx, attack.fieldy])
                 else:
-                    max_prio(priomove, PRIO['good'])
+                    #max_prio(priomove, min(PRIO['good'], element[1]))
+                    pmove.prio = min(PRIO['good'], pmove.prio_sec)
 
-    list_disclosed_attacked.sort(key=attrgetter('prio', 'prio_sec'))
-    for pmove in list_disclosed_attacked:
+    excludes.clear()
+    #list_disclosed_attacked.sort(key=attrgetter('prio', 'prio_sec'))
+    for element in list_disclosed_attacked:
+        pmove = element[0]
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            max_prio(priomove, PRIO['good'])
+            #max_prio(priomove, min(PRIO['good'], element[1]))
+            pmove.prio = min(PRIO['good'], pmove.prio_sec)
 
     excludes.clear()
-    list_supported.sort(key=attrgetter('prio', 'prio_sec'))
-    for pmove in list_supported:
+    #list_supported.sort(key=attrgetter('prio', 'prio_sec'))
+    for element in list_supported:
+        pmove = element[0]
         for support in all_supported:
-            if(pmove.gmove.srcx == support.agent_srcx and pmove.gmove.srcy == support.agent_srcy and 
-               pmove.gmove.dstx == support.agent_dstx and pmove.gmove.dsty == support.agent_dsty):
-                if(any(e[0] == support.fieldx and e[1] == support.fieldy for e in excludes) == False): # e[0] == support.agent_srcx and e[1] == support.agent_srcy and
-                    excludes.append([support.fieldx, support.fieldy]) # support.agent_srcx, support.agent_srcy, 
+            if(pmove.gmove.srcx == support.agent_srcx and pmove.gmove.srcy == support.agent_srcy):
+                if(any(e[0] == support.fieldx and e[1] == support.fieldy for e in excludes) == False):
+                    excludes.append([support.fieldx, support.fieldy])
                 else:
-                    max_prio(priomove, PRIO['good'])
+                    #max_prio(priomove, min(PRIO['good'], element[1]))
+                    pmove.prio = min(PRIO['good'], pmove.prio_sec)
 
     excludes.clear()
-    list_forked.sort(key=attrgetter('prio', 'prio_sec'))
-    for pmove in list_forked:
+    #list_forked.sort(key=attrgetter('prio', 'prio_sec'))
+    for element in list_forked:
+        pmove = element[0]
         for fork in all_forked:
-            if(pmove.gmove.srcx == fork.agent_srcx and pmove.gmove.srcy == fork.agent_srcy and 
-               pmove.gmove.dstx == fork.agent_dstx and pmove.gmove.dsty == fork.agent_dsty):
-                if(any(e[0] == fork.forkx and e[1] == fork.forky for e in excludes) == False): # e[0] == fork.agent_srcx and e[1] == fork.agent_srcy and
-                    excludes.append([fork.forkx, fork.forky]) # 
+            if(pmove.gmove.srcx == fork.agent_srcx and pmove.gmove.srcy == fork.agent_srcy):
+                if(any(e[0] == fork.forkx and e[1] == fork.forky for e in excludes) == False):
+                    excludes.append([fork.forkx, fork.forky])
                 else:
-                    max_prio(priomove, PRIO['good'])
+                    #max_prio(priomove, min(PRIO['good'], element[1]))
+                    pmove.prio = min(PRIO['good'], pmove.prio_sec)
 
     excludes.clear()
-    list_flee.sort(key=attrgetter('prio', 'prio_sec'))
-    for pmove in list_flee:
+    #list_flee.sort(key=attrgetter('prio', 'prio_sec'))
+    for element in list_flee:
+        pmove = element[0]
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            max_prio(priomove, PRIO['good'])
+            #max_prio(priomove, min(PRIO['good'], element[1]))
+            pmove.prio = min(PRIO['good'], pmove.prio_sec)
 
     priomoves.sort(key=attrgetter('prio', 'prio_sec'))
 

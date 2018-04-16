@@ -44,6 +44,7 @@ def prnt_priorities(priomoves, priocnts):
         token = priomove.tokens[0]
         prnt_move("\n ", priomove.gmove, "")        
         print("piece:" + str(priomove.piece) + " token:" + hex(token) + 
+               " " + reverse_lookup(TACTICS, fetch_tactics(priomove, 0)) + 
                " " + reverse_lookup(PRIO, priomove.prio) + 
                " \ntoken: " + hex(token) + " " + token_to_text(token))
 
@@ -68,6 +69,7 @@ class PrioMove:
         self.gmove = gmove
         self.piece = piece
         self.tokens = tokens
+        self.tactics = []
         self.prio = prio
         self.prio_sec = prio_sec
 
@@ -132,7 +134,7 @@ def generate_moves(match):
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         tokens = analyze_move(match, gmove)
-                        priomove = PrioMove(gmove, piece, tokens, PRIO['last'], PRIO['last'])
+                        priomove = PrioMove(gmove, piece, tokens, PRIO['prio10'], PRIO['prio10'])
                         priomoves.append(priomove)
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
@@ -144,7 +146,7 @@ def generate_moves(match):
 
     if(kg_attacked):
         for priomove in priomoves:
-            priomove.prio = PRIO['defend-check']
+            priomove.prio = PRIO['prio1']
 
         priomoves.sort(key=attrgetter('prio'))
 
@@ -152,8 +154,11 @@ def generate_moves(match):
             priocnts[i] = 0
         priocnts[0] = len(priomoves)
     else:
-        rank_moves(match, priomoves)
+        #rank_moves(match, priomoves)
+        #priomoves.sort(key=attrgetter('prio', 'prio_sec'))
+        eval_tactics(match, priomoves)
         priomoves.sort(key=attrgetter('prio', 'prio_sec'))
+        #priomoves.sort(key=fetch_tactics, 0)
 
         for priomove in priomoves:
             priocnts[priomove.prio] += 1
@@ -179,13 +184,24 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         return newscore
 
 
-def was_last_move_stormy(last_prio):
+"""def was_last_move_stormy2(last_prio):
     if(last_prio == PRIO['promotion'] or
        last_prio == PRIO['capture-good-deal'] or
        last_prio == PRIO['attack-king-good-deal'] or 
        last_prio == PRIO['capture-bad-deal'] or       
        last_prio == PRIO['attack-king-bad-deal'] or
        last_prio == PRIO['attack-stormy']):
+        return True
+    else:
+        return False"""
+
+def was_last_move_stormy(last_pmove):
+    if(fetch_tactics(last_pmove, 0) == TACTICS['promotion'] or
+       fetch_tactics(last_pmove, 0) == TACTICS['capture-good-deal'] or
+       fetch_tactics(last_pmove, 0) == TACTICS['attack-king-good-deal'] or 
+       fetch_tactics(last_pmove, 0) == TACTICS['capture-bad-deal'] or       
+       fetch_tactics(last_pmove, 0) == TACTICS['attack-king-bad-deal'] or
+       fetch_tactics(last_pmove, 0) == TACTICS['attack-stormy']):
         return True
     else:
         return False
@@ -195,7 +211,6 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
     prio_mvcnt1 = 0
     prio_mvcnt2 = 0
     prio_mvcnt3 = 0
-    time_exceeded = False
 
     elapsed_time = time.time() - match.time_start
 
@@ -213,45 +228,34 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
     if(last_pmove):
         last_prio = last_pmove.prio
     else:
-        last_prio = PRIO['last']
+        last_prio = PRIO['prio10']
 
     if(match.level == LEVELS['blitz']):
         cnt = 8
         dpth = 2
         max_dpth = 8
-        if(elapsed_time > 30):
-            time_exceeded = True
     elif(match.level == LEVELS['low']):
         cnt = 10
         dpth = 3
         max_dpth = 10
-        if(elapsed_time > 60):
-            time_exceeded = True
     elif(match.level == LEVELS['medium']):
         cnt = 12
         dpth = 4
         max_dpth = 12
-        if(elapsed_time > 90):
-            time_exceeded = True
     else:
         cnt = 16
         dpth = 5
         max_dpth = 14
-        if(elapsed_time > 120):
-            time_exceeded = True
 
     if(is_endgame(match)):
-        dpth += 1
+        dpth += 2
 
     if(depth <= dpth):
-        if(time_exceeded):
-            return min(cnt, prio_mvcnt1)
-        else:
-            return max(cnt, prio_mvcnt1)
-    elif(depth <= dpth + 3 and (was_last_move_stormy(last_prio) or is_stormy(match))):
-        return prio_mvcnt2
-    elif(depth <= max_dpth and was_last_move_stormy(last_prio)):
-        return prio_mvcnt3
+        return max(cnt, prio_mvcnt1)
+    elif(depth <= dpth + 3 and (was_last_move_stormy(last_pmove) or is_stormy(match))):
+        return min(cnt, prio_mvcnt2)
+    elif(depth <= max_dpth and was_last_move_stormy(last_pmove)):
+        return min(cnt, prio_mvcnt3)
     else:
         return 0
 
@@ -287,7 +291,7 @@ def calc_max(match, depth, alpha, beta, last_pmove):
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
+            print("   " + reverse_lookup(TACTICS, fetch_tactics(priomove, 0)) + " | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
             token = priomove.tokens[0]
             print("token: " + hex(token) + " " + token_to_text(token))
@@ -297,8 +301,8 @@ def calc_max(match, depth, alpha, beta, last_pmove):
         newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, priomove) # , dbginfo
 
         ### todo move code to other module
-        if(match.movecnt <= 20):
-            if(piece_movecnt(match, move) >= 3):
+        if(is_opening(match)):
+            if(piece_movecnt(match, move) == 3):
                 if(color == COLORS['white']):
                     newscore += ATTACKED_SCORES[PIECES['bPw']]
                 else:
@@ -316,7 +320,7 @@ def calc_max(match, depth, alpha, beta, last_pmove):
             prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
-            elapsed_time = time.time() - match.time_start
+            """elapsed_time = time.time() - match.time_start
             if(match.level == LEVELS['blitz']):
                 if(elapsed_time > 30):
                     maxcnt = 8
@@ -328,7 +332,7 @@ def calc_max(match, depth, alpha, beta, last_pmove):
                     maxcnt = 12
             else:
                 if(elapsed_time > 120):
-                    maxcnt = 16
+                    maxcnt = 16"""
 
         if(score > maxscore):
             maxscore = score
@@ -336,17 +340,14 @@ def calc_max(match, depth, alpha, beta, last_pmove):
                 return maxscore, candidates
 
         if(count >= maxcnt):
-            if(depth > 2):
-                return maxscore, candidates
-            elif(priomove.prio < PRIO['good']):
+            return maxscore, candidates
+            """if(depth > 2):
                 return maxscore, candidates
             else:
                 diff = abs(maxscore) - abs(match.score)
                 max_diff = abs(SCORES[PIECES['wPw']]) * 1.5
                 if(abs(diff) < max_diff):
-                    return maxscore, candidates
-
-            return maxscore, candidates
+                    return maxscore, candidates"""
 
     return maxscore, candidates
 
@@ -382,7 +383,7 @@ def calc_min(match, depth, alpha, beta, last_pmove):
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, "")
-            print("   " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
+            print("   " + reverse_lookup(TACTICS, fetch_tactics(priomove, 0)) + " | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
             token = priomove.tokens[0]
             print("token: " + hex(token) + " " + token_to_text(token))
@@ -392,8 +393,8 @@ def calc_min(match, depth, alpha, beta, last_pmove):
         newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, priomove) # , dbginfo
 
         ### todo move code to other module
-        if(match.movecnt <= 20):
-            if(piece_movecnt(match, move) >= 3):
+        if(is_opening(match)):
+            if(piece_movecnt(match, move) == 3):
                 if(color == COLORS['white']):
                     newscore += ATTACKED_SCORES[PIECES['bPw']]
                 else:
@@ -411,7 +412,7 @@ def calc_min(match, depth, alpha, beta, last_pmove):
             prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
-            elapsed_time = time.time() - match.time_start
+            """elapsed_time = time.time() - match.time_start
             if(match.level == LEVELS['blitz']):
                 if(elapsed_time > 30):
                     maxcnt = 8
@@ -423,7 +424,7 @@ def calc_min(match, depth, alpha, beta, last_pmove):
                     maxcnt = 12
             else:
                 if(elapsed_time > 120):
-                    maxcnt = 16
+                    maxcnt = 16"""
 
         if(score < minscore):
             minscore = score
@@ -431,15 +432,14 @@ def calc_min(match, depth, alpha, beta, last_pmove):
                 return minscore, candidates
 
         if(count >= maxcnt):
-            if(depth > 2):
-                return minscore, candidates
-            elif(priomove.prio < PRIO['good']):
+            return minscore, candidates
+            """if(depth > 2):
                 return minscore, candidates
             else:
-                diff = abs(minscore) - abs(match.score)
-                max_diff = abs(SCORES[PIECES['wPw']]) * 1.5
-                if(abs(diff) < max_diff):
-                    return minscore, candidates
+               diff = abs(minscore) - abs(match.score)
+               max_diff = abs(SCORES[PIECES['wPw']]) * 1.5
+               if(abs(diff) < max_diff):
+                   return minscore, candidates"""
 
     return minscore, candidates
 

@@ -144,6 +144,7 @@ class Match:
         self.movecnt = 0
         self.score = 0
         self.level = LEVELS['blitz']
+        self.seconds_per_move = 30
         self.begin = datetime.now()
         self.time_start = 0
         self.white_player_name = ""
@@ -177,6 +178,15 @@ class Match:
 
 
     def update_attributes(self):
+        if(self.level == LEVELS['blitz']):
+            self.seconds_per_move = 30
+        elif(self.level == LEVELS['low']):
+            self.seconds_per_move = 60
+        elif(self.level == LEVELS['medium']):
+            self.seconds_per_move = 90
+        else:
+            self.seconds_per_move = 120
+
         self.movecnt = len(self.move_list)
         if(self.movecnt > 0):
             move = self.move_list[-1]
