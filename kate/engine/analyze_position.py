@@ -487,13 +487,7 @@ def are_attacks_or_captures_possible(match):
 def is_stormy(match):
     color = match.next_color()
 
-    # is attacked
-    """score = score_attacks(match, color)
-    if(score > ATTACKED_SCORES[PIECES['bQu']] or score < ATTACKED_SCORES[PIECES['wQu']]):
-        return True"""
-    ###
-
-    # is pawn on last row before promotion
+    ### is pawn on last row before promotion
     if(color == COLORS['white']):
         y = 6
         pw = PIECES['wPw']
@@ -506,19 +500,22 @@ def is_stormy(match):
             return True
     ###
 
-    # attacks
+    ### attacks
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
             if(piece == PIECES['blk']):
                 continue
 
-            if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                continue
-
             piece_color = Match.color_of_piece(piece)
 
             frdlytouches, enmytouches = field_touches(match, piece_color, x, y)
+
+            if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                if(len(enmytouches) > 0):
+                    return True
+                else:
+                    continue
 
             if(rules.is_pinned(match, x, y)[0] or is_soft_pin(match, x, y)):
                 if(len(frdlytouches) < len(enmytouches)):
@@ -531,6 +528,7 @@ def is_stormy(match):
                 enmyfriends, enmyenemies = field_touches(match, Match.color_of_piece(enmy.piece), enmy.fieldx, enmy.fieldy)
                 if(len(enmyenemies) == 0):
                     return True
+    ###
 
     return False
 
