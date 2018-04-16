@@ -406,7 +406,7 @@ def eval_tactics(match, priomoves):
                     if(token & ATTACK_IS_PIN > 0 or token & ATTACK_IS_SOFT_PIN > 0 or 
                        is_attacked_pinned(match, attacked) or is_attacked_soft_pinned(match, attacked)):
                         priomove.tactics.append(TACTICS['attack-stormy'])
-                        #all_attacking.append(priomove)
+                        all_attacking.append(priomove)
                     elif(is_attacked_supported(attacked) == False or is_attacked_higher_than_piece(match, attacked)):
                         priomove.tactics.append(TACTICS['attack-good-deal'])
                         all_attacking.append(priomove)
@@ -458,19 +458,18 @@ def eval_tactics(match, priomoves):
             priomove.prio = PRIO['prio10']
             priomove.prio_sec = PRIO['prio10']
 
-    #all_attacking.sort(key = len_tactics, reverse=True)
     all_attacking.sort(key = fetch_first_tactics)
     for pmove in all_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
+             downgrade(pmove, TACTICS['attack-stormy'], TACTICS['attack-downgraded'])
              downgrade(pmove, TACTICS['attack-good-deal'], TACTICS['attack-downgraded'])
              priomove.tactics.sort()
              priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
              priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
 
     excludes.clear()
-    #all_disclosed_attacking.sort(key = len_tactics, reverse=True)
     all_disclosed_attacking.sort(key = fetch_first_tactics)
     for pmove in all_disclosed_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
@@ -482,7 +481,6 @@ def eval_tactics(match, priomoves):
             priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
 
     excludes.clear()
-    #all_supporting.sort(key = len_tactics, reverse=True)
     all_supporting.sort(key = fetch_first_tactics)
     for pmove in all_supporting:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
@@ -494,7 +492,6 @@ def eval_tactics(match, priomoves):
             priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
 
     excludes.clear()
-    #all_fork_defending.sort(key = len_tactics, reverse=True)
     all_fork_defending.sort(key = fetch_first_tactics)
     for pmove in all_fork_defending:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
@@ -506,7 +503,6 @@ def eval_tactics(match, priomoves):
             priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
 
     excludes.clear()
-    #all_fleeing.sort(key = len_tactics, reverse=True)
     all_fleeing.sort(key = fetch_first_tactics)
     for pmove in all_fleeing:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
