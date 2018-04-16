@@ -352,7 +352,7 @@ def downgrade(priomove, old_tactic, new_tactic):
 
 def len_tactics(priomove):
     return len(priomove.tactics)
-    
+
 """def first_tactics(priomove):
     if(len(priomove.tactics) > 0):
         return priomove.tactics[0]
@@ -364,6 +364,9 @@ def fetch_tactics(priomove, idx):
         return priomove.tactics[idx]
     else:
         return TACTICS['undefined']
+
+def sortkeys_tactics(priomove):
+    return fetch_tactics(priomove, 0), len(priomove.tactics)
 
 def eval_tactics(match, priomoves):
     all_attacking = []
@@ -475,7 +478,9 @@ def eval_tactics(match, priomoves):
             priomove.prio = PRIO['prio10']
 
 
-    all_attacking.sort(key = len_tactics, reverse=True)
+    #all_attacking.sort(key = len_tactics, reverse=True)
+    all_attacking.sort(key = lambda pmove: (fetch_tactics(pmove, 0), [(-ord(c) for c in len_tactics(pmove))]))
+    print("sort does not fail")
     for pmove in all_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
