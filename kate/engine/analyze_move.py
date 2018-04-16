@@ -452,12 +452,13 @@ def eval_tactics(match, priomoves):
         if(len(priomove.tactics) > 0):
             priomove.tactics.sort()
             priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
+            priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
         else:
             priomove.tactics.append(TACTICS['undefined'])
             priomove.prio = PRIO['prio10']
+            priomove.prio_sec = PRIO['prio10']
 
-
-    all_attacking.sort(key = len_tactics, reverse=True)
+    #all_attacking.sort(key = len_tactics, reverse=True)
     all_attacking.sort(key = fetch_first_tactics)
     for pmove in all_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
@@ -467,7 +468,7 @@ def eval_tactics(match, priomoves):
              priomove.tactics.sort()
 
     excludes.clear()
-    all_disclosed_attacking.sort(key = len_tactics, reverse=True)
+    #all_disclosed_attacking.sort(key = len_tactics, reverse=True)
     all_disclosed_attacking.sort(key = fetch_first_tactics)
     for pmove in all_disclosed_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
@@ -477,7 +478,7 @@ def eval_tactics(match, priomoves):
             priomove.tactics.sort()
 
     excludes.clear()
-    all_supporting.sort(key = len_tactics, reverse=True)
+    #all_supporting.sort(key = len_tactics, reverse=True)
     all_supporting.sort(key = fetch_first_tactics)
     for pmove in all_supporting:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
@@ -487,7 +488,7 @@ def eval_tactics(match, priomoves):
             priomove.tactics.sort()
 
     excludes.clear()
-    all_fork_defending.sort(key = len_tactics, reverse=True)
+    #all_fork_defending.sort(key = len_tactics, reverse=True)
     all_fork_defending.sort(key = fetch_first_tactics)
     for pmove in all_fork_defending:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
@@ -497,7 +498,7 @@ def eval_tactics(match, priomoves):
             priomove.tactics.sort()
 
     excludes.clear()
-    all_fleeing.sort(key = len_tactics, reverse=True)
+    #all_fleeing.sort(key = len_tactics, reverse=True)
     all_fleeing.sort(key = fetch_first_tactics)
     for pmove in all_fleeing:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
@@ -512,5 +513,6 @@ def eval_tactics(match, priomoves):
             priomove.tactics.append(TACTICS['single-silent-move'])
             priomove.tactics.sort()
             priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
+            priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
             break
 
