@@ -39,14 +39,16 @@ def prnt_moves(msg, moves):
         print("")
 
 
-def prnt_priorities(priomoves, priocnts):
+def prnt_priomoves(priomoves, priocnts):
     for priomove in priomoves:
         token = priomove.tokens[0]
-        prnt_move("\n ", priomove.gmove, "")        
-        print("piece:" + str(priomove.piece) + " token:" + hex(token) + 
-               " " + reverse_lookup(TACTICS, fetch_tactics(priomove, 0)) + 
+        prnt_move("\n", priomove.gmove, "")        
+        print(" piece:" + str(priomove.piece) + " token:" + hex(token) + 
                " " + reverse_lookup(PRIO, priomove.prio) + 
                " \ntoken: " + hex(token) + " " + token_to_text(token))
+        for tactic in priomove.tactics:
+            print(reverse_lookup(TACTICS, tactic), end=" ")
+        print("\n")
 
     for i in range(len(priocnts)):
         print(reverse_lookup(PRIO, i)  + ": " + str(priocnts[i]))
@@ -146,6 +148,7 @@ def generate_moves(match):
 
     if(kg_attacked):
         for priomove in priomoves:
+            priomove.tactics.append(TACTICS['defend-check'])
             priomove.prio = PRIO['prio1']
 
         priomoves.sort(key=attrgetter('prio'))
@@ -197,8 +200,11 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
     prio_mvcnt1 = 0
     prio_mvcnt2 = 0
     prio_mvcnt3 = 0
+    exceeded = False
 
     elapsed_time = time.time() - match.time_start
+    if(elapsed_time > match.seconds_per_move):
+        exceeded = True
 
     for i in range(PRIO_LIMES3 + 1):
         prio_mvcnt3 += priocnts[i]
@@ -237,12 +243,14 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
         dpth += 2
 
     if(depth <= dpth):
-        return max(cnt, prio_mvcnt1)
-    #elif(depth <= dpth + 3 and (was_last_move_stormy(last_pmove) or is_stormy(match))):
-        #return min(cnt, prio_mvcnt2)
-    elif(depth <= max_dpth and was_last_move_stormy(last_pmove)):
+        if(exceeded):
+            return min(cnt, prio_mvcnt1)
+        else:
+            return max(cnt, prio_mvcnt1)
+    elif(depth <= dpth + 3 and (was_last_move_stormy(last_pmove) or is_stormy(match))):
         return min(cnt, prio_mvcnt2)
-        #return min(cnt, prio_mvcnt3)
+    elif(depth <= max_dpth and was_last_move_stormy(last_pmove)):
+        return min(cnt, prio_mvcnt3)
     else:
         return 0
 
@@ -259,7 +267,7 @@ def calc_max(match, depth, alpha, beta, last_pmove):
     maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_pmove)
 
     if(depth == 1):
-        prnt_priorities(priomoves, priocnts)
+        prnt_priomoves(priomoves, priocnts)
         if(len(priomoves) == 1):
             pmove = priomoves[0]
             candidates.append(pmove.gmove)
@@ -277,8 +285,10 @@ def calc_max(match, depth, alpha, beta, last_pmove):
 
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, newmove, "")
-            print("   " + reverse_lookup(TACTICS, fetch_tactics(priomove, 0)) + " | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
+            prnt_move(msg, newmove, " | ")
+            for tactic in priomove.tactics:
+                print(reverse_lookup(TACTICS, tactic), end=" | ")
+            print(reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
             token = priomove.tokens[0]
             print("token: " + hex(token) + " " + token_to_text(token))
@@ -308,17 +318,14 @@ def calc_max(match, depth, alpha, beta, last_pmove):
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
             """elapsed_time = time.time() - match.time_start
-            if(match.level == LEVELS['blitz']):
-                if(elapsed_time > 30):
+            if(elapsed_time > match.seconds_per_move):
+                if(match.level == LEVELS['blitz']):
                     maxcnt = 8
-            elif(match.level == LEVELS['low']):
-                if(elapsed_time > 60):
+                elif(match.level == LEVELS['low']):
                     maxcnt = 10
-            elif(match.level == LEVELS['medium']):
-                if(elapsed_time > 90):
+                elif(match.level == LEVELS['medium']):
                     maxcnt = 12
-            else:
-                if(elapsed_time > 120):
+                else:
                     maxcnt = 16"""
 
         if(score > maxscore):
@@ -351,7 +358,7 @@ def calc_min(match, depth, alpha, beta, last_pmove):
     maxcnt = select_maxcnt(match, depth, priomoves, priocnts, last_pmove)
 
     if(depth == 1):
-        prnt_priorities(priomoves, priocnts)
+        prnt_priomoves(priomoves, priocnts)
         if(len(priomoves) == 1):
             pmove = priomoves[0]
             candidates.append(pmove.gmove)
@@ -369,8 +376,10 @@ def calc_min(match, depth, alpha, beta, last_pmove):
 
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, newmove, "")
-            print("   " + reverse_lookup(TACTICS, fetch_tactics(priomove, 0)) + " | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
+            prnt_move(msg, newmove, " | ")
+            for tactic in priomove.tactics:
+                print(reverse_lookup(TACTICS, tactic), end=" | ")
+            print(reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
             token = priomove.tokens[0]
             print("token: " + hex(token) + " " + token_to_text(token))
@@ -400,17 +409,14 @@ def calc_min(match, depth, alpha, beta, last_pmove):
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
             """elapsed_time = time.time() - match.time_start
-            if(match.level == LEVELS['blitz']):
-                if(elapsed_time > 30):
+            if(elapsed_time > match.seconds_per_move):
+                if(match.level == LEVELS['blitz']):
                     maxcnt = 8
-            elif(match.level == LEVELS['low']):
-                if(elapsed_time > 60):
+                elif(match.level == LEVELS['low']):
                     maxcnt = 10
-            elif(match.level == LEVELS['medium']):
-                if(elapsed_time > 90):
+                elif(match.level == LEVELS['medium']):
                     maxcnt = 12
-            else:
-                if(elapsed_time > 120):
+                else:
                     maxcnt = 16"""
 
         if(score < minscore):

@@ -517,17 +517,20 @@ def is_stormy(match):
                 else:
                     continue
 
+            if(len(enmytouches) > len(frdlytouches)):
+                return True
+
             if(rules.is_pinned(match, x, y)[0] or is_soft_pin(match, x, y)):
-                if(len(frdlytouches) < len(enmytouches)):
-                    return True
+                return True
 
             for enmy in enmytouches:
                 if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
                     return True
 
-                enmyfriends, enmyenemies = field_touches(match, Match.color_of_piece(enmy.piece), enmy.fieldx, enmy.fieldy)
+                """enmyfriends, enmyenemies = field_touches(match, Match.color_of_piece(enmy.piece), enmy.fieldx, enmy.fieldy)
                 if(len(enmyenemies) == 0):
-                    return True
+                    print("is_stormy: enmyenemies == 0")
+                    return True"""
     ###
 
     return False

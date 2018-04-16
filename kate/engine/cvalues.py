@@ -45,6 +45,7 @@ PRIO_LIMES3 = PRIO['prio2']
 PRIO_LIMES2 = PRIO['prio3']
 PRIO_LIMES1 = PRIO['prio5']
 
+
 TACTICS_TO_PRIO = {
       TACTICS['defend-check'] : PRIO['prio1'],
       TACTICS['promotion'] : PRIO['prio2'],
@@ -72,33 +73,6 @@ TACTICS_TO_PRIO = {
       TACTICS['attack-bad-deal'] : PRIO['prio8'], 
       TACTICS['support-bad-deal'] : PRIO['prio8'],
       TACTICS['undefined'] : PRIO['prio10'] }
-
-PRIO2 = {
-    'defend-check' : 0,
-    'promotion' : 1,
-    'capture-good-deal' : 2,
-    'running-pawn-in-endgame' : 3,
-    'attack-king-good-deal' : 4,
-    'single-silent-move' : 5,
-    'capture-bad-deal' : 6,
-    'attack-king-bad-deal' : 7,
-    'attack-stormy' : 8,
-    'defend-fork' : 9,
-    'flee-urgent' : 10,
-    'support-good-deal' : 11,
-    'attack-good-deal' : 12,
-    'controles-file-good-deal' : 13,
-    'castling' : 14,
-    'flee' : 15,
-    'good' : 16,
-    'support-unattacked' : 17,
-    'attack-bad-deal' : 18,
-    'support-bad-deal' : 19,
-    'last' : 20 }
-
-PRIO2_LIMES3 = PRIO2['single-silent-move'] # attack-king-bad-deal
-PRIO2_LIMES2 = PRIO2['attack-stormy']
-PRIO2_LIMES1 = PRIO2['castling']
 
 
 MV_IS_PROMOTION                        = 0x80000000000000000
