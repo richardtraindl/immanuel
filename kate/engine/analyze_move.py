@@ -510,6 +510,7 @@ def eval_tactics(match, priomoves):
         if(fetch_tactics(priomove, 0) >= TACTICS['support-good-deal'] and 
            fetch_tactics(priomove, 0) <= TACTICS['support-unattacked']):
             priomove.tactics.append(TACTICS['single-silent-move'])
-            priomove.prio = TACTICS_TO_PRIO[TACTICS['single-silent-move']] #PRIO['prio2']
+            priomove.tactics.sort()
+            priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
             break
 
