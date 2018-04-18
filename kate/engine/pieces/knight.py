@@ -72,7 +72,7 @@ def is_piece_stuck(match, srcx, srcy):
             if(Match.color_of_piece(piece) == color):
                 continue
             else:
-                if(is_field_touched(match, Match.oppcolor_of_piece(knight), x1, y1, 0)):
+                if(rules.is_field_touched(match, Match.oppcolor_of_piece(knight), x1, y1, 0)):
                     if(PIECES_RANK[knight] <= PIECES_RANK[piece]):
                         return False
                 else:
