@@ -67,7 +67,7 @@ def is_piece_stuck(match, srcx, srcy):
             elif(Match.color_of_piece(piece) == color):
                 continue
             else:
-                if(is_field_touched(match, Match.oppcolor_of_piece(rook), x1, y1, 0)):
+                if(rules.is_field_touched(match, Match.oppcolor_of_piece(rook), x1, y1, 0)):
                     if(PIECES_RANK[rook] <= PIECES_RANK[piece]):
                         return False
                 else:
