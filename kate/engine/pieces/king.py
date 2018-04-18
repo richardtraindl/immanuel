@@ -55,8 +55,22 @@ def is_field_touched(match, color, fieldx, fieldy):
 
 
 def is_piece_stuck(match, srcx, srcy):
-    return False
+    king = match.readfield(srcx, srcy)
+    color = Match.color_of_piece(king)
 
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+
+            if(Match.color_of_piece(piece) == color):
+                continue
+            else:
+                if(is_field_touched(match, Match.oppcolor_of_piece(king), x1, y1, 0) == False):
+                    return False
+
+    return True
 
 def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches):
     for i in range(8):
