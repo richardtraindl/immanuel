@@ -52,7 +52,11 @@ def is_field_touched(match, color, fieldx, fieldy):
                 return True
 
     return False
-  
+
+
+def is_piece_stuck(match, srcx, srcy):
+    return False
+
 
 def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches):
     for i in range(8):
