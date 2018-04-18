@@ -52,6 +52,10 @@ def is_field_touched(match, color, fieldx, fieldy, mode):
     return False
 
 
+def is_piece_stuck(match, srcx, srcy):
+    return False
+
+
 def is_move_stuck(match, srcx, srcy, dstx, dsty):
     move_dir = rk_dir(srcx, srcy, dstx, dsty)
     pin_dir = rules.pin_dir(match, None, srcx, srcy)
