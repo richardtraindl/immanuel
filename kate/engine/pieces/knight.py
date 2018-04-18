@@ -60,7 +60,25 @@ def is_field_touched(match, color, fieldx, fieldy, mode):
 
 
 def is_piece_stuck(match, srcx, srcy):
-    return False
+    knight = match.readfield(srcx, srcy)
+    color = Match.color_of_piece(knight)
+
+    for i in range(8):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+
+            if(Match.color_of_piece(piece) == color):
+                continue
+            else:
+                if(is_field_touched(match, Match.oppcolor_of_piece(knight), x1, y1, 0)):
+                    if(PIECES_RANK[knight] <= PIECES_RANK[piece]):
+                        return False
+                else:
+                    return False
+
+    return True
 
 
 def is_stuck(match, fieldx, fieldy):
