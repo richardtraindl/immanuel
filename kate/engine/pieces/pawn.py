@@ -86,7 +86,7 @@ def is_piece_stuck(match, srcx, srcy):
         dsty = srcy + WHITE_1N_Y
     else:
         STEPS = BPW_STEPS
-        dsty = srcy + WHITE_1S_Y
+        dsty = srcy + BLACK_1S_Y
 
     if(match.readfield(srcx, dsty) == PIECES['blk']):
         return False
