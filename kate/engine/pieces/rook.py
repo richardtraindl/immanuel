@@ -53,7 +53,27 @@ def is_field_touched(match, color, fieldx, fieldy, mode):
 
 
 def is_piece_stuck(match, srcx, srcy):
-    return False
+    rook = match.readfield(srcx, srcy)
+    color = Match.color_of_piece(rook)
+
+    for i in range(4):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+
+            if(piece == PIECES['blk']):
+                return False
+            elif(Match.color_of_piece(piece) == color):
+                continue
+            else:
+                if(is_field_touched(match, Match.oppcolor_of_piece(rook), x1, y1, 0)):
+                    if(PIECES_RANK[rook] <= PIECES_RANK[piece]):
+                        return False
+                else:
+                    return False
+
+    return True
 
 
 def is_move_stuck(match, srcx, srcy, dstx, dsty):
