@@ -59,6 +59,10 @@ def is_field_touched(match, color, fieldx, fieldy, mode):
     return False
 
 
+def is_piece_stuck(match, srcx, srcy):
+    return False
+
+
 def is_stuck(match, fieldx, fieldy):
     pin_dir = rules.pin_dir(match, None, fieldx, fieldy)
     if(pin_dir == rules.DIRS['undefined']):
