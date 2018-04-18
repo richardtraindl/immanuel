@@ -410,7 +410,7 @@ def score_stucks(match):
                 continue
 
             if(is_piece_stuck(match, x, y)):
-                if(Match.color_of_piece(piece) == COLORS['white'])
+                if(Match.color_of_piece(piece) == COLORS['white']):
                     score += blackrate
                 else:
                     score += whiterate
