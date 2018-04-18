@@ -2,8 +2,8 @@ from .match import *
 from .cvalues import *
 from . import rules
 from .pieces import pawn, knight, bishop, rook, king 
-from .pieces.generic_piece import cTouchBeyond, is_piece_stuck
-from .analyze_helper import field_touches_beyond, field_touches, is_soft_pin
+from .pieces.generic_piece import cTouchBeyond
+from .analyze_helper import field_touches_beyond, field_touches, is_soft_pin, is_piece_stuck
 
 
 def score_supports(match, color):
