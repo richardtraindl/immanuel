@@ -78,8 +78,30 @@ def is_field_touched(match, color, fieldx, fieldy, mode):
 
 
 def is_piece_stuck(match, srcx, srcy):
-    return False
-  
+    pawn = match.readfield(srcx, srcy)
+    color = Match.color_of_piece(pawn)
+
+    if(color == COLORS['white']):
+        STEPS = WPW_STEPS
+        dsty = srcy + WHITE_1N_Y
+    else:
+        STEPS = BPW_STEPS
+        dsty = srcy + WHITE_1S_Y
+
+    if(match.readfield(srcx, dsty) == PIECES['blk']):
+        return False
+
+    for i in range(2):
+        x1 = srcx + STEPS[i][0]
+        y1 = srcy + STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            piece = match.readfield(x1, y1)
+
+            if(Match.color_of_piece(piece) == Match.oppcolor_of_piece(pawn):
+                return False
+
+    return True
+
 
 def is_move_stuck(match, piece, srcx, srcy, dstx, dsty):
     move_dir = pw_dir(srcx, srcy, dstx, dsty, piece)
