@@ -2,9 +2,8 @@ from .match import *
 from .cvalues import *
 from . import rules
 from .pieces import pawn, knight, bishop, rook, king 
-from .pieces.generic_piece import cTouchBeyond
+from .pieces.generic_piece import cTouchBeyond, is_piece_stuck
 from .analyze_helper import field_touches_beyond, field_touches, is_soft_pin
-
 
 
 def score_supports(match, color):
@@ -399,6 +398,26 @@ def score_endgame(match):
     return value
 
 
+def score_stucks(match):
+    whiterate = ATTACKED_SCORES[PIECES['bPw']]
+    blackrate = ATTACKED_SCORES[PIECES['wPw']]
+    score = 0
+
+    for y in range(8):
+        for x in range(8):
+            piece = match.readfield(x, y)
+            if(piece == PIECES['blk']):
+                continue
+
+            if(is_piece_stuck(match, x, y)):
+                if(Match.color_of_piece(piece) == COLORS['white'])
+                    score += blackrate
+                else:
+                    score += whiterate
+
+    return score
+
+
 def score_position(match, movecnt):
     status = rules.status(match)
 
@@ -413,6 +432,8 @@ def score_position(match, movecnt):
         score = match.score
         
         color = match.next_color()
+
+        score += score_stucks(match)
 
         #score += score_attacks(match, color)
 
