@@ -3,23 +3,6 @@ from .. match import *
 from .. cvalues import *
 
 
-def is_piece_stuck(match, srcx, srcy):
-    piece = match.readfield(srcx, srcy)
-
-    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        return pawn.is_piece_stuck(match, srcx, srcy)
-    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        return knight.is_piece_stuck(match, srcx, srcy)
-    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        return bishop.is_piece_stuck(match, srcx, srcy)
-    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        return rook.is_piece_stuck(match, srcx, srcy)
-    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        return bishop.is_piece_stuck(match, srcx, srcy) or rook.is_piece_stuck(match, srcx, srcy)
-    else:
-        return king.is_piece_stuck(match, srcx, srcy)
-
-
 def count_contacts(contacts):
     pw_cnt = 0
     kn_cnt = 0
