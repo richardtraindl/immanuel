@@ -97,7 +97,7 @@ def is_piece_stuck(match, srcx, srcy):
         if(rules.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
 
-            if(Match.color_of_piece(piece) == Match.oppcolor_of_piece(pawn):
+            if(Match.color_of_piece(piece) == Match.oppcolor_of_piece(pawn)):
                 return False
 
     return True
