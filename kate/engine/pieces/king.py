@@ -67,7 +67,7 @@ def is_piece_stuck(match, srcx, srcy):
             if(Match.color_of_piece(piece) == color):
                 continue
             else:
-                if(is_field_touched(match, Match.oppcolor_of_piece(king), x1, y1, 0) == False):
+                if(rules.is_field_touched(match, Match.oppcolor_of_piece(king), x1, y1, 0) == False):
                     return False
 
     return True
