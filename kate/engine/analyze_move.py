@@ -13,10 +13,14 @@ from .pieces.generic_piece import contacts_to_token
 
 TOKENS = {
     'token' : 0,
-    'attacked' : 1,
-    'supported' : 2,
-    'disclosed_attacked' : 3,
-    'forked' : 4 }
+    'src_attacked' : 1,
+    'src_supported' : 2,
+    'dst_attacked' : 3,
+    'dst_supported' : 4,
+    'attacked' : 5,
+    'supported' : 6,
+    'disclosed_attacked' : 7,
+    'forked' : 8 }
 
 
 def captures(match, move):
@@ -258,6 +262,10 @@ def controles_file(match, move):
 def analyze_move(match, move):
     tokens = [0] * len(TOKENS)
     token = 0x0
+    src_attacked = []
+    src_supported = []
+    dst_attacked = []
+    dst_supported = []
     attacked = []
     supported = []
     disclosed_attacked = []
@@ -285,19 +293,16 @@ def analyze_move(match, move):
     ###
     match.writefield(move.srcx, move.srcy, PIECES['blk'])
 
-    frdlycontacts, enmycontacts = field_touches(match, color, move.srcx, move.srcy)
+    
+    src_supported, src_attacked = field_touches(match, color, move.srcx, move.srcy)
 
-    token = token | contacts_to_token(frdlycontacts, enmycontacts, "SRCFIELDTOUCHES")
-    frdlycontacts.clear()
-    enmycontacts.clear()
+    token = token | contacts_to_token(src_supported, src_attacked, "SRCFIELDTOUCHES")
 
-    frdlycontacts, enmycontacts = field_touches(match, color, move.dstx, move.dsty)
+    dst_supported, dst_attacked = field_touches(match, color, move.dstx, move.dsty)
 
     match.writefield(move.srcx, move.srcy, piece)
 
-    token = token | contacts_to_token(frdlycontacts, enmycontacts, "DSTFIELDTOUCHES")
-    frdlycontacts.clear()
-    enmycontacts.clear()
+    token = token | contacts_to_token(dst_supported, dst_attacked, "DSTFIELDTOUCHES")
     ###
 
     token = token | captures(match, move)
@@ -321,6 +326,10 @@ def analyze_move(match, move):
     token = token | controles_file(match, move)
 
     tokens[TOKENS['token']] = token
+    tokens[TOKENS['src_attacked']] = src_attacked
+    tokens[TOKENS['src_supported']] = src_supported
+    tokens[TOKENS['dst_attacked']] = dst_attacked
+    tokens[TOKENS['dst_supported']] = dst_supported    
     tokens[TOKENS['attacked']] = attacked
     tokens[TOKENS['supported']] = supported
     tokens[TOKENS['disclosed_attacked']] = disclosed_attacked
@@ -357,6 +366,10 @@ def eval_tactics(match, priomoves):
 
     for priomove in priomoves:
         token = priomove.tokens[TOKENS['token']]
+        src_attacked = priomove.tokens[TOKENS['src_attacked']]
+        src_supported = priomove.tokens[TOKENS['src_supported']]
+        dst_attacked = priomove.tokens[TOKENS['dst_attacked']]
+        dst_supported = priomove.tokens[TOKENS['dst_supported']]        
         attacked = priomove.tokens[TOKENS['attacked']]
         supported = priomove.tokens[TOKENS['supported']]
         disclosed_attacked = priomove.tokens[TOKENS['disclosed_attacked']]

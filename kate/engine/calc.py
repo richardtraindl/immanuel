@@ -185,21 +185,22 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
 
 
 def was_last_move_stormy(last_pmove):
-    if(fetch_tactics(last_pmove, 0) == TACTICS['promotion'] or
-       fetch_tactics(last_pmove, 0) == TACTICS['capture-good-deal'] or
-       fetch_tactics(last_pmove, 0) == TACTICS['attack-king-good-deal'] or 
-       fetch_tactics(last_pmove, 0) == TACTICS['capture-bad-deal'] or       
-       fetch_tactics(last_pmove, 0) == TACTICS['attack-king-bad-deal'] or
-       fetch_tactics(last_pmove, 0) == TACTICS['attack-stormy']):
-        return True
-    else:
-        return False
+    for tactic in last_pmove.tactics:
+        if(tactic == TACTICS['promotion'] or
+           tactic == TACTICS['capture-good-deal'] or
+           tactic == TACTICS['attack-king-good-deal'] or 
+           tactic == TACTICS['capture-bad-deal'] or       
+           tactic == TACTICS['attack-king-bad-deal'] or
+           tactic == TACTICS['attack-stormy']):
+            return True
+
+    return False
 
 def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
     mvcnt = len(priomoves)
-    prio_mvcnt1 = 0
-    prio_mvcnt2 = 0
-    prio_mvcnt3 = 0
+    prio_limes1 = 0
+    prio_limes2 = 0
+    prio_limes3 = 0
     exceeded = False
 
     elapsed_time = time.time() - match.time_start
@@ -207,15 +208,15 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
         exceeded = True
 
     for i in range(PRIO_LIMES3 + 1):
-        prio_mvcnt3 += priocnts[i]
+        prio_limes3 += priocnts[i]
 
-    prio_mvcnt2 = prio_mvcnt3
+    prio_limes2 = prio_limes3
     for i in range(PRIO_LIMES3 + 1, PRIO_LIMES2 + 1):
-        prio_mvcnt2 += priocnts[i]
+        prio_limes2 += priocnts[i]
 
-    prio_mvcnt1 = prio_mvcnt2
+    prio_limes1 = prio_limes2
     for i in range(PRIO_LIMES2 + 1, PRIO_LIMES1 + 1):
-        prio_mvcnt1 += priocnts[i]
+        prio_limes1 += priocnts[i]
 
     if(last_pmove):
         last_prio = last_pmove.prio
@@ -224,33 +225,39 @@ def select_maxcnt(match, depth, priomoves, priocnts, last_pmove):
 
     if(match.level == LEVELS['blitz']):
         cnt = 8
-        dpth = 2
-        max_dpth = 8
+        dpth_stage1 = 2
+        dpth_stage2 = 4
+        dpth_stage3 = 8
     elif(match.level == LEVELS['low']):
         cnt = 10
-        dpth = 3
-        max_dpth = 10
+        dpth_stage1 = 3
+        dpth_stage2 = 5
+        dpth_stage3 = 8
     elif(match.level == LEVELS['medium']):
         cnt = 12
-        dpth = 4
-        max_dpth = 12
+        dpth_stage1 = 4
+        dpth_stage2 = 7
+        dpth_stage3 = 12
     else:
         cnt = 16
-        dpth = 5
-        max_dpth = 14
+        dpth_stage1 = 5
+        dpth_stage2 = 8
+        dpth_stage3 = 12
 
     if(is_endgame(match)):
-        dpth += 2
+        dpth_stage1 += 2
 
-    if(depth <= dpth):
+    if(depth <= dpth_stage1):
         if(exceeded):
-            return min(cnt, prio_mvcnt1)
+            return prio_limes2
         else:
-            return max(cnt, prio_mvcnt1)
-    elif(depth <= dpth + 3 and (was_last_move_stormy(last_pmove) or is_stormy(match))):
-        return min(cnt, prio_mvcnt2)
-    elif(depth <= max_dpth and was_last_move_stormy(last_pmove)):
-        return min(cnt, prio_mvcnt3)
+            return max(cnt, prio_limes1)
+    #elif(depth <= dpth_stage2 and (was_last_move_stormy(last_pmove) or is_stormy(match))):
+        #return min(cnt, prio_limes2)
+    #elif(depth <= dpth_stage3 and was_last_move_stormy(last_pmove)):
+        #return min(cnt, prio_limes3)
+    elif(depth <= dpth_stage3 and (was_last_move_stormy(last_pmove) or is_stormy(match))):
+        return min(cnt, prio_limes3)
     else:
         return 0
 
