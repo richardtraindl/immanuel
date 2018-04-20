@@ -317,11 +317,11 @@ def eval_tactics(match, priomoves):
                 if(piece_is_lower_equal_than_enemy_on_srcfield(priomove.analyses) == False):
                     priomove.tactics.append(TACTICS['flee-urgent'])
                     all_fleeing.append(priomove)
-                elif(srcfield_is_supported(token) == False):
+                elif(srcfield_is_supported(priomove.analyses) == False):
                     priomove.tactics.append(TACTICS['flee'])
 
         if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_ATTACK'])):
-            if(token & ATTACKED_IS_KG > 0):
+            if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['ATTACKED_IS_KG'])):
                 if(dstfield_is_attacked(priomove.analyses) == False or 
                    (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
                     priomove.tactics.append(TACTICS['attack-king-good-deal'])
@@ -330,7 +330,8 @@ def eval_tactics(match, priomoves):
             else:
                 if(dstfield_is_attacked(priomove.analyses) == False or 
                    (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
-                    if(token & ATTACK_IS_PIN > 0 or token & ATTACK_IS_SOFT_PIN > 0 or 
+                    if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['ATTACK_IS_PIN']) is None or 
+                       fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['ATTACK_IS_SOFT_PIN']) is None or 
                        is_attacked_pinned(match, priomove.analyses) or is_attacked_soft_pinned(match, priomove.analyses)):
                         priomove.tactics.append(TACTICS['attack-stormy'])
                         all_attacking.append(priomove)
