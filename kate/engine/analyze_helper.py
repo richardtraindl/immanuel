@@ -136,11 +136,11 @@ def analyse_piece_fields(frdlycontacts, enmycontacts, mode, analyses):
             
             if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                 analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_PW'])
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
                 analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_KN'])
             elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
                 analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_BP'])
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
                 analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_RK'])
             elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                 analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_QU'])
@@ -152,11 +152,11 @@ def analyse_piece_fields(frdlycontacts, enmycontacts, mode, analyses):
             
             if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                 analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW'])
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
                 analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_KN'])
             elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
                 analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_BP'])
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
                 analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_RK'])
             elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                 analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_QU'])
@@ -168,11 +168,11 @@ def analyse_piece_fields(frdlycontacts, enmycontacts, mode, analyses):
             
             if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                 analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_PW'])
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
                 analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_KN'])
             elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
                 analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_BP'])
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
                 analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_RK'])
             elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                 analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_QU'])
@@ -184,11 +184,11 @@ def analyse_piece_fields(frdlycontacts, enmycontacts, mode, analyses):
             
             if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                 analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'])
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
                 analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_KN'])
             elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
                 analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_BP'])
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
                 analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_RK'])
             elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                 analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_QU'])
