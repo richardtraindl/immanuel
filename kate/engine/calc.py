@@ -42,17 +42,19 @@ def prnt_moves(msg, moves):
 def prnt_core_analyses(lst_core):
     for core in lst_core:
         print(reverse_lookup(ANALYSES, core), end=" | ")
+    print("\n")
 
 
 def prnt_tactics(tactics):
     for tactic in tactics:
         print(reverse_lookup(TACTICS, tactic), end=" | ")
+    print("\n")
 
 
 def prnt_priomoves(priomoves, priocnts):
     for priomove in priomoves:
         prnt_move("\n", priomove.gmove, "")
-        print(" piece:" + reverse_lookup(PIECES, priomove.piece))
+        print(" piece: " + reverse_lookup(PIECES, priomove.piece))
         prnt_core_analyses(priomove.analyses.lst_core)
         prnt_tactics(priomove.tactics)
         print("\n")
