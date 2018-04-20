@@ -251,23 +251,23 @@ def is_fork_field(match, piece, forkx, forky):
 
     return False
 
-def fetch_analyses(analyses, item):
-    for analysis in analyses:
-        if(analysis == item):
+def fetch_analyses_lst(list, search_item):
+    for item in list:
+        if(item == search_item):
             return item
 
     return None
 
-def fetch_range_analyses(analyses, start_item, end_item):
-    for analysis in analyses:
-        if(analysis >= start_item and analysis <= end_item):
+def fetch_range_analyses_lst(list, start_item, end_item):
+    for item in list:
+        if(item >= start_item and item <= end_item):
             return item
 
     return None
 
-def piece_is_lower_equal_than_captured(priomove):
-    piece = fetch_range_analyses(analyses, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
-    captured_piece = fetch_range_analyses(analyses, ANALYSES['CAPTURED_IS_PW'], ANALYSES['CAPTURED_IS_QU'])
+def piece_is_lower_equal_than_captured(analyses):
+    piece = fetch_range_analyses_lst(analyses.core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
+    captured_piece = fetch_range_analyses_lst(analyses.core, ANALYSES['CAPTURED_IS_PW'], ANALYSES['CAPTURED_IS_QU'])
 
     if(captured_piece in None):
         return False
@@ -299,59 +299,32 @@ def piece_is_lower_equal_than_captured(priomove):
     return False
 
 
-def piece_is_lower_equal_than_captured2(token):
-    if(token & MV_PIECE_IS_KG > 0):
-        return False
-    elif(token & MV_PIECE_IS_QU > 0):
-        if(token & CAPTURED_IS_QU > 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_RK > 0):
-        if(token & CAPTURED_IS_QU > 0 or 
-           token & CAPTURED_IS_RK > 0):
-            return True
-        else:
-            return False
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if(token & CAPTURED_IS_QU > 0 or 
-           token & CAPTURED_IS_RK > 0 or
-           token & CAPTURED_IS_BP > 0 or
-           token & CAPTURED_IS_KN > 0):
-            return True
-        else:
-            return False
-    else: # MV_PIECE_IS_PW
-        if(token & CAPTURED_IS_QU > 0 or
-           token & CAPTURED_IS_RK > 0 or
-           token & CAPTURED_IS_BP > 0 or
-           token & CAPTURED_IS_KN > 0 or
-           token & CAPTURED_IS_PW > 0):
-            return True
-        else:
-            return False
+def piece_is_lower_equal_than_enemy_on_srcfield(analyses):
+    piece = fetch_range_analyses_lst(analyses.core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
+    enemy = fetch_range_analyses_lst(analyses.core, ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW'], ANALYSES['SRCFLD_IS_ENM_TOU_BY_KG'])
 
-
-def piece_is_lower_equal_than_enemy_on_srcfield(token):
-    if(token & MV_PIECE_IS_KG > 0):
+    if(enemy in None):
         return False
-    elif(token & MV_PIECE_IS_QU > 0):
-        if(token & SRCFLD_IS_ENM_TOU_BY_RK > 0 or
-           token & SRCFLD_IS_ENM_TOU_BY_BP > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_KN > 0 or
-           token & SRCFLD_IS_ENM_TOU_BY_PW > 0):
+
+    if(piece == ANALYSES['MV_PIECE_IS_KG']):
+        return False
+    elif(piece == ANALYSES['MV_PIECE_IS_QU']):
+        if(enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_RK'] or
+           enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_BP'] or 
+           enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_KN'] or
+           enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW']):
             return False
         else:
             return True
-    elif(token & MV_PIECE_IS_RK > 0):
-        if(token & SRCFLD_IS_ENM_TOU_BY_BP > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_KN > 0 or 
-           token & SRCFLD_IS_ENM_TOU_BY_PW > 0):
+    elif(piece == ANALYSES['MV_PIECE_IS_RK']):
+        if(enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_BP'] or 
+           enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_KN'] or 
+           enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW']):
             return False
         else:
             return True
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if(token & SRCFLD_IS_ENM_TOU_BY_PW > 0):
+    elif(piece == ANALYSES['MV_PIECE_IS_BP'] or piece == ANALYSES['MV_PIECE_IS_KN']):
+        if(enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW']):
             return False
         else:
             return True
@@ -359,26 +332,32 @@ def piece_is_lower_equal_than_enemy_on_srcfield(token):
         return True
 
 
-def piece_is_lower_equal_than_enemy_on_dstfield(token):
-    if(token & MV_PIECE_IS_KG > 0):
+def piece_is_lower_equal_than_enemy_on_dstfield(analyses):
+    piece = fetch_range_analyses_lst(analyses.core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
+    enemy = fetch_range_analyses_lst(analyses.core, ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'], ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
+
+    if(enemy in None):
         return False
-    elif(token & MV_PIECE_IS_QU > 0):
-        if(token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
+    
+   if(piece == ANALYSES['MV_PIECE_IS_KG']):
+        return False
+    elif(piece == ANALYSES['MV_PIECE_IS_QU']):
+        if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_RK'] or
+           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_BP'] or 
+           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_KN'] or
+           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW']):
             return False
         else:
             return True
-    elif(token & MV_PIECE_IS_RK > 0):
-        if(token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
+    elif(piece == ANALYSES['MV_PIECE_IS_RK']):
+        if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_BP'] or 
+           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_KN'] or 
+           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW']):
             return False
         else:
             return True
-    elif(token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if(token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
+    elif(piece == ANALYSES['MV_PIECE_IS_BP'] or piece == ANALYSES['MV_PIECE_IS_KN']):
+        if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW']):
             return False
         else:
             return True
@@ -386,19 +365,25 @@ def piece_is_lower_equal_than_enemy_on_dstfield(token):
         return True
 
 
-def piece_is_lower_fairy_equal_than_enemy_on_dstfield(token):
-    if(token & MV_PIECE_IS_KG > 0):
+def piece_is_lower_fairy_equal_than_enemy_on_dstfield(analyses):
+    piece = fetch_range_analyses_lst(analyses.core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
+    enemy = fetch_range_analyses_lst(analyses.core, ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'], ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
+
+    if(enemy in None):
         return False
-    elif(token & MV_PIECE_IS_QU > 0):
-        if(token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or
-           token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
+
+   if(piece == ANALYSES['MV_PIECE_IS_KG']):
+        return False
+    elif(piece == ANALYSES['MV_PIECE_IS_QU']):
+        if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_RK'] or
+           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_BP'] or 
+           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_KN'] or
+           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW']):
             return False
         else:
             return True
-    elif(token & MV_PIECE_IS_RK > 0 or token & MV_PIECE_IS_BP > 0 or token & MV_PIECE_IS_KN > 0):
-        if(token & DSTFLD_IS_ENM_TOU_BY_PW > 0):
+    elif(piece == ANALYSES['MV_PIECE_IS_RK'] or piece == ANALYSES['MV_PIECE_IS_BP'] or piece == ANALYSES['MV_PIECE_IS_KN']):
+        if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW']):
             return False
         else:
             return True
@@ -406,58 +391,49 @@ def piece_is_lower_fairy_equal_than_enemy_on_dstfield(token):
         return True
 
 
-def srcfield_is_supported(token):
-    if(token & SRCFLD_IS_FRDL_TOU_BY_PW > 0 or 
-       token & SRCFLD_IS_FRDL_TOU_BY_KN > 0 or 
-       token & SRCFLD_IS_FRDL_TOU_BY_BP > 0 or 
-       token & SRCFLD_IS_FRDL_TOU_BY_RK > 0 or 
-       token & SRCFLD_IS_FRDL_TOU_BY_QU > 0 or 
-       token & SRCFLD_IS_FRDL_TOU_BY_KG > 0):
-        return True
+def srcfield_is_supported(analyses):
+    friend = fetch_range_analyses_lst(analyses.core, ANALYSES['SRCFLD_IS_FRDL_TOU_BY_PW'], ANALYSES['SRCFLD_IS_FRDL_TOU_BY_KG'])
+
+    if(friend in None):
+        return False
     else:
-        return False
-
-
-def dstfield_is_attacked(token):
-    if(token & DSTFLD_IS_ENM_TOU_BY_PW > 0 or 
-       token & DSTFLD_IS_ENM_TOU_BY_KN > 0 or 
-       token & DSTFLD_IS_ENM_TOU_BY_BP > 0 or 
-       token & DSTFLD_IS_ENM_TOU_BY_RK > 0 or 
-       token & DSTFLD_IS_ENM_TOU_BY_QU > 0 or 
-       token & DSTFLD_IS_ENM_TOU_BY_KG > 0):
         return True
-    else:
+
+
+def dstfield_is_attacked(analyses):
+    enemy = fetch_range_analyses_lst(analyses.core, ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'], ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
+
+    if(enemy in None):
         return False
-
-
-def dstfield_is_supported(token):
-    if(token & DSTFLD_IS_FRDL_TOU_BY_PW > 0 or 
-       token & DSTFLD_IS_FRDL_TOU_BY_KN > 0 or 
-       token & DSTFLD_IS_FRDL_TOU_BY_BP > 0 or 
-       token & DSTFLD_IS_FRDL_TOU_BY_RK > 0 or 
-       token & DSTFLD_IS_FRDL_TOU_BY_QU > 0 or 
-       token & DSTFLD_IS_FRDL_TOU_BY_KG > 0):
+    else:
         return True
+
+
+def dstfield_is_supported(analyses):
+    friend = fetch_range_analyses_lst(analyses.core, ANALYSES['DSTFLD_IS_FRDL_TOU_BY_PW'], ANALYSES['DSTFLD_IS_FRDL_TOU_BY_KG'])
+
+    if(friend in None):
+        return False
     else:
+        return True
+
+
+def is_attacked_supported(analyses):
+    if(len(analyses.attacked) == 0):
         return False
 
-
-def is_attacked_supported(attacked):
-    if(len(attacked) == 0):
-        return None
-
-    for ctouch_beyond in attacked:
+    for ctouch_beyond in analyses.attacked:
         if(len(ctouch_beyond.supporter_beyond) > 0):
             return True
 
     return False
 
 
-def is_attacked_pinned(match, attacked):
-    if(len(attacked) == 0):
-        return None
+def is_attacked_pinned(match, analyses):
+    if(len(analyses.attacked) == 0):
+        return False
 
-    for ctouch_beyond in attacked:
+    for ctouch_beyond in analyses.attacked:
         pindir = rules.pin_dir(match, None, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
         if(pindir != rules.DIRS['undefined']):
             return True
@@ -465,30 +441,30 @@ def is_attacked_pinned(match, attacked):
     return False
 
 
-def is_attacked_soft_pinned(match, attacked):
-    if(len(attacked) == 0):
-        return None
+def is_attacked_soft_pinned(match, analyses):
+    if(len(analyses.attacked) == 0):
+        return False
 
-    for ctouch_beyond in attacked:
+    for ctouch_beyond in analyses.attacked:
         if(is_soft_pin(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)):
             return True
 
     return False
 
 
-def is_attacked_add_attacked(attacked):
-    if(len(attacked) == 0):
-        return None
+def is_attacked_add_attacked(analyses):
+    if(len(analyses.attacked) == 0):
+        return False
 
-    for ctouch_beyond in attacked:
+    for ctouch_beyond in analyses.attacked:
         if(len(ctouch_beyond.attacker_beyond) > 0):
             return True
 
     return False
 
 
-def is_attacked_higher_than_piece(match, attacked):
-    for ctouch_beyond in attacked:
+def is_attacked_higher_than_piece(match, analyses):
+    for ctouch_beyond in analyses.attacked:
         piece = match.readfield(ctouch_beyond.agent_srcx, ctouch_beyond.agent_srcy)
         if(PIECES_RANK[ctouch_beyond.piece] > PIECES_RANK[piece]):
             return True
@@ -496,20 +472,20 @@ def is_attacked_higher_than_piece(match, attacked):
     return False
 
 
-def is_supported_attacked(supported):
-    if(len(supported) == 0):
-        return None
+def is_supported_attacked(analyses):
+    if(len(analyses.supported) == 0):
+        return False
 
-    for ctouch_beyond in supported:
+    for ctouch_beyond in analyses.supported:
         if(len(ctouch_beyond.attacker_beyond) > 0):
             return True
 
     return False
 
 
-def is_supported_lower_equal_than_attacker(supported):
-    if(len(supported) == 0):
-        return None
+def is_supported_lower_equal_than_attacker(analyses):
+    if(len(analyses.supported) == 0):
+        return False
 
     for ctouch_beyond in supported:
         for attacker_beyond in ctouch_beyond.attacker_beyond:
@@ -519,32 +495,32 @@ def is_supported_lower_equal_than_attacker(supported):
     return True
 
 
-def is_supported_add_supported(supported):
-    if(len(supported) == 0):
-        return None
+def is_supported_add_supported(analyses):
+    if(len(analyses.supported) == 0):
+        return False
 
-    for ctouch_beyond in supported:
+    for ctouch_beyond in analyses.supported:
         if(len(ctouch_beyond.supporter_beyond) > 0):
             return True
 
     return False
 
 
-def is_disclosed_attacked_supported(disclosed_attacked):
-    if(len(disclosed_attacked) == 0):
-        return None
+def is_disclosed_attacked_supported(analyses):
+    if(len(analyses.disclosed_attacked) == 0):
+        return False
 
-    for ctouch_beyond in disclosed_attacked:
+    for ctouch_beyond in analyses.disclosed_attacked:
         if(len(ctouch_beyond.supporter_beyond) > 0):
             return True
 
     return False
 
 
-def highest_disclosed_attacked(disclosed_attacked):
+def highest_disclosed_attacked(analyses):
     piece = PIECES['blk']
 
-    for ctouch_beyond in disclosed_attacked:
+    for ctouch_beyond in analyses.disclosed_attacked:
         if(PIECES_RANK[ctouch_beyond.piece] > PIECES_RANK[piece]):
             piece = ctouch_beyond.piece
 
