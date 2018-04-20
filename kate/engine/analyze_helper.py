@@ -418,6 +418,19 @@ def dstfield_is_supported(analyses):
         return True
 
 
+def dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(analyses):
+    frnd_cnt = 0
+    enmy_cnt = 0
+
+    for core in analyses.lst_core:
+        if(core >= ANALYSES['DSTFLD_IS_FRDL_TOU_BY_PW'] and core <= ANALYSES['DSTFLD_IS_FRDL_TOU_BY_KG']):
+            frnd_cnt += 1
+        elif(core >= ANALYSES['DSTFLD_IS_ENMY_TOU_BY_PW'] and core <= ANALYSES['DSTFLD_IS_ENMY_TOU_BY_KG']):
+            enmy_cnt += 1
+
+    return frnd_cnt >= enmy_cnt
+
+
 def is_attacked_supported(analyses):
     if(len(analyses.lst_attacked) == 0):
         return False
