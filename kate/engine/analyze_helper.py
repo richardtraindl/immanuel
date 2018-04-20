@@ -252,17 +252,15 @@ def is_fork_field(match, piece, forkx, forky):
     return False
 
 def fetch_analyses_lst(list, search_item):
-    print(type(search_item))
     for item in list:
-        print(type(item))
-        if(int(item) == search_item):
+        if(item == search_item):
             return item
 
     return None
 
 def fetch_range_analyses_lst(list, start_item, end_item):
     for item in list:
-        if(int(item) >= start_item and int(item) <= end_item):
+        if(item >= start_item and item <= end_item):
             return item
 
     return None
