@@ -357,8 +357,7 @@ def eval_tactics(match, priomoves):
         if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_SUPPORT_UNATTACKED'])):
             priomove.tactics.append(TACTICS['support-unattacked'])
 
-        if(token & MV_IS_DISCLOSURE > 0):
-        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_FLEE'])):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_DISCLOSURE'])):
             if(is_disclosed_attacked_supported(priomove.analyses) == False):
                 priomove.tactics.append(TACTICS['attack-good-deal'])
                 all_disclosed_attacking.append(priomove)
