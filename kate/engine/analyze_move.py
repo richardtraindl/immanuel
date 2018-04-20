@@ -18,26 +18,26 @@ def captures(match, move, analyses):
     dstpiece = match.readfield(move.dstx, move.dsty)
 
     if(dstpiece != PIECES['blk']):
-        analyses.append(ANALYSES['MV_IS_CAPTURE'])
+        analyses.lst_core.append(ANALYSES['MV_IS_CAPTURE'])
         if(dstpiece == PIECES['wPw'] or dstpiece == PIECES['bPw']):
-            analyses.append('CAPTURED_IS_PW')
+            analyses.lst_core.append('CAPTURED_IS_PW')
         elif(dstpiece == PIECES['wKn'] or dstpiece == PIECES['bKn']):
-            analyses.append(ANALYSES['CAPTURED_IS_KN'])
+            analyses.lst_core.append(ANALYSES['CAPTURED_IS_KN'])
         elif(dstpiece == PIECES['wBp'] or dstpiece == PIECES['bBp']):
-            analyses.append(ANALYSES['CAPTURED_IS_BP'])
+            analyses.lst_core.append(ANALYSES['CAPTURED_IS_BP'])
         elif(dstpiece == PIECES['wRk'] or dstpiece == PIECES['bRk']):
-            analyses.append(ANALYSES['CAPTURED_IS_RK'])
+            analyses.lst_core.append(ANALYSES['CAPTURED_IS_RK'])
         elif(dstpiece == PIECES['wQu'] or dstpiece == PIECES['bQu']):
-            analyses.append(ANALYSES['CAPTURED_IS_QU'])
+            analyses.lst_core.append(ANALYSES['CAPTURED_IS_QU'])
 
     elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and move.srcx != move.dstx ):
-        analyses.append(ANALYSES['MV_IS_CAPTURE'])
-        analyses.append(ANALYSES['CAPTURED_IS_PW'])
+        analyses.lst_core.append(ANALYSES['MV_IS_CAPTURE'])
+        analyses.lst_core.append(ANALYSES['CAPTURED_IS_PW'])
 
 
 def promotes(match, move, analyses):
     if(move.prom_piece != PIECES['blk']):
-        analyses.append(ANALYSES['MV_IS_PROMOTION'])
+        analyses.lst_core.append(ANALYSES['MV_IS_PROMOTION'])
 
 
 def castles(match, move, analyses):
@@ -45,34 +45,29 @@ def castles(match, move, analyses):
 
     if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
         if(move.srcx - move.dstx == 2 or move.srcx - move.dstx == -2):
-            analyses.append(ANALYSES['MV_IS_CASTLING'])
+            analyses.lst_core.append(ANALYSES['MV_IS_CASTLING'])
 
 
 def attacks_and_supports(match, move, analyses):
-    attacked = []
-    supported = []
-
     piece = match.readfield(move.srcx, move.srcy)
 
     if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        pawn.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses, attacked, supported)
+        pawn.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses)
     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        knight.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses, attacked, supported)
+        knight.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses)
     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        bishop.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses, attacked, supported)
+        bishop.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses)
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        rook.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses, attacked, supported)    
+        rook.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses)    
     elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        rook.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses, attacked, supported)
-        bishop.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses, attacked, supported)
+        rook.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses)
+        bishop.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses)
     elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        king.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses, attacked, supported)
+        king.attacks_and_supports(match, move.srcx, move.srcy, move.dstx, move.dsty, analyses)
         if(move.srcx - move.dstx == -2):
-            rook.attacks_and_supports(match, move.dstx + 1, move.srcy, move.dstx - 1, move.dsty, analyses, attacked, supported)
+            rook.attacks_and_supports(match, move.dstx + 1, move.srcy, move.dstx - 1, move.dsty, analyses)
         elif(move.srcx - move.dstx == 2):
-            rook.attacks_and_supports(match, move.dstx - 2, move.srcy, move.dstx + 1, move.dsty, analyses, attacked, supported)
-
-    return attacked, supported
+            rook.attacks_and_supports(match, move.dstx - 2, move.srcy, move.dstx + 1, move.dsty, analyses)
 
 
 def defends_check(match, move, analyses):
@@ -89,23 +84,17 @@ def defends_check(match, move, analyses):
         kg_y = match.bKg_y
 
     if(rules.is_king_attacked(match, kg_x, kg_y)):
-        analyses.append(ANALYSES['MV_DEFENDS_CHECK'])
+        analyses.lst_core.append(ANALYSES['MV_DEFENDS_CHECK'])
 
 
 def defends_fork(match, move, analyses):
-    fork_defended = []
-
     piece = match.readfield(move.srcx, move.srcy)
 
-    if(defends_fork_field(match, piece, move.srcx, move.srcy, move.dstx, move.dsty, fork_defended)):
-        analyses.append(ANALYSES['MV_IS_FORK_DEFENSE'])
-
-    return fork_defended
+    if(defends_fork_field(match, piece, move.srcx, move.srcy, move.dstx, move.dsty, analyses)):
+        analyses.lst_core.append(ANALYSES['MV_IS_FORK_DEFENSE'])
 
 
 def disclosures(match, move, analyses):
-    disclosed_attacked = []
-    
     piece = match.readfield(move.srcx, move.srcy)
 
     color = Match.color_of_piece(piece)
@@ -116,11 +105,11 @@ def disclosures(match, move, analyses):
 
     do_move(match, move.srcx, move.srcy, move.dstx, move.dsty, move.prom_piece)
 
-    if(rook.disclosures_field(match, color, excluded_dir, move.srcx, move.srcy, disclosed_attacked)):
-        analyses.append(ANALYSES['MV_IS_DISCLOSURE'])
+    if(rook.disclosures_field(match, color, excluded_dir, move.srcx, move.srcy, analyses)):
+        analyses.lst_core.append(ANALYSES['MV_IS_DISCLOSURE'])
 
-    if(bishop.disclosures_field(match, color, excluded_dir, move.srcx, move.srcy, disclosed_attacked)):
-        analyses.append(ANALYSES['MV_IS_DISCLOSURE'])
+    if(bishop.disclosures_field(match, color, excluded_dir, move.srcx, move.srcy, analyses)):
+        analyses.lst_core.append(ANALYSES['MV_IS_DISCLOSURE'])
 
     undo_move(match)
 
@@ -132,8 +121,6 @@ def disclosures(match, move, analyses):
 
     match.writefield(move.srcx, move.srcy, piece)
     ###
-    
-    return disclosed_attacked
 
 
 def flees(match, move, analyses):
@@ -171,7 +158,7 @@ def flees(match, move, analyses):
     if((old_lower_cnt + old_higher_cnt) > 0 and 
        (new_lower_cnt < old_lower_cnt or 
         new_lower_cnt + new_higher_cnt < old_lower_cnt + old_higher_cnt)):
-        analyses.append(ANALYSES['MV_IS_FLEE'])
+        analyses.lst_core.append(ANALYSES['MV_IS_FLEE'])
 
 
 def progress(match, move, analyses):
@@ -179,9 +166,9 @@ def progress(match, move, analyses):
 
     if(is_endgame(match)):
         if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-            analyses.append(ANALYSES['MV_IS_RUNNING_PAWN'])
+            analyses.core.append(ANALYSES['MV_IS_RUNNING_PAWN'])
         elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-            analyses.append(ANALYSES['MV_IS_PROGRESS'])
+            analyses.lst_core.append(ANALYSES['MV_IS_PROGRESS'])
 
     """color = Match.color_of_piece(piece)
 
@@ -208,37 +195,35 @@ def controles_file(match, move, analyses):
         return
     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
         if(bishop.controles_file(match, piece, color, move.srcx, move.srcy, move.dstx, move.dsty)):
-            analyses.append(ANALYSES['MV_CONTROLES_FILE'])
+            analyses.lst_core.append(ANALYSES['MV_CONTROLES_FILE'])
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
         if(rook.controles_file(match, piece, color, move.srcx, move.srcy, move.dstx, move.dsty)):
-            analyses.append(ANALYSES['MV_CONTROLES_FILE'])
+            analyses.lst_core.append(ANALYSES['MV_CONTROLES_FILE'])
     elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         if(rook.controles_file(match, piece, color, move.srcx, move.srcy, move.dstx, move.dsty)):
-            analyses.append(ANALYSES['MV_CONTROLES_FILE'])
+            analyses.lst_core.append(ANALYSES['MV_CONTROLES_FILE'])
         if(bishop.controles_file(match, piece, color, move.srcx, move.srcy, move.dstx, move.dsty)):
-            analyses.append(ANALYSES['MV_CONTROLES_FILE'])
+            analyses.lst_core.append(ANALYSES['MV_CONTROLES_FILE'])
 
 
-def analyze_move(match, move):
-    analyses = []
-
+def analyze_move(match, move, analyses):
     piece = match.readfield(move.srcx, move.srcy)
-    
+
     color = Match.color_of_piece(piece)
 
     ###
     if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        analyses.append(ANALYSES['MV_PIECE_IS_PW'])
+        analyses.lst_core.append(ANALYSES['MV_PIECE_IS_PW'])
     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        analyses.append(ANALYSES['MV_PIECE_IS_KN'])
+        analyses.lst_core.append(ANALYSES['MV_PIECE_IS_KN'])
     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        analyses.append(ANALYSES['MV_PIECE_IS_BP'])
+        analyses.lst_core.append(ANALYSES['MV_PIECE_IS_BP'])
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        analyses.append(ANALYSES['MV_PIECE_IS_RK'])
+        analyses.lst_core.append(ANALYSES['MV_PIECE_IS_RK'])
     elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        analyses.append(ANALYSES['MV_PIECE_IS_QU'])
+        analyses.lst_core.append(ANALYSES['MV_PIECE_IS_QU'])
     elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        analyses.append(ANALYSES['MV_PIECE_IS_KG'])
+        analyses.lst_core.append(ANALYSES['MV_PIECE_IS_KG'])
     ###
 
     ###
@@ -275,8 +260,6 @@ def analyze_move(match, move):
     
     controles_file(match, move, analyses)
 
-    return analyses, attacked, supported, disclosed_attacked, fork_defended
-
 
 def downgrade(priomove, old_tactic, new_tactic):
     priomove.prio = TACTICS_TO_PRIO[new_tactic]
@@ -298,56 +281,60 @@ def fetch_first_tactics(priomove):
     return  fetch_tactics(priomove, 0)
 
 def eval_tactics(match, priomoves):
-    all_analyses = []
+    all_attacking = []
+    all_supporting = []
+    all_fork_defending = []
+    all_disclosed_attacking = []
+    all_fleeing = []
     excludes = []
 
     for priomove in priomoves:
-        if(token & MV_IS_CASTLING > 0):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_CASTLING'])):
             priomove.tactics.append(TACTICS['castling'])
 
-        if(token & MV_IS_PROMOTION > 0):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_PROMOTION'])):
             priomove.tactics.append(TACTICS['promotion'])
 
-        if(token & MV_IS_CAPTURE > 0):
-            if(piece_is_lower_equal_than_captured(priomove) or
-               dstfield_is_attacked(priomove) == False or
-               (dstfield_is_supported(priomove) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove))):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_CAPTURE'])):
+            if(piece_is_lower_equal_than_captured(priomove.analyses) or
+               dstfield_is_attacked(priomove.analyses) == False or
+               (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
                 priomove.tactics.append(TACTICS['capture-good-deal'])
             else:
                 priomove.tactics.append(TACTICS['capture-bad-deal'])
 
-        if(token & MV_IS_FORK_DEFENSE > 0):
-            if(dstfield_is_attacked(token) == False or 
-               (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_FORK_DEFENSE'])):
+            if(dstfield_is_attacked(priomove.analyses) == False or 
+               (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
                 priomove.tactics.append(TACTICS['defend-fork'])
                 all_fork_defending.append(priomove)
             else:
                 priomove.tactics.append(TACTICS['support-bad-deal'])
 
-        if(token & MV_IS_FLEE > 0):
-            if(dstfield_is_attacked(token) == False or
-                (dstfield_is_supported(token) and piece_is_lower_equal_than_enemy_on_dstfield(token))):
-                if(piece_is_lower_equal_than_enemy_on_srcfield(token) == False):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_FLEE'])):
+            if(dstfield_is_attacked(priomove.analyses) == False or
+                (dstfield_is_supported(priomove.analyses) and piece_is_lower_equal_than_enemy_on_dstfield(priomove.analyses))):
+                if(piece_is_lower_equal_than_enemy_on_srcfield(priomove.analyses) == False):
                     priomove.tactics.append(TACTICS['flee-urgent'])
                     all_fleeing.append(priomove)
                 elif(srcfield_is_supported(token) == False):
                     priomove.tactics.append(TACTICS['flee'])
 
-        if(token & MV_IS_ATTACK > 0):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_ATTACK'])):
             if(token & ATTACKED_IS_KG > 0):
-                if(dstfield_is_attacked(token) == False or 
-                   (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                if(dstfield_is_attacked(priomove.analyses) == False or 
+                   (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
                     priomove.tactics.append(TACTICS['attack-king-good-deal'])
                 else:
                     priomove.tactics.append(TACTICS['attack-king-bad-deal'])
             else:
-                if(dstfield_is_attacked(token) == False or 
-                   (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
+                if(dstfield_is_attacked(priomove.analyses) == False or 
+                   (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
                     if(token & ATTACK_IS_PIN > 0 or token & ATTACK_IS_SOFT_PIN > 0 or 
-                       is_attacked_pinned(match, attacked) or is_attacked_soft_pinned(match, attacked)):
+                       is_attacked_pinned(match, priomove.analyses) or is_attacked_soft_pinned(match, priomove.analyses)):
                         priomove.tactics.append(TACTICS['attack-stormy'])
                         all_attacking.append(priomove)
-                    elif(is_attacked_supported(attacked) == False or is_attacked_higher_than_piece(match, attacked)):
+                    elif(is_attacked_supported(priomove.analyses) == False or is_attacked_higher_than_piece(match, priomove.analyses)):
                         priomove.tactics.append(TACTICS['attack-good-deal'])
                         all_attacking.append(priomove)
                     else:
@@ -355,11 +342,11 @@ def eval_tactics(match, priomoves):
                 else:
                     priomove.tactics.append(TACTICS['attack-bad-deal'])
 
-        if(token & MV_IS_SUPPORT > 0):
-            if(is_supported_attacked(supported)):
-                if(dstfield_is_attacked(token) == False or 
-                   (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
-                    if(is_supported_lower_equal_than_attacker(supported)):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_SUPPORT'])):
+            if(is_supported_attacked(priomove.analyses)):
+                if(dstfield_is_attacked(priomove.analyses) == False or 
+                   (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
+                    if(is_supported_lower_equal_than_attacker(priomove.analyses)):
                         priomove.tactics.append(TACTICS['support-good-deal'])
                         all_supporting.append(priomove)
                     else:
@@ -367,24 +354,24 @@ def eval_tactics(match, priomoves):
                 else:
                     priomove.tactics.append(TACTICS['support-bad-deal'])
 
-        if(token & MV_IS_SUPPORT_UNATTACKED > 0):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_SUPPORT_UNATTACKED'])):
             priomove.tactics.append(TACTICS['support-unattacked'])
 
         if(token & MV_IS_DISCLOSURE > 0):
-            if(is_disclosed_attacked_supported(disclosed_attacked) == False):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_FLEE'])):
+            if(is_disclosed_attacked_supported(priomove.analyses) == False):
                 priomove.tactics.append(TACTICS['attack-good-deal'])
                 all_disclosed_attacking.append(priomove)
             else:
                 priomove.tactics.append(TACTICS['attack-bad-deal'])
 
-
-        if(token & MV_IS_PROGRESS > 0): #and is_endgame(match)
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_PROGRESS'])): # and is_endgame(match)
             priomove.tactics.append(TACTICS['progress'])
 
-        if(token & MV_IS_RUNNING_PAWN > 0):
+        if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_RUNNING_PAWN'])):
             priomove.tactics.append(TACTICS['running-pawn-in-endgame'])
 
-        """if(token & MV_CONTROLES_FILE > 0):
+        """if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_CONTROLES_FILE'])):
             if(dstfield_is_attacked(token) == False or 
                (dstfield_is_supported(token) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(token))):
                priomove.tactics.append(TACTICS['controles-file-good-deal'])"""
