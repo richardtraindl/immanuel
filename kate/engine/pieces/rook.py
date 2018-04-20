@@ -180,9 +180,9 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses):
                     if(Match.color_of_piece(piece_behind) == opp_color):
                         if(PIECES_RANK[piece_behind] > PIECES_RANK[rook]):
                             if(piece_behind == PIECES['wKg'] or piece_behind == PIECES['bKg']):
-                                analyses.append(ANALYSES['ATTACK_IS_PIN'])
+                                analyses.lst_core.append(ANALYSES['ATTACK_IS_PIN'])
                             else:
-                                analyses.append(ANALYSES['ATTACK_IS_SOFT_PIN'])
+                                analyses.lst_core.append(ANALYSES['ATTACK_IS_SOFT_PIN'])
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
