@@ -218,7 +218,7 @@ ANALYSES = {
     'MV_PIECE_IS_RK' : 3,
     'MV_PIECE_IS_QU' : 4,
     'MV_PIECE_IS_KG' : 5,
-    
+
     'SRCFLD_IS_FRDL_TOU_BY_PW' : 10,
     'SRCFLD_IS_FRDL_TOU_BY_KN' : 11,
     'SRCFLD_IS_FRDL_TOU_BY_BP' : 12,
@@ -246,7 +246,7 @@ ANALYSES = {
     'DSTFLD_IS_ENM_TOU_BY_RK' : 43,
     'DSTFLD_IS_ENM_TOU_BY_QU' : 44,
     'DSTFLD_IS_ENM_TOU_BY_KG' : 45,
-    
+
     'CAPTURED_IS_PW' : 50,
     'CAPTURED_IS_KN' : 51,
     'CAPTURED_IS_BP' : 52,
@@ -260,7 +260,7 @@ ANALYSES = {
     'ATTACKED_IS_QU' : 64,
     'ATTACKED_IS_KG' : 65,
 
-    'ATTACK_IS_PIN ' : 70,
+    'ATTACK_IS_PIN'      : 70,
     'ATTACK_IS_SOFT_PIN' : 71,
 
     'SUPPORTED_IS_PW' : 80,
@@ -268,19 +268,19 @@ ANALYSES = {
     'SUPPORTED_IS_BP' : 82,
     'SUPPORTED_IS_RK' : 83,
     'SUPPORTED_IS_QU' : 84, 
-    
-    'MV_IS_CASTLING' : 100,
-    'MV_IS_PROMOTION' : 101,
-    'MV_IS_CAPTURE' : 102,    
-    'MV_IS_ATTACK' : 103,
-    'MV_IS_DISCLOSURE' : 104,
-    'MV_IS_FORK' : 105,
-    'MV_IS_FORK_DEFENSE' : 106,
-    'MV_DEFENDS_CHECK' : 107,
-    'MV_IS_SUPPORT' : 108,
-    'MV_IS_SUPPORT_UNATTACKED' : 109,
-    'MV_IS_FLEE' : 110,
-    'MV_IS_PROGRESS' : 111,
-    'MV_IS_RUNNING_PAWN' : 112,
-    'MV_CONTROLES_FILE' : 113 }
+
+    'MV_IS_CASTLING'           : 90,
+    'MV_IS_PROMOTION'          : 91,
+    'MV_IS_CAPTURE'            : 92,    
+    'MV_IS_ATTACK'             : 93,
+    'MV_IS_DISCLOSURE'         : 94,
+    'MV_IS_FORK'               : 95,
+    'MV_IS_FORK_DEFENSE'       : 96,
+    'MV_DEFENDS_CHECK'         : 97,
+    'MV_IS_SUPPORT'            : 98,
+    'MV_IS_SUPPORT_UNATTACKED' : 99,
+    'MV_IS_FLEE'               : 100,
+    'MV_IS_PROGRESS'           : 101,
+    'MV_IS_RUNNING_PAWN'       : 102,
+    'MV_CONTROLES_FILE'        : 103 }
 
