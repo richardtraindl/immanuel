@@ -339,7 +339,7 @@ def piece_is_lower_equal_than_enemy_on_dstfield(analyses):
     if(enemy in None):
         return False
     
-   if(piece == ANALYSES['MV_PIECE_IS_KG']):
+    if(piece == ANALYSES['MV_PIECE_IS_KG']):
         return False
     elif(piece == ANALYSES['MV_PIECE_IS_QU']):
         if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_RK'] or
@@ -372,7 +372,7 @@ def piece_is_lower_fairy_equal_than_enemy_on_dstfield(analyses):
     if(enemy in None):
         return False
 
-   if(piece == ANALYSES['MV_PIECE_IS_KG']):
+    if(piece == ANALYSES['MV_PIECE_IS_KG']):
         return False
     elif(piece == ANALYSES['MV_PIECE_IS_QU']):
         if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_RK'] or
