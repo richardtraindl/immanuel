@@ -75,11 +75,11 @@ def read_steps(steps, dir_idx, step_idx):
 
 class Analyses:
     def __init__(self):
-        self.core = []
-        self.attacked = []
-        self.supported = []
-        self.disclosed_attacked = []
-        self.fork_defended = []
+        self.lst_core = []
+        self.lst_attacked = []
+        self.lst_supported = []
+        self.lst_disclosed_attacked = []
+        self.lst_fork_defended = []
 
 class PrioMove:
     def __init__(self, gmove=None, piece=None, prio=None, prio_sec=None):
