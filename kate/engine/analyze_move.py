@@ -20,7 +20,7 @@ def captures(match, move, analyses):
     if(dstpiece != PIECES['blk']):
         analyses.lst_core.append(ANALYSES['MV_IS_CAPTURE'])
         if(dstpiece == PIECES['wPw'] or dstpiece == PIECES['bPw']):
-            analyses.lst_core.append('CAPTURED_IS_PW')
+            analyses.lst_core.append(ANALYSES['CAPTURED_IS_PW'])
         elif(dstpiece == PIECES['wKn'] or dstpiece == PIECES['bKn']):
             analyses.lst_core.append(ANALYSES['CAPTURED_IS_KN'])
         elif(dstpiece == PIECES['wBp'] or dstpiece == PIECES['bBp']):
