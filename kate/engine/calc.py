@@ -151,7 +151,7 @@ def generate_moves(match):
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
                         priomove = PrioMove(gmove, piece, PRIO['prio10'], PRIO['prio10'])
-                        analyze_move(match, gmove, priomove)
+                        analyze_move(match, gmove, priomove.analyses)
                         priomoves.append(priomove)
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
