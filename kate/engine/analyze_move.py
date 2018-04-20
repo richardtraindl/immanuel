@@ -298,14 +298,14 @@ def eval_tactics(match, priomoves):
         if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_CAPTURE'])):
             if(piece_is_lower_equal_than_captured(priomove.analyses) or
                dstfield_is_attacked(priomove.analyses) == False or
-               (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
+               (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
                 priomove.tactics.append(TACTICS['capture-good-deal'])
             else:
                 priomove.tactics.append(TACTICS['capture-bad-deal'])
 
         if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_FORK_DEFENSE'])):
             if(dstfield_is_attacked(priomove.analyses) == False or 
-               (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
+               (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
                 priomove.tactics.append(TACTICS['defend-fork'])
                 all_fork_defending.append(priomove)
             else:
@@ -313,7 +313,7 @@ def eval_tactics(match, priomoves):
 
         if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_FLEE'])):
             if(dstfield_is_attacked(priomove.analyses) == False or
-                (dstfield_is_supported(priomove.analyses) and piece_is_lower_equal_than_enemy_on_dstfield(priomove.analyses))):
+                (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(priomove.analyses) and piece_is_lower_equal_than_enemy_on_dstfield(priomove.analyses))):
                 if(piece_is_lower_equal_than_enemy_on_srcfield(priomove.analyses) == False):
                     priomove.tactics.append(TACTICS['flee-urgent'])
                     all_fleeing.append(priomove)
@@ -323,13 +323,13 @@ def eval_tactics(match, priomoves):
         if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_ATTACK'])):
             if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['ATTACKED_IS_KG'])):
                 if(dstfield_is_attacked(priomove.analyses) == False or 
-                   (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
+                   (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
                     priomove.tactics.append(TACTICS['attack-king-good-deal'])
                 else:
                     priomove.tactics.append(TACTICS['attack-king-bad-deal'])
             else:
                 if(dstfield_is_attacked(priomove.analyses) == False or 
-                   (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
+                   (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
                     if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['ATTACK_IS_PIN']) is None or 
                        fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['ATTACK_IS_SOFT_PIN']) is None or 
                        is_attacked_pinned(match, priomove.analyses) or is_attacked_soft_pinned(match, priomove.analyses)):
@@ -345,7 +345,7 @@ def eval_tactics(match, priomoves):
 
         if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_SUPPORT'])):
             if(dstfield_is_attacked(priomove.analyses) == False or 
-               (dstfield_is_supported(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
+               (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(priomove.analyses) and piece_is_lower_fairy_equal_than_enemy_on_dstfield(priomove.analyses))):
                 if(is_supported_lower_equal_than_attacker(priomove.analyses)):
                     priomove.tactics.append(TACTICS['support-good-deal'])
                     all_supporting.append(priomove)
@@ -355,7 +355,11 @@ def eval_tactics(match, priomoves):
                 priomove.tactics.append(TACTICS['support-bad-deal'])
 
         if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_SUPPORT_UNATTACKED'])):
-            priomove.tactics.append(TACTICS['support-unattacked'])
+            if(dstfield_is_attacked(priomove.analyses) == False or 
+               dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(priomove.analyses)):
+                priomove.tactics.append(TACTICS['support-unattacked'])
+            else:
+                priomove.tactics.append(TACTICS['support-bad-deal'])
 
         if(fetch_analyses_lst(priomove.analyses.lst_core, ANALYSES['MV_IS_DISCLOSURE'])):
             if(is_disclosed_attacked_supported(priomove.analyses) == False):
