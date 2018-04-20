@@ -39,20 +39,22 @@ def prnt_moves(msg, moves):
         print("")
 
 
-def prnt_analyses(priomove):
-    for analysis in priomove.analyses:
+def prnt_analyses(analyses):
+    for analysis in analyses:
         print(reverse_lookup(ANALYSES, analysis), end=" ")
 
-def prnt_tactics(priomove):
-    for tactic in priomove.tactics:
+
+def prnt_tactics(tactics):
+    for tactic in tactics:
         print(reverse_lookup(TACTICS, tactic), end=" ")
+
 
 def prnt_priomoves(priomoves, priocnts):
     for priomove in priomoves:
         prnt_move("\n", priomove.gmove, "")
         print(" piece:" + str(priomove.piece))
-        prnt_analyses(priomove)
-        prnt_tactics(priomove)
+        prnt_analyses(priomove.analyses)
+        prnt_tactics(priomove.tactics)
         print("\n")
 
     for i in range(len(priocnts)):
@@ -71,15 +73,19 @@ def read_steps(steps, dir_idx, step_idx):
     prom_piece = steps[dir_idx][step_idx][2]
     return stepx, stepy, prom_piece
 
+class Analyses:
+    def __init__(self):
+        self.core = []
+        self.attacked = []
+        self.supported = []
+        self.disclosed_attacked = []
+        self.fork_defended = []
+
 class PrioMove:
-    def __init__(self, gmove=None, piece=None, analyses=None, attacked= None, supported=None,disclosed_attacked=None, fork_defended=None, prio=None, prio_sec=None):
+    def __init__(self, gmove=None, piece=None, prio=None, prio_sec=None):
         self.gmove = gmove
         self.piece = piece
-        self.analyses = analyses
-        self.attacked = attacked
-        self.supported = supported
-        self.disclosed_attacked = disclosed_attacked
-        self.fork_defended = fork_defended
+        self.analyses = Analyses()
         self.tactics = []
         self.prio = prio
         self.prio_sec = prio_sec
@@ -144,8 +150,8 @@ def generate_moves(match):
                     flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
-                        analyses, attacked, supported, disclosed_attacked, fork_defended = analyze_move(match, gmove)
-                        priomove = PrioMove(gmove, piece, analyses, attacked, supported, disclosed_attacked, fork_defended, PRIO['prio10'], PRIO['prio10'])
+                        priomove = PrioMove(gmove, piece, PRIO['prio10'], PRIO['prio10'])
+                        analyze_move(match, gmove, priomove)
                         priomoves.append(priomove)
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
@@ -302,8 +308,8 @@ def calc_max(match, depth, alpha, beta, last_pmove):
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, " | ")
-            prnt_analyses(priomove)
-            prnt_tactics(priomove)
+            prnt_analyses(priomove.analyses)
+            prnt_tactics(priomove.tactics)
             print(reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
         move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
@@ -390,8 +396,8 @@ def calc_min(match, depth, alpha, beta, last_pmove):
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, " | ")
-            prnt_analyses(priomove)
-            prnt_tactics(priomove)
+            prnt_analyses(priomove.analyses)
+            prnt_tactics(priomove.tactics)
             print(reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
         move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
@@ -448,8 +454,6 @@ def calc_min(match, depth, alpha, beta, last_pmove):
 
 
 def calc_move(match):
-    prnt_attributes(match, "\n")
-    
     print("is opening: " + str(is_opening(match)) + " is endgame: " + str(is_endgame(match)))
 
     candidates = []
