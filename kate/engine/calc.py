@@ -39,9 +39,9 @@ def prnt_moves(msg, moves):
         print("")
 
 
-def prnt_analyses(analyses):
-    for analysis in analyses:
-        print(reverse_lookup(ANALYSES, analysis), end=" ")
+def prnt_core_analyses(lst_core):
+    for core in lst_core:
+        print(reverse_lookup(ANALYSES, core), end=" ")
 
 
 def prnt_tactics(tactics):
@@ -53,7 +53,7 @@ def prnt_priomoves(priomoves, priocnts):
     for priomove in priomoves:
         prnt_move("\n", priomove.gmove, "")
         print(" piece:" + str(priomove.piece))
-        prnt_analyses(priomove.analyses)
+        prnt_core_analyses(priomove.analyses.lst_core)
         prnt_tactics(priomove.tactics)
         print("\n")
 
@@ -308,7 +308,7 @@ def calc_max(match, depth, alpha, beta, last_pmove):
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, " | ")
-            prnt_analyses(priomove.analyses)
+            prnt_core_analyses(priomove.analyses.lst_core)
             prnt_tactics(priomove.tactics)
             print(reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
@@ -396,7 +396,7 @@ def calc_min(match, depth, alpha, beta, last_pmove):
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, " | ")
-            prnt_analyses(priomove.analyses)
+            prnt_core_analyses(priomove.analyses.lst_core)
             prnt_tactics(priomove.tactics)
             print(reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
