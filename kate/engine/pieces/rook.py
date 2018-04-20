@@ -365,7 +365,7 @@ def count_touches(match, color, fieldx, fieldy):
     return count
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, analyses):
     if(is_move_stuck(match, srcx, srcy, dstx, dsty)):
         return False
 
@@ -392,7 +392,7 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
 
             if(analyze_helper.is_fork_field(match, piece, x1, y1)):
                 cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
-                forked.append(cfork)
+                analyses.lst_fork_defended.append(cfork)
                 return True
 
             if(Match.color_of_piece(fork_field) == color):
