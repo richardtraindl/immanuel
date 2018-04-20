@@ -246,7 +246,7 @@ def analyze_move(match, move, analyses):
 
     castles(match, move, analyses)
 
-    attacked, supported = attacks_and_supports(match, move, analyses)
+    attacks_and_supports(match, move, analyses)
     
     defends_check(match, move, analyses)
 
