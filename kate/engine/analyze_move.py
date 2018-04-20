@@ -116,7 +116,7 @@ def disclosures(match, move, analyses):
     ###
     match.writefield(move.srcx, move.srcy, PIECES['blk'])
 
-    for ctouch_beyond in disclosed_attacked:
+    for ctouch_beyond in analyses.lst_disclosed_attacked:
         field_touches_beyond(match, color, ctouch_beyond)
 
     match.writefield(move.srcx, move.srcy, piece)
@@ -166,7 +166,7 @@ def progress(match, move, analyses):
 
     if(is_endgame(match)):
         if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-            analyses.core.append(ANALYSES['MV_IS_RUNNING_PAWN'])
+            analyses.lst_core.append(ANALYSES['MV_IS_RUNNING_PAWN'])
         elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
             analyses.lst_core.append(ANALYSES['MV_IS_PROGRESS'])
 
