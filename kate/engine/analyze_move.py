@@ -29,7 +29,6 @@ def captures(match, move, analyses):
             analyses.lst_core.append(ANALYSES['CAPTURED_IS_RK'])
         elif(dstpiece == PIECES['wQu'] or dstpiece == PIECES['bQu']):
             analyses.lst_core.append(ANALYSES['CAPTURED_IS_QU'])
-
     elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and move.srcx != move.dstx ):
         analyses.lst_core.append(ANALYSES['MV_IS_CAPTURE'])
         analyses.lst_core.append(ANALYSES['CAPTURED_IS_PW'])
