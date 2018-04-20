@@ -269,7 +269,7 @@ def piece_is_lower_equal_than_captured(analyses):
     piece = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
     captured_piece = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['CAPTURED_IS_PW'], ANALYSES['CAPTURED_IS_QU'])
 
-    if(captured_piece in None):
+    if(captured_piece is None):
         return False
 
     if(piece == ANALYSES['MV_PIECE_IS_KG']):
@@ -303,7 +303,7 @@ def piece_is_lower_equal_than_enemy_on_srcfield(analyses):
     piece = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
     enemy = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW'], ANALYSES['SRCFLD_IS_ENM_TOU_BY_KG'])
 
-    if(enemy in None):
+    if(enemy is None):
         return False
 
     if(piece == ANALYSES['MV_PIECE_IS_KG']):
@@ -336,7 +336,7 @@ def piece_is_lower_equal_than_enemy_on_dstfield(analyses):
     piece = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
     enemy = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'], ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
 
-    if(enemy in None):
+    if(enemy is None):
         return False
     
     if(piece == ANALYSES['MV_PIECE_IS_KG']):
@@ -369,7 +369,7 @@ def piece_is_lower_fairy_equal_than_enemy_on_dstfield(analyses):
     piece = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
     enemy = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'], ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
 
-    if(enemy in None):
+    if(enemy is None):
         return False
 
     if(piece == ANALYSES['MV_PIECE_IS_KG']):
@@ -394,7 +394,7 @@ def piece_is_lower_fairy_equal_than_enemy_on_dstfield(analyses):
 def srcfield_is_supported(analyses):
     friend = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['SRCFLD_IS_FRDL_TOU_BY_PW'], ANALYSES['SRCFLD_IS_FRDL_TOU_BY_KG'])
 
-    if(friend in None):
+    if(friend is None):
         return False
     else:
         return True
@@ -403,7 +403,7 @@ def srcfield_is_supported(analyses):
 def dstfield_is_attacked(analyses):
     enemy = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'], ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
 
-    if(enemy in None):
+    if(enemy is None):
         return False
     else:
         return True
@@ -412,7 +412,7 @@ def dstfield_is_attacked(analyses):
 def dstfield_is_supported(analyses):
     friend = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['DSTFLD_IS_FRDL_TOU_BY_PW'], ANALYSES['DSTFLD_IS_FRDL_TOU_BY_KG'])
 
-    if(friend in None):
+    if(friend is None):
         return False
     else:
         return True
