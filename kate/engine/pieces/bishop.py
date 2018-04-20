@@ -138,7 +138,7 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
   
-def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses, attacked, supported):
+def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses):
     bishop = match.readfield(srcx, srcy)
 
     color = Match.color_of_piece(bishop)
@@ -159,21 +159,21 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses, attacked, supp
             
             if(Match.color_of_piece(piece) == opp_color):
                 ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                attacked.append(ctouch_beyond)
+                analyses.lst_attacked.append(ctouch_beyond)
 
-                analyses.append(ANALYSES['MV_IS_ATTACK'])
+                analyses.lst_core.append(ANALYSES['MV_IS_ATTACK'])
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                    analyses.append(ANALYSES['ATTACKED_IS_PW'])
+                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_PW'])
                 elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                    analyses.append(ANALYSES['ATTACKED_IS_KN'])
+                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_KN'])
                 elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                    analyses.append(ANALYSES['ATTACKED_IS_BP'])
+                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_BP'])
                 elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                    analyses.append(ANALYSES['ATTACKED_IS_RK'])
+                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_RK'])
                 elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    analyses.append(ANALYSES['ATTACKED_IS_QU'])
+                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_QU'])
                 elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    analyses.append(ANALYSES['ATTACKED_IS_KG'])
+                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_KG'])
 
                 # attacked piece behind
                 x2, y2 = rules.search(match, x1, y1, stepx, stepy)
@@ -182,9 +182,9 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses, attacked, supp
                     if(Match.color_of_piece(piece_behind) == opp_color):
                         if(PIECES_RANK[piece_behind] > PIECES_RANK[bishop]):
                             if(piece_behind == PIECES['wKg'] or piece_behind == PIECES['bKg']):
-                                analyses.append(ANALYSES['ATTACK_IS_PIN'])
+                                analyses.lst_core.append(ANALYSES['ATTACK_IS_PIN'])
                             else:
-                                analyses.append(ANALYSES['ATTACK_IS_SOFT_PIN'])
+                                analyses.lst_core.append(ANALYSES['ATTACK_IS_SOFT_PIN'])
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
@@ -199,23 +199,23 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses, attacked, supp
                     continue
 
                 ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                supported.append(ctouch_beyond)
+                analyses.lst_supported.append(ctouch_beyond)
 
                 if(rules.is_field_touched(match, opp_color, x1, y1, 0)):
-                    analyses.append(ANALYSES['MV_IS_SUPPORT'])
+                    analyses.lst_core.append(ANALYSES['MV_IS_SUPPORT'])
                 else:
-                    analyses.append(ANALYSES['MV_IS_SUPPORT_UNATTACKED'])
+                    analyses.lst_core.append(ANALYSES['MV_IS_SUPPORT_UNATTACKED'])
 
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                    analyses.append(ANALYSES['SUPPORTED_IS_PW'])
+                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_PW'])
                 elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                    analyses.append(ANALYSES['SUPPORTED_IS_KN'])
+                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_KN'])
                 elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                    analyses.append(ANALYSES['SUPPORTED_IS_BP'])
+                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_BP'])
                 elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                    analyses.append(ANALYSES['SUPPORTED_IS_RK'])
+                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_RK'])
                 elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    analyses.append(ANALYSES['SUPPORTED_IS_QU'])
+                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_QU'])
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
@@ -226,7 +226,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses, attacked, supp
                 ###
 
 
-def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked):
+def disclosures_field(match, color, excluded_dir, srcx, srcy, analyses):
     for j in range(0, 4, 2):
         first = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
         second = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
@@ -253,12 +253,12 @@ def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked
                         if(Match.color_of_piece(first.piece) == color):
                             if(first.piece == PIECES['wBp'] or first.piece == PIECES['bBp'] or 
                                first.piece == PIECES['wQu'] or first.piece == PIECES['bQu']):
-                                disclosed_attacked.append(second)
+                                analyses.lst_disclosed_attacked.append(second)
                                 return True
                         else:
                             if(second.piece == PIECES['wBp'] or second.piece == PIECES['bBp'] or 
                                second.piece == PIECES['wQu'] or second.piece == PIECES['bQu']):
-                                disclosed_attacked.append(first)
+                                analyses.lst_disclosed_attacked.append(first)
                                 return True
                     else:
                         break
