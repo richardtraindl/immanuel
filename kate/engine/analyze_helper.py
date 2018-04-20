@@ -129,6 +129,73 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
 
+def analyse_piece_fields(frdlycontacts, enmycontacts, mode, analyses):
+    if(mode == "SRCFIELDTOUCHES"):
+        for friend in frdlycontacts:
+            piece = friend.piece
+            
+            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                analyses.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_PW'])
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+                analyses.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_KN'])
+            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                analyses.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_BP'])
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+                analyses.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_RK'])
+            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                analyses.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_QU'])
+            elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                analyses.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_KG'])
+            
+        for enmemy in enmycontacts:
+            piece = enmemy.piece
+            
+            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                analyses.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW'])
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+                analyses.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_KN'])
+            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                analyses.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_BP'])
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+                analyses.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_RK'])
+            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                analyses.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_QU'])
+            elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                analyses.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_KG'])
+    elif(mode == "DSTFIELDTOUCHES"):
+        for friend in frdlycontacts:
+            piece = friend.piece
+            
+            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                analyses.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_PW'])
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+                analyses.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_KN'])
+            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                analyses.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_BP'])
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+                analyses.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_RK'])
+            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                analyses.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_QU'])
+            elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                analyses.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_KG'])
+            
+        for enmemy in enmycontacts:
+            piece = enmemy.piece
+            
+            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                analyses.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'])
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+                analyses.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_KN'])
+            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                analyses.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_BP'])
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+                analyses.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_RK'])
+            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                analyses.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_QU'])
+            elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                analyses.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
+
+
 def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
     if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         return queen.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
@@ -184,8 +251,55 @@ def is_fork_field(match, piece, forkx, forky):
 
     return False
 
+def fetch_analyses(analyses, item):
+    for analysis in analyses:
+        if(analysis == item):
+            return item
 
-def piece_is_lower_equal_than_captured(token):
+    return None
+
+def fetch_range_analyses(analyses, start_item, end_item):
+    for analysis in analyses:
+        if(analysis >= start_item and analysis <= end_item):
+            return item
+
+    return None
+
+def piece_is_lower_equal_than_captured(priomove):
+    piece = fetch_range_analyses(analyses, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
+    captured_piece = fetch_range_analyses(analyses, ANALYSES['CAPTURED_IS_PW'], ANALYSES['CAPTURED_IS_QU'])
+
+    if(captured_piece in None):
+        return False
+
+    if(piece == ANALYSES['MV_PIECE_IS_KG']):
+        return False
+    elif(piece == ANALYSES['MV_PIECE_IS_QU']):
+        if(captured_piece == ANALYSES['CAPTURED_IS_QU']):
+            return True
+        else:
+            return False
+    elif(piece == ANALYSES['MV_PIECE_IS_RK']):
+        if(captured_piece == ANALYSES['CAPTURED_IS_QU'] or 
+           captured_piece == ANALYSES['CAPTURED_IS_RK']):
+            return True
+        else:
+            return False
+    elif(piece == ANALYSES['MV_PIECE_IS_BP'] or piece == ANALYSES['MV_PIECE_IS_KN']):
+        if(captured_piece == ANALYSES['CAPTURED_IS_QU'] or 
+           captured_piece == ANALYSES['CAPTURED_IS_RK'] or
+           captured_piece == ANALYSES['CAPTURED_IS_BP'] or
+           captured_piece == ANALYSES['CAPTURED_IS_KN']):
+            return True
+        else:
+            return False
+    elif(piece == ANALYSES['MV_PIECE_IS_PW']):
+        return True
+
+    return False
+
+
+def piece_is_lower_equal_than_captured2(token):
     if(token & MV_PIECE_IS_KG > 0):
         return False
     elif(token & MV_PIECE_IS_QU > 0):

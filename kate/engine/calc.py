@@ -10,7 +10,7 @@ from .helper import *
 from .cvalues import *
 from .rules import is_move_valid, RETURN_CODES, is_field_touched
 from .pieces import pawn, rook, bishop, knight, queen, king
-from .debug import prnt_attributes, token_to_text
+from .debug import prnt_attributes
 
 
 def prnt_move(headmsg, move, tailmsg):
@@ -39,15 +39,20 @@ def prnt_moves(msg, moves):
         print("")
 
 
+def prnt_analyses(priomove):
+    for analysis in priomove.analyses:
+        print(reverse_lookup(ANALYSES, analysis), end=" ")
+
+def prnt_tactics(priomove):
+    for tactic in priomove.tactics:
+        print(reverse_lookup(TACTICS, tactic), end=" ")
+
 def prnt_priomoves(priomoves, priocnts):
     for priomove in priomoves:
-        token = priomove.tokens[0]
-        prnt_move("\n", priomove.gmove, "")        
-        print(" piece:" + str(priomove.piece) + " token:" + hex(token) + 
-               " " + reverse_lookup(PRIO, priomove.prio) + 
-               " \ntoken: " + hex(token) + " " + token_to_text(token))
-        for tactic in priomove.tactics:
-            print(reverse_lookup(TACTICS, tactic), end=" ")
+        prnt_move("\n", priomove.gmove, "")
+        print(" piece:" + str(priomove.piece))
+        prnt_analyses(priomove)
+        prnt_tactics(priomove)
         print("\n")
 
     for i in range(len(priocnts)):
@@ -67,10 +72,14 @@ def read_steps(steps, dir_idx, step_idx):
     return stepx, stepy, prom_piece
 
 class PrioMove:
-    def __init__(self, gmove=None, piece=None, tokens=None, prio=None, prio_sec=None):
+    def __init__(self, gmove=None, piece=None, analyses=None, attacked= None, supported=None,disclosed_attacked=None, fork_defended=None, prio=None, prio_sec=None):
         self.gmove = gmove
         self.piece = piece
-        self.tokens = tokens
+        self.analyses = analyses
+        self.attacked = attacked
+        self.supported = supported
+        self.disclosed_attacked = disclosed_attacked
+        self.fork_defended = fork_defended
         self.tactics = []
         self.prio = prio
         self.prio_sec = prio_sec
@@ -135,8 +144,8 @@ def generate_moves(match):
                     flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
                     if(flag):
                         gmove = GenMove(x, y, dstx, dsty, prom_piece)
-                        tokens = analyze_move(match, gmove)
-                        priomove = PrioMove(gmove, piece, tokens, PRIO['prio10'], PRIO['prio10'])
+                        analyses, attacked, supported, disclosed_attacked, fork_defended = analyze_move(match, gmove)
+                        priomove = PrioMove(gmove, piece, analyses, attacked, supported, disclosed_attacked, fork_defended, PRIO['prio10'], PRIO['prio10'])
                         priomoves.append(priomove)
                     elif(errmsg != rules.RETURN_CODES['king-error']):
                         break
@@ -293,12 +302,9 @@ def calc_max(match, depth, alpha, beta, last_pmove):
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, " | ")
-            for tactic in priomove.tactics:
-                print(reverse_lookup(TACTICS, tactic), end=" | ")
+            prnt_analyses(priomove)
+            prnt_tactics(priomove)
             print(reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
-
-            token = priomove.tokens[0]
-            print("token: " + hex(token) + " " + token_to_text(token))
 
         move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
@@ -384,12 +390,9 @@ def calc_min(match, depth, alpha, beta, last_pmove):
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, newmove, " | ")
-            for tactic in priomove.tactics:
-                print(reverse_lookup(TACTICS, tactic), end=" | ")
+            prnt_analyses(priomove)
+            prnt_tactics(priomove)
             print(reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
-
-            token = priomove.tokens[0]
-            print("token: " + hex(token) + " " + token_to_text(token))
 
         move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 

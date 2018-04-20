@@ -138,9 +138,7 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
   
-def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
-    token = 0x0
-
+def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses, attacked, supported):
     bishop = match.readfield(srcx, srcy)
 
     color = Match.color_of_piece(bishop)
@@ -163,19 +161,19 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
                 attacked.append(ctouch_beyond)
 
-                token = token | MV_IS_ATTACK
+                analyses.append(ANALYSES['MV_IS_ATTACK'])
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                    token = token | ATTACKED_IS_PW
+                    analyses.append(ANALYSES['ATTACKED_IS_PW'])
                 elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                    token = token | ATTACKED_IS_KN
+                    analyses.append(ANALYSES['ATTACKED_IS_KN'])
                 elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                    token = token | ATTACKED_IS_BP
+                    analyses.append(ANALYSES['ATTACKED_IS_BP'])
                 elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                    token = token | ATTACKED_IS_RK
+                    analyses.append(ANALYSES['ATTACKED_IS_RK'])
                 elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    token = token | ATTACKED_IS_QU
+                    analyses.append(ANALYSES['ATTACKED_IS_QU'])
                 elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    token = token | ATTACKED_IS_KG
+                    analyses.append(ANALYSES['ATTACKED_IS_KG'])
 
                 # attacked piece behind
                 x2, y2 = rules.search(match, x1, y1, stepx, stepy)
@@ -184,9 +182,9 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                     if(Match.color_of_piece(piece_behind) == opp_color):
                         if(PIECES_RANK[piece_behind] > PIECES_RANK[bishop]):
                             if(piece_behind == PIECES['wKg'] or piece_behind == PIECES['bKg']):
-                                token = token | ATTACK_IS_PIN
+                                analyses.append(ANALYSES['ATTACK_IS_PIN'])
                             else:
-                                token = token | ATTACK_IS_SOFT_PIN
+                                analyses.append(ANALYSES['ATTACK_IS_SOFT_PIN'])
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
@@ -204,20 +202,20 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 supported.append(ctouch_beyond)
 
                 if(rules.is_field_touched(match, opp_color, x1, y1, 0)):
-                    token = token | MV_IS_SUPPORT
+                    analyses.append(ANALYSES['MV_IS_SUPPORT'])
                 else:
-                    token = token | MV_IS_SUPPORT_UNATTACKED
+                    analyses.append(ANALYSES['MV_IS_SUPPORT_UNATTACKED'])
 
                 if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                    token = token | SUPPORTED_IS_PW
+                    analyses.append(ANALYSES['SUPPORTED_IS_PW'])
                 elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                    token = token | SUPPORTED_IS_KN
+                    analyses.append(ANALYSES['SUPPORTED_IS_KN'])
                 elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                    token = token | SUPPORTED_IS_BP
+                    analyses.append(ANALYSES['SUPPORTED_IS_BP'])
                 elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                    token = token | SUPPORTED_IS_RK
+                    analyses.append(ANALYSES['SUPPORTED_IS_RK'])
                 elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    token = token | SUPPORTED_IS_QU
+                    analyses.append(ANALYSES['SUPPORTED_IS_QU'])
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
@@ -226,8 +224,6 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
 
                 match.writefield(srcx, srcy, bishop)
                 ###
-
-    return token 
 
 
 def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked):
