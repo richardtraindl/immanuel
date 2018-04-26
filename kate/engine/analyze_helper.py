@@ -135,7 +135,7 @@ def piece_is_lower_equal_than_captured(match, gmove):
         return True
 
     captured_piece = match.readfield(gmove.dstx, gmove.dsty)
-    if(piece <= captured_piece):
+    if(PIECES_RANK[piece] <= PIECES_RANK[captured_piece]):
         return True
     else:
         return False

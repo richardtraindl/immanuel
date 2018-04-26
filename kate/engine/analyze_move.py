@@ -390,5 +390,5 @@ def rank_gmoves(match, priomoves):
             priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
             break
     
-    priomoves.sort(key=attrgetter('prio'))
+    priomoves.sort(key=attrgetter('prio', 'prio_sec'))
 
