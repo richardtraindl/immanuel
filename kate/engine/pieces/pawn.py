@@ -171,7 +171,7 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
  
  
-def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses):
+def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
     pawn = match.readfield(srcx, srcy)
 
     color = Match.color_of_piece(pawn)
@@ -196,21 +196,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses):
 
             if(match.color_of_piece(piece) == opp_color):
                 ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                analyses.lst_attacked.append(ctouch_beyond)
-
-                analyses.lst_core.append(ANALYSES['MV_IS_ATTACK'])
-                if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_PW'])
-                elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_KN'])
-                elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_BP'])
-                elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_RK'])
-                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_QU'])
-                elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_KG'])
+                attacked.append(ctouch_beyond)
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
@@ -224,23 +210,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses):
                     continue
 
                 ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                analyses.lst_supported.append(ctouch_beyond)
-
-                if(rules.is_field_touched(match, opp_color, x1, y1, 0)):
-                    analyses.lst_core.append(ANALYSES['MV_IS_SUPPORT'])
-                else:
-                    analyses.lst_core.append(ANALYSES['MV_IS_SUPPORT_UNATTACKED'])
-
-                if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_PW'])
-                elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_KN'])
-                elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_BP'])
-                elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_RK'])
-                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_QU'])
+                supported.append(ctouch_beyond)
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
@@ -355,7 +325,7 @@ def count_touches(match, color, fieldx, fieldy):
     return count
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, analyses):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): #, analyses
     if(is_move_stuck(match, piece, srcx, srcy, dstx, dsty)):
         return False
 
@@ -378,8 +348,8 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, analyses):
                 continue
 
             if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
-                analyses.lst_fork_defended.append(cfork)
+                #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
+                #analyses.lst_fork_defended.append(cfork)
                 return True
 
     return False

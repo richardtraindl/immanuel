@@ -136,7 +136,7 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
 
-def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses):
+def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
     rook = match.readfield(srcx, srcy)
 
     color = Match.color_of_piece(rook)
@@ -157,32 +157,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses):
 
             if(Match.color_of_piece(piece) == opp_color):
                 ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                analyses.lst_attacked.append(ctouch_beyond)
-
-                analyses.lst_core.append(ANALYSES['MV_IS_ATTACK'])
-                if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_PW'])
-                elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_KN'])
-                elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_BP'])
-                elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_RK'])
-                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_QU'])
-                elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    analyses.lst_core.append(ANALYSES['ATTACKED_IS_KG'])
-
-                # attacked piece behind
-                x2, y2 = rules.search(match, x1, y1, stepx, stepy)
-                if(x2 != rules.UNDEF_X):
-                    piece_behind = match.readfield(x2, y2)
-                    if(Match.color_of_piece(piece_behind) == opp_color):
-                        if(PIECES_RANK[piece_behind] > PIECES_RANK[rook]):
-                            if(piece_behind == PIECES['wKg'] or piece_behind == PIECES['bKg']):
-                                analyses.lst_core.append(ANALYSES['ATTACK_IS_PIN'])
-                            else:
-                                analyses.lst_core.append(ANALYSES['ATTACK_IS_SOFT_PIN'])
+                attacked.append(ctouch_beyond)
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
@@ -196,23 +171,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses):
                     continue
 
                 ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                analyses.lst_supported.append(ctouch_beyond)
-
-                if(rules.is_field_touched(match, opp_color, x1, y1, 0)):
-                    analyses.lst_core.append(ANALYSES['MV_IS_SUPPORT'])
-                else:
-                    analyses.lst_core.append(ANALYSES['MV_IS_SUPPORT_UNATTACKED'])
-
-                if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_PW'])
-                elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_KN'])
-                elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_BP'])
-                elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_RK'])
-                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    analyses.lst_core.append(ANALYSES['SUPPORTED_IS_QU'])
+                supported.append(ctouch_beyond)
 
                 ###
                 match.writefield(srcx, srcy, PIECES['blk'])
@@ -223,7 +182,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, analyses):
                 ###
 
 
-def disclosures_field(match, color, excluded_dir, srcx, srcy, analyses):
+def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked):
     for j in range(0, 4, 2):
         first = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
         second = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
@@ -250,19 +209,15 @@ def disclosures_field(match, color, excluded_dir, srcx, srcy, analyses):
                         if(Match.color_of_piece(first.piece) == color):
                             if(first.piece == PIECES['wRk'] or first.piece == PIECES['bRk'] or 
                                first.piece == PIECES['wQu'] or first.piece == PIECES['bQu']):
-                                analyses.lst_disclosed_attacked.append(second)
-                                return True
+                                disclosed_attacked.append(second)
                         else:
                             if(second.piece == PIECES['wRk'] or second.piece == PIECES['bRk'] or 
                                second.piece == PIECES['wQu'] or second.piece == PIECES['bQu']):
-                                analyses.lst_disclosed_attacked.append(first)
-                                return True
+                                disclosed_attacked.append(first)
                     else:
                         break
                 else:
                     break
-
-    return False
 
 
 def score_attacks(match, srcx, srcy):
@@ -365,7 +320,7 @@ def count_touches(match, color, fieldx, fieldy):
     return count
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, analyses):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): #, analyses
     if(is_move_stuck(match, srcx, srcy, dstx, dsty)):
         return False
 
@@ -391,8 +346,8 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, analyses):
                 break
 
             if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
-                analyses.lst_fork_defended.append(cfork)
+                #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
+                #analyses.lst_fork_defended.append(cfork)
                 return True
 
             if(Match.color_of_piece(fork_field) == color):

@@ -5,7 +5,6 @@ from .pieces import pawn, rook, knight, bishop, queen, king
 
 
 def piece_movecnt(match, gmove):
-    
     if(gmove is None):
         return 0
 
@@ -129,86 +128,98 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
 
-def analyse_piece_fields(frdlycontacts, enmycontacts, mode, analyses):
-    if(mode == "SRCFIELDTOUCHES"):
-        for friend in frdlycontacts:
-            piece = friend.piece
-            
-            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_PW'])
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_KN'])
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_BP'])
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_RK'])
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_QU'])
-            elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_FRDL_TOU_BY_KG'])
-            
-        for enmemy in enmycontacts:
-            piece = enmemy.piece
-            
-            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW'])
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_KN'])
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_BP'])
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_RK'])
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_QU'])
-            elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                analyses.lst_core.append(ANALYSES['SRCFLD_IS_ENM_TOU_BY_KG'])
-    elif(mode == "DSTFIELDTOUCHES"):
-        for friend in frdlycontacts:
-            piece = friend.piece
-            
-            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_PW'])
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_KN'])
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_BP'])
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_RK'])
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_QU'])
-            elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_FRDL_TOU_BY_KG'])
-            
-        for enmemy in enmycontacts:
-            piece = enmemy.piece
-            
-            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'])
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_KN'])
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_BP'])
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_RK'])
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_QU'])
-            elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                analyses.lst_core.append(ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
+def piece_is_lower_equal_than_captured(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+    
+    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+        return True
+
+    captured_piece = match.readfield(gmove.dstx, gmove.dsty)
+    if(piece <= captured_piece):
+        return True
+    else:
+        return False
+  
+
+def dstfield_is_supported(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+
+    return rules.is_field_touched(match, Match.color_of_piece(piece), gmove.dstx, gmove.dsty, 0)
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked):
+def dstfield_is_attacked(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+
+    return rules.is_field_touched(match, Match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty, 0)
+
+
+def dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+
+    frdlytouches, enmytouches = field_touches(match, Match.color_of_piece(piece), gmove.dstx, gmove.dsty)
+
+    return len(frdlytouches) >= len(enmytouches)
+
+
+def piece_is_lower_equal_than_enemy_on_srcfield(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+
+    enemies = list_field_touches(match, Match.oppcolor_of_piece(piece), gmove.srcx, gmove.srcy)
+
+    for enemy in enemies:
+        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
+            return False
+
+    return True
+
+
+def piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+
+    enemies = list_field_touches(match, Match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
+
+    for enemy in enemies:
+        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
+            if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wRk']] and 
+               PIECES_RANK[enemy.piece] == PIECES_RANK[PIECES['wBp']]):
+                continue
+            else:
+                return False
+
+    return True
+
+
+def is_disclosed_attacked_supported(disclosed_attacked):
+    if(len(disclosed_attacked) == 0):
+        return False
+
+    for ctouch_beyond in disclosed_attacked:
+        if(len(ctouch_beyond.supporter_beyond) > 0):
+            return True
+
+    return False
+
+
+
+def srcfield_is_supported(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+
+    return rules.is_field_touched(match, Match.color_of_piece(piece), gmove.srcx, gmove.srcy, 0)
+
+
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
     if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        return queen.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+        return queen.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        return rook.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+        return rook.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        return bishop.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+        return bishop.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        return knight.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+        return knight.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
     elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        return king.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+        return king.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
     elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        return pawn.defends_fork_field(match, piece, srcx, srcy, dstx, dsty, forked)
+        return pawn.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
     else:
         return False
 
@@ -251,202 +262,43 @@ def is_fork_field(match, piece, forkx, forky):
 
     return False
 
-def fetch_analyses_lst(list, search_item):
-    for item in list:
-        if(item == search_item):
-            return item
 
-    return None
-
-def fetch_range_analyses_lst(list, start_item, end_item):
-    for item in list:
-        if(item >= start_item and item <= end_item):
-            return item
-
-    return None
-
-def piece_is_lower_equal_than_captured(analyses):
-    piece = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
-    captured_piece = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['CAPTURED_IS_PW'], ANALYSES['CAPTURED_IS_QU'])
-
-    if(captured_piece is None):
-        return False
-
-    if(piece == ANALYSES['MV_PIECE_IS_KG']):
-        return False
-    elif(piece == ANALYSES['MV_PIECE_IS_QU']):
-        if(captured_piece == ANALYSES['CAPTURED_IS_QU']):
+def is_piece_attacked(lst, piece1, piece2):
+    for ctouch_beyond in lst:
+        if(ctouch_beyond.piece == piece1 or ctouch_beyond.piece == piece2):
             return True
-        else:
-            return False
-    elif(piece == ANALYSES['MV_PIECE_IS_RK']):
-        if(captured_piece == ANALYSES['CAPTURED_IS_QU'] or 
-           captured_piece == ANALYSES['CAPTURED_IS_RK']):
-            return True
-        else:
-            return False
-    elif(piece == ANALYSES['MV_PIECE_IS_BP'] or piece == ANALYSES['MV_PIECE_IS_KN']):
-        if(captured_piece == ANALYSES['CAPTURED_IS_QU'] or 
-           captured_piece == ANALYSES['CAPTURED_IS_RK'] or
-           captured_piece == ANALYSES['CAPTURED_IS_BP'] or
-           captured_piece == ANALYSES['CAPTURED_IS_KN']):
-            return True
-        else:
-            return False
-    elif(piece == ANALYSES['MV_PIECE_IS_PW']):
-        return True
 
     return False
 
 
-def piece_is_lower_equal_than_enemy_on_srcfield(analyses):
-    piece = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
-    enemy = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW'], ANALYSES['SRCFLD_IS_ENM_TOU_BY_KG'])
+def piece_is_lower_equal_than_enemy_on_dstfield(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
 
-    if(enemy is None):
-        return False
+    enemies = list_field_touches(match, Match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
 
-    if(piece == ANALYSES['MV_PIECE_IS_KG']):
-        return False
-    elif(piece == ANALYSES['MV_PIECE_IS_QU']):
-        if(enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_RK'] or
-           enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_BP'] or 
-           enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_KN'] or
-           enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW']):
+    for enemy in enemies:
+        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
             return False
-        else:
-            return True
-    elif(piece == ANALYSES['MV_PIECE_IS_RK']):
-        if(enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_BP'] or 
-           enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_KN'] or 
-           enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW']):
-            return False
-        else:
-            return True
-    elif(piece == ANALYSES['MV_PIECE_IS_BP'] or piece == ANALYSES['MV_PIECE_IS_KN']):
-        if(enemy == ANALYSES['SRCFLD_IS_ENM_TOU_BY_PW']):
-            return False
-        else:
-            return True
-    else: # MV_PIECE_IS_PW
-        return True
+
+    return True
 
 
-def piece_is_lower_equal_than_enemy_on_dstfield(analyses):
-    piece = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
-    enemy = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'], ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
-
-    if(enemy is None):
-        return False
-    
-    if(piece == ANALYSES['MV_PIECE_IS_KG']):
-        return False
-    elif(piece == ANALYSES['MV_PIECE_IS_QU']):
-        if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_RK'] or
-           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_BP'] or 
-           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_KN'] or
-           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW']):
-            return False
-        else:
-            return True
-    elif(piece == ANALYSES['MV_PIECE_IS_RK']):
-        if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_BP'] or 
-           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_KN'] or 
-           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW']):
-            return False
-        else:
-            return True
-    elif(piece == ANALYSES['MV_PIECE_IS_BP'] or piece == ANALYSES['MV_PIECE_IS_KN']):
-        if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW']):
-            return False
-        else:
-            return True
-    else: # MV_PIECE_IS_PW
-        return True
-
-
-def piece_is_lower_fairy_equal_than_enemy_on_dstfield(analyses):
-    piece = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['MV_PIECE_IS_PW'], ANALYSES['MV_PIECE_IS_KG'])
-    enemy = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'], ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
-
-    if(enemy is None):
+def is_attacked_supported(attacked):
+    if(len(attacked) == 0):
         return False
 
-    if(piece == ANALYSES['MV_PIECE_IS_KG']):
-        return False
-    elif(piece == ANALYSES['MV_PIECE_IS_QU']):
-        if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_RK'] or
-           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_BP'] or 
-           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_KN'] or
-           enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW']):
-            return False
-        else:
-            return True
-    elif(piece == ANALYSES['MV_PIECE_IS_RK'] or piece == ANALYSES['MV_PIECE_IS_BP'] or piece == ANALYSES['MV_PIECE_IS_KN']):
-        if(enemy == ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW']):
-            return False
-        else:
-            return True
-    else: # MV_PIECE_IS_PW
-        return True
-
-
-def srcfield_is_supported(analyses):
-    friend = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['SRCFLD_IS_FRDL_TOU_BY_PW'], ANALYSES['SRCFLD_IS_FRDL_TOU_BY_KG'])
-
-    if(friend is None):
-        return False
-    else:
-        return True
-
-
-def dstfield_is_attacked(analyses):
-    enemy = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'], ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG'])
-
-    if(enemy is None):
-        return False
-    else:
-        return True
-
-
-def dstfield_is_supported(analyses):
-    friend = fetch_range_analyses_lst(analyses.lst_core, ANALYSES['DSTFLD_IS_FRDL_TOU_BY_PW'], ANALYSES['DSTFLD_IS_FRDL_TOU_BY_KG'])
-
-    if(friend is None):
-        return False
-    else:
-        return True
-
-
-def dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(analyses):
-    frnd_cnt = 0
-    enmy_cnt = 0
-
-    for core in analyses.lst_core:
-        if(core >= ANALYSES['DSTFLD_IS_FRDL_TOU_BY_PW'] and core <= ANALYSES['DSTFLD_IS_FRDL_TOU_BY_KG']):
-            frnd_cnt += 1
-        elif(core >= ANALYSES['DSTFLD_IS_ENM_TOU_BY_PW'] and core <= ANALYSES['DSTFLD_IS_ENM_TOU_BY_KG']):
-            enmy_cnt += 1
-
-    return frnd_cnt >= enmy_cnt
-
-
-def is_attacked_supported(analyses):
-    if(len(analyses.lst_attacked) == 0):
-        return False
-
-    for ctouch_beyond in analyses.lst_attacked:
+    for ctouch_beyond in attacked:
         if(len(ctouch_beyond.supporter_beyond) > 0):
             return True
 
     return False
 
 
-def is_attacked_pinned(match, analyses):
-    if(len(analyses.lst_attacked) == 0):
+def is_attacked_pinned(match, attacked):
+    if(len(attacked) == 0):
         return False
 
-    for ctouch_beyond in analyses.lst_attacked:
+    for ctouch_beyond in attacked:
         pindir = rules.pin_dir(match, None, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
         if(pindir != rules.DIRS['undefined']):
             return True
@@ -454,30 +306,19 @@ def is_attacked_pinned(match, analyses):
     return False
 
 
-def is_attacked_soft_pinned(match, analyses):
-    if(len(analyses.lst_attacked) == 0):
+def is_attacked_soft_pinned(match, attacked):
+    if(len(attacked) == 0):
         return False
 
-    for ctouch_beyond in analyses.lst_attacked:
+    for ctouch_beyond in attacked:
         if(is_soft_pin(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)):
             return True
 
     return False
 
 
-def is_attacked_add_attacked(analyses):
-    if(len(analyses.lst_attacked) == 0):
-        return False
-
-    for ctouch_beyond in analyses.lst_attacked:
-        if(len(ctouch_beyond.attacker_beyond) > 0):
-            return True
-
-    return False
-
-
-def is_attacked_higher_than_piece(match, analyses):
-    for ctouch_beyond in analyses.lst_attacked:
+def is_attacked_higher_than_piece(match, attacked):
+    for ctouch_beyond in attacked:
         piece = match.readfield(ctouch_beyond.agent_srcx, ctouch_beyond.agent_srcy)
         if(PIECES_RANK[ctouch_beyond.piece] > PIECES_RANK[piece]):
             return True
@@ -485,22 +326,22 @@ def is_attacked_higher_than_piece(match, analyses):
     return False
 
 
-def is_supported_attacked(analyses):
-    if(len(analyses.lst_supported) == 0):
+def is_supported_attacked(supported):
+    if(len(supported) == 0):
         return False
 
-    for ctouch_beyond in analyses.lst_supported:
+    for ctouch_beyond in supported:
         if(len(ctouch_beyond.attacker_beyond) > 0):
             return True
 
     return False
 
 
-def is_supported_lower_equal_than_attacker(analyses):
-    if(len(analyses.lst_supported) == 0):
+def is_supported_lower_equal_than_attacker(supported):
+    if(len(supported) == 0):
         return False
 
-    for ctouch_beyond in analyses.lst_supported:
+    for ctouch_beyond in supported:
         for attacker_beyond in ctouch_beyond.attacker_beyond:
             if(PIECES_RANK[ctouch_beyond.piece] > PIECES_RANK[attacker_beyond.piece]):
                 return False
@@ -508,22 +349,11 @@ def is_supported_lower_equal_than_attacker(analyses):
     return True
 
 
-def is_supported_add_supported(analyses):
+"""def is_supported_add_supported(analyses):
     if(len(analyses.lst_supported) == 0):
         return False
 
     for ctouch_beyond in analyses.lst_supported:
-        if(len(ctouch_beyond.supporter_beyond) > 0):
-            return True
-
-    return False
-
-
-def is_disclosed_attacked_supported(analyses):
-    if(len(analyses.lst_disclosed_attacked) == 0):
-        return False
-
-    for ctouch_beyond in analyses.lst_disclosed_attacked:
         if(len(ctouch_beyond.supporter_beyond) > 0):
             return True
 
@@ -539,3 +369,14 @@ def highest_disclosed_attacked(analyses):
 
     return piece
 
+
+
+def is_attacked_add_attacked(analyses):
+    if(len(analyses.lst_attacked) == 0):
+        return False
+
+    for ctouch_beyond in analyses.lst_attacked:
+        if(len(ctouch_beyond.attacker_beyond) > 0):
+            return True
+
+    return False"""

@@ -50,7 +50,7 @@ def is_move_stuck(match, srcx, srcy, dstx, dsty):
     return bp_flag or rk_flag
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, analyses):
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , analyses
     if(is_move_stuck(match, srcx, srcy, dstx, dsty)):
         return False
 
@@ -77,8 +77,8 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty, analyses):
                 break
 
             if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
-                analyses.lst_fork_defended.append(cfork)
+                #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
+                #analyses.lst_fork_defended.append(cfork)
                 return True
 
             if(Match.color_of_piece(fork_field) == color):

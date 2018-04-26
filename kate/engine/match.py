@@ -63,18 +63,18 @@ PIECES_COLOR = {
 
 PIECES_RANK = {
         PIECES['blk'] : 0,
-        PIECES['wPw'] : 1,
-        PIECES['bPw'] : 1,
-        PIECES['wKn'] : 2,
-        PIECES['bKn'] : 2,
-        PIECES['wBp'] : 2,
-        PIECES['bBp'] : 2,
-        PIECES['wRk'] : 4,
-        PIECES['bRk'] : 4,
-        PIECES['wQu'] : 5,
-        PIECES['bQu'] : 5,
-        PIECES['wKg'] : 6,
-        PIECES['bKg'] : 6 }
+        PIECES['wPw'] : 2,
+        PIECES['bPw'] : 2,
+        PIECES['wKn'] : 4,
+        PIECES['bKn'] : 4,
+        PIECES['wBp'] : 4,
+        PIECES['bBp'] : 4,
+        PIECES['wRk'] : 5,
+        PIECES['bRk'] : 5,
+        PIECES['wQu'] : 7,
+        PIECES['bQu'] : 7,
+        PIECES['wKg'] : 9,
+        PIECES['bKg'] : 9 }
 
 
 SCORES = { 
