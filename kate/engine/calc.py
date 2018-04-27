@@ -64,12 +64,6 @@ def prnt_fmttime(msg, seconds):
     print( msg + "%02d:%02d:%02d" % (hour, minute, sec))
 
 
-def read_steps(steps, dir_idx, step_idx):
-    stepx = steps[dir_idx][step_idx][0]
-    stepy = steps[dir_idx][step_idx][1]
-    prom_piece = steps[dir_idx][step_idx][2]
-    return stepx, stepy, prom_piece
-
 class Analyses:
     def __init__(self):
         self.core_token = 0x0
@@ -86,6 +80,29 @@ class PrioMove:
         self.tactics = []
         self.prio = PRIO['prio10']
         self.prio_sec = PRIO['prio10']
+
+    def downgrade(self, old_tactic, new_tactic):
+        self.prio = TACTICS_TO_PRIO[new_tactic]
+        for idx in range(len(self.tactics)):
+            if(self.tactics[idx] == old_tactic):
+                self.tactics[idx] = new_tactic
+                return
+
+    def fetch_tactics(self, idx):
+        if(len(self.tactics) > idx):
+            return self.tactics[idx]
+        else:
+            return TACTICS['undefined']
+
+    def fetch_first_tactics(self):
+        return  self.fetch_tactics(0)
+
+
+def read_steps(steps, dir_idx, step_idx):
+    stepx = steps[dir_idx][step_idx][0]
+    stepy = steps[dir_idx][step_idx][1]
+    prom_piece = steps[dir_idx][step_idx][2]
+    return stepx, stepy, prom_piece
 
 def generate_moves(match):
     color = match.next_color()
