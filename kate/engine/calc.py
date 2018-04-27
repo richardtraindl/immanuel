@@ -199,11 +199,11 @@ def was_last_move_stormy(last_pmove):
     return False
 
 def select_maxcnt_maxprio(match, depth, priomoves, last_pmove):
-    exceeded = False
+    #exceeded = False
 
-    elapsed_time = time.time() - match.time_start
-    if(elapsed_time > match.seconds_per_move):
-        exceeded = True
+    #elapsed_time = time.time() - match.time_start
+    #if(elapsed_time > match.seconds_per_move):
+        #exceeded = True
 
     if(last_pmove):
         last_prio = last_pmove.prio
@@ -235,14 +235,14 @@ def select_maxcnt_maxprio(match, depth, priomoves, last_pmove):
         dpth_stage1 += 2
 
     if(depth <= dpth_stage1):
-        if(exceeded):
-            return cnt, PRIO_MIN
-        else:
-            return cnt, PRIO_MAX
+        #if(exceeded):
+            #return cnt, PRIO_MIN
+        #else:
+        return cnt, PRIO_MAX
     elif(depth <= dpth_stage2 and (was_last_move_stormy(last_pmove) or is_stormy(match))):
         return cnt, PRIO_MID
     elif(depth <= dpth_stage3 and was_last_move_stormy(last_pmove)):
-        return cnt, PRIO_MAX
+        return cnt, PRIO_MIN
     #elif(depth <= dpth_stage3 and (was_last_move_stormy(last_pmove) or is_stormy(match))):
         #return cnt, PRIO_MIN
     else:
