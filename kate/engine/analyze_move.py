@@ -188,6 +188,9 @@ def controles_file(match, gmove):
     return False
 
 
+def fetch_first_tactics(priomove):
+    return priomove.fetch_tactics(0)
+
 def rank_gmoves(match, priomoves):
     all_attacking = []
     all_supporting = []
