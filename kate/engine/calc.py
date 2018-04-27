@@ -94,9 +94,6 @@ class PrioMove:
         else:
             return TACTICS['undefined']
 
-    def fetch_first_tactics(self):
-        return  self.fetch_tactics(0)
-
 
 def read_steps(steps, dir_idx, step_idx):
     stepx = steps[dir_idx][step_idx][0]
