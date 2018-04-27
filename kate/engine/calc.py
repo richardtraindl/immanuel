@@ -314,7 +314,7 @@ def calc_max(match, depth, alpha, beta, last_pmove):
             if(maxscore > beta):
                 return maxscore, candidates
 
-        if((count > maxcnt and priomove.prio > PRIO['prio1']) or priomove.prio > maxprio):
+        if((count >= maxcnt and priomove.prio > PRIO['prio1']) or priomove.prio > maxprio):
             return maxscore, candidates
 
     return maxscore, candidates
@@ -385,7 +385,7 @@ def calc_min(match, depth, alpha, beta, last_pmove):
             if(minscore < alpha):
                 return minscore, candidates
 
-        if((count > maxcnt and priomove.prio > PRIO['prio1']) or priomove.prio > maxprio):
+        if((count >= maxcnt and priomove.prio > PRIO['prio1']) or priomove.prio > maxprio):
             return minscore, candidates
 
     return minscore, candidates
