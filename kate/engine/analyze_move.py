@@ -303,8 +303,8 @@ def rank_gmoves(match, priomoves):
 
         if(len(priomove.tactics) > 0):
             priomove.tactics.sort()
-            priomove.prio = TACTICS_TO_PRIO[fetch_tactics(priomove, 0)]
-            priomove.prio_sec = TACTICS_TO_PRIO[fetch_tactics(priomove, 1)]
+            priomove.prio = TACTICS_TO_PRIO[priomove.fetch_tactics(0)]
+            priomove.prio_sec = TACTICS_TO_PRIO[priomove.fetch_tactics(1)]
         else:
             priomove.tactics.append(TACTICS['undefined'])
             priomove.prio = PRIO['prio10']
