@@ -318,8 +318,8 @@ def rank_gmoves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-             downgrade(pmove, TACTICS['attack-stormy'], TACTICS['attack-downgraded'])
-             downgrade(pmove, TACTICS['attack-good-deal'], TACTICS['attack-downgraded'])
+             pmove.downgrade(TACTICS['attack-stormy'], TACTICS['attack-downgraded'])
+             pmove.downgrade(TACTICS['attack-good-deal'], TACTICS['attack-downgraded'])
              pmove.tactics.sort()
              pmove.prio = TACTICS_TO_PRIO[pmove.fetch_tactics(0)]
              pmove.prio_sec = TACTICS_TO_PRIO[pmove.fetch_tactics(1)]
@@ -330,7 +330,7 @@ def rank_gmoves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            downgrade(pmove, TACTICS['disclosed-attack-good-deal'], TACTICS['attack-downgraded'])
+            pmove.downgrade(TACTICS['disclosed-attack-good-deal'], TACTICS['attack-downgraded'])
             pmove.tactics.sort()
             pmove.prio = TACTICS_TO_PRIO[pmove.fetch_tactics(0)]
             pmove.prio_sec = TACTICS_TO_PRIO[pmove.fetch_tactics(1)]
@@ -341,7 +341,7 @@ def rank_gmoves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            downgrade(pmove, TACTICS['support-good-deal'], TACTICS['support-downgraded'])
+            pmove.downgrade(TACTICS['support-good-deal'], TACTICS['support-downgraded'])
             pmove.tactics.sort()
             pmove.prio = TACTICS_TO_PRIO[pmove.fetch_tactics(0)]
             pmove.prio_sec = TACTICS_TO_PRIO[pmove.fetch_tactics(1)]
