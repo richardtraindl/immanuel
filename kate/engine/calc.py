@@ -266,12 +266,12 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
             if(maxscore > beta):
                 return maxscore, candidates
 
-        elapsed_time = time.time() - match.time_start
-        if(elapsed_time > match.seconds_per_move):
-            exceeded = True
-        else:
-            exceeded = False
-        if(count >= maxcnt and (exceeded or priomove.prio > minprio)):
+        #elapsed_time = time.time() - match.time_start
+        #if(elapsed_time > match.seconds_per_move):
+            #exceeded = True
+        #else:
+            #exceeded = False
+        if(count >= maxcnt and priomove.prio > minprio): #(exceeded or )
             return maxscore, candidates
 
     return maxscore, candidates
@@ -340,12 +340,12 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
             if(minscore < alpha):
                 return minscore, candidates
 
-        elapsed_time = time.time() - match.time_start
-        if(elapsed_time > match.seconds_per_move):
-            exceeded = True
-        else:
-            exceeded = False
-        if(count >= maxcnt and (exceeded or priomove.prio > minprio)):
+        #elapsed_time = time.time() - match.time_start
+        #if(elapsed_time > match.seconds_per_move):
+            #exceeded = True
+        #else:
+            #exceeded = False
+        if(count >= maxcnt and priomove.prio > minprio): #(exceeded or  )
             return minscore, candidates
 
     return minscore, candidates
