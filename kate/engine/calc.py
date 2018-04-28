@@ -40,7 +40,7 @@ def prnt_moves(msg, moves):
 
 
 def prnt_tactics(tactics):
-    print("tatics: ", end="")
+    print("tactics: ", end="")
 
     length = len(tactics)
     i = 1
