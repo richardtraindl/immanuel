@@ -75,3 +75,6 @@ TACTICS_TO_PRIO = {
       TACTICS['support-bad-deal'] : PRIO['prio8'],
       TACTICS['undefined'] : PRIO['prio10'] }
 
+
+MISSION_NONE       = 0x0000
+MISSION_CAPTURE    = 0x1000

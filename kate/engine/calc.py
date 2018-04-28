@@ -93,6 +93,23 @@ class PrioMove:
             return self.tactics[idx]
         else:
             return TACTICS['undefined']
+    
+    def find_tactic(self, tactic):
+        for tactic_item in self.tactics:
+            if(tactic_item == tactic):
+                return True
+        return False
+
+    def is_tactic_stormy(self):
+        for tactic in self.tactics:
+            if(tactic == TACTICS['promotion'] or
+               tactic == TACTICS['capture-good-deal'] or
+               tactic == TACTICS['attack-king-good-deal'] or 
+               tactic == TACTICS['capture-bad-deal'] or       
+               tactic == TACTICS['attack-king-bad-deal'] or
+               tactic == TACTICS['attack-stormy']):
+                return True
+        return False
 
 
 def read_steps(steps, dir_idx, step_idx):
@@ -186,70 +203,7 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         return newscore
 
 
-def was_last_move_stormy(last_pmove):
-    for tactic in last_pmove.tactics:
-        if(tactic == TACTICS['promotion'] or
-           tactic == TACTICS['capture-good-deal'] or
-           tactic == TACTICS['attack-king-good-deal'] or 
-           tactic == TACTICS['capture-bad-deal'] or       
-           tactic == TACTICS['attack-king-bad-deal'] or
-           tactic == TACTICS['attack-stormy']):
-            return True
-
-    return False
-
-def select_maxcnt_maxprio(match, depth, priomoves, last_pmove):
-    #exceeded = False
-
-    #elapsed_time = time.time() - match.time_start
-    #if(elapsed_time > match.seconds_per_move):
-        #exceeded = True
-
-    if(last_pmove):
-        last_prio = last_pmove.prio
-    else:
-        last_prio = PRIO['prio10']
-
-    if(match.level == LEVELS['blitz']):
-        cnt = 8
-        dpth_stage1 = 2
-        dpth_stage2 = 5
-        dpth_stage3 = 8
-    elif(match.level == LEVELS['low']):
-        cnt = 10
-        dpth_stage1 = 3
-        dpth_stage2 = 5
-        dpth_stage3 = 8
-    elif(match.level == LEVELS['medium']):
-        cnt = 12
-        dpth_stage1 = 4
-        dpth_stage2 = 7
-        dpth_stage3 = 12
-    else:
-        cnt = 16
-        dpth_stage1 = 5
-        dpth_stage2 = 8
-        dpth_stage3 = 12
-
-    if(is_endgame(match)):
-        dpth_stage1 += 2
-
-    if(depth <= dpth_stage1):
-        #if(exceeded):
-            #return cnt, PRIO_MIN
-        #else:
-        return cnt, PRIO_MAX
-    elif(depth <= dpth_stage2 and (was_last_move_stormy(last_pmove) or is_stormy(match))):
-        return cnt, PRIO_MID
-    elif(depth <= dpth_stage3 and was_last_move_stormy(last_pmove)):
-        return cnt, PRIO_MIN
-    #elif(depth <= dpth_stage3 and (was_last_move_stormy(last_pmove) or is_stormy(match))):
-        #return cnt, PRIO_MIN
-    else:
-        return 0, PRIO['prio1']
-
-
-def calc_max(match, depth, alpha, beta, last_pmove):
+def calc_max(match, depth, slimits, alpha, beta, last_pmove):
     color = match.next_color()
     candidates = []
     newcandidates = []
@@ -258,10 +212,8 @@ def calc_max(match, depth, alpha, beta, last_pmove):
 
     priomoves = generate_moves(match)
     
-    rank_gmoves(match, priomoves)
+    maxcnt, minprio = rank_gmoves(match, priomoves, depth, slimits, last_pmove)
     
-    maxcnt, maxprio = select_maxcnt_maxprio(match, depth, priomoves, last_pmove)
-
     if(depth == 1):
         prnt_priomoves(priomoves)
         if(len(priomoves) == 1):
@@ -287,7 +239,7 @@ def calc_max(match, depth, alpha, beta, last_pmove):
 
         move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcandidates = calc_min(match, depth + 1, maxscore, beta, priomove) # , dbginfo
+        newscore, newcandidates = calc_min(match, depth + 1, slimits, maxscore, beta, priomove)
 
         ### todo move code to other module
         if(is_opening(match)):
@@ -314,13 +266,18 @@ def calc_max(match, depth, alpha, beta, last_pmove):
             if(maxscore > beta):
                 return maxscore, candidates
 
-        if((count >= maxcnt and priomove.prio > PRIO['prio1']) or priomove.prio > maxprio):
+        elapsed_time = time.time() - match.time_start
+        if(elapsed_time > match.seconds_per_move):
+            exceeded = True
+        else:
+            exceeded = False
+        if(count >= maxcnt and (exceeded or priomove.prio > minprio)):
             return maxscore, candidates
 
     return maxscore, candidates
 
 
-def calc_min(match, depth, alpha, beta, last_pmove):
+def calc_min(match, depth, slimits, alpha, beta, last_pmove):
     color = match.next_color()
     candidates = []
     newcandidates = []
@@ -329,9 +286,7 @@ def calc_min(match, depth, alpha, beta, last_pmove):
 
     priomoves = generate_moves(match)
     
-    rank_gmoves(match, priomoves)
-
-    maxcnt, maxprio = select_maxcnt_maxprio(match, depth, priomoves, last_pmove)
+    maxcnt, minprio = rank_gmoves(match, priomoves, depth, slimits, last_pmove)
 
     if(depth == 1):
         prnt_priomoves(priomoves)
@@ -358,7 +313,7 @@ def calc_min(match, depth, alpha, beta, last_pmove):
 
         move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcandidates = calc_max(match, depth + 1, alpha, minscore, priomove) # , dbginfo
+        newscore, newcandidates = calc_max(match, depth + 1, slimits, alpha, minscore, priomove)
 
         ### todo move code to other module
         if(is_opening(match)):
@@ -385,16 +340,55 @@ def calc_min(match, depth, alpha, beta, last_pmove):
             if(minscore < alpha):
                 return minscore, candidates
 
-        if((count >= maxcnt and priomove.prio > PRIO['prio1']) or priomove.prio > maxprio):
+        elapsed_time = time.time() - match.time_start
+        if(elapsed_time > match.seconds_per_move):
+            exceeded = True
+        else:
+            exceeded = False
+        if(count >= maxcnt and (exceeded or priomove.prio > minprio)):
             return minscore, candidates
 
     return minscore, candidates
+
+
+class SearchLimits:
+    def __init__(self, match): # , count=8, dpth_stage1=2, dpth_stage2=5, dpth_stage3=8
+        self.count = 8
+        self.dpth_stage1 = 2
+        self.dpth_stage2 = 5
+        self.dpth_stage3 = 7
+
+        self.setlimits(match)
+
+    def setlimits(self, match):
+        if(match.level == LEVELS['blitz']):
+            self.count = 8
+            self.dpth_stage1 = 2
+            self.dpth_stage2 = 5
+            self.dpth_stage3 = 7
+        elif(match.level == LEVELS['low']):
+            self.count = 10
+            self.dpth_stage1 = 3
+            self.dpth_stage2 = 6
+            self.dpth_stage3 = 8
+        elif(match.level == LEVELS['medium']):
+            self.count = 12
+            self.dpth_stage1 = 4
+            self.dpth_stage2 = 7
+            self.dpth_stage3 = 9
+        else:
+            self.count = 16
+            self.dpth_stage1 = 5
+            self.dpth_stage2 = 8
+            self.dpth_stage3 = 10
 
 
 def calc_move(match):
     print("is opening: " + str(is_opening(match)) + " is endgame: " + str(is_endgame(match)))
 
     candidates = []
+    
+    slimits = SearchLimits(match)
 
     match.time_start = time.time()
 
@@ -403,9 +397,9 @@ def calc_move(match):
         candidates.append(gmove)
         score = match.score
     elif(match.next_color() == COLORS['white']):
-        score, candidates = calc_max(match, 1, SCORES[PIECES['bKg']] * 2, SCORES[PIECES['bKg']] * 2, None) # , dbginfo
+        score, candidates = calc_max(match, 1, slimits, SCORES[PIECES['bKg']] * 2, SCORES[PIECES['bKg']] * 2, None)
     else:
-        score, candidates = calc_min(match, 1, SCORES[PIECES['wKg']] * 2, SCORES[PIECES['bKg']] * 2, None) # , dbginfo
+        score, candidates = calc_min(match, 1, slimits, SCORES[PIECES['wKg']] * 2, SCORES[PIECES['bKg']] * 2, None)
 
     ### time
     elapsed_time = time.time() - match.time_start

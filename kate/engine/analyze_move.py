@@ -5,7 +5,7 @@ from .matchmove import do_move, undo_move
 #from .move import *
 #from .calc import *
 from . import rules
-from .analyze_position import score_supports, score_attacks, score_opening, score_endgame, is_endgame
+from .analyze_position import score_supports, score_attacks, score_opening, score_endgame, is_endgame, is_stormy
 from .analyze_helper import *
 from .pieces import pawn, knight, bishop, rook, king
 
@@ -191,7 +191,7 @@ def controles_file(match, gmove):
 def fetch_first_tactics(priomove):
     return priomove.fetch_tactics(0)
 
-def rank_gmoves(match, priomoves):
+def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
     all_attacking = []
     all_supporting = []
     all_fork_defending = []
@@ -199,12 +199,14 @@ def rank_gmoves(match, priomoves):
     all_fleeing = []
     excludes = []
 
+    if(depth > slimits.dpth_stage3):
+        return 0, PRIO['prio10']
+
     if(defends_check(match)):
         for priomove in priomoves:
             priomove.tactics.append(TACTICS['defend-check'])
             priomove.prio = PRIO['prio1']
-
-        return
+        return len(priomoves), PRIO['prio1']
 
     for priomove in priomoves:
         if(castles(match, priomove.gmove)):
@@ -376,6 +378,43 @@ def rank_gmoves(match, priomoves):
             priomove.prio = TACTICS_TO_PRIO[priomove.fetch_tactics(0)]
             priomove.prio_sec = TACTICS_TO_PRIO[priomove.fetch_tactics(1)]
             break
-    
+
     priomoves.sort(key=attrgetter('prio', 'prio_sec'))
+
+    if(depth <= slimits.dpth_stage1):
+        return slimits.count, PRIO_MAX
+    elif(depth <= slimits.dpth_stage2):
+        return slimits.count, PRIO_MID
+    elif(depth <= slimits.dpth_stage3 and 
+         (last_pmove.is_tactic_stormy() or is_stormy(match))):
+        count = 0
+        silentmove = True
+
+        if(last_pmove.find_tactic(TACTICS['capture-good-deal'])):
+            silentmove = False
+        elif(last_pmove.find_tactic(TACTICS['capture-bad-deal'])):
+            silentmove = False
+
+        for priomove in priomoves:
+            if(priomove.find_tactic(TACTICS['capture-good-deal'])):
+                count += 1
+                priomove.prio = PRIO['prio1']
+                continue
+            elif(priomove.find_tactic(TACTICS['capture-bad-deal'])):
+                count += 1
+                priomove.prio = PRIO['prio2']
+                continue
+            elif(silentmove == False):
+                silentmove = True
+                count += 1
+                priomove.prio = PRIO['prio3']
+                continue
+            else:
+                priomove.prio = PRIO['prio10']
+
+        priomoves.sort(key=attrgetter('prio'))
+        return count, PRIO['prio3']
+    else:
+        return 0, PRIO['prio10']
+
 
