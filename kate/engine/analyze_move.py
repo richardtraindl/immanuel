@@ -382,9 +382,9 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
     priomoves.sort(key=attrgetter('prio', 'prio_sec'))
 
     if(depth <= slimits.dpth_stage1):
-        return slimits.count, PRIO_MAX
+        return min(slimits.count, len(priomoves)), PRIO_MAX
     elif(depth <= slimits.dpth_stage2):
-        return slimits.count, PRIO_MID
+        return min(slimits.count, len(priomoves)), PRIO_MID
     elif(depth <= slimits.dpth_stage3 and 
          (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
