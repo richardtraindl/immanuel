@@ -370,14 +370,14 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
             pmove.prio = TACTICS_TO_PRIO[pmove.fetch_tactics(0)]
             pmove.prio_sec = TACTICS_TO_PRIO[pmove.fetch_tactics(1)]
 
-    for priomove in priomoves:
+    """for priomove in priomoves:
         if(priomove.fetch_tactics(0) >= TACTICS['support-good-deal'] and 
            priomove.fetch_tactics(0) <= TACTICS['support-unattacked']):
             priomove.tactics.append(TACTICS['single-silent-move'])
             priomove.tactics.sort()
             priomove.prio = TACTICS_TO_PRIO[priomove.fetch_tactics(0)]
             priomove.prio_sec = TACTICS_TO_PRIO[priomove.fetch_tactics(1)]
-            break
+            break"""
 
     priomoves.sort(key=attrgetter('prio', 'prio_sec'))
 
@@ -389,6 +389,7 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
          (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
         silentmove = True
+        minprio = PRIO['prio1']
 
         if(last_pmove.find_tactic(TACTICS['capture-good-deal'])):
             silentmove = False
@@ -403,17 +404,19 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
             elif(priomove.find_tactic(TACTICS['capture-bad-deal'])):
                 count += 1
                 priomove.prio = PRIO['prio2']
+                minprio = max(minprio, PRIO['prio2'])
                 continue
             elif(silentmove == False):
                 silentmove = True
                 count += 1
                 priomove.prio = PRIO['prio3']
+                minprio = PRIO['prio3']
                 continue
             else:
                 priomove.prio = PRIO['prio10']
 
         priomoves.sort(key=attrgetter('prio'))
-        return count, PRIO['prio3']
+        return count, minprio
     else:
         return 0, PRIO['prio10']
 
