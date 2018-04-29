@@ -201,8 +201,7 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
 
     for priomove in priomoves:
         if(defends_check(match)):
-            for priomove in priomoves:
-                priomove.tactics.append(TACTICS['defend-check'])
+            priomove.tactics.append(TACTICS['defend-check'])
         
         if(castles(match, priomove.gmove)):
             priomove.tactics.append(TACTICS['castling'])
