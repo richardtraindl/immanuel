@@ -218,10 +218,8 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return len(priomoves)
     
     if(depth <= slimits.dpth_stage1):
-        return count_up_to_prio(priomoves, PRIO_MAX)
-    #elif(depth <= slimits.dpth_stage2):
-        #return count_up_to_prio(priomoves, PRIO_MID)
-    elif(depth <= slimits.dpth_stage3 and 
+        return max(slimits.count, count_up_to_prio(priomoves, PRIO['prio5']))
+    elif(depth <= slimits.dpth_stage2 and 
          (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
         silentmove = True
@@ -404,34 +402,29 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
 
 class SearchLimits:
     def __init__(self, match):
-        self.count = 8
+        self.count = 6
         self.dpth_stage1 = 2
-        self.dpth_stage2 = 5
-        self.dpth_stage3 = 7
+        self.dpth_stage2 = 7
 
         self.setlimits(match)
 
     def setlimits(self, match):
         if(match.level == LEVELS['blitz']):
-            self.count = 8
+            self.count = 6
             self.dpth_stage1 = 2
-            self.dpth_stage2 = 5
-            self.dpth_stage3 = 7
+            self.dpth_stage2 = 7
         elif(match.level == LEVELS['low']):
-            self.count = 10
+            self.count = 8
             self.dpth_stage1 = 3
-            self.dpth_stage2 = 6
-            self.dpth_stage3 = 8
+            self.dpth_stage2 = 8
         elif(match.level == LEVELS['medium']):
             self.count = 12
             self.dpth_stage1 = 4
-            self.dpth_stage2 = 7
-            self.dpth_stage3 = 9
+            self.dpth_stage2 = 9
         else:
             self.count = 16
             self.dpth_stage1 = 5
-            self.dpth_stage2 = 8
-            self.dpth_stage3 = 10
+            self.dpth_stage2 = 10
 
 
 def calc_move(match):
