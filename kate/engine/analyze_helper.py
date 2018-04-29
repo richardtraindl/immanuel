@@ -143,20 +143,36 @@ def piece_is_lower_equal_than_captured(match, gmove):
 
 def dstfield_is_supported(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
+    
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])    
 
-    return rules.is_field_touched(match, Match.color_of_piece(piece), gmove.dstx, gmove.dsty, 0)
+    is_touched = rules.is_field_touched(match, Match.color_of_piece(piece), gmove.dstx, gmove.dsty, 0)
+
+    match.writefield(gmove.srcx, gmove.srcy, piece)
+    
+    return is_touched
 
 
 def dstfield_is_attacked(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
+    
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])    
 
-    return rules.is_field_touched(match, Match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty, 0)
+    is_touched = rules.is_field_touched(match, Match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty, 0)
+
+    match.writefield(gmove.srcx, gmove.srcy, piece)
+    
+    return is_touched
 
 
 def dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
+    
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
 
     frdlytouches, enmytouches = field_touches(match, Match.color_of_piece(piece), gmove.dstx, gmove.dsty)
+    
+    match.writefield(gmove.srcx, gmove.srcy, piece)
 
     return len(frdlytouches) >= len(enmytouches)
 
