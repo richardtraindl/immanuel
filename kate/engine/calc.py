@@ -10,7 +10,6 @@ from .helper import *
 from .cvalues import *
 from .rules import is_move_valid, RETURN_CODES, is_field_touched
 from .pieces import pawn, rook, bishop, knight, queen, king
-from .debug import prnt_attributes
 
 
 def prnt_move(headmsg, move, tailmsg):
@@ -466,6 +465,5 @@ def calc_move(match):
     msg = "result: " + str(score) + " match.id: " + str(match.id) + " "
     prnt_moves(msg, candidates)
     prnt_fmttime("\ncalc-time: ", elapsed_time)
-    prnt_attributes(match, "\n")
     return candidates
 
