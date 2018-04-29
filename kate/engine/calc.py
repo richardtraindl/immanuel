@@ -203,6 +203,13 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         return newscore
 
 
+def count_up_to_prio(priomoves, prio_limit):
+    count = 0
+    for priomove in priomoves:
+        if(priomove.prio <= prio_limit):
+            count += 1
+    return count
+    
 def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     if(len(priomoves) == 0):
         return 0
@@ -211,9 +218,9 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return len(priomoves)
     
     if(depth <= slimits.dpth_stage1):
-        return min(slimits.count, len(priomoves))
+        return count_up_to_prio(priomoves, PRIO_MAX)
     elif(depth <= slimits.dpth_stage2):
-        return min(slimits.count, len(priomoves))
+        return count_up_to_prio(priomoves, PRIO_MID)
     elif(depth <= slimits.dpth_stage3 and 
          (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
