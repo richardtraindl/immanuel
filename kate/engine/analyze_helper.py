@@ -290,7 +290,11 @@ def is_piece_attacked(lst, piece1, piece2):
 def piece_is_lower_equal_than_enemy_on_dstfield(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
+
     enemies = list_field_touches(match, Match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
+
+    match.writefield(gmove.srcx, gmove.srcy, piece)
 
     for enemy in enemies:
         if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
