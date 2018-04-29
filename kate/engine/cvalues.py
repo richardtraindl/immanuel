@@ -6,27 +6,26 @@ TACTICS = {
     'capture-good-deal' : 2,
     'running-pawn-in-endgame' : 3, 
     'attack-king-good-deal' : 4,
-    'single-silent-move' : 5,
-    'attack-stormy' : 6,
-    'flee-urgent' : 7,
-    'support-good-deal' : 8,
-    'defend-fork' : 9,
-    'attack-good-deal' : 10,
-    'disclosed-attack-good-deal' : 11,
-    'capture-bad-deal' : 12,
-    'attack-king-bad-deal' : 13,
-    'controles-file-good-deal' : 14,
-    'castling' : 15,
-    'defend-fork-downgraded' : 16,
-    'flee-downgraded' : 17,
-    'support-downgraded' : 18,
-    'attack-downgraded' : 19,
-    'support-unattacked' : 20,
-    'progress' : 21, 
-    'flee' : 22,
-    'attack-bad-deal' : 23,
-    'support-bad-deal' : 24,
-    'undefined' : 25 }
+    'attack-stormy' : 5,
+    'flee-urgent' : 6,
+    'support-good-deal' : 7,
+    'defend-fork' : 8,
+    'attack-good-deal' : 9,
+    'disclosed-attack-good-deal' : 10,
+    'capture-bad-deal' : 11,
+    'attack-king-bad-deal' : 12,
+    'controles-file-good-deal' : 13,
+    'castling' : 14,
+    'defend-fork-downgraded' : 15,
+    'flee-downgraded' : 16,
+    'support-downgraded' : 17,
+    'attack-downgraded' : 18,
+    'support-unattacked' : 19,
+    'progress' : 20, 
+    'flee' : 21,
+    'attack-bad-deal' : 22,
+    'support-bad-deal' : 23,
+    'undefined' : 24 }
 
 
 PRIO = {
@@ -42,23 +41,17 @@ PRIO = {
     'prio10' : 9 }
 
 
-PRIO_MIN = PRIO['prio2']
-PRIO_MID = PRIO['prio3']
-PRIO_MAX = PRIO['prio5']
-
-
 TACTICS_TO_PRIO = {
       TACTICS['defend-check'] : PRIO['prio1'],
       TACTICS['promotion'] : PRIO['prio2'],
       TACTICS['capture-good-deal'] : PRIO['prio2'],
       TACTICS['running-pawn-in-endgame'] : PRIO['prio2'], 
       TACTICS['attack-king-good-deal'] : PRIO['prio2'],
-      TACTICS['single-silent-move'] : PRIO['prio2'],
       TACTICS['attack-stormy'] : PRIO['prio3'],
       TACTICS['flee-urgent'] : PRIO['prio3'], 
       TACTICS['support-good-deal'] : PRIO['prio4'], 
-      TACTICS['defend-fork'] : PRIO['prio3'], 
-      TACTICS['attack-good-deal'] : PRIO['prio5'], 
+      TACTICS['defend-fork'] : PRIO['prio4'], 
+      TACTICS['attack-good-deal'] : PRIO['prio4'], 
       TACTICS['disclosed-attack-good-deal'] : PRIO['prio4'], 
       TACTICS['capture-bad-deal'] : PRIO['prio5'], 
       TACTICS['attack-king-bad-deal'] : PRIO['prio5'], 
@@ -75,6 +68,3 @@ TACTICS_TO_PRIO = {
       TACTICS['support-bad-deal'] : PRIO['prio8'],
       TACTICS['undefined'] : PRIO['prio10'] }
 
-
-MISSION_NONE       = 0x0000
-MISSION_CAPTURE    = 0x1000
