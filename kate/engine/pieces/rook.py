@@ -407,7 +407,7 @@ def rk_dir(srcx, srcy, dstx, dsty):
 
 def rk_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
     DIRS = rules.DIRS
-    if(direction == None):
+    if(direction is None):
         direction = rk_dir(srcx, srcy, dstx, dsty)
 
     if(direction == DIRS['north']):

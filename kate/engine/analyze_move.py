@@ -159,7 +159,7 @@ def running_pawn_in_endgame(match, gmove):
 
     if(is_endgame(match)):
         if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-            return True
+            return pawn.is_running(match, gmove.srcx, gmove.srcy)
 
     return False
 

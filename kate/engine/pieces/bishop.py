@@ -410,7 +410,7 @@ def bp_dir(srcx, srcy, dstx, dsty):
 
 def bp_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
     DIRS = rules.DIRS
-    if(direction == None):
+    if(direction is None):
         direction = bp_dir(srcx, srcy, dstx, dsty)
 
     if(direction == DIRS['north-east']):

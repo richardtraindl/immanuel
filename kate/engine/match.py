@@ -176,7 +176,6 @@ class Match:
         self.bOfficer_cnt = 6
         self.move_list = []
 
-
     def update_attributes(self):
         if(self.level == LEVELS['blitz']):
             self.seconds_per_move = 30
@@ -249,14 +248,11 @@ class Match:
                 elif(piece == PIECES['bRk'] or piece == PIECES['bBp'] or piece == PIECES['bKn']):
                     self.bOfficer_cnt += 1
 
-
     def writefield(self, x, y, value):
         self.board[y][x] = value
 
-
     def readfield(self, x, y):
         return self.board[y][x]
-
 
     def is_next_color_human(self):
         if(self.movecnt % 2 == 0 ):
@@ -264,13 +260,11 @@ class Match:
         else:
             return self.black_player_is_human
 
-
     def next_color(self):
         if(self.movecnt % 2 == 0 ):
             return COLORS['white']
         else:
             return COLORS['black']
-
 
     def is_last_move_capture(self):
         if(len(self.move_list) > 0):
@@ -280,7 +274,6 @@ class Match:
 
         return False
 
-
     def is_last_move_promotion(self):
         if(len(self.move_list) > 0):
             move = self.move_list[-1]
@@ -289,18 +282,32 @@ class Match:
 
         return False
 
-
     def read_move_list(self, idx):
         if(len(self.move_list) > 0):
             return self.move_list[idx]
         else:
             return None
 
+    def piece_movecnt(self):
+        count = 0
+        last_srcx = None
+        last_srcy = None
+
+        for move in reversed(self.move_list):
+            if(last_srcx == move.dstx and last_srcy == move.dsty):
+                count += 1
+                last_srcx = move.srcx
+                last_srcy = move.srcy
+            elif(last_srcx is None):
+                count += 1
+                last_srcx = move.srcx
+                last_srcy = move.srcy
+
+        return count
 
     @staticmethod
     def color_of_piece(piece):
         return PIECES_COLOR[piece]
-
 
     @staticmethod
     def oppcolor_of_piece(piece):

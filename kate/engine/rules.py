@@ -118,7 +118,7 @@ def is_pinned(match, x, y):
 def pin_dir(match, color, scrx, srcy):
     piece = match.readfield(scrx, srcy)
     
-    if(color == None):
+    if(color is None):
         color = Match.color_of_piece(piece)
 
     if(color == COLORS['white']):

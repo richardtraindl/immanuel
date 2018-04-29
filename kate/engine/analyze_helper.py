@@ -4,23 +4,6 @@ from . import rules
 from .pieces import pawn, rook, knight, bishop, queen, king
 
 
-def piece_movecnt(match, gmove):
-    if(gmove is None):
-        return 0
-
-    cnt = 1
-    last_srcx = gmove.srcx
-    last_srcy = gmove.srcy
-
-    for move in match.move_list:
-        if(last_srcx == move.dstx and last_srcy == move.dsty):
-            cnt += 1
-            last_srcx = move.srcx
-            last_srcy = move.srcy
-
-    return cnt
-
-
 def is_soft_pin(match, srcx, srcy):
     piece = match.readfield(srcx, srcy)
     color = Match.color_of_piece(piece)

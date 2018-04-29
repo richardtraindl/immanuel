@@ -398,6 +398,18 @@ def score_endgame(match):
     return value
 
 
+def score_mupltiple_piece_moves_in_opening(match, gmove):
+    if(is_opening(match)):
+        if(match.piece_movecnt() == 3):
+            piece = match.readfield(gmove.srcx, gmove.srcy)
+
+            if(Match.color_of_piece(piece) == COLORS['white']):
+                return ATTACKED_SCORES[PIECES['wPw']]
+            else:
+                return ATTACKED_SCORES[PIECES['bPw']]
+    return 0
+
+
 def score_stucks(match):
     whiterate = ATTACKED_SCORES[PIECES['bPw']]
     blackrate = ATTACKED_SCORES[PIECES['wPw']]

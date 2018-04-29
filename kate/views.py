@@ -30,7 +30,7 @@ def match(request, matchid=None):
     msg = request.GET.get('msg', None)
     debug = request.GET.get('debug', "false")
 
-    if(matchid == None):
+    if(matchid is None):
         modelmatch = ModelMatch(white_player_name=None, black_player_name=None)
     else:
         try:
@@ -64,7 +64,7 @@ def match(request, matchid=None):
 
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:5]
     
-    if(msg == None):
+    if(msg is None):
         #status = interface.status(modelmatch)
         if(match.status != STATUS['open']):
             if(match.status == STATUS['winner_white']):
@@ -104,7 +104,7 @@ def settings(request, matchid=None):
     switch = request.GET.get('switch', '0')
     debug = request.GET.get('debug', "false")
 
-    if(matchid == None):
+    if(matchid is None):
         modelmatch = ModelMatch()
         create = True
     else:
@@ -128,7 +128,7 @@ def settings(request, matchid=None):
         else:
             return render(request, 'kate/settings.html', { 'form': form, 'matchid': matchid, 'switch': switch } )
     else:
-        if(matchid == None):
+        if(matchid is None):
             form = MatchForm()
             return render(request, 'kate/settings.html', { 'form': form } )
         else:
@@ -158,6 +158,7 @@ def do_move(request, matchid=None):
         if(interface.is_next_color_human(modelmatch) == False):
             msg = RETURN_CODES['wrong-color']
         else:
+            print("****")
             form = DoMoveForm(request.POST)
             if(form.is_valid()):
                 srcx,srcy = coord_to_index(form.move_src)
@@ -260,7 +261,7 @@ def debug(request, matchid=None):
     context = RequestContext(request)
     fcode = request.GET.get('fcode', None)
 
-    if(matchid == None or fcode == None):
+    if(matchid is None or fcode is None):
         return HttpResponseRedirect('/kate')
     else:
         try:
