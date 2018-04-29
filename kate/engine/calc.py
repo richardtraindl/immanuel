@@ -203,6 +203,50 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         return newscore
 
 
+def select_maxcount(match, priomoves, depth, slimits, last_pmove):
+    if(len(priomoves) == 0):
+        return 0
+    
+    if(priomoves[0].find_tactic(TACTICS['defend-check'])):
+        return len(priomoves)
+    
+    if(depth <= slimits.dpth_stage1):
+        return min(slimits.count, len(priomoves))
+    elif(depth <= slimits.dpth_stage2):
+        return min(slimits.count, len(priomoves))
+    elif(depth <= slimits.dpth_stage3 and 
+         (last_pmove.is_tactic_stormy() or is_stormy(match))):
+        count = 0
+        silentmove = True
+
+        if(last_pmove.find_tactic(TACTICS['capture-good-deal'])):
+            silentmove = False
+        elif(last_pmove.find_tactic(TACTICS['capture-bad-deal'])):
+            silentmove = False
+
+        for priomove in priomoves:
+            if(priomove.find_tactic(TACTICS['capture-good-deal'])):
+                count += 1
+                priomove.prio = PRIO['prio1']
+                continue
+            elif(priomove.find_tactic(TACTICS['capture-bad-deal'])):
+                count += 1
+                priomove.prio = PRIO['prio2']
+                continue
+            elif(silentmove == False):
+                silentmove = True
+                count += 1
+                priomove.prio = PRIO['prio3']
+                continue
+            else:
+                priomove.prio = PRIO['prio10']
+
+        priomoves.sort(key=attrgetter('prio'))
+        return count
+    else:
+        return 0
+    
+    
 def calc_max(match, depth, slimits, alpha, beta, last_pmove):
     color = match.next_color()
     candidates = []
@@ -212,8 +256,10 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
 
     priomoves = generate_moves(match)
     
-    maxcnt, minprio = rank_gmoves(match, priomoves, depth, slimits, last_pmove)
+    rank_gmoves(match, priomoves, depth, slimits, last_pmove)    
     
+    maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
+
     if(depth == 1):
         prnt_priomoves(priomoves)
         if(len(priomoves) == 1):
@@ -271,7 +317,7 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
             #exceeded = True
         #else:
             #exceeded = False
-        if(count >= maxcnt and priomove.prio > minprio): #(exceeded or )
+        if(count >= maxcnt): #exceeded
             return maxscore, candidates
 
     return maxscore, candidates
@@ -286,7 +332,9 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
 
     priomoves = generate_moves(match)
     
-    maxcnt, minprio = rank_gmoves(match, priomoves, depth, slimits, last_pmove)
+    rank_gmoves(match, priomoves, depth, slimits, last_pmove)
+    
+    maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 
     if(depth == 1):
         prnt_priomoves(priomoves)
@@ -345,7 +393,7 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
             #exceeded = True
         #else:
             #exceeded = False
-        if(count >= maxcnt and priomove.prio > minprio): #(exceeded or  )
+        if(count >= maxcnt): #exceeded
             return minscore, candidates
 
     return minscore, candidates
