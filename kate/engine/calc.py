@@ -277,6 +277,7 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
     maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 
     if(depth == 1):
+        print("maxcount: " + str(maxcnt))
         prnt_priomoves(priomoves)
         if(len(priomoves) == 1):
             pmove = priomoves[0]
@@ -346,6 +347,7 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
     maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 
     if(depth == 1):
+        print("maxcount: " + str(maxcnt))
         prnt_priomoves(priomoves)
         if(len(priomoves) == 1):
             pmove = priomoves[0]
