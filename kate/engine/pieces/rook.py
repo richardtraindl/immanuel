@@ -190,7 +190,8 @@ def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_su
         for i in range(0, 2, 1):
             stepx = STEPS[j+i][0]
             stepy = STEPS[j+i][1]
-            if(excluded_dir == rk_dir(srcx, srcy, (srcx + stepx), (srcy + stepy))):
+            direction == rk_dir(srcx, srcy, (srcx + stepx), (srcy + stepy))
+            if(direction == excluded_dir or direction == REVERSE_DIRS[excluded_dir]):
                 break
             x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
             if(x1 != rules.UNDEF_X):
@@ -215,12 +216,12 @@ def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_su
                                second.piece == PIECES['wQu'] or second.piece == PIECES['bQu']):
                                 discl_attacked.append(first)
                     elif(Match.color_of_piece(first.piece) == Match.color_of_piece(second.piece) and 
-                         Match.color_of_piece(first.piece) == color and
+                         Match.color_of_piece(first.piece) == color and 
                          first.piece != PIECES['blk'] and second.piece != PIECES['blk']):
                         if(first.piece == PIECES['wRk'] or first.piece == PIECES['bRk'] or 
                            first.piece == PIECES['wQu'] or first.piece == PIECES['bQu']):
                             discl_supported.append(second)
-                        elif(second.piece == PIECES['wRk'] or second.piece == PIECES['bRk'] or 
+                        if(second.piece == PIECES['wRk'] or second.piece == PIECES['bRk'] or 
                              second.piece == PIECES['wQu'] or second.piece == PIECES['bQu']):
                             discl_supported.append(first)
                     else:
