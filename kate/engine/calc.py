@@ -317,7 +317,7 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
 
         if(score > maxscore):
             maxscore = score
-            if(maxscore > beta): # >=
+            if(maxscore >= beta): # >
                 break #return maxscore, candidates
 
         #elapsed_time = time.time() - match.time_start
@@ -388,7 +388,7 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
 
         if(score < minscore):
             minscore = score
-            if(minscore < alpha): # <=
+            if(minscore <= alpha): # <
                 break #return minscore, candidates
 
         #elapsed_time = time.time() - match.time_start
