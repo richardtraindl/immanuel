@@ -320,17 +320,23 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
 
         matchmove.undo_move(match)
 
+        if(score > maxscore):
+            maxscore = score
+            append_newmove(newmove, candidates, newcandidates)
+            if(depth == 1):
+                prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]")
+                prnt_moves("", newcandidates)
+                prnt_moves("CANDIDATES:  " + str(maxscore).rjust(8, " "), candidates)
+                print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+            if(maxscore >= beta):
+                break
+
         if(depth == 1):
+            print("move rejected–––––––––––––––––––––––––––––––––––––––––––––––")
             prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]")
             prnt_moves("", newcandidates)
             prnt_moves("CANDIDATES:  " + str(maxscore).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
-
-        if(score > maxscore):
-            maxscore = score
-            append_newmove(newmove, candidates, newcandidates)
-            if(maxscore >= beta):
-                break
 
         #elapsed_time = time.time() - match.time_start
         #if(elapsed_time > match.seconds_per_move):
@@ -390,18 +396,24 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
         #score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
 
         matchmove.undo_move(match)
-        
-        if(depth == 1):
-            prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]")
-            prnt_moves("", newcandidates)
-            prnt_moves("CANDIDATES:  " + str(minscore).rjust(8, " "), candidates)
-            print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         if(score < minscore):
             minscore = score
             append_newmove(newmove, candidates, newcandidates)
+            if(depth == 1):
+                prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]")
+                prnt_moves("", newcandidates)
+                prnt_moves("CANDIDATES:  " + str(minscore).rjust(8, " "), candidates)
+                print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
             if(minscore <= alpha):
                 break
+
+        if(depth == 1):
+            print("move rejected–––––––––––––––––––––––––––––––––––––––––––––––")
+            prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]")
+            prnt_moves("", newcandidates)
+            prnt_moves("CANDIDATES:  " + str(minscore).rjust(8, " "), candidates)
+            print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         #elapsed_time = time.time() - match.time_start
         #if(elapsed_time > match.seconds_per_move):
