@@ -127,7 +127,6 @@ def disclosures(match, gmove):
     discl_attacked = []
     discl_supported = []
 
-    print("disclosures")
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
     color = Match.color_of_piece(piece)
@@ -290,6 +289,7 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
                     priomove.tactics.append(TACTICS['support-bad-deal'])
 
         discl_attacked, discl_supported = disclosures(match, priomove.gmove)
+        print("disclosures " + str(len(discl_attacked)) + " " + str(len(discl_supported)))
         if(len(discl_attacked) > 0):
             if(is_discl_attacked_supported(discl_attacked) == False):
                 priomove.tactics.append(TACTICS['attack-good-deal'])
