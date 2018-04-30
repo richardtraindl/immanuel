@@ -297,7 +297,7 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
                 priomove.tactics.append(TACTICS['attack-bad-deal'])
 
         if(len(discl_supported) > 0):
-            if(is_discl_supported_attacked_(discl_supported) == False):
+            if(is_discl_supported_attacked_(discl_supported)):
                 priomove.tactics.append(TACTICS['support-good-deal'])
                 all_discl_supporting.append(priomove)
             else:
