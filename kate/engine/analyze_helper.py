@@ -205,6 +205,7 @@ def is_discl_supported_attacked_(discl_supported):
 
     for ctouch_beyond in discl_supported:
         if(len(ctouch_beyond.attacker_beyond) > 0):
+            print("disclosed supported is attacked")
             return True
 
     return False
