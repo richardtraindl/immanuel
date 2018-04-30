@@ -264,8 +264,9 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
     color = match.next_color()
     candidates = []
     newcandidates = []
-    maxscore = SCORES[PIECES['wKg']] * 2
     count = 0
+
+    maxscore = alpha #(SCORES[PIECES['wKg']] + SCORES[PIECES['wKg']])
 
     priomoves = generate_moves(match)
     
@@ -316,8 +317,8 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
 
         if(score > maxscore):
             maxscore = score
-            if(maxscore > beta):
-                return maxscore, candidates
+            if(maxscore > beta): # >=
+                break #return maxscore, candidates
 
         #elapsed_time = time.time() - match.time_start
         #if(elapsed_time > match.seconds_per_move):
@@ -325,7 +326,7 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
         #else:
             #exceeded = False
         if(count >= maxcnt):
-            return maxscore, candidates
+            break #return maxscore, candidates
 
     return maxscore, candidates
 
@@ -334,8 +335,9 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
     color = match.next_color()
     candidates = []
     newcandidates = []
-    minscore = SCORES[PIECES['bKg']] * 2
     count = 0
+
+    minscore = beta #(SCORES[PIECES['bKg']] + SCORES[PIECES['bKg']])
 
     priomoves = generate_moves(match)
     
@@ -386,8 +388,8 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
 
         if(score < minscore):
             minscore = score
-            if(minscore < alpha):
-                return minscore, candidates
+            if(minscore < alpha): # <=
+                break #return minscore, candidates
 
         #elapsed_time = time.time() - match.time_start
         #if(elapsed_time > match.seconds_per_move):
@@ -395,7 +397,7 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
         #else:
             #exceeded = False
         if(count >= maxcnt):
-            return minscore, candidates
+            break #return minscore, candidates
 
     return minscore, candidates
 
@@ -441,9 +443,9 @@ def calc_move(match):
         candidates.append(gmove)
         score = match.score
     elif(match.next_color() == COLORS['white']):
-        score, candidates = calc_max(match, 1, slimits, SCORES[PIECES['wKg']] * 2, SCORES[PIECES['bKg']] * 2, None)
+        score, candidates = calc_max(match, 1, slimits, (SCORES[PIECES['wKg']] + SCORES[PIECES['wKg']]), (SCORES[PIECES['bKg']] + SCORES[PIECES['bKg']]), None)
     else:
-        score, candidates = calc_min(match, 1, slimits, SCORES[PIECES['wKg']] * 2, SCORES[PIECES['bKg']] * 2, None)
+        score, candidates = calc_min(match, 1, slimits, (SCORES[PIECES['wKg']] + SCORES[PIECES['wKg']]), (SCORES[PIECES['bKg']] + SCORES[PIECES['bKg']]), None)
 
     ### time
     elapsed_time = time.time() - match.time_start
