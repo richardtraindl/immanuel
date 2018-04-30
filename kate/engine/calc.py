@@ -328,10 +328,10 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
 
         if(score > maxscore):
             maxscore = score
+            append_newmove(newmove, candidates, newcandidates)
             if(maxscore >= beta):
                 break
 
-        append_newmove(newmove, candidates, newcandidates)
         #elapsed_time = time.time() - match.time_start
         #if(elapsed_time > match.seconds_per_move):
             #exceeded = True
@@ -399,10 +399,10 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
 
         if(score < minscore):
             minscore = score
+            append_newmove(newmove, candidates, newcandidates)
             if(minscore <= alpha):
                 break
 
-        append_newmove(newmove, candidates, newcandidates)
         #elapsed_time = time.time() - match.time_start
         #if(elapsed_time > match.seconds_per_move):
             #exceeded = True
