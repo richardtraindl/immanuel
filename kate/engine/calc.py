@@ -203,6 +203,20 @@ def rate(color, newscore, newmove, newcandidates, score, candidates):
         return newscore
 
 
+def append_newmove(newmove, candidates, newcandidates):
+    candidates.clear()
+    candidates.append(newmove)
+
+    if(len(newcandidates) > 0):
+        for newcandidate in newcandidates:
+            if(newcandidate):
+                candidates.append(newcandidate)
+            else:
+                break
+
+    candidates.append(None)
+
+
 def count_up_to_prio(priomoves, prio_limit):
     count = 0
     for priomove in priomoves:
@@ -300,19 +314,19 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
 
         move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcandidates = calc_min(match, depth + 1, slimits, maxscore, beta, priomove)
+        score, newcandidates = calc_min(match, depth + 1, slimits, maxscore, beta, priomove) # newscore
 
-        newscore += score_mupltiple_piece_moves_in_opening(match, priomove.gmove)
+        score += score_mupltiple_piece_moves_in_opening(match, priomove.gmove) # newscore
 
-        score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
+        #score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
 
         matchmove.undo_move(match)
 
         if(depth == 1):
-            prnt_move("\nCURR SEARCH: " + str(newscore).rjust(8, " ") + " [", newmove, "]")
+            prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]") # newscore
             prnt_moves("", newcandidates)
 
-            prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
+            #prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         if(score > maxscore):
@@ -320,6 +334,7 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
             if(maxscore >= beta): # >
                 break #return maxscore, candidates
 
+        append_newmove(newmove, candidates, newcandidates)
         #elapsed_time = time.time() - match.time_start
         #if(elapsed_time > match.seconds_per_move):
             #exceeded = True
@@ -371,19 +386,19 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
 
         move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
 
-        newscore, newcandidates = calc_max(match, depth + 1, slimits, alpha, minscore, priomove)
+        score, newcandidates = calc_max(match, depth + 1, slimits, alpha, minscore, priomove) # newscore
 
-        newscore += score_mupltiple_piece_moves_in_opening(match, priomove.gmove)
+        score += score_mupltiple_piece_moves_in_opening(match, priomove.gmove) # newscore
 
-        score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
+        #score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
 
         matchmove.undo_move(match)
         
         if(depth == 1):
-            prnt_move("\nCURR SEARCH: " + str(newscore).rjust(8, " ") + " [", newmove, "]")
+            prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]") # newscore
             prnt_moves("", newcandidates)
 
-            prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
+            #prnt_moves("CANDIDATES:  " + str(score).rjust(8, " "), candidates)
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
         if(score < minscore):
@@ -391,6 +406,7 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
             if(minscore <= alpha): # <
                 break #return minscore, candidates
 
+        append_newmove(newmove, candidates, newcandidates)
         #elapsed_time = time.time() - match.time_start
         #if(elapsed_time > match.seconds_per_move):
             #exceeded = True
