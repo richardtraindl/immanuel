@@ -218,7 +218,7 @@ def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_su
                     elif(Match.color_of_piece(first.piece) == Match.color_of_piece(second.piece) and 
                          Match.color_of_piece(first.piece) == color and
                          first.piece != PIECES['blk'] and second.piece != PIECES['blk']):
-                         print("111")
+                        print("111")
                         if(first.piece == PIECES['wRk'] or first.piece == PIECES['bRk'] or 
                            first.piece == PIECES['wQu'] or first.piece == PIECES['bQu']):
                             print("222")
