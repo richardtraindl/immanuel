@@ -124,7 +124,8 @@ def defends_check(match):
 
 
 def disclosures(match, gmove):
-    disclosed_attacked = []
+    discl_attacked = []
+    discl_supported = []
 
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
@@ -136,22 +137,25 @@ def disclosures(match, gmove):
 
     do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-    rook.disclosures_field(match, color, excluded_dir, gmove.srcx, gmove.srcy, disclosed_attacked)
+    rook.disclosures(match, color, excluded_dir, gmove.srcx, gmove.srcy, discl_attacked, discl_supported)
 
-    bishop.disclosures_field(match, color, excluded_dir, gmove.srcx, gmove.srcy, disclosed_attacked)
+    bishop.disclosures(match, color, excluded_dir, gmove.srcx, gmove.srcy, discl_attacked, discl_supported)
 
     undo_move(match)
 
     ###
     match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
 
-    for ctouch_beyond in disclosed_attacked:
+    for ctouch_beyond in discl_attacked:
+        field_touches_beyond(match, color, ctouch_beyond)
+
+    for ctouch_beyond in discl_supported:
         field_touches_beyond(match, color, ctouch_beyond)
 
     match.writefield(gmove.srcx, gmove.srcy, piece)
     ###
     
-    return disclosed_attacked
+    return discl_attacked, discl_supported
 
 
 def running_pawn_in_endgame(match, gmove):
@@ -195,7 +199,8 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
     all_attacking = []
     all_supporting = []
     all_fork_defending = []
-    all_disclosed_attacking = []
+    all_discl_attacking = []
+    all_discl_supporting = []
     all_fleeing = []
     excludes = []
 
@@ -283,13 +288,20 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
                 else:
                     priomove.tactics.append(TACTICS['support-bad-deal'])
 
-        disclosed_attacked = disclosures(match, priomove.gmove)
-        if(len(disclosed_attacked) > 0):
-            if(is_disclosed_attacked_supported(disclosed_attacked) == False):
+        discl_attacked, discl_supported = disclosures(match, priomove.gmove)
+        if(len(discl_attacked) > 0):
+            if(is_discl_attacked_supported(discl_attacked) == False):
                 priomove.tactics.append(TACTICS['attack-good-deal'])
-                all_disclosed_attacking.append(priomove)
+                all_discl_attacking.append(priomove)
             else:
                 priomove.tactics.append(TACTICS['attack-bad-deal'])
+
+        if(len(discl_supported) > 0):
+            if(is_discl_supported_attacked_(discl_supported) == False):
+                priomove.tactics.append(TACTICS['support-good-deal'])
+                all_discl_supporting.append(priomove)
+            else:
+                priomove.tactics.append(TACTICS['support-bad-deal'])
 
         if(running_pawn_in_endgame(match, priomove.gmove)):
             priomove.tactics.append(TACTICS['running-pawn-in-endgame'])
@@ -321,12 +333,12 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
              pmove.prio_sec = TACTICS_TO_PRIO[pmove.fetch_tactics(1)]
 
     excludes.clear()
-    all_disclosed_attacking.sort(key = fetch_first_tactics)
-    for pmove in all_disclosed_attacking:
+    all_discl_attacking.sort(key = fetch_first_tactics)
+    for pmove in all_discl_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            pmove.downgrade(TACTICS['disclosed-attack-good-deal'], TACTICS['attack-downgraded'])
+            pmove.downgrade(TACTICS['discl-attack-good-deal'], TACTICS['attack-downgraded'])
             pmove.tactics.sort()
             pmove.prio = TACTICS_TO_PRIO[pmove.fetch_tactics(0)]
             pmove.prio_sec = TACTICS_TO_PRIO[pmove.fetch_tactics(1)]
@@ -338,6 +350,17 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(TACTICS['support-good-deal'], TACTICS['support-downgraded'])
+            pmove.tactics.sort()
+            pmove.prio = TACTICS_TO_PRIO[pmove.fetch_tactics(0)]
+            pmove.prio_sec = TACTICS_TO_PRIO[pmove.fetch_tactics(1)]
+
+    excludes.clear()
+    all_discl_supporting.sort(key = fetch_first_tactics)
+    for pmove in all_discl_supporting:
+        if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
+            excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
+        else:
+            pmove.downgrade(TACTICS['discl-support-good-deal'], TACTICS['support-downgraded'])
             pmove.tactics.sort()
             pmove.prio = TACTICS_TO_PRIO[pmove.fetch_tactics(0)]
             pmove.prio_sec = TACTICS_TO_PRIO[pmove.fetch_tactics(1)]
@@ -365,4 +388,5 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
             pmove.prio_sec = TACTICS_TO_PRIO[pmove.fetch_tactics(1)]
 
     priomoves.sort(key=attrgetter('prio', 'prio_sec'))
+
 

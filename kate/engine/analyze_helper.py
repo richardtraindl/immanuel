@@ -188,16 +188,26 @@ def piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, gmove):
     return True
 
 
-def is_disclosed_attacked_supported(disclosed_attacked):
-    if(len(disclosed_attacked) == 0):
+def is_discl_attacked_supported(discl_attacked):
+    if(len(discl_attacked) == 0):
         return False
 
-    for ctouch_beyond in disclosed_attacked:
+    for ctouch_beyond in discl_attacked:
         if(len(ctouch_beyond.supporter_beyond) > 0):
             return True
 
     return False
 
+
+def is_discl_supported_attacked_(discl_supported):
+    if(len(discl_supported) == 0):
+        return False
+
+    for ctouch_beyond in discl_supported:
+        if(len(ctouch_beyond.attacker_beyond) > 0):
+            return True
+
+    return False
 
 
 def srcfield_is_supported(match, gmove):

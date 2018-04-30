@@ -182,7 +182,7 @@ def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
                 ###
 
 
-def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked):
+def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_supported):
     for j in range(0, 4, 2):
         first = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
         second = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
@@ -209,11 +209,20 @@ def disclosures_field(match, color, excluded_dir, srcx, srcy, disclosed_attacked
                         if(Match.color_of_piece(first.piece) == color):
                             if(first.piece == PIECES['wRk'] or first.piece == PIECES['bRk'] or 
                                first.piece == PIECES['wQu'] or first.piece == PIECES['bQu']):
-                                disclosed_attacked.append(second)
+                                discl_attacked.append(second)
                         else:
                             if(second.piece == PIECES['wRk'] or second.piece == PIECES['bRk'] or 
                                second.piece == PIECES['wQu'] or second.piece == PIECES['bQu']):
-                                disclosed_attacked.append(first)
+                                discl_attacked.append(first)
+                    elif(Match.color_of_piece(first.piece) == Match.color_of_piece(second.piece) and 
+                         Match.color_of_piece(first.piece) == color and
+                         first.piece != PIECES['blk'] and second.piece != PIECES['blk']):
+                        if(first.piece == PIECES['wRk'] or first.piece == PIECES['bRk'] or 
+                           first.piece == PIECES['wQu'] or first.piece == PIECES['bQu']):
+                            discl_supported.append(second)
+                        elif(second.piece == PIECES['wRk'] or second.piece == PIECES['bRk'] or 
+                             second.piece == PIECES['wQu'] or second.piece == PIECES['bQu']):
+                            discl_supported.append(first)
                     else:
                         break
                 else:
