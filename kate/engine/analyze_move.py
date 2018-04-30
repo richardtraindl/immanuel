@@ -127,6 +127,7 @@ def disclosures(match, gmove):
     discl_attacked = []
     discl_supported = []
 
+    print("disclosures")
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
     color = Match.color_of_piece(piece)
