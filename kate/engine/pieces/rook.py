@@ -204,7 +204,6 @@ def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_su
                     second.piece = piece
                     second.fieldx = x1
                     second.fieldy = y1
-                    print("second")
                     if(Match.color_of_piece(first.piece) != Match.color_of_piece(second.piece) and 
                        first.piece != PIECES['blk'] and second.piece != PIECES['blk']):
                         if(Match.color_of_piece(first.piece) == color):
