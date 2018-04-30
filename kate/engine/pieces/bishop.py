@@ -194,7 +194,7 @@ def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_su
             stepx = STEPS[j+i][0]
             stepy = STEPS[j+i][1]
             direction = bp_dir(srcx, srcy, (srcx + stepx), (srcy + stepy))
-            if(direction == excluded_dir or direction == REVERSE_DIRS[excluded_dir]):
+            if(direction == excluded_dir or direction == rules.REVERSE_DIRS[excluded_dir]):
                 break
             x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
             if(x1 != rules.UNDEF_X):
