@@ -328,7 +328,7 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
                 prnt_moves("", newcandidates)
                 prnt_moves("CANDIDATES:  " + str(maxscore).rjust(8, " "), candidates)
                 print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
-            if(maxscore >= beta):
+            if(maxscore > beta): # >=
                 break
 
         if(depth == 1):
@@ -405,7 +405,7 @@ def calc_min(match, depth, slimits, alpha, beta, last_pmove):
                 prnt_moves("", newcandidates)
                 prnt_moves("CANDIDATES:  " + str(minscore).rjust(8, " "), candidates)
                 print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
-            if(minscore <= alpha):
+            if(minscore < alpha): # <=
                 break
 
         if(depth == 1):
