@@ -130,15 +130,13 @@ def disclosures(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
     color = Match.color_of_piece(piece)
-    
-    excluded_dir = rook.rk_dir(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
-    if(excluded_dir == rules.DIRS['undefined']):
-        excluded_dir = bishop.bp_dir(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
 
     do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
+    excluded_dir = rook.rk_dir(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
     rook.disclosures(match, color, excluded_dir, gmove.srcx, gmove.srcy, discl_attacked, discl_supported)
 
+    excluded_dir = bishop.bp_dir(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
     bishop.disclosures(match, color, excluded_dir, gmove.srcx, gmove.srcy, discl_attacked, discl_supported)
 
     undo_move(match)
