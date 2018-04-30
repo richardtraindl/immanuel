@@ -204,6 +204,7 @@ def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_su
                     second.piece = piece
                     second.fieldx = x1
                     second.fieldy = y1
+                    print("second")
                     if(Match.color_of_piece(first.piece) != Match.color_of_piece(second.piece) and 
                        first.piece != PIECES['blk'] and second.piece != PIECES['blk']):
                         if(Match.color_of_piece(first.piece) == color):
@@ -217,11 +218,14 @@ def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_su
                     elif(Match.color_of_piece(first.piece) == Match.color_of_piece(second.piece) and 
                          Match.color_of_piece(first.piece) == color and
                          first.piece != PIECES['blk'] and second.piece != PIECES['blk']):
+                         print("111")
                         if(first.piece == PIECES['wRk'] or first.piece == PIECES['bRk'] or 
                            first.piece == PIECES['wQu'] or first.piece == PIECES['bQu']):
+                            print("222")
                             discl_supported.append(second)
                         elif(second.piece == PIECES['wRk'] or second.piece == PIECES['bRk'] or 
                              second.piece == PIECES['wQu'] or second.piece == PIECES['bQu']):
+                            print("333")
                             discl_supported.append(first)
                     else:
                         break
