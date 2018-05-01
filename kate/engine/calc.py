@@ -197,11 +197,17 @@ def append_newmove(gmove, nodecandidates, newcandidates):
 
     nodecandidates.append(None)
 
-def count_up_to_prio(priomoves, prio_limit):
+def count_up_to_prio(priomoves, prio_limit, limit_maxcnt):
     count = 0
+    limitcnt = 0
+
     for priomove in priomoves:
-        if(priomove.prio <= prio_limit):
+        if(priomove.prio < prio_limit):
             count += 1
+        if(priomove.prio == prio_limit and limitcnt < limit_maxcnt):
+            count += 1
+            limitcnt += 1
+            
     return count
     
 def select_maxcount(match, priomoves, depth, slimits, last_pmove):
@@ -212,7 +218,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return len(priomoves)
     
     if(depth <= slimits.dpth_stage1):
-        return max(slimits.count, count_up_to_prio(priomoves, PRIO['prio5']))
+        return max(slimits.count, count_up_to_prio(priomoves, PRIO['prio5'], 3))
     elif(depth <= slimits.dpth_stage2 and 
          (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
