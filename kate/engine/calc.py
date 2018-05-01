@@ -185,35 +185,17 @@ def generate_moves(match):
     return priomoves
 
 
-"""def rate(color, newscore, newmove, newcandidates, score, candidates):
-    if( (color == COLORS["white"] and score >= newscore) or (color == COLORS["black"] and score <= newscore) ):
-        return score
-    else:
-        candidates.clear()
-        candidates.append(newmove)
+def append_newmove(gmove, nodecandidates, newcandidates):
+    nodecandidates.clear()
+    nodecandidates.append(gmove)
 
-        if(len(newcandidates) > 0):
-            for newcandidate in newcandidates:
-                if(newcandidate):
-                    candidates.append(newcandidate)
-                else:
-                    break
+    for newcandidate in newcandidates:
+        if(newcandidate):
+            nodecandidates.append(newcandidate)
+        else:
+            break
 
-        candidates.append(None)
-        return newscore"""
-
-def append_newmove(newmove, candidates, newcandidates):
-    candidates.clear()
-    candidates.append(newmove)
-
-    if(len(newcandidates) > 0):
-        for newcandidate in newcandidates:
-            if(newcandidate):
-                candidates.append(newcandidate)
-            else:
-                break
-
-    candidates.append(None)
+    nodecandidates.append(None)
 
 def count_up_to_prio(priomoves, prio_limit):
     count = 0
@@ -234,12 +216,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     elif(depth <= slimits.dpth_stage2 and 
          (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
-        silentmove = True
-
-        if(last_pmove.find_tactic(TACTICS['capture-good-deal'])):
-            silentmove = False
-        elif(last_pmove.find_tactic(TACTICS['capture-bad-deal'])):
-            silentmove = False
+        silent_move_cnt = 2
 
         for priomove in priomoves:
             if(priomove.find_tactic(TACTICS['attack-king-good-deal'])):
@@ -258,9 +235,9 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                 count += 1
                 priomove.prio = PRIO['prio2']
                 continue
-            elif(silentmove == False):
-                silentmove = True
+            elif(silent_move_cnt > 0):
                 count += 1
+                silent_move_cnt -= 1
                 priomove.prio = PRIO['prio3']
                 continue
             else:
@@ -270,15 +247,18 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return count
     else:
         return 0
-    
-    
-def calc_max(match, depth, slimits, alpha, beta, last_pmove):
+
+
+def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
     color = match.next_color()
-    candidates = []
+    nodecandidates = []
     newcandidates = []
     count = 0
 
-    maxscore = alpha #(SCORES[PIECES['wKg']] + SCORES[PIECES['wKg']])
+    if(maximizing):
+        nodescore = SCORES[PIECES['wKg']] * 2
+    else:
+        nodescore = SCORES[PIECES['bKg']] * 2
 
     priomoves = generate_moves(match)
     
@@ -291,52 +271,59 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
         prnt_priomoves(priomoves)
         if(len(priomoves) == 1):
             pmove = priomoves[0]
-            candidates.append(pmove.gmove)
-            candidates.append(None)
-            return score_position(match, len(priomoves)), candidates
+            nodecandidates.append(pmove.gmove)
+            nodecandidates.append(None)
+            return score_position(match, len(priomoves)), nodecandidates
 
     if(len(priomoves) == 0 or maxcnt == 0):
-        candidates.append(None)
-        return score_position(match, len(priomoves)), candidates
+        nodecandidates.append(None)
+        return score_position(match, len(priomoves)), nodecandidates
 
     for priomove in priomoves:
-        newmove = priomove.gmove
+        gmove = priomove.gmove
 
         count += 1
 
         if(depth == 1):
             msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, newmove, " | ")
+            prnt_move(msg, gmove, " | ")
             prnt_tactics(priomove.tactics)
             print(" | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
-        move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
+        matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-        score, newcandidates = calc_min(match, depth + 1, slimits, maxscore, beta, priomove)
+        score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, beta, not maximizing, priomove)
 
-        score += score_mupltiple_piece_moves_in_opening(match, priomove.gmove)
-
-        #score = rate(color, newscore, newmove, newcandidates, maxscore, candidates)
+        score += score_mupltiple_piece_moves_in_opening(match, color)
 
         matchmove.undo_move(match)
 
-        if(score > maxscore):
-            maxscore = score
-            append_newmove(newmove, candidates, newcandidates)
-            if(depth == 1):
-                prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]")
-                prnt_moves("", newcandidates)
-                prnt_moves("CANDIDATES:  " + str(maxscore).rjust(8, " "), candidates)
-                print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
-            if(maxscore > beta): # >=
-                break
+        if(maximizing):
+            if(score > nodescore):
+                nodescore = score
+                append_newmove(gmove, nodecandidates, newcandidates)
+                if(depth == 1):
+                    prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
+                    prnt_moves("", newcandidates)
+                    prnt_moves("CANDIDATES:  " + str(nodescore).rjust(8, " "), nodecandidates)
+                    print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
-        if(depth == 1):
-            print("move rejected–––––––––––––––––––––––––––––––––––––––––––––––")
-            prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]")
-            prnt_moves("", newcandidates)
-            prnt_moves("CANDIDATES:  " + str(maxscore).rjust(8, " "), candidates)
-            print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+            alpha = max(alpha, nodescore)
+            if(beta <= alpha):
+                break # beta cut-off
+        else:
+            if(score < nodescore):
+                nodescore = score
+                append_newmove(gmove, nodecandidates, newcandidates)
+                if(depth == 1):
+                    prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
+                    prnt_moves("", newcandidates)
+                    prnt_moves("CANDIDATES:  " + str(nodescore).rjust(8, " "), nodecandidates)
+                    print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+
+            beta = min(beta, nodescore)
+            if(beta <= alpha):
+                break # alpha cut-off
 
         #elapsed_time = time.time() - match.time_start
         #if(elapsed_time > match.seconds_per_move):
@@ -346,84 +333,7 @@ def calc_max(match, depth, slimits, alpha, beta, last_pmove):
         if(count >= maxcnt):
             break
 
-    return maxscore, candidates
-
-
-def calc_min(match, depth, slimits, alpha, beta, last_pmove):
-    color = match.next_color()
-    candidates = []
-    newcandidates = []
-    count = 0
-
-    minscore = beta #(SCORES[PIECES['bKg']] + SCORES[PIECES['bKg']])
-
-    priomoves = generate_moves(match)
-    
-    rank_gmoves(match, priomoves, depth, slimits, last_pmove)
-    
-    maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
-
-    if(depth == 1):
-        print("maxcount: " + str(maxcnt))
-        prnt_priomoves(priomoves)
-        if(len(priomoves) == 1):
-            pmove = priomoves[0]
-            candidates.append(pmove.gmove)
-            candidates.append(None)
-            return score_position(match, len(priomoves)), candidates
-
-    if(len(priomoves) == 0 or maxcnt == 0):
-        candidates.append(None)
-        return score_position(match, len(priomoves)), candidates
-
-    for priomove in priomoves:
-        newmove = priomove.gmove
-
-        count += 1
-
-        if(depth == 1):
-            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, newmove, " | ")
-            prnt_tactics(priomove.tactics)
-            print(" | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
-
-        move = matchmove.do_move(match, newmove.srcx, newmove.srcy, newmove.dstx, newmove.dsty, newmove.prom_piece)
-
-        score, newcandidates = calc_max(match, depth + 1, slimits, alpha, minscore, priomove)
-
-        score += score_mupltiple_piece_moves_in_opening(match, priomove.gmove)
-
-        #score = rate(color, newscore, newmove, newcandidates, minscore, candidates)
-
-        matchmove.undo_move(match)
-
-        if(score < minscore):
-            minscore = score
-            append_newmove(newmove, candidates, newcandidates)
-            if(depth == 1):
-                prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]")
-                prnt_moves("", newcandidates)
-                prnt_moves("CANDIDATES:  " + str(minscore).rjust(8, " "), candidates)
-                print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
-            if(minscore < alpha): # <=
-                break
-
-        if(depth == 1):
-            print("move rejected–––––––––––––––––––––––––––––––––––––––––––––––")
-            prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", newmove, "]")
-            prnt_moves("", newcandidates)
-            prnt_moves("CANDIDATES:  " + str(minscore).rjust(8, " "), candidates)
-            print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
-
-        #elapsed_time = time.time() - match.time_start
-        #if(elapsed_time > match.seconds_per_move):
-            #exceeded = True
-        #else:
-            #exceeded = False
-        if(count >= maxcnt):
-            break
-
-    return minscore, candidates
+    return nodescore, nodecandidates
 
 
 class SearchLimits:
@@ -466,10 +376,11 @@ def calc_move(match):
     if(gmove is not None):
         candidates.append(gmove)
         score = match.score
-    elif(match.next_color() == COLORS['white']):
-        score, candidates = calc_max(match, 1, slimits, (SCORES[PIECES['wKg']] + SCORES[PIECES['wKg']]), (SCORES[PIECES['bKg']] + SCORES[PIECES['bKg']]), None)
     else:
-        score, candidates = calc_min(match, 1, slimits, (SCORES[PIECES['wKg']] + SCORES[PIECES['wKg']]), (SCORES[PIECES['bKg']] + SCORES[PIECES['bKg']]), None)
+        maximizing = match.next_color() == COLORS['white']
+        alpha = SCORES[PIECES['wKg']] * 10
+        beta = SCORES[PIECES['bKg']] * 10 
+        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None)
 
     ### time
     elapsed_time = time.time() - match.time_start

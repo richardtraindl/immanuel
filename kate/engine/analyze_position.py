@@ -398,12 +398,10 @@ def score_endgame(match):
     return value
 
 
-def score_mupltiple_piece_moves_in_opening(match, gmove):
+def score_mupltiple_piece_moves_in_opening(match, color):
     if(is_opening(match)):
         if(match.piece_movecnt() == 3):
-            piece = match.readfield(gmove.srcx, gmove.srcy)
-
-            if(Match.color_of_piece(piece) == COLORS['white']):
+            if(color == COLORS['white']):
                 return ATTACKED_SCORES[PIECES['wPw']]
             else:
                 return ATTACKED_SCORES[PIECES['bPw']]
