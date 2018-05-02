@@ -268,7 +268,7 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
                     priomove.tactics.append(TACTICS['attack-bad-deal'])
 
         if(len(supported) > 0):
-            if(is_supported_attacked(supported)):
+            if(is_supported_weak(supported)): # is_supported_attacked(supported)
                 if(dstfield_is_attacked(match, priomove.gmove) == False or 
                    (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) and 
                     piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, priomove.gmove))):
@@ -296,7 +296,7 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
                 priomove.tactics.append(TACTICS['attack-bad-deal'])
 
         if(len(discl_supported) > 0):
-            if(is_discl_supported_attacked_(discl_supported)):
+            if(is_discl_supported_weak(discl_supported)): # is_discl_supported_attacked(discl_supported)
                 priomove.tactics.append(TACTICS['support-good-deal'])
                 all_discl_supporting.append(priomove)
             else:

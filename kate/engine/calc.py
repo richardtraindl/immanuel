@@ -105,9 +105,16 @@ class PrioMove:
                tactic == TACTICS['promotion'] or
                tactic == TACTICS['capture-good-deal'] or
                tactic == TACTICS['attack-king-good-deal'] or 
-               tactic == TACTICS['capture-bad-deal'] or       
+               tactic == TACTICS['capture-bad-deal'] or 
                tactic == TACTICS['attack-king-bad-deal'] or
                tactic == TACTICS['attack-stormy']):
+                return True
+        return False
+
+    def is_tactic_capture(self):
+        for tactic in self.tactics:
+            if(tactic == TACTICS['capture-good-deal'] or
+               tactic == TACTICS['capture-bad-deal']):
                 return True
         return False
 
@@ -197,17 +204,13 @@ def append_newmove(gmove, nodecandidates, newcandidates):
 
     nodecandidates.append(None)
 
-def count_up_to_prio(priomoves, prio_limit, limit_maxcnt):
+def count_up_to_prio(priomoves, prio_limit):
     count = 0
-    limitcnt = 0
 
     for priomove in priomoves:
-        if(priomove.prio < prio_limit):
+        if(priomove.prio <= prio_limit):
             count += 1
-        if(priomove.prio == prio_limit and limitcnt < limit_maxcnt):
-            count += 1
-            limitcnt += 1
-            
+
     return count
     
 def select_maxcount(match, priomoves, depth, slimits, last_pmove):
@@ -218,7 +221,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return len(priomoves)
     
     if(depth <= slimits.dpth_stage1):
-        return max(slimits.count, count_up_to_prio(priomoves, PRIO['prio5'], 3))
+        return max(slimits.count, count_up_to_prio(priomoves, PRIO['prio5']))
     elif(depth <= slimits.dpth_stage2 and 
          (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
@@ -248,6 +251,32 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                 continue
             else:
                 priomove.prio = PRIO['prio10']
+
+        priomoves.sort(key=attrgetter('prio'))
+        return count
+    elif(last_pmove.is_tactic_capture()):
+        count = 0
+        silent_move_cnt = 1
+
+        for priomove in priomoves:
+            if(priomove.find_tactic(TACTICS['capture-good-deal'])):
+                count += 1
+                priomove.prio = PRIO['prio1']
+                continue
+            elif(priomove.find_tactic(TACTICS['capture-bad-deal'])):
+                count += 1
+                priomove.prio = PRIO['prio2']
+                continue
+            elif(silent_move_cnt > 0):
+                count += 1
+                silent_move_cnt -= 1
+                priomove.prio = PRIO['prio3']
+                continue
+            else:
+                priomove.prio = PRIO['prio10']
+
+        if(count == 1 and silent_move_cnt == 0):
+            return 0
 
         priomoves.sort(key=attrgetter('prio'))
         return count
@@ -346,7 +375,7 @@ class SearchLimits:
     def __init__(self, match):
         self.count = 6
         self.dpth_stage1 = 2
-        self.dpth_stage2 = 7
+        self.dpth_stage2 = 5
 
         self.setlimits(match)
 
@@ -354,19 +383,19 @@ class SearchLimits:
         if(match.level == LEVELS['blitz']):
             self.count = 6
             self.dpth_stage1 = 2
-            self.dpth_stage2 = 7
+            self.dpth_stage2 = 5
         elif(match.level == LEVELS['low']):
             self.count = 8
             self.dpth_stage1 = 3
-            self.dpth_stage2 = 8
+            self.dpth_stage2 = 6
         elif(match.level == LEVELS['medium']):
             self.count = 12
             self.dpth_stage1 = 4
-            self.dpth_stage2 = 9
+            self.dpth_stage2 = 7
         else:
             self.count = 16
             self.dpth_stage1 = 5
-            self.dpth_stage2 = 10
+            self.dpth_stage2 = 8
 
 
 def calc_move(match):

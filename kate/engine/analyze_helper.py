@@ -210,6 +210,17 @@ def is_discl_supported_attacked_(discl_supported):
     return False
 
 
+def is_discl_supported_weak(discl_supported):
+    if(len(discl_supported) == 0):
+        return False
+
+    for ctouch_beyond in discl_supported:
+        if(len(ctouch_beyond.attacker_beyond) >= len(ctouch_beyond.supporter_beyond)):
+            return True
+
+    return False
+
+
 def srcfield_is_supported(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
@@ -334,6 +345,17 @@ def is_attacked_higher_than_piece(match, attacked):
     for ctouch_beyond in attacked:
         piece = match.readfield(ctouch_beyond.agent_srcx, ctouch_beyond.agent_srcy)
         if(PIECES_RANK[ctouch_beyond.piece] > PIECES_RANK[piece]):
+            return True
+
+    return False
+
+
+def is_supported_weak(supported):
+    if(len(supported) == 0):
+        return False
+
+    for ctouch_beyond in supported:
+        if(len(ctouch_beyond.attacker_beyond) >= len(ctouch_beyond.supporter_beyond)):
             return True
 
     return False
