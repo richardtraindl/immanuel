@@ -122,7 +122,69 @@ def piece_is_lower_equal_than_captured(match, gmove):
         return True
     else:
         return False
-  
+
+
+def srcfield_is_supported(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+
+    return rules.is_field_touched(match, Match.color_of_piece(piece), gmove.srcx, gmove.srcy, 0)
+
+
+def piece_is_lower_equal_than_enemy_on_srcfield(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+
+    enemies = list_field_touches(match, Match.oppcolor_of_piece(piece), gmove.srcx, gmove.srcy)
+
+    for enemy in enemies:
+        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
+            return False
+
+    return True
+    
+
+def srcfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+    
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
+
+    frdlytouches, enmytouches = field_touches(match, Match.color_of_piece(piece), gmove.srcx, gmove.srcy)
+    
+    match.writefield(gmove.srcx, gmove.srcy, piece)
+
+    return len(frdlytouches) >= len(enmytouches)
+
+
+def piece_is_lower_equal_than_enemy_on_dstfield(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
+
+    enemies = list_field_touches(match, Match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
+
+    match.writefield(gmove.srcx, gmove.srcy, piece)
+
+    for enemy in enemies:
+        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
+            return False
+
+    return True
+
+
+def piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+
+    enemies = list_field_touches(match, Match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
+
+    for enemy in enemies:
+        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
+            if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wRk']] and 
+               PIECES_RANK[enemy.piece] == PIECES_RANK[PIECES['wBp']]):
+                continue
+            else:
+                return False
+
+    return True
+
 
 def dstfield_is_supported(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
@@ -160,34 +222,6 @@ def dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match,
     return len(frdlytouches) >= len(enmytouches)
 
 
-def piece_is_lower_equal_than_enemy_on_srcfield(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-
-    enemies = list_field_touches(match, Match.oppcolor_of_piece(piece), gmove.srcx, gmove.srcy)
-
-    for enemy in enemies:
-        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
-            return False
-
-    return True
-
-
-def piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-
-    enemies = list_field_touches(match, Match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
-
-    for enemy in enemies:
-        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
-            if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wRk']] and 
-               PIECES_RANK[enemy.piece] == PIECES_RANK[PIECES['wBp']]):
-                continue
-            else:
-                return False
-
-    return True
-
-
 def is_discl_attacked_supported(discl_attacked):
     if(len(discl_attacked) == 0):
         return False
@@ -215,33 +249,10 @@ def is_discl_supported_weak(discl_supported):
         return False
 
     for ctouch_beyond in discl_supported:
-        if(len(ctouch_beyond.attacker_beyond) >= len(ctouch_beyond.supporter_beyond)):
+        if(len(ctouch_beyond.attacker_beyond) > len(ctouch_beyond.supporter_beyond)):
             return True
 
     return False
-
-
-def srcfield_is_supported(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-
-    return rules.is_field_touched(match, Match.color_of_piece(piece), gmove.srcx, gmove.srcy, 0)
-
-
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
-    if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        return queen.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
-    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        return rook.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
-    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        return bishop.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
-    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        return knight.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
-    elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        return king.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
-    elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        return pawn.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
-    else:
-        return False
 
 
 def is_fork_field(match, piece, forkx, forky):
@@ -289,22 +300,6 @@ def is_piece_attacked(lst, piece1, piece2):
             return True
 
     return False
-
-
-def piece_is_lower_equal_than_enemy_on_dstfield(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-
-    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
-
-    enemies = list_field_touches(match, Match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
-
-    match.writefield(gmove.srcx, gmove.srcy, piece)
-
-    for enemy in enemies:
-        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
-            return False
-
-    return True
 
 
 def is_attacked_supported(attacked):
@@ -355,7 +350,7 @@ def is_supported_weak(supported):
         return False
 
     for ctouch_beyond in supported:
-        if(len(ctouch_beyond.attacker_beyond) >= len(ctouch_beyond.supporter_beyond)):
+        if(len(ctouch_beyond.attacker_beyond) > len(ctouch_beyond.supporter_beyond)):
             return True
 
     return False

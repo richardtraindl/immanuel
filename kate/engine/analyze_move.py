@@ -156,6 +156,28 @@ def disclosures(match, gmove):
     return discl_attacked, discl_supported
 
 
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
+    if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+        return queen.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+        return rook.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+        return bishop.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+        return knight.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+    elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+        return king.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+    elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+        return pawn.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+    else:
+        return False
+
+
+def blocks(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+    return False
+
+
 def running_pawn_in_endgame(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
@@ -234,7 +256,8 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
             if(dstfield_is_attacked(match, priomove.gmove) == False or
                 (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) and 
                  piece_is_lower_equal_than_enemy_on_dstfield(match, priomove.gmove))):
-                if(piece_is_lower_equal_than_enemy_on_srcfield(match, priomove.gmove) == False):
+                if(srcfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) or
+                   piece_is_lower_equal_than_enemy_on_srcfield(match, priomove.gmove) == False):
                     priomove.tactics.append(TACTICS['flee-urgent'])
                     all_fleeing.append(priomove)
                 elif(srcfield_is_supported(match, priomove.gmove) == False):
@@ -301,6 +324,9 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
                 all_discl_supporting.append(priomove)
             else:
                 priomove.tactics.append(TACTICS['support-bad-deal'])
+
+        #if(blocks(match, priomove.gmove)):
+
 
         if(running_pawn_in_endgame(match, priomove.gmove)):
             priomove.tactics.append(TACTICS['running-pawn-in-endgame'])

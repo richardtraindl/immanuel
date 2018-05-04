@@ -98,8 +98,10 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 0px;
-    width: 640px;
-    min-width: 640px;
+    width: 96%;
+    min-width: 96%;
+    /*width: 640px;
+    min-width: 640px;*/
     background-color: Linen;
 }
 
@@ -278,9 +280,10 @@ a.btn, a.btn:visited, a.btn:hover {
   padding-bottom: 10px;
 }
 
-@media (min-width: 1024px) {
+@media(min-width: 1024px) {
     #wrapper {
         width: 748px;
+        min-width: 748px;
     }
     #game {
         display: grid;
