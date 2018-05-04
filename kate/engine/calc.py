@@ -228,26 +228,18 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         silent_move_cnt = 0
 
         for priomove in priomoves:
-            if(priomove.find_tactic(TACTICS['attack-king-good-deal'])):
+            if(priomove.find_tactic(TACTICS['attack-king-good-deal']) or priomove.find_tactic(TACTICS['capture-good-deal'])):
                 count += 1
                 priomove.prio = PRIO['prio1']
                 continue
-            elif(priomove.find_tactic(TACTICS['capture-good-deal'])):
+            elif(priomove.find_tactic(TACTICS['attack-king-bad-deal'] or priomove.find_tactic(TACTICS['capture-bad-deal'])):
                 count += 1
-                priomove.prio = PRIO['prio1']
-                continue
-            elif(priomove.find_tactic(TACTICS['attack-king-bad-deal'])):
-                count += 1
-                priomove.prio = PRIO['prio2']
-                continue
-            elif(priomove.find_tactic(TACTICS['capture-bad-deal'])):
-                count += 1
-                priomove.prio = PRIO['prio2']
+                priomove.prio = PRIO['prio3']
                 continue
             elif(silent_move_cnt < 2):
                 count += 1
                 silent_move_cnt += 1
-                priomove.prio = PRIO['prio3']
+                priomove.prio = PRIO['prio2']
                 continue
             else:
                 priomove.prio = PRIO['prio10']
@@ -265,18 +257,18 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                 continue
             elif(priomove.find_tactic(TACTICS['capture-bad-deal'])):
                 count += 1
-                priomove.prio = PRIO['prio2']
+                priomove.prio = PRIO['prio3']
                 continue
             elif(silent_move_cnt < 1):
                 count += 1
                 silent_move_cnt += 1
-                priomove.prio = PRIO['prio3']
+                priomove.prio = PRIO['prio2']
                 continue
             else:
                 priomove.prio = PRIO['prio10']
 
-        if(count == 1 and silent_move_cnt == 1):
-            return 0
+        #if(count == 1 and silent_move_cnt == 1):
+            #return 0
 
         priomoves.sort(key=attrgetter('prio'))
         return count
