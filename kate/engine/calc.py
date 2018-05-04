@@ -232,7 +232,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                 count += 1
                 priomove.prio = PRIO['prio1']
                 continue
-            elif(priomove.find_tactic(TACTICS['attack-king-bad-deal'] or priomove.find_tactic(TACTICS['capture-bad-deal'])):
+            elif(priomove.find_tactic(TACTICS['attack-king-bad-deal']) or priomove.find_tactic(TACTICS['capture-bad-deal'])):
                 count += 1
                 priomove.prio = PRIO['prio3']
                 continue
