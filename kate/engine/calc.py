@@ -225,7 +225,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     elif(depth <= slimits.dpth_stage2 and 
          (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
-        silent_move_cnt = 2
+        silent_move_cnt = 0
 
         for priomove in priomoves:
             if(priomove.find_tactic(TACTICS['attack-king-good-deal'])):
@@ -244,9 +244,9 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                 count += 1
                 priomove.prio = PRIO['prio2']
                 continue
-            elif(silent_move_cnt > 0):
+            elif(silent_move_cnt < 2):
                 count += 1
-                silent_move_cnt -= 1
+                silent_move_cnt += 1
                 priomove.prio = PRIO['prio3']
                 continue
             else:
@@ -256,7 +256,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return count
     elif(last_pmove.is_tactic_capture()):
         count = 0
-        silent_move_cnt = 1
+        silent_move_cnt = 0
 
         for priomove in priomoves:
             if(priomove.find_tactic(TACTICS['capture-good-deal'])):
@@ -267,15 +267,15 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                 count += 1
                 priomove.prio = PRIO['prio2']
                 continue
-            elif(silent_move_cnt > 0):
+            elif(silent_move_cnt < 1):
                 count += 1
-                silent_move_cnt -= 1
+                silent_move_cnt += 1
                 priomove.prio = PRIO['prio3']
                 continue
             else:
                 priomove.prio = PRIO['prio10']
 
-        if(count == 1 and silent_move_cnt == 0):
+        if(count == 1 and silent_move_cnt == 1):
             return 0
 
         priomoves.sort(key=attrgetter('prio'))
