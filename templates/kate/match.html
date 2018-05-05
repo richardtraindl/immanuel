@@ -9,9 +9,7 @@
 
     <h2>{{ match.white_player_name }} &nbsp; : &nbsp; {{ match.black_player_name }}</h2>
 
-    <p>Level: &nbsp; {{ match.level|matchlevel }}</p>
-
-    <p>Created on: &nbsp; {{ match.begin|fmtdate }}</p>
+    <p style="font-size: 10px">Created on: &nbsp; {{ match.begin|fmtdate }}</p>
 {% endblock %}
 
 
@@ -70,11 +68,16 @@
       </div>
 
       <div id="minutes">
-        <p>Score: &nbsp; {{ match.score }}</p>
-        
+        <table style="width: 100%">
+            <tr>
+                <td >Level: &nbsp; {{ match.level|matchlevel }}</td>
+                <td>Score: &nbsp; {{ match.score }}</td>
+            </tr>
+        </table>
+
         <div class="small-gap"></div>
          
-        <table>
+        <table style="width: 100%">
             <tr>
                 <td>Time White: {{ match.white_elapsed_seconds|fmttime }}</td>
                 <td>Time Black: {{ match.black_elapsed_seconds|fmttime }}</td>

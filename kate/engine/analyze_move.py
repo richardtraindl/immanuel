@@ -123,6 +123,46 @@ def defends_check(match):
         return True
 
 
+def defends_king_attack(match, gmove):
+    color = match.next_color()
+    beforecnt = 0
+    aftercnt = 0
+
+    if(color == COLORS['white']):
+        Kg_x = match.wKg_x
+        Kg_y = match.wKg_y
+    else:
+        Kg_x = match.bKg_x
+        Kg_y = match.bKg_y
+
+    for i in range(8):
+        x1, y1 = rules.search(match, Kg_x, Kg_y, king.STEPS[i][0], king.STEPS[i][1])
+        if(x1 != rules.UNDEF_X):
+            friends, enemies = field_touches(match, color, x1, y1)
+            if(len(friends) < len(enemies)):
+                beforecnt += 1
+
+    do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+
+    if(Kg_x == gmove.srcx):
+        Kg_x = gmove.dstx
+        Kg_y = gmove.dsty
+
+    for i in range(8):
+        x1, y1 = rules.search(match, Kg_x, Kg_y, king.STEPS[i][0], king.STEPS[i][1])
+        if(x1 != rules.UNDEF_X):
+            friends, enemies = field_touches(match, color, x1, y1)
+            if(len(friends) < len(enemies)):
+                aftercnt += 1
+
+    undo_move(match)
+
+    if(beforecnt > aftercnt):
+        return True
+    else:
+        return False
+
+
 def disclosures(match, gmove):
     discl_attacked = []
     discl_supported = []
@@ -227,7 +267,11 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
     for priomove in priomoves:
         if(defends_check(match)):
             priomove.tactics.append(TACTICS['defend-check'])
-        
+
+        if(defends_king_attack(match, priomove.gmove)):
+            if(dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove)):
+                priomove.tactics.append(TACTICS['defend-king-attack'])
+
         if(castles(match, priomove.gmove)):
             priomove.tactics.append(TACTICS['castling'])
 

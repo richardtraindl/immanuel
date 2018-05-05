@@ -102,6 +102,7 @@ class PrioMove:
     def is_tactic_stormy(self):
         for tactic in self.tactics:
             if(tactic == TACTICS['defend-check'] or
+               tactic == TACTICS['defend-king-attack'] or
                tactic == TACTICS['promotion'] or
                tactic == TACTICS['capture-good-deal'] or
                tactic == TACTICS['attack-king-good-deal'] or 
@@ -111,9 +112,10 @@ class PrioMove:
                 return True
         return False
 
-    def is_tactic_capture(self):
+    def is_tactic_urgent(self):
         for tactic in self.tactics:
-            if(tactic == TACTICS['capture-good-deal'] or
+            if(tactic == TACTICS['defend-king-attack'] or
+               tactic == TACTICS['capture-good-deal'] or
                tactic == TACTICS['capture-bad-deal']):
                 return True
         return False
@@ -228,7 +230,9 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         silent_move_cnt = 0
 
         for priomove in priomoves:
-            if(priomove.find_tactic(TACTICS['attack-king-good-deal']) or priomove.find_tactic(TACTICS['capture-good-deal'])):
+            if(priomove.find_tactic(TACTICS['defend-king-attack']) or
+               priomove.find_tactic(TACTICS['attack-king-good-deal']) or 
+               priomove.find_tactic(TACTICS['capture-good-deal'])):
                 count += 1
                 priomove.prio = PRIO['prio1']
                 continue
@@ -246,12 +250,13 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
 
         priomoves.sort(key=attrgetter('prio'))
         return count
-    elif(last_pmove.is_tactic_capture()):
+    elif(last_pmove.is_tactic_urgent()):
         count = 0
         silent_move_cnt = 0
 
         for priomove in priomoves:
-            if(priomove.find_tactic(TACTICS['capture-good-deal'])):
+            if(priomove.find_tactic(TACTICS['defend-king-attack']) or
+               priomove.find_tactic(TACTICS['capture-good-deal'])):
                 count += 1
                 priomove.prio = PRIO['prio2']
                 continue

@@ -150,6 +150,7 @@ nav li a:active {
     }
 
 #game {
+    display: block;
     padding-top: 10px;
 }
 
