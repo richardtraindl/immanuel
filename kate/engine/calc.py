@@ -102,6 +102,7 @@ class PrioMove:
     def is_tactic_stormy(self):
         for tactic in self.tactics:
             if(tactic == TACTICS['defend-check'] or
+               tactic == TACTICS['defend-king-attack-urgent'] or
                tactic == TACTICS['defend-king-attack'] or
                tactic == TACTICS['promotion'] or
                tactic == TACTICS['capture-good-deal'] or
@@ -114,7 +115,7 @@ class PrioMove:
 
     def is_tactic_urgent(self):
         for tactic in self.tactics:
-            if(tactic == TACTICS['defend-king-attack'] or
+            if(tactic == TACTICS['defend-king-attack-urgent'] or
                tactic == TACTICS['capture-good-deal'] or
                tactic == TACTICS['capture-bad-deal']):
                 return True
@@ -230,7 +231,8 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         silent_move_cnt = 0
 
         for priomove in priomoves:
-            if(priomove.find_tactic(TACTICS['defend-king-attack']) or
+            if(priomove.find_tactic(TACTICS['defend-king-attack-urgent']) or
+               priomove.find_tactic(TACTICS['defend-king-attack']) or
                priomove.find_tactic(TACTICS['attack-king-good-deal']) or 
                priomove.find_tactic(TACTICS['capture-good-deal'])):
                 count += 1
@@ -255,7 +257,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         silent_move_cnt = 0
 
         for priomove in priomoves:
-            if(priomove.find_tactic(TACTICS['defend-king-attack']) or
+            if(priomove.find_tactic(TACTICS['defend-king-attack-urgent']) or
                priomove.find_tactic(TACTICS['capture-good-deal'])):
                 count += 1
                 priomove.prio = PRIO['prio2']
@@ -302,7 +304,10 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
             pmove = priomoves[0]
             nodecandidates.append(pmove.gmove)
             nodecandidates.append(None)
-            return score_position(match, len(priomoves)), nodecandidates
+            if(pmove.find_tactic(TACTICS['position-repeat'])):
+                return 0, nodecandidates
+            else:
+                return score_position(match, len(priomoves)), nodecandidates
 
     if(len(priomoves) == 0 or maxcnt == 0):
         nodecandidates.append(None)
@@ -319,13 +324,18 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
             prnt_tactics(priomove.tactics)
             print(" | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
-        matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        if(priomove.find_tactic(TACTICS['position-repeat'])):
+            newcandidates.clear()
+            newcandidates.append(None)
+            score = 0
+        else:
+            matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-        score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, beta, not maximizing, priomove)
+            score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, beta, not maximizing, priomove)
 
-        score += score_mupltiple_piece_moves_in_opening(match, color)
+            #score += score_mupltiple_piece_moves_in_opening(match, color)
 
-        matchmove.undo_move(match)
+            matchmove.undo_move(match)
 
         if(maximizing):
             if(score > nodescore):

@@ -298,4 +298,3 @@ def pawn_undo_en_passant(match, move):
     match.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
     match.score -= SCORES[move.captured_piece]
     return move
-
