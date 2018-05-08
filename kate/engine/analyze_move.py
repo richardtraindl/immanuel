@@ -143,7 +143,7 @@ def is_field_blocking_attacks_on_king(x1, y1, kg_x, kg_y, enemies):
 
     return False
 
-def defends_king_attack(match, gmove):
+def defends_king_attack2(match, gmove):
     color = match.next_color()
     beforecnt = 0
     aftercnt = 0
@@ -190,6 +190,51 @@ def defends_king_attack(match, gmove):
         return True, urgent
     else:
         return False, urgent
+
+
+def defends_king_attack(match, gmove):
+    color = match.next_color()
+    before_cnt = 0
+    after_cnt = 0
+    urgent = True
+
+    if(color == COLORS['white']):
+        Kg_x = match.wKg_x
+        Kg_y = match.wKg_y
+    else:
+        Kg_x = match.bKg_x
+        Kg_y = match.bKg_y
+
+    for i in range(8):
+        x1 = Kg_x + king.STEPS[i][0]
+        y1 = Kg_y + king.STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            friends, enemies = field_touches(match, color, x1, y1)
+            if(len(friends) < len(enemies)):
+                before_cnt += 1
+            if(len(enemies) == 0):
+                urgent = False
+
+    do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+
+    if(Kg_x == gmove.srcx):
+        Kg_x = gmove.dstx
+        Kg_y = gmove.dsty
+
+    for i in range(8):
+        x1 = Kg_x + king.STEPS[i][0]
+        y1 = Kg_y + king.STEPS[i][1]
+        if(rules.is_inbounds(x1, y1)):
+            friends, enemies = field_touches(match, color, x1, y1)
+            if(len(friends) < len(enemies)):
+                after_cnt += 1
+
+    undo_move(match)
+
+    if(before_cnt > after_cnt):
+        return True, urgent
+    else:
+        return False, False
 
 
 def disclosures(match, gmove):
