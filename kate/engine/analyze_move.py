@@ -422,7 +422,7 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
             if(dstfield_is_attacked(match, priomove.gmove) == False or
                 (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) and 
                  piece_is_lower_equal_than_enemy_on_dstfield(match, priomove.gmove))):
-                if(srcfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) or
+                if(srcfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) == False or
                    piece_is_lower_equal_than_enemy_on_srcfield(match, priomove.gmove) == False):
                     priomove.tactics.append(TACTICS['flee-urgent'])
                     all_fleeing.append(priomove)
