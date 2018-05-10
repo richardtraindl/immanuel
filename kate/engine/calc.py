@@ -341,11 +341,12 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
             if(score > nodescore):
                 nodescore = score
                 append_newmove(gmove, nodecandidates, newcandidates)
-                if(depth == 1):
-                    prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
-                    prnt_moves("", newcandidates)
-                    prnt_moves("CANDIDATES:  " + str(nodescore).rjust(8, " "), nodecandidates)
-                    print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+
+            if(depth == 1):
+                prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
+                prnt_moves("", newcandidates)
+                prnt_moves("CANDIDATES:  " + str(nodescore).rjust(8, " "), nodecandidates)
+                print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
             alpha = max(alpha, nodescore)
             if(beta <= alpha):
@@ -354,11 +355,12 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
             if(score < nodescore):
                 nodescore = score
                 append_newmove(gmove, nodecandidates, newcandidates)
-                if(depth == 1):
-                    prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
-                    prnt_moves("", newcandidates)
-                    prnt_moves("CANDIDATES:  " + str(nodescore).rjust(8, " "), nodecandidates)
-                    print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+
+            if(depth == 1):
+                prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
+                prnt_moves("", newcandidates)
+                prnt_moves("CANDIDATES:  " + str(nodescore).rjust(8, " "), nodecandidates)
+                print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
 
             beta = min(beta, nodescore)
             if(beta <= alpha):

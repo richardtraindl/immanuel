@@ -34,8 +34,7 @@ html {
 }
 
 body {
-    background-color: White;
-    min-width: 640px;
+    /* background-color: White; */
 }
 
 h1, h2, h3 {
@@ -98,10 +97,8 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 0px;
-    width: 96%;
-    min-width: 96%;
-    /*width: 640px;
-    min-width: 640px;*/
+    width: 640px;
+    min-width: 640px;
     background-color: Linen;
 }
 
@@ -149,7 +146,7 @@ nav li a:active {
         background-color: #FFDEAD;
     }
 
-#game {
+#board-wrapper {
     display: block;
     padding-top: 10px;
 }
@@ -185,7 +182,7 @@ nav li a:active {
 }
 
 #board td {
-    width: 64px; 
+    width: 64px;
     height: 64px;
 }
 
@@ -282,23 +279,6 @@ a.btn, a.btn:visited, a.btn:hover {
 }
 
 @media(min-width: 1024px) {
-    #wrapper {
-        width: 748px;
-        min-width: 748px;
-    }
-    #game {
-        display: grid;
-        grid-template-columns: 460px 1fr;
-        grid-gap: 10px;
-    }
-    #board td {
-        width: 48px; 
-        height: 48px;
-    }
-    #board img {
-        width: 48px; 
-        height: 48px;
-    }
     #board-letters1 td, #board-letters2 td, .board-label {
         font-size: 12px !important;
     }
