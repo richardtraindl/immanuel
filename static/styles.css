@@ -97,8 +97,8 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 0px;
-    width: 616px;
-    min-width: 616px;
+    width: 640px;
+    min-width: 640px;
     background-color: Linen;
 }
 
@@ -193,11 +193,11 @@ nav li a:active {
     font-size: 20px !important;
 }
 
-#board-letters1 td:first-child, #board-letters1 td:nth-child(10),
+/* #board-letters1 td:first-child, #board-letters1 td:nth-child(10),
 #board-letters2 td:first-child, #board-letters2 td:nth-child(10), 
 .board-label {
-    width: 54px !important; /* 32 */
-}
+    width: 54px !important;
+} */
 
 #board-letters1 td, #board-letters2 td {
     height: 32px !important;
