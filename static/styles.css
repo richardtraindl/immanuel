@@ -30,11 +30,6 @@ footer, header, hgroup, menu, nav, section {
 
 html {
     overflow: -moz-scrollbars-vertical;
-    /* overflow: scroll; */
-}
-
-body {
-    /* background-color: White; */
 }
 
 h1, h2, h3 {
@@ -97,8 +92,8 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 0px;
-    width: 640px;
-    min-width: 640px;
+    width: 596px;
+    min-width: 596px;
     background-color: Linen;
 }
 
@@ -230,24 +225,6 @@ input:hover[type="submit"] {
 input[type="text"] {
     background-color: Linen;
 }
-
-/* .btn {
-  display: inline-block;
-  padding: 4px 10px 4px;
-  text-align: center;
-  color: #333;
-  background-color: #E6E6E6;
-  background: linear-gradient(top, White 0%, #E6E6E6 100%);
-  border-radius: 4px;
-  cursor: pointer;
-  border: 1px solid Black;
-  white-space: nowrap; 
-}
-
-a.btn, a.btn:visited, a.btn:hover {
-  color: #333;
-  text-decoration: none; 
-} */
 
 .ok {
     font-weight: bold;
