@@ -1,33 +1,40 @@
 {% load staticfiles %}
 {% load kate_extras %}
 
-                <p>Minutes</p>
-                <table>
-                    <tr>
-                        <td>
-                            # &nbsp;
-                        </td>
-                        <td>
+                <div style="display: table; width: 100%">
+                    <div style="display: table-row;">
+                        <div class="tiny-gap" style="display: table-cell; width: 8%">
+                            <p>&nbsp;</p>
+                        </div>
+                        <div class="tiny-gap" style="display: table-cell; width: 22%">
                             {% if match.white_player_is_human == False %}
                                 <span class="fbold">{{ match.white_player_name }}</span>
                             {% else %}
                                 {{ match.white_player_name }}
                             {% endif %}
-                        </td>
-                        <td>
+                        </div>
+                        <div class="tiny-gap" style="display: table-cell; width: 70%">
                             {% if match.black_player_is_human == False %}
                                 <span class="fbold"> {{ match.black_player_name }} </span>
                             {% else %}
                                 {{ match.black_player_name }}
                             {% endif %}
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                     {% for move in moves %}
                         {% if move.count|iseven == False %}
-                            <tr><td>{{ move.count|chesscnt }}.</td>
-                            <td>{{ move.format_move }}</td>
+                            <div style="display: table-row;">
+                                <div style="display: table-cell; padding-bottom: 2px; width: 8%">
+                                    {{ move.count|chesscnt }}.
+                                </div>
+                                <div style="display: table-cell; padding-bottom: 2px; width: 22%">
+                                    {{ move.format_move }}
+                                </div>
                         {% else %}
-                            <td>{{ move.format_move }}</td></tr>
+                            <div style="display: table-cell; padding-bottom: 2px; width: 70%">
+                                {{ move.format_move }}
+                            </div>
+                        </div>
                         {% endif %}
                     {% endfor %}
-                </table>
+                </div>

@@ -5,7 +5,7 @@
 
 {% block header %}
   {% if matchid %}
-    <h2>Edit Game</h2>
+    <h2>Settings</h2>
   {% else %}
     <h2>New Game</h2>
   {% endif %}
@@ -15,9 +15,9 @@
 {% block nav %}
     <ul>
       {% if matchid %}
-        <li><a href="{% url 'kate:match' matchid %}?switch={{ switch }}">CANCEL</a></li>
+        <li><a href="{% url 'kate:match' matchid %}?switch={{ switch }}">Cancel</a></li>
       {% else %}
-        <li><a href="{% url 'kate:index' %}">CANCEL</a></li>
+        <li><a href="{% url 'kate:index' %}">Cancel</a></li>
       {% endif %}
         
     </ul>

@@ -3,7 +3,7 @@
     padding: 0;
     border: 0;
     font-family: "Trebuchet MS", Copperplate, "Myriad Pro", Arial, sans-serif;
-    font-size: 22px;
+    font-size: 16px;
 }
 
 /* HTML5 display-role reset for older browsers */
@@ -48,15 +48,15 @@ p {
 }
 
 h1, h1 a  {
-    font-size: 28px;
-}
-
-h2, h2 a  {
     font-size: 26px;
 }
 
-h3, h3 a  {
+h2, h2 a  {
     font-size: 24px;
+}
+
+h3, h3 a  {
+    font-size: 22px;
 }
 
 a, a:link, a:visited, a:active  {
@@ -88,7 +88,7 @@ table {
 
 #match-list li {
     list-style-type: none;
-    padding-bottom: 16px;
+    padding-bottom: 8px;
     display: grid;
     grid-template-columns: 4fr 1fr;
     grid-gap: 10px;
@@ -97,8 +97,8 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 0px;
-    width: 640px;
-    min-width: 640px;
+    width: 596px;
+    min-width: 596px;
     background-color: Linen;
 }
 
@@ -116,12 +116,12 @@ nav {
 
 nav ul {
     list-style-type: none;
-    font-size: 24px;
+    font-size: 22px;
 }
 
 nav li {
     display: inline-block;
-    margin-right: 20px;
+    margin: 0px 10px 0px 0px;
 }
 
 nav li a, 
@@ -167,14 +167,6 @@ nav li a:active {
 
 #newcomment * {
     background-color: Linen;
-}
-
-#msg {
-    background-color: Linen;
-    margin: 0px 0px 10px 0px;
-    min-height: 20px;
-    max-height: 30px;
-    overflow: auto;
 }
 
 #board  {
@@ -276,6 +268,10 @@ a.btn, a.btn:visited, a.btn:hover {
 
 .small-gap {
   padding-bottom: 10px;
+}
+
+.tiny-gap {
+  padding-bottom: 6px;
 }
 
 @media(min-width: 1024px) {

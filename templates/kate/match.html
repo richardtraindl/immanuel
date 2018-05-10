@@ -5,25 +5,32 @@
 
 
 {% block header %}
-    <h1><a href="{% url 'kate:match' match.id %}?switch={{ switch }}">Game</a></h1>
+    <h1 class="tiny-gap"><a href="{% url 'kate:match' match.id %}?switch={{ switch }}">Game</a></h1>
 
-    <h2>{{ match.white_player_name }} &nbsp; : &nbsp; {{ match.black_player_name }}</h2>
-
-    <p style="font-size: 10px">Created on: &nbsp; {{ match.begin|fmtdate }}</p>
+    <div style="display: table; width: 100%">
+        <div style="display: table-row;">
+            <div style="display: table-cell; width: 60%">
+                <h2>{{ match.white_player_name }} : {{ match.black_player_name }}</h2>
+            </div>
+            <div style="display: table-cell">
+                <p style="font-size: 12px; text-align: right;">Created on: {{ match.begin|fmtdate }}</p>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 
 {% block nav %}
     <ul>
-        <li><a href="{% url 'kate:match' match.id %}?switch={{ switch|invert }}">SWITCH BOARD</a></li>
+        <li><a href="{% url 'kate:match' match.id %}?switch={{ switch|invert }}">Switch Board</a></li>
 
-        <li><a href="{% url 'kate:undomove' match.id %}?switch={{ switch }}" onclick="return confirm('Withdraw last move?')">WITHDRAW MOVE</a></li>
+        <li><a href="{% url 'kate:undomove' match.id %}?switch={{ switch }}" onclick="return confirm('Withdraw last move?')">Withdraw Move</a></li>
 
-        <li><a href="{% url 'kate:resume' match.id %}?switch={{ switch }}">RESUME</a></li>
+        <li><a href="{% url 'kate:resume' match.id %}?switch={{ switch }}">Resume</a></li>
 
-        <li><a href="{% url 'kate:settings' match.id %}?switch={{ switch }}">EDIT GAME</a></li>
+        <li><a href="{% url 'kate:settings' match.id %}?switch={{ switch }}">Settings</a></li>
 
-        <li><a href="{% url 'kate:index' %}">OVERVIEW</a></li>
+        <li><a href="{% url 'kate:index' %}">Overview</a></li>
     </ul>
 {% endblock %}
 
@@ -36,7 +43,38 @@
     {% endif %}
 
     <div id="board-wrapper">
-        <p id="msg">{{ msg|safe }}</p>
+        <div class="tiny-gap" style="display: table; width: 100%">
+            <div style="display: table-row;">
+                <div style="display: table-cell; width: 25%">
+                    <p>msg:</p>
+                </div>
+                <div style="display: table-cell; width: 75%">
+                    <p>{{ msg|safe }} {{ running }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tiny-gap" style="display: table; width: 100%">
+            <div style="display: table-row;">
+                <div style="display: table-cell; width: 50%">
+                    <p>Score: {{ match.score }}</p>
+                </div>
+                <div style="display: table-cell; width: 50%">
+                    <p>Level: {{ match.level|matchlevel }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tiny-gap" style="display: table; width: 100%">
+            <div style="display: table-row;">
+                <div style="display: table-cell; width: 50%">
+                    <p>Time White: {{ match.white_elapsed_seconds|fmttime }}</p>
+                </div>
+                <div style="display: table-cell; width: 50%">
+                    <p>Time Black: {{ match.black_elapsed_seconds|fmttime }}</p>
+                </div>
+            </div>
+        </div>
 
         {% if switch == '0' %}
             {% include "kate/_chessboard.html" with match=match board=board %}
@@ -44,20 +82,23 @@
             {% include "kate/_reversed_chessboard.html" with match=match board=board %}
         {% endif %}
 
-        <table id="promotion">
-            <tr id="white-pieces" class="invisible">
-                <td value="wQu"><img src="{% static 'wQu'|imgsrc %}"></td>
-                <td value="wBp"><img src="{% static 'wBp'|imgsrc %}"></td>
-                <td value="wKn"><img src="{% static 'wKn'|imgsrc %}"></td>
-                <td value="wRk"><img src="{% static 'wRk'|imgsrc %}"></td>
-            </tr>
-            <tr id="black-pieces" class="invisible">
-                <td value="bQu"><img src="{% static 'bQu'|imgsrc %}"></td>
-                <td value="bBp"><img src="{% static 'bBp'|imgsrc %}"></td>
-                <td value="bKn"><img src="{% static 'bKn'|imgsrc %}"></td>
-                <td value="bRk"><img src="{% static 'bRk'|imgsrc %}"></td>
-            </tr>
-        </table>
+        
+        <div class="tiny-gap" style="padding-left: 32px;">
+            <table id="promotion">
+                <tr id="white-pieces" class="invisible">
+                    <td value="wQu"><img src="{% static 'wQu'|imgsrc %}"></td>
+                    <td value="wBp"><img src="{% static 'wBp'|imgsrc %}"></td>
+                    <td value="wKn"><img src="{% static 'wKn'|imgsrc %}"></td>
+                    <td value="wRk"><img src="{% static 'wRk'|imgsrc %}"></td>
+                </tr>
+                <tr id="black-pieces" class="invisible">
+                    <td value="bQu"><img src="{% static 'bQu'|imgsrc %}"></td>
+                    <td value="bBp"><img src="{% static 'bBp'|imgsrc %}"></td>
+                    <td value="bKn"><img src="{% static 'bKn'|imgsrc %}"></td>
+                    <td value="bRk"><img src="{% static 'bRk'|imgsrc %}"></td>
+                </tr>
+            </table>
+        </div>
 
         <form id="move" method="post" action="{% url 'kate:domove' match.id %}?switch={{ switch }}" style="display: none;">
             {% csrf_token %}
@@ -67,28 +108,6 @@
     </div>
 
     <div id="minutes">
-        <table style="width: 100%">
-            <tr>
-                <td >Level: &nbsp; {{ match.level|matchlevel }}</td>
-                <td>Score: &nbsp; {{ match.score }}</td>
-            </tr>
-        </table>
-
-        <div class="small-gap"></div>
-     
-        <table style="width: 100%">
-            <tr>
-                <td>Time White: {{ match.white_elapsed_seconds|fmttime }}</td>
-                <td>Time Black: {{ match.black_elapsed_seconds|fmttime }}</td>
-            </tr>
-        </table>
-
-        <div class="small-gap"></div>
-
-        <p>{{ running }}</p>
-
-        <div class="small-gap"></div>
-
         {% include "kate/_minutes.html" with match=match %}
     </div>
 
