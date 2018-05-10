@@ -193,11 +193,11 @@ nav li a:active {
     font-size: 20px !important;
 }
 
-/* #board-letters1 td:first-child, #board-letters1 td:nth-child(10),
+#board-letters1 td:first-child, #board-letters1 td:nth-child(10),
 #board-letters2 td:first-child, #board-letters2 td:nth-child(10), 
 .board-label {
-    width: 54px !important;
-} */
+    width: 32px !important;
+}
 
 #board-letters1 td, #board-letters2 td {
     height: 32px !important;
