@@ -92,8 +92,8 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 0px;
-    width: 596px;
-    min-width: 596px;
+    width: 600px;
+    min-width: 600px;
     background-color: Linen;
 }
 
@@ -129,16 +129,16 @@ nav li a:active {
 
 #content-wrapper {
     margin: 10px 0px 10px 0px;
-    padding: 10px;
+    padding: 12px;
     background-color: #FF8C69;
 }
 
 #chat {
-        padding: 10px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-gap: 10px;
-        background-color: #FFDEAD;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
+    background-color: #FFDEAD;
     }
 
 #board-wrapper {
@@ -182,21 +182,24 @@ nav li a:active {
     height: 64px;
 }
 
-#board-letters1 td, #board-letters2 td, .board-label {
-    background-color: #FF8C69 !important;
-    text-align: center !important;
-    font-size: 20px !important;
+.board-letter {
+    height: 32px !important;
 }
 
-#board-letters1 td:first-child, #board-letters1 td:nth-child(10),
-#board-letters2 td:first-child, #board-letters2 td:nth-child(10), 
-.board-label {
+.board-letter:first-child, .board-letter:nth-child(10){
     width: 32px !important;
 }
 
-#board-letters1 td, #board-letters2 td {
-    height: 32px !important;
+.board-letter, .board-number {
+    background-color: #FF8C69 !important;
+    text-align: center !important;
+    font-size: 16px;
 }
+
+.board-number {
+    width: 32px !important;
+}
+
 
 #minutes table {
     margin: 0px;
@@ -251,31 +254,41 @@ input[type="text"] {
   padding-bottom: 6px;
 }
 
-@media(min-width: 1024px) {
-    #board-letters1 td, #board-letters2 td, .board-label {
-        font-size: 12px !important;
+@media screen and (orientation:landscape){
+    #wrapper {
+        width: 520px;
+        min-width: 520px;
     }
-    #board-letters1 td:first-child, #board-letters1 td:nth-child(10),
-    #board-letters2 td:first-child, #board-letters2 td:nth-child(10), 
-    .board-label {
-        width: 38px !important;
+    #content-wrapper {
+        padding: 8px;
     }
-    #board-letters1 td, #board-letters2 td {
-        height: 24px !important;
+    #board td {
+        width: 56px;
+        height: 56px;
+    }
+    #board img {
+        width: 56px; 
+        height: 56px;
+    }
+    .board-letter {
+        height: 28px !important;
+    }
+    .board-letter, .board-number {
+        font-size: 14px !important;
     }
     * {
-        font-size: 16px;
+        font-size: 14px;
     }
     h1, h1 a  {
-        font-size: 22px;
-    }
-    h2, h2 a  {
         font-size: 20px;
     }
-    h3, h3 a  {
+    h2, h2 a  {
         font-size: 18px;
     }
-    p  {
+    h3, h3 a  {
         font-size: 16px;
+    }
+    p  {
+        font-size: 14px;
     }
 }
