@@ -3,7 +3,7 @@
     padding: 0;
     border: 0;
     font-family: "Trebuchet MS", Copperplate, "Myriad Pro", Arial, sans-serif;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 /* HTML5 display-role reset for older browsers */
@@ -43,15 +43,19 @@ p {
 }
 
 h1, h1 a  {
-    font-size: 26px;
+    font-size: 20px; /* 26px */
 }
 
 h2, h2 a  {
-    font-size: 24px;
+    font-size: 18px; /* 24px */
 }
 
 h3, h3 a  {
-    font-size: 22px;
+    font-size: 16px; /* 22px */
+}
+
+p  {
+    font-size: 14px;
 }
 
 a, a:link, a:visited, a:active  {
@@ -92,8 +96,8 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 0px;
-    width: 600px;
-    min-width: 600px;
+    width: 448px;
+    min-width: 400px;
     background-color: Linen;
 }
 
@@ -111,7 +115,6 @@ nav {
 
 nav ul {
     list-style-type: none;
-    font-size: 22px;
 }
 
 nav li {
@@ -125,12 +128,15 @@ nav li a:visited,
 nav li a:active {
     color: #0000CD;
     text-decoration: none;
+    font-size: 16px;
 }
 
 #content-wrapper {
     margin: 10px 0px 10px 0px;
-    padding: 12px;
-    background-color: #FF8C69;
+    padding: 8px;
+    background-color: Green;
+    /* padding: 12px;
+    background-color: #FF8C69; */
 }
 
 #chat {
@@ -139,7 +145,7 @@ nav li a:active {
     grid-template-columns: 1fr 1fr;
     grid-gap: 10px;
     background-color: #FFDEAD;
-    }
+}
 
 #board-wrapper {
     display: block;
@@ -168,36 +174,36 @@ nav li a:active {
     background-color: Linen;
 }
 
-#board td {
-    width: 64px;
-    height: 64px;
-}
-
 #board tr:nth-child(odd) td:nth-child(even), #board tr:nth-child(even) td:nth-child(odd) {
     background: Gray;
 }
 
+#board td {
+    width: 48px;
+    height: 48px;
+}
+
 #board img {
-    width: 64px; 
-    height: 64px;
-}
-
-.board-letter {
-    height: 32px !important;
-}
-
-.board-letter:first-child, .board-letter:nth-child(10){
-    width: 32px !important;
+    width: 48px; 
+    height: 48px;
 }
 
 .board-letter, .board-number {
     background-color: #FF8C69 !important;
     text-align: center !important;
-    font-size: 16px;
+    font-size: 14px;
+}
+
+.board-letter {
+    height: 24px !important;
+}
+
+.board-letter:first-child, .board-letter:nth-child(10){
+    width: 24px !important;
 }
 
 .board-number {
-    width: 32px !important;
+    width: 24px !important;
 }
 
 
@@ -252,43 +258,4 @@ input[type="text"] {
 
 .tiny-gap {
   padding-bottom: 6px;
-}
-
-@media screen and (orientation:landscape){
-    #wrapper {
-        width: 520px;
-        min-width: 520px;
-    }
-    #content-wrapper {
-        padding: 8px;
-    }
-    #board td {
-        width: 56px;
-        height: 56px;
-    }
-    #board img {
-        width: 56px; 
-        height: 56px;
-    }
-    .board-letter {
-        height: 28px !important;
-    }
-    .board-letter, .board-number {
-        font-size: 14px !important;
-    }
-    * {
-        font-size: 14px;
-    }
-    h1, h1 a  {
-        font-size: 20px;
-    }
-    h2, h2 a  {
-        font-size: 18px;
-    }
-    h3, h3 a  {
-        font-size: 16px;
-    }
-    p  {
-        font-size: 14px;
-    }
 }
