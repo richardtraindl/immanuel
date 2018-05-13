@@ -19,8 +19,8 @@
     <ul id="match-list">
       {% for match in matches %}
         <li>
-            <div><a href="{% url 'kate:match' match.id %}">{{ match.begin }} {{ match.white_player }} {{ match.black_player }}</a></div>
-
+            <div><a href="{% url 'kate:match' match.id %}">{{ match.white_player_name }} : {{ match.black_player_name }}</a></div>
+            <div>{{ match.begin }}</div>
             <div><a style="color: #800000;" href="{% url 'kate:delete' match.id %}" onclick="return confirm('Wollen sie diese Partie endgültig löschen?')">delete</a></div>
         </li>
       {% endfor %}

@@ -31,7 +31,7 @@
     <form id="new" method="post" action="{% url 'kate:settings' %}">
   {% endif %} 
         {% csrf_token %}
-        <table>
+        <table id="settings">
             {{ form.as_table }}
         </table>
 

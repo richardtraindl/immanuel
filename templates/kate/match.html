@@ -43,37 +43,19 @@
     {% endif %}
 
     <div id="board-wrapper">
-        <div class="tiny-gap" style="display: table; width: 100%">
-            <div style="display: table-row;">
-                <div style="display: table-cell; width: 25%">
-                    <p>msg:</p>
-                </div>
-                <div style="display: table-cell; width: 75%">
-                    <p>{{ msg|safe }} {{ running }}</p>
-                </div>
-            </div>
+        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 3fr; grid-gap: 4px;">
+            <p>msg:</p>
+            <p>{{ msg|safe }} {{ running }}</p>
         </div>
 
-        <div class="tiny-gap" style="display: table; width: 100%">
-            <div style="display: table-row;">
-                <div style="display: table-cell; width: 50%">
-                    <p>Score: {{ match.score }}</p>
-                </div>
-                <div style="display: table-cell; width: 50%">
-                    <p>Level: {{ match.level|matchlevel }}</p>
-                </div>
-            </div>
+        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr; grid-gap: 4px;">
+            <p>Score: {{ match.score }}</p>
+            <p>Level: {{ match.level|matchlevel }}</p>
         </div>
 
-        <div class="tiny-gap" style="display: table; width: 100%">
-            <div style="display: table-row;">
-                <div style="display: table-cell; width: 50%">
-                    <p>Time White: {{ match.white_elapsed_seconds|fmttime }}</p>
-                </div>
-                <div style="display: table-cell; width: 50%">
-                    <p>Time Black: {{ match.black_elapsed_seconds|fmttime }}</p>
-                </div>
-            </div>
+        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr; grid-gap: 4px;">
+            <p>Time White: {{ match.white_elapsed_seconds|fmttime }}</p>
+            <p>Time Black: {{ match.black_elapsed_seconds|fmttime }}</p>
         </div>
 
         {% if switch == '0' %}

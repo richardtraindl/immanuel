@@ -1,40 +1,29 @@
 {% load staticfiles %}
 {% load kate_extras %}
 
-                <div style="display: table; width: 100%">
-                    <div style="display: table-row;">
-                        <div class="tiny-gap" style="display: table-cell; width: 8%">
-                            <p>&nbsp;</p>
-                        </div>
-                        <div class="tiny-gap" style="display: table-cell; width: 22%">
-                            {% if match.white_player_is_human == False %}
-                                <span class="fbold">{{ match.white_player_name }}</span>
-                            {% else %}
-                                {{ match.white_player_name }}
-                            {% endif %}
-                        </div>
-                        <div class="tiny-gap" style="display: table-cell; width: 70%">
-                            {% if match.black_player_is_human == False %}
-                                <span class="fbold"> {{ match.black_player_name }} </span>
-                            {% else %}
-                                {{ match.black_player_name }}
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% for move in moves %}
-                        {% if move.count|iseven == False %}
-                            <div style="display: table-row;">
-                                <div style="display: table-cell; padding-bottom: 2px; width: 8%">
-                                    {{ move.count|chesscnt }}.
-                                </div>
-                                <div style="display: table-cell; padding-bottom: 2px; width: 22%">
-                                    {{ move.format_move }}
-                                </div>
-                        {% else %}
-                            <div style="display: table-cell; padding-bottom: 2px; width: 70%">
-                                {{ move.format_move }}
-                            </div>
-                        </div>
-                        {% endif %}
-                    {% endfor %}
+                <div class="tiny-gap" style="display: grid; grid-template-columns: 2fr 6fr 16fr; grid-gap: 4px;">
+                    <p>&nbsp;</p>
+                    
+                    {% if match.white_player_is_human == False %}
+                        <p class="fbold">{{ match.white_player_name }}</p>
+                    {% else %}
+                        <p>{{ match.white_player_name }}</p>
+                    {% endif %}
+
+                    {% if match.black_player_is_human == False %}
+                        <p class="fbold"> {{ match.black_player_name }}</p>
+                    {% else %}
+                        <p>{{ match.black_player_name }}</p>
+                    {% endif %}
                 </div>
+
+                {% for move in moves %}
+                    {% if move.count|iseven == False %}
+                        <div style="display: grid; grid-template-columns: 2fr 6fr 16fr; grid-gap: 4px;">
+                            <p>{{ move.count|chesscnt }}.</p>
+                            <p>{{ move.format_move }}</p>
+                    {% else %}
+                            <p>{{ move.format_move }}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
