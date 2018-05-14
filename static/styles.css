@@ -88,8 +88,8 @@ table {
 #wrapper {
     margin: 0px auto;
     padding: 0px;
-    width: 460px;
-    min-width: 400px;
+    width: 452px;
+    min-width: 384px;
     background-color: Linen;
 }
 
@@ -143,7 +143,7 @@ nav li a:active {
 
 #content-wrapper {
     margin: 10px 0px 10px 0px;
-    padding: 14px;
+    padding: 10px;
     background-color: DarkSeaGreen; /* #FF8C69; */
 }
 
@@ -265,4 +265,28 @@ input[type="text"] {
 
 .tiny-gap {
   padding-bottom: 6px;
+}
+
+@media only screen and (min-width: 768px) {
+    #wrapper {
+        width: 596px;
+        min-width: 512px;
+    }
+    #board td {
+        width: 64px;
+        height: 64px;
+    }
+    #board img {
+        width: 64px; 
+        height: 64px;
+    }
+    .board-letter {
+        height: 32px !important;
+    }
+    .board-letter:first-child, .board-letter:nth-child(10){
+        width: 32px !important;
+    }
+    .board-number {
+        width: 32px !important;
+    }
 }
