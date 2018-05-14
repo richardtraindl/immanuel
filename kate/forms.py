@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
 
 class DoMoveForm(forms.Form):
@@ -12,7 +13,9 @@ class DoMoveForm(forms.Form):
         self.move_dst = cleaned_data.get("move_dst")
         self.prom_piece = cleaned_data.get("prom_piece")
 
-        if(not (len(self.move_src) > 0 and len(self.move_dst) > 0 and len(self.prom_piece) > 0) ):
+        if(self.move_src is None or self.move_dst is None or self.prom_piece is None):
+            raise ValidationError("...")
+        if(len(self.move_src) == 0 or len(self.move_dst) == 0 or len(self.prom_piece) == 0):
             raise ValidationError("...")
 
            

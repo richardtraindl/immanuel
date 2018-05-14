@@ -158,7 +158,6 @@ def do_move(request, matchid=None):
         if(interface.is_next_color_human(modelmatch) == False):
             msg = RETURN_CODES['wrong-color']
         else:
-            print("****")
             form = DoMoveForm(request.POST)
             if(form.is_valid()):
                 srcx,srcy = coord_to_index(form.move_src)
