@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.template import RequestContext
 from django.utils import timezone
 from .forms import *
+from .utils import preformat_board
 from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from .modules import interface
 from .engine.match import *
@@ -90,13 +91,15 @@ def match(request, matchid=None):
 
     form = DoMoveForm()
 
-    if(debug == "true"):
+    if(debug == "true" or debug == "t"):
         importform = ImportMatchForm()
         debug_data = str_attributes(match, "<br>")
     else:
         debug_data = ""
 
-    return render(request, 'kate/match.html', { 'match': match, 'board': modelmatch.board, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running, 'debug': debug, 'debug_data': debug_data } )
+    fmtboard = preformat_board(modelmatch.board, switch)
+
+    return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running, 'debug': debug, 'debug_data': debug_data } )
 
 
 def settings(request, matchid=None):

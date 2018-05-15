@@ -1,29 +1,29 @@
 {% load staticfiles %}
 {% load kate_extras %}
 
-                <div class="tiny-gap" style="display: grid; grid-template-columns: 2fr 6fr 16fr; grid-gap: 4px;">
-                    <p>&nbsp;</p>
-                    
-                    {% if match.white_player_is_human == False %}
-                        <p class="fbold">{{ match.white_player_name }}</p>
-                    {% else %}
-                        <p>{{ match.white_player_name }}</p>
-                    {% endif %}
+        <div class="tiny-gap" style="display: grid; grid-template-columns: 2fr 6fr 16fr; grid-gap: 4px;">
+            <p>&nbsp;</p>
+            
+            {% if match.white_player_is_human == False %}
+                <p class="fbold">{{ match.white_player_name }}</p>
+            {% else %}
+                <p>{{ match.white_player_name }}</p>
+            {% endif %}
 
-                    {% if match.black_player_is_human == False %}
-                        <p class="fbold"> {{ match.black_player_name }}</p>
-                    {% else %}
-                        <p>{{ match.black_player_name }}</p>
-                    {% endif %}
+            {% if match.black_player_is_human == False %}
+                <p class="fbold"> {{ match.black_player_name }}</p>
+            {% else %}
+                <p>{{ match.black_player_name }}</p>
+            {% endif %}
+        </div>
+
+        {% for move in moves %}
+            {% if move.count|iseven == False %}
+                <div style="display: grid; grid-template-columns: 2fr 6fr 16fr; grid-gap: 4px;">
+                    <p>{{ move.count|chesscnt }}.</p>
+                    <p>{{ move.format_move }}</p>
+            {% else %}
+                    <p>{{ move.format_move }}</p>
                 </div>
-
-                {% for move in moves %}
-                    {% if move.count|iseven == False %}
-                        <div style="display: grid; grid-template-columns: 2fr 6fr 16fr; grid-gap: 4px;">
-                            <p>{{ move.count|chesscnt }}.</p>
-                            <p>{{ move.format_move }}</p>
-                    {% else %}
-                            <p>{{ move.format_move }}</p>
-                        </div>
-                    {% endif %}
-                {% endfor %}
+            {% endif %}
+        {% endfor %}

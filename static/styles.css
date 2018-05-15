@@ -124,7 +124,12 @@ nav li a:active {
     line-height:1.6;
 }
 
-#match-list li {
+.promotion {
+    padding: 0px 0px 60px 30px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+#matches li {
     list-style-type: none;
     padding-bottom: 8px;
     display: grid;
@@ -132,7 +137,7 @@ nav li a:active {
     grid-gap: 10px;
 }
 
-#match-list li a {
+#matches li a {
     text-decoration: none;
 }
 

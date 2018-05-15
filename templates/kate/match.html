@@ -57,28 +57,47 @@
             <p>Time Black: {{ match.black_elapsed_seconds|fmttime }}</p>
         </div>
 
-        {% if switch == '0' %}
-            {% include "kate/_chessboard.html" with match=match board=board %}
-        {% else %}
-            {% include "kate/_reversed_chessboard.html" with match=match board=board %}
-        {% endif %}
+        <table id="board" matchid="{{ match.id }}" movecnt="{{ match.movecnt }}">
+            {% for fmtfield in fmtboard %}
+                {% with meta=fmtfield|readmeta field=fmtfield|readfield %}
+                {% if meta == 'letter1' or meta == 'number1' %}
+                    <tr>
+                {% endif %}
+                    {% if meta == 'letter' or meta == 'letter1' or meta == 'letter10' %}
+                        <td class="board-letter">{{ field }}</td>
+                    {% else %}
+                            {% if meta == 'number1' or meta == 'number10' %}
+                                <td class="board-number">{{ field }}</td>
+                            {% else %}
+                                <td id="{{ meta }}" class="droppable" value="{{ field }}">
+                                {% if field == "blk" %}
+                                    <div>&nbsp;</div>
+                                {% else %}
+                                    <img class="draggable" src="{% static  field|imgsrc %}">
+                                {% endif %}
+                            {% endif %}
+                    {% endif %}
+                {% if meta == 'letter10' or meta == 'number10' %}
+                    </tr>
+                {% endif %}
 
-        
-        <div class="tiny-gap" style="padding-left: 32px;">
-            <table id="promotion">
-                <tr id="white-pieces" class="invisible">
-                    <td value="wQu"><img src="{% static 'wQu'|imgsrc %}"></td>
-                    <td value="wBp"><img src="{% static 'wBp'|imgsrc %}"></td>
-                    <td value="wKn"><img src="{% static 'wKn'|imgsrc %}"></td>
-                    <td value="wRk"><img src="{% static 'wRk'|imgsrc %}"></td>
-                </tr>
-                <tr id="black-pieces" class="invisible">
-                    <td value="bQu"><img src="{% static 'bQu'|imgsrc %}"></td>
-                    <td value="bBp"><img src="{% static 'bBp'|imgsrc %}"></td>
-                    <td value="bKn"><img src="{% static 'bKn'|imgsrc %}"></td>
-                    <td value="bRk"><img src="{% static 'bRk'|imgsrc %}"></td>
-                </tr>
-            </table>
+                {% endwith %}
+            {% endfor %}
+        </table>
+
+        <div class="tiny-gap"></div>
+
+        <div id="white-pieces" class="promotion invisible">
+            <p value="wQu"><img src="{% static 'wQu'|imgsrc %}"></p>
+            <p value="wBp"><img src="{% static 'wBp'|imgsrc %}"></p>
+            <p value="wKn"><img src="{% static 'wKn'|imgsrc %}"></p>
+            <p value="wRk"><img src="{% static 'wRk'|imgsrc %}"></p>
+        </div>
+        <div id="black-pieces" class="promotion invisible">
+            <p value="bQu"><img src="{% static 'bQu'|imgsrc %}"></p>
+            <p value="bBp"><img src="{% static 'bBp'|imgsrc %}"></p>
+            <p value="bKn"><img src="{% static 'bKn'|imgsrc %}"></p>
+            <p value="bRk"><img src="{% static 'bRk'|imgsrc %}"></p>
         </div>
 
         <form id="move" method="post" action="{% url 'kate:domove' match.id %}?switch={{ switch }}" style="display: none;">
@@ -93,7 +112,7 @@
     </div>
 
 
-    {% if debug == 'true' %}
+    {% if debug == 'true' or debug == 't' %}
         <p>{{ debug_data|safe }}</p>
     {% endif %}
 
@@ -103,7 +122,7 @@
             drag();
             drop();
 
-            $('#promotion td').click(function(){
+            $('.promotion p').click(function(){
                 var piece;
                 piece = $(this).attr("value");
                 $('#prom-piece').val(piece);

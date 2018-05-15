@@ -16,7 +16,7 @@
 
 
 {% block content %}
-    <ul id="match-list">
+    <ul id="matches">
       {% for match in matches %}
         <li>
             <div><a href="{% url 'kate:match' match.id %}">{{ match.white_player_name }} : {{ match.black_player_name }}</a></div>
