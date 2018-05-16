@@ -44,7 +44,11 @@
 
     <div id="board-wrapper">
         <div class="tiny-gap">
-            <p>msg: {{ msg|safe }} {{ running }}</p>
+            {% if urgent %}
+                <p>msg: <span class="error">{{ msg }}</span></p>
+            {% else %}
+                <p>msg: {{ msg }}</p>
+            {% endif %}
         </div>
 
         <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr; grid-gap: 4px;">
