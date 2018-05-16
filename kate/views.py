@@ -28,7 +28,7 @@ def index(request):
 def match(request, matchid=None):
     context = RequestContext(request)
     switch = request.GET.get('switch', '0')
-    msg = request.GET.get('msg', None)
+    msgcode = request.GET.get('msgcode', None)
     debug = request.GET.get('debug', "false")
 
     if(matchid is None):
@@ -65,29 +65,28 @@ def match(request, matchid=None):
 
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:5]
     
-    if(msg is None):
-        #status = interface.status(modelmatch)
+    if(msgcode is None):
         if(match.status != STATUS['open']):
+            urgent = True
             if(match.status == STATUS['winner_white']):
-                msg = RETURN_CODES['winner_white']
+                msg = RETURN_MSGS[RETURN_CODES['winner_white']]
             elif(match.status == STATUS['winner_black']):
-                msg = RETURN_CODES['winner_black']
+                msg = RETURN_MSGS[RETURN_CODES['winner_black']]
             else:
-                msg = RETURN_CODES['draw']
-
-            fmtmsg = "<span class='error'>" + RETURN_MSGS[msg] + "</span>"
+                msg = RETURN_MSGS[RETURN_CODES['draw']]
         else:
-            fmtmsg = "<span class='ok'>&nbsp;</span>"
-    elif(int(msg) == RETURN_CODES['ok']):
-        fmtmsg = "<span class='ok'>" + RETURN_MSGS[int(msg)] + "</span>"
+            urgent = False
+            msg = ""
+    elif(int(msgcode) == RETURN_CODES['ok']):
+        urgent = False
+        msg = RETURN_MSGS[int(msgcode)]
     else:
-        fmtmsg = "<span class='error'>" + RETURN_MSGS[int(msg)] + "</span>"
+        urgent = True
+        msg = RETURN_MSGS[int(msgcode)]
 
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
-        running = "calculation is running..."
-    else:
-        running = ""
+        msg += " calculation is running..."
 
     form = DoMoveForm()
 
@@ -99,7 +98,7 @@ def match(request, matchid=None):
 
     fmtboard = preformat_board(modelmatch.board, switch)
 
-    return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': fmtmsg, 'running': running, 'debug': debug, 'debug_data': debug_data } )
+    return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': msg, 'urgent': urgent, 'debug': debug, 'debug_data': debug_data } )
 
 
 def settings(request, matchid=None):
@@ -159,14 +158,14 @@ def do_move(request, matchid=None):
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
         if(interface.is_next_color_human(modelmatch) == False):
-            msg = RETURN_CODES['wrong-color']
+            msgcode = RETURN_CODES['wrong-color']
         else:
             form = DoMoveForm(request.POST)
             if(form.is_valid()):
                 srcx,srcy = coord_to_index(form.move_src)
                 dstx,dsty = coord_to_index(form.move_dst)
                 prom_piece = PIECES[form.prom_piece]
-                valid, msg = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+                valid, msgcode = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
                 if(valid):
                     interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
 
@@ -174,15 +173,15 @@ def do_move(request, matchid=None):
                     status = interface.status(modelmatch)
                     if(status != STATUS['open']):
                         if(status == STATUS['winner_white']):
-                            msg = RETURN_CODES['winner_white']    
+                            msgcode = RETURN_CODES['winner_white']
                         elif(status == STATUS['winner_black']):
-                            msg = RETURN_CODES['winner_black']
+                            msgcode = RETURN_CODES['winner_black']
                         else:
-                            msg = RETURN_CODES['draw']
+                            msgcode = RETURN_CODES['draw']
             else:
-                msg= RETURN_CODES['format-error']
+                msgcode= RETURN_CODES['format-error']
 
-        return HttpResponseRedirect("%s?switch=%s&msg=%s" % (reverse('kate:match', args=(matchid,)), switch, msg))
+        return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(matchid,)), switch, msgcode))
     else:
         return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(matchid,)), switch))
 
@@ -208,9 +207,9 @@ def resume(request, matchid=None):
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread is None):
-        flag, msg = interface.calc_move_for_immanuel(modelmatch)
+        flag, msgcode = interface.calc_move_for_immanuel(modelmatch)
         if(flag == False):
-            return HttpResponseRedirect("%s?switch=%s&msg=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msg))
+            return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
 
     return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
