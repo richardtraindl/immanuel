@@ -69,7 +69,11 @@
                             {% if meta == 'number1' or meta == 'number10' %}
                                 <td class="board-number">{{ field }}</td>
                             {% else %}
-                                <td id="{{ meta }}" class="droppable" value="{{ field }}">
+                                {% if meta == movesrc or meta == movedst %}
+                                    <td id="{{ meta }}" class="hint droppable" value="{{ field }}">
+                                {% else %}
+                                    <td id="{{ meta }}" class="droppable" value="{{ field }}">
+                                {% endif %}
                                 {% if field == "blk" %}
                                     <div>&nbsp;</div>
                                 {% else %}
