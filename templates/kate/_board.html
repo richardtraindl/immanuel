@@ -1,0 +1,73 @@
+{% load staticfiles %}
+{% load kate_extras %}
+
+       <div class="tiny-gap">
+            {% if urgent %}
+                <p>msg: <span class="error">{{ msg }}</span></p>
+            {% else %}
+                <p>msg: {{ msg }}</p>
+            {% endif %}
+        </div>
+
+        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr; grid-gap: 4px;">
+            <p>Score: {{ match.score }}</p>
+            <p>Level: {{ match.level|matchlevel }}</p>
+        </div>
+
+        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr; grid-gap: 4px;">
+            <p>Time White: {{ match.white_elapsed_seconds|fmttime }}</p>
+            <p>Time Black: {{ match.black_elapsed_seconds|fmttime }}</p>
+        </div>
+
+        <table id="board" matchid="{{ match.id }}" movecnt="{{ match.movecnt }}">
+            {% for fmtfield in fmtboard %}
+                {% with meta=fmtfield|readmeta field=fmtfield|readfield %}
+                {% if meta == 'letter1' or meta == 'number1' %}
+                    <tr>
+                {% endif %}
+                    {% if meta == 'letter' or meta == 'letter1' or meta == 'letter10' %}
+                        <td class="board-letter">{{ field }}</td>
+                    {% else %}
+                            {% if meta == 'number1' or meta == 'number10' %}
+                                <td class="board-number">{{ field }}</td>
+                            {% else %}
+                                {% if meta == movesrc or meta == movedst %}
+                                    <td id="{{ meta }}" class="hint droppable" value="{{ field }}">
+                                {% else %}
+                                    <td id="{{ meta }}" class="droppable" value="{{ field }}">
+                                {% endif %}
+                                {% if field == "blk" %}
+                                    <div>&nbsp;</div>
+                                {% else %}
+                                    <img class="draggable" src="{% static  field|imgsrc %}">
+                                {% endif %}
+                            {% endif %}
+                    {% endif %}
+                {% if meta == 'letter10' or meta == 'number10' %}
+                    </tr>
+                {% endif %}
+
+                {% endwith %}
+            {% endfor %}
+        </table>
+
+        <div class="tiny-gap"></div>
+
+        <div id="white-pieces" class="promotion invisible">
+            <p value="wQu"><img src="{% static 'wQu'|imgsrc %}"></p>
+            <p value="wBp"><img src="{% static 'wBp'|imgsrc %}"></p>
+            <p value="wKn"><img src="{% static 'wKn'|imgsrc %}"></p>
+            <p value="wRk"><img src="{% static 'wRk'|imgsrc %}"></p>
+        </div>
+        <div id="black-pieces" class="promotion invisible">
+            <p value="bQu"><img src="{% static 'bQu'|imgsrc %}"></p>
+            <p value="bBp"><img src="{% static 'bBp'|imgsrc %}"></p>
+            <p value="bKn"><img src="{% static 'bKn'|imgsrc %}"></p>
+            <p value="bRk"><img src="{% static 'bRk'|imgsrc %}"></p>
+        </div>
+
+        <form id="move" method="post" action="{% url 'kate:domove' match.id %}?switch={{ switch }}" style="display: none;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="submit" />
+        </form>

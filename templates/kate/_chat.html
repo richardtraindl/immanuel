@@ -4,7 +4,7 @@
     <div>
       <form id="addcomment" method="post" action="{% url 'kate:addcomment' match.id %}?switch={{ switch }}" matchid="{{ match.id }}">
         {% csrf_token %}
-        <textarea id="newcomment" name="newcomment"></textarea>
+        <textarea id="newcomment" name="newcomment" rows="2"></textarea>
         
         <div class="small-gap"></div>
 
