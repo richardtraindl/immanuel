@@ -272,7 +272,7 @@ input[type="text"] {
   padding-bottom: 6px;
 }
 
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 1200px) {
     #wrapper {
         width: 596px;
         min-width: 512px;

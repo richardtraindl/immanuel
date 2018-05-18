@@ -139,6 +139,8 @@ class immanuelsThread(threading.Thread):
 
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
+            self.match.status = rules.status(self.match)
+
             modelmatch = ModelMatch()
             map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
             modelmatch.save()

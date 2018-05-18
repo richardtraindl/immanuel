@@ -18,6 +18,7 @@ from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
 from .modules.interface import read_searchmoves
 from .engine.analyze_position import score_position, is_stormy
 
+
 def index(request):
     context = RequestContext(request)
     modelmatches = ModelMatch.objects.order_by("begin").reverse()[:10]
