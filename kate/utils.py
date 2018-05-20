@@ -45,3 +45,9 @@ def preformat_board(board, switch):
         data.append(['letter10', ''])
 
     return data
+
+
+def fmttime(seconds):
+    minutes, seconds = divmod(seconds, 60)
+    hour, minutes = divmod(minutes, 60)
+    return "%02d:%02d:%02d" % (hour, minutes, seconds)

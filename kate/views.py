@@ -1,4 +1,4 @@
-import re
+import re, time
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.template import RequestContext
 from django.utils import timezone
 from .forms import *
-from .utils import preformat_board
+from .utils import preformat_board, fmttime
 from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from .modules import interface
 from .engine.match import *
@@ -67,14 +67,15 @@ def match(request, matchid=None):
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:5]
     
     if(msgcode is None):
-        if(match.status != STATUS['open']):
+        if(match.status == STATUS['winner_white']):
             urgent = True
-            if(match.status == STATUS['winner_white']):
-                msg = RETURN_MSGS[RETURN_CODES['winner_white']]
-            elif(match.status == STATUS['winner_black']):
-                msg = RETURN_MSGS[RETURN_CODES['winner_black']]
-            else:
-                msg = RETURN_MSGS[RETURN_CODES['draw']]
+            msg = RETURN_MSGS[RETURN_CODES['winner_white']]
+        elif(match.status == STATUS['winner_black']):
+            urgent = True
+            msg = RETURN_MSGS[RETURN_CODES['winner_black']]
+        elif(match.status == STATUS['draw']):
+            urgent = True
+            msg = RETURN_MSGS[RETURN_CODES['draw']]
         else:
             urgent = False
             msg = ""
@@ -171,14 +172,6 @@ def do_move(request, matchid=None):
                     interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
 
                     interface.calc_move_for_immanuel(modelmatch)
-                    status = interface.status(modelmatch)
-                    if(status != STATUS['open']):
-                        if(status == STATUS['winner_white']):
-                            msgcode = RETURN_CODES['winner_white']
-                        elif(status == STATUS['winner_black']):
-                            msgcode = RETURN_CODES['winner_black']
-                        else:
-                            msgcode = RETURN_CODES['draw']
             else:
                 msgcode= RETURN_CODES['format-error']
 
@@ -192,12 +185,54 @@ def undo_move(request, matchid=None):
     switch = request.GET.get('switch', '0')
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
         ModelMatch.deactivate_threads(modelmatch)
         ModelMatch.remove_outdated_threads()
 
     interface.undo_move(modelmatch)
+
+    return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
+
+
+def force_move(request, matchid=None):
+    context = RequestContext(request)
+    switch = request.GET.get('switch', '0')
+
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+
+    """thread = ModelMatch.get_active_thread(modelmatch)
+    if(thread):
+        ModelMatch.deactivate_threads(modelmatch)
+        ModelMatch.remove_outdated_threads()
+
+    interface.undo_move(modelmatch)"""
+
+    return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
+
+
+def pause(request, matchid=None):
+    context = RequestContext(request)
+    switch = request.GET.get('switch', '0')
+
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+
+    if(modelmatch.status == STATUS['open']):
+        if(modelmatch.time_start > 0):
+            elapsed_time = time.time() - modelmatch.time_start
+
+            movecnt = ModelMove.objects.filter(match_id=modelmatch.id).count()
+            if(movecnt % 2 == 0):
+                modelmatch.white_elapsed_seconds += elapsed_time
+            else:
+                modelmatch.black_elapsed_seconds += elapsed_time
+
+            modelmatch.time_start = 0
+
+        modelmatch.status = STATUS['paused']
+        modelmatch.save()
+
     return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
 
@@ -206,6 +241,10 @@ def resume(request, matchid=None):
     switch = request.GET.get('switch', '0')
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+    if(modelmatch.status == STATUS['paused']):
+        modelmatch.status = STATUS['open']
+        modelmatch.save()
+
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread is None):
         flag, msgcode = interface.calc_move_for_immanuel(modelmatch)
@@ -250,11 +289,24 @@ def fetch_match(request):
     movecnt = request.GET['movecnt']
 
     modelmatch = ModelMatch.objects.get(id=matchid)
-    lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
-    if(modelmatch and lastmove and lastmove.count > int(movecnt)):
-        data = "1"
+    match = Match()
+    interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
+    if(match.time_start > 0):
+        elapsed_time = time.time() - match.time_start
     else:
-        data = ""
+        elapsed_time = 0
+
+    if(match.next_color() == COLORS['white']):
+        match.white_elapsed_seconds += elapsed_time
+    else:
+        match.black_elapsed_seconds += elapsed_time
+
+    lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
+
+    if(modelmatch and lastmove and lastmove.count > int(movecnt)):
+        data = "1" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds)
+    else:
+        data = "0" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds)
 
     return HttpResponse(data)
 

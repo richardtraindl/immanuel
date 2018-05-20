@@ -83,7 +83,7 @@ def is_next_color_human(modelmatch):
 def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    
+
     ### time
     if(match.time_start > 0):
         elapsed_time = time.time() - match.time_start
@@ -99,6 +99,7 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     ###
 
     move = matchmove.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
+    match.status = STATUS['open']
     map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
     modelmatch.save()
 
@@ -141,16 +142,19 @@ class immanuelsThread(threading.Thread):
 
             self.match.status = rules.status(self.match)
 
-            modelmatch = ModelMatch()
-            map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
-            modelmatch.save()
+            modelmatch = ModelMatch.objects.get(id=self.match.id) #modelmatch = ModelMatch()
+            if(modelmatch.status == STATUS['paused']):
+                print("paused - reject calculated move")
+            else:
+                map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
+                modelmatch.save()
 
-            modelmove = ModelMove()            
-            map_moves(move, modelmove, MAP_DIR['engine-to-model'])
-            modelmove.match = modelmatch
-            modelmove.save()
-            self.running = False
-            print("move saved")
+                modelmove = ModelMove()            
+                map_moves(move, modelmove, MAP_DIR['engine-to-model'])
+                modelmove.match = modelmatch
+                modelmove.save()
+                self.running = False
+                print("move saved")
         else:
             print("no move found or thread outdated!")
 

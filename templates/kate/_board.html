@@ -9,14 +9,15 @@
             {% endif %}
         </div>
 
-        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr; grid-gap: 4px;">
+        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-gap: 4px;">
             <p>Score: {{ match.score }}</p>
             <p>Level: {{ match.level|matchlevel }}</p>
+            <p>Level: {{ match.status|matchstatus }}</p>
         </div>
 
         <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr; grid-gap: 4px;">
-            <p>Time White: {{ match.white_elapsed_seconds|fmttime }}</p>
-            <p>Time Black: {{ match.black_elapsed_seconds|fmttime }}</p>
+            <p>Time White: <span id="white-time">{{ match.white_elapsed_seconds|fmttime }}</span></p>
+            <p>Time Black: <span id="black-time">{{ match.black_elapsed_seconds|fmttime }}</span></p>
         </div>
 
         <table id="board" matchid="{{ match.id }}" movecnt="{{ match.movecnt }}">
