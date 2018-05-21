@@ -49,16 +49,6 @@ class Match(models.Model):
 
 
     @classmethod
-    def remove_outdated_threads(cls):
-        with cls._matches_thread_lock:
-            for item in cls._matches_thread_list:
-                if(item.running == False): # item.is_alive() == False or 
-                    item.running = False
-                    cls._matches_thread_list.remove(item)
-                    item.join()
-
-
-    @classmethod
     def add_thread(cls, thread):
         with cls._matches_thread_lock:
             cls._matches_thread_list.append(thread)
@@ -79,6 +69,15 @@ class Match(models.Model):
             for item in cls._matches_thread_list:
                 if(item.match.id == match.id):
                     item.running = False
+
+    @classmethod
+    def remove_outdated_threads(cls):
+        with cls._matches_thread_lock:
+            for item in cls._matches_thread_list:
+                if(item.running == False): # item.is_alive() == False or 
+                    item.running = False
+                    cls._matches_thread_list.remove(item)
+                    item.join(3.0)
 
 
 class Move(models.Model):

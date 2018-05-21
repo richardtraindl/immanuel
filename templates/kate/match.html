@@ -26,11 +26,11 @@
 
         <li><a href="{% url 'kate:undomove' match.id %}?switch={{ switch }}" onclick="return confirm('Withdraw last move?')">Withdraw Move</a></li>
 
-        <li><a href="{% url 'kate:forcemove' match.id %}?switch={{ switch }}">Force Move</a></li>
-
         <li><a href="{% url 'kate:pause' match.id %}?switch={{ switch }}">Pause</a></li>
         
         <li><a href="{% url 'kate:resume' match.id %}?switch={{ switch }}">Resume</a></li>
+
+        <li><a href="{% url 'kate:forcemove' match.id %}?switch={{ switch }}">Force Move</a></li>
 
         <li><a href="{% url 'kate:settings' match.id %}?switch={{ switch }}">Change Settings</a></li>
 
@@ -86,6 +86,7 @@
                     else{
                         $('#white-time').text(result[1]);
                         $('#black-time').text(result[2]);
+                        $('#currentsearch').text(result[3]);                        
                     }
                 });
           {% if match.level == 0 %}

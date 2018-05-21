@@ -6,12 +6,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.template import RequestContext
 from django.utils import timezone
 from .forms import *
-from .utils import preformat_board, fmttime
+from .utils import preformat_board, fmttime, fmtmove
 from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from .modules import interface
 from .engine.match import *
 from .engine.move import *
-from .engine import matchmove
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.debug import str_attributes
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
@@ -32,6 +31,8 @@ def match(request, matchid=None):
     msgcode = request.GET.get('msgcode', None)
     debug = request.GET.get('debug', "false")
 
+    currentsearch = ""
+
     if(matchid is None):
         modelmatch = ModelMatch(white_player_name=None, black_player_name=None)
     else:
@@ -39,6 +40,11 @@ def match(request, matchid=None):
             modelmatch = ModelMatch.objects.get(id=matchid)
         except ObjectDoesNotExist: #ModelMatch.DoesNotExist:
             return HttpResponseRedirect('/kate')
+        
+        thread = ModelMatch.get_active_thread(modelmatch)
+        if(thread):
+            for candidate in thread.currentsearch:
+                currentsearch += fmtmove(candidate)
 
     match = Match()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
@@ -65,7 +71,7 @@ def match(request, matchid=None):
             moves.append(move)
 
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:5]
-    
+
     if(msgcode is None):
         if(match.status == STATUS['winner_white']):
             urgent = True
@@ -100,7 +106,7 @@ def match(request, matchid=None):
 
     fmtboard = preformat_board(modelmatch.board, switch)
 
-    return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'msg': msg, 'urgent': urgent, 'debug': debug, 'debug_data': debug_data } )
+    return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'urgent': urgent, 'msg': msg, "currentsearch": currentsearch, 'debug': debug, 'debug_data': debug_data } )
 
 
 def settings(request, matchid=None):
@@ -202,14 +208,20 @@ def force_move(request, matchid=None):
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
-    """thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread):
+    thread = ModelMatch.get_active_thread(modelmatch)
+    if(thread and len(thread.currentsearch) > 0):
         ModelMatch.deactivate_threads(modelmatch)
+
+        gmove = thread.currentsearch[0]
+
+        interface.do_move(modelmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+
         ModelMatch.remove_outdated_threads()
 
-    interface.undo_move(modelmatch)"""
-
-    return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
+        return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
+    else:
+        msgcode = RETURN_CODES['general-error']
+        return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
 
 
 def pause(request, matchid=None):
@@ -301,12 +313,18 @@ def fetch_match(request):
     else:
         match.black_elapsed_seconds += elapsed_time
 
+    currentsearch = ""
+    thread = ModelMatch.get_active_thread(modelmatch)
+    if(thread):
+        for candidate in thread.currentsearch:
+            currentsearch += fmtmove(candidate)
+
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
 
     if(modelmatch and lastmove and lastmove.count > int(movecnt)):
-        data = "1" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds)
+        data = "1" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds) + "|" + currentsearch
     else:
-        data = "0" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds)
+        data = "0" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds) + "|" + currentsearch
 
     return HttpResponse(data)
 

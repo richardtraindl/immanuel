@@ -92,10 +92,10 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
         else:
             match.black_elapsed_seconds += elapsed_time
 
-    if(match.is_next_color_human()):
-        match.time_start = time.time()
-    else:
-        match.time_start = 0
+    #if(match.is_next_color_human()):
+    match.time_start = time.time()
+    #else:
+        #match.time_start = 0
     ###
 
     move = matchmove.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
@@ -128,13 +128,14 @@ class immanuelsThread(threading.Thread):
         self.name = name
         self.running = True
         self.match = copy.deepcopy(match)
+        self.currentsearch = []
 
         ModelMatch.add_thread(self)
 
 
     def run(self):
         print("Thread starting " + str(self.name))
-        candidates = calc.calc_move(self.match) 
+        candidates = calc.calc_move(self.match, self.currentsearch) 
         if(len(candidates) > 0 and ModelMatch.get_active_thread(self.match)): #  and self.running
             gmove = candidates[0]
 
@@ -146,6 +147,8 @@ class immanuelsThread(threading.Thread):
             if(modelmatch.status == STATUS['paused']):
                 print("paused - reject calculated move")
             else:
+                ModelMatch.deactivate_threads(modelmatch)
+
                 map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
                 modelmatch.save()
 
@@ -153,7 +156,6 @@ class immanuelsThread(threading.Thread):
                 map_moves(move, modelmove, MAP_DIR['engine-to-model'])
                 modelmove.match = modelmatch
                 modelmove.save()
-                self.running = False
                 print("move saved")
         else:
             print("no move found or thread outdated!")
@@ -169,7 +171,7 @@ def calc_move_for_immanuel(modelmatch):
     else:
         thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
         thread.start()
-        return True, 0
+        return True, rules.RETURN_CODES['ok']
 
 
 def read_searchmoves(): 

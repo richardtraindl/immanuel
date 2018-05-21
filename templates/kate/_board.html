@@ -1,23 +1,34 @@
 {% load staticfiles %}
 {% load kate_extras %}
 
-       <div class="tiny-gap">
+       <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 3fr; grid-gap: 4px;">
             {% if urgent %}
-                <p>msg: <span class="error">{{ msg }}</span></p>
+                <p>Message:</p>
+                <p class="error">{{ msg }}</p>
             {% else %}
-                <p>msg: {{ msg }}</p>
+                <p>Message: </p>
+                <p>{{ msg }}</p>
             {% endif %}
         </div>
-
-        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-gap: 4px;">
+       
+       <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr 2fr; grid-gap: 4px;">
             <p>Score: {{ match.score }}</p>
-            <p>Level: {{ match.level|matchlevel }}</p>
-            <p>Level: {{ match.status|matchstatus }}</p>
+            <p>Current Search:</p>
+            <p id="currentsearch">{{ currentsearch }}</p>
         </div>
 
-        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr; grid-gap: 4px;">
-            <p>Time White: <span id="white-time">{{ match.white_elapsed_seconds|fmttime }}</span></p>
-            <p>Time Black: <span id="black-time">{{ match.black_elapsed_seconds|fmttime }}</span></p>
+        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-gap: 4px;">
+            <p>Level:</p>
+            <p>{{ match.level|matchlevel }}</p>
+            <p>Status:</p>
+            <p>{{ match.status|matchstatus }}</p>
+        </div>
+
+        <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-gap: 4px;">
+            <p>Time White:</p>
+            <p id="white-time">{{ match.white_elapsed_seconds|fmttime }}</p>
+            <p>Time Black:</p>
+            <p id="black-time">{{ match.black_elapsed_seconds|fmttime }}</p>
         </div>
 
         <table id="board" matchid="{{ match.id }}" movecnt="{{ match.movecnt }}">

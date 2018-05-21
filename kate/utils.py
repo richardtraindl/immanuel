@@ -1,3 +1,5 @@
+from .engine.helper import index_to_coord, reverse_lookup
+from .engine.match import PIECES
 
 
 def preformat_board(board, switch):
@@ -51,3 +53,15 @@ def fmttime(seconds):
     minutes, seconds = divmod(seconds, 60)
     hour, minutes = divmod(minutes, 60)
     return "%02d:%02d:%02d" % (hour, minutes, seconds)
+    
+
+def fmtmove(gmove):
+    strmove = "[" + index_to_coord(gmove.srcx, gmove.srcy) + "-"
+    strmove += index_to_coord(gmove.dstx, gmove.dsty)
+    if(gmove.prom_piece != PIECES['blk']):
+        strmove += " " + reverse_lookup(PIECES, gmove.prom_piece)
+    strmove += "]"
+    return strmove
+
+
+
