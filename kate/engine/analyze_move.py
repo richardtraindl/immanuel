@@ -7,7 +7,7 @@ from .matchmove import do_move, undo_move
 from . import rules
 from .analyze_position import score_supports, score_attacks, score_opening, score_endgame, is_endgame, is_stormy
 from .analyze_helper import *
-from .pieces import pawn, knight, bishop, rook, king
+from .pieces import pawn, knight, bishop, rook, king, queen
 
 
 def castles(match, gmove):
@@ -108,6 +108,44 @@ def attacks_and_supports(match, gmove):
             rook.attacks_and_supports(match, gmove.dstx - 2, gmove.srcy, gmove.dstx + 1, gmove.dsty, attacked, supported)
 
     return attacked, supported
+
+
+def is_soft_pinned(match, x, y):
+    piece = match.readfield(x, y)
+
+    for i in range(8):
+        x1, y1 = rules.search(match, x, y, queen.STEPS[i][0], queen.STEPS[i][1])
+        if(x1 == rules.UNDEF_X):
+            continue
+        neighb = match.readfield(x1, y1)
+        if(Match.color_of_piece(piece) == Match.color_of_piece(neighb) and 
+           PIECES_RANK[piece] > PIECES_RANK[neighb]):
+            x2, y2 = rules.search(match, x1, y1, queen.STEPS[i][0], queen.STEPS[i][1])
+            if(x2 == rules.UNDEF_X):
+                continue
+            neighbsneighb = match.readfield(x2, y2)
+            if(Match.color_of_piece(neighb) == Match.oppcolor_of_piece(neighbsneighb)):
+                if(rook.rk_dir(x, y, x1, y1) != rules.DIRS['undefined'] and
+                   (neighbsneighb == PIECES['wQu'] or neighbsneighb == PIECES['bQu'] or
+                    neighbsneighb == PIECES['wRk'] or neighbsneighb == PIECES['bRk'])):
+                    return True
+                if(bishop.bp_dir(x, y, x1, y1) != rules.DIRS['undefined'] and
+                   (neighbsneighb == PIECES['wQu'] or neighbsneighb == PIECES['bQu'] or
+                    neighbsneighb == PIECES['wBp'] or neighbsneighb == PIECES['bBp'])):
+                    return True
+
+    return False
+
+def does_unpin(match, gmove):
+    flag = False
+
+    if(is_soft_pinned(match, gmove.srcx, gmove.srcy)):
+        do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        flag = not is_soft_pinned(match, gmove.dstx, gmove.dsty)
+        undo_move(match)
+
+    return flag        
+
 
 
 def defends_check(match):
@@ -339,6 +377,9 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
                 priomove.tactics.append(TACTICS['capture-good-deal'])
             else:
                 priomove.tactics.append(TACTICS['capture-bad-deal'])
+
+        if(does_unpin(match, priomove.gmove)):
+            priomove.tactics.append(TACTICS['does-unpin'])
 
         if(defends_fork(match, priomove.gmove)):
             if(dstfield_is_attacked(match, priomove.gmove) == False or 
