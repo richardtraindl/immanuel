@@ -92,7 +92,7 @@ def match(request, matchid=None):
         urgent = True
         msg = RETURN_MSGS[int(msgcode)]
 
-    thread = ModelMatch.get_active_thread(modelmatch)
+    thread = ModelMatch.get_active_thread(modelmatch.id)
     if(thread):
         msg += " calculation is running..."
 
