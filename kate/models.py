@@ -57,7 +57,9 @@ class Match(models.Model):
     @classmethod
     def get_active_thread(cls, match):
         with cls._matches_thread_lock:
+            print("get_active_thread length: " + str(len(cls._matches_thread_list)))
             for item in cls._matches_thread_list:
+                print("item.match.id: " + str(item.match.id)  + " match.id: " + str(match.id) + " item.running: " + str(item.running))
                 if(item.match.id == match.id and item.running):
                     return item
             return None
