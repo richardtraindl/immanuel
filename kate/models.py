@@ -55,19 +55,19 @@ class Match(models.Model):
 
 
     @classmethod
-    def get_active_thread(cls, matchid):
+    def get_active_thread(cls, match):
         with cls._matches_thread_lock:
             for item in cls._matches_thread_list:
-                if(item.match.id == matchid and item.running):
+                if(item.match.id == match.id and item.running):
                     return item
             return None
 
 
     @classmethod
-    def deactivate_threads(cls, matchid):
+    def deactivate_threads(cls, match):
         with cls._matches_thread_lock:
             for item in cls._matches_thread_list:
-                if(item.match.id == matchid):
+                if(item.match.id == match.id):
                     item.running = False
 
     @classmethod
