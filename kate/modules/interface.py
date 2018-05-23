@@ -132,7 +132,7 @@ class immanuelsThread(threading.Thread):
     def run(self):
         print("Thread starting " + str(self.name))
         candidates = calc.calc_move(self.match, self.currentsearch) 
-        if(len(candidates) > 0 and ModelMatch.get_active_thread(self.match.id)):
+        if(len(candidates) > 0 and self.running): #ModelMatch.get_active_thread(self.match)
             gmove = candidates[0]
 
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -143,7 +143,7 @@ class immanuelsThread(threading.Thread):
             if(modelmatch.status == STATUS['paused']):
                 print("paused - reject calculated move")
             else:
-                ModelMatch.deactivate_threads(modelmatch.id)
+                ModelMatch.deactivate_threads(modelmatch)
 
                 map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
                 modelmatch.save()
