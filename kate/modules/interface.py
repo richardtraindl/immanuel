@@ -91,7 +91,11 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
             match.white_elapsed_seconds += elapsed_time
         else:
             match.black_elapsed_seconds += elapsed_time
+
+    #if(match.is_next_color_human()):
     match.time_start = time.time()
+    #else:
+        #match.time_start = 0
     ###
 
     move = matchmove.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
@@ -132,18 +136,18 @@ class immanuelsThread(threading.Thread):
     def run(self):
         print("Thread starting " + str(self.name))
         candidates = calc.calc_move(self.match, self.currentsearch) 
-        if(len(candidates) > 0 and ModelMatch.get_active_thread(self.match.id)):
+        if(len(candidates) > 0 and ModelMatch.get_active_thread(self.match)): #  and self.running
             gmove = candidates[0]
 
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             self.match.status = rules.status(self.match)
 
-            modelmatch = ModelMatch.objects.get(id=self.match.id)
+            modelmatch = ModelMatch.objects.get(id=self.match.id) #modelmatch = ModelMatch()
             if(modelmatch.status == STATUS['paused']):
                 print("paused - reject calculated move")
             else:
-                ModelMatch.deactivate_threads(modelmatch.id)
+                ModelMatch.deactivate_threads(modelmatch)
 
                 map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
                 modelmatch.save()

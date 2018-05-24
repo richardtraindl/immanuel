@@ -41,7 +41,7 @@ def match(request, matchid=None):
         except ObjectDoesNotExist: #ModelMatch.DoesNotExist:
             return HttpResponseRedirect('/kate')
         
-        thread = ModelMatch.get_active_thread(modelmatch.id)
+        thread = ModelMatch.get_active_thread(modelmatch)
         if(thread):
             for candidate in thread.currentsearch:
                 currentsearch += fmtmove(candidate)
@@ -92,7 +92,7 @@ def match(request, matchid=None):
         urgent = True
         msg = RETURN_MSGS[int(msgcode)]
 
-    thread = ModelMatch.get_active_thread(modelmatch.id)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
         msg += " calculation is running..."
 
@@ -192,9 +192,9 @@ def undo_move(request, matchid=None):
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
-    thread = ModelMatch.get_active_thread(modelmatch.id)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
-        ModelMatch.deactivate_threads(modelmatch.id)
+        ModelMatch.deactivate_threads(modelmatch)
         ModelMatch.remove_outdated_threads()
 
     interface.undo_move(modelmatch)
@@ -208,9 +208,9 @@ def force_move(request, matchid=None):
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
-    thread = ModelMatch.get_active_thread(modelmatch.id)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread and len(thread.currentsearch) > 0):
-        ModelMatch.deactivate_threads(modelmatch.id)
+        ModelMatch.deactivate_threads(modelmatch)
 
         gmove = thread.currentsearch[0]
 
@@ -257,7 +257,7 @@ def resume(request, matchid=None):
         modelmatch.status = STATUS['open']
         modelmatch.save()
 
-    thread = ModelMatch.get_active_thread(modelmatch.id)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread is None):
         flag, msgcode = interface.calc_move_for_immanuel(modelmatch)
         if(flag == False):
@@ -314,7 +314,7 @@ def fetch_match(request):
         match.black_elapsed_seconds += elapsed_time
 
     currentsearch = ""
-    thread = ModelMatch.get_active_thread(modelmatch.id)
+    thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
         for candidate in thread.currentsearch:
             currentsearch += fmtmove(candidate)
