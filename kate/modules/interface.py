@@ -136,7 +136,11 @@ class immanuelsThread(threading.Thread):
     def run(self):
         print("Thread starting " + str(self.name))
         candidates = calc.calc_move(self.match, self.currentsearch) 
+<<<<<<< HEAD
         if(len(candidates) > 0 and ModelMatch.get_active_thread(self.match)): #  and self.running
+=======
+        if(len(candidates) > 0 and self.running): #ModelMatch.get_active_thread(self.match)
+>>>>>>> a974c662302f6511b3cec88806efd20b22af4f2f
             gmove = candidates[0]
 
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)

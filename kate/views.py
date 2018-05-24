@@ -316,8 +316,11 @@ def fetch_match(request):
     currentsearch = ""
     thread = ModelMatch.get_active_thread(modelmatch)
     if(thread):
+        print("thread found in fetch_match")
         for candidate in thread.currentsearch:
             currentsearch += fmtmove(candidate)
+    else:
+        print("no thread found in fetch_match")
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
 
