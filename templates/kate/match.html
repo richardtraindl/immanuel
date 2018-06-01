@@ -54,10 +54,6 @@
         {% include "kate/_minutes.html" with match=match %}
     </div>
 
-    {% if debug == 'true' or debug == 't' %}
-        <p>{{ debug_data|safe }}</p>
-    {% endif %}
-
     <script>
         $(document).ready(function() {
             performMove();

@@ -1,3 +1,7 @@
+import django_rq
+from rq.registry import StartedJobRegistry # FinishedJobRegistry
+from rq.job import Job
+from rq.exceptions import NoSuchJobError
 from .engine.helper import index_to_coord, reverse_lookup
 from .engine.match import PIECES
 
@@ -5,7 +9,7 @@ from .engine.match import PIECES
 def preformat_board(board, switch):
     data = []
 
-    if(switch == '0'):
+    if(switch == 0):
         data.append(['letter1', ''])
         for i in range(8):
             data.append(['letter', chr(i + ord('A'))])
@@ -64,4 +68,24 @@ def fmtmove(gmove):
     return strmove
 
 
+def get_active_job(matchid):
+    redis_conn = django_rq.get_connection()
+    registry = StartedJobRegistry('default', redis_conn)
+    
+    job_ids = registry.get_job_ids()
+    for job_id in job_ids:
+        try:
+            job = Job.fetch(job_id, redis_conn)
+        except NoSuchJobError:
+            return None
+        
+        try:
+            job_matchid = job.meta['matchid']
+        except KeyError:
+            return None
+
+        if(job_matchid == matchid):
+            return job
+
+    return None
 

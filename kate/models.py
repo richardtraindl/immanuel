@@ -24,9 +24,6 @@ class Match(models.Model):
                                                                   'blk;blk;blk;blk;blk;blk;blk;blk;' \
                                                                   'bPw;bPw;bPw;bPw;bPw;bPw;bPw;bPw;' \
                                                                   'bRk;bKn;bBp;bQu;bKg;bBp;bKn;bRk;')
-    _matches_thread_lock = threading.Lock()
-    _matches_thread_list = []
-
 
     def __init__(self, *args, **kwargs):
         super(Match, self).__init__(*args, **kwargs)
@@ -46,39 +43,6 @@ class Match(models.Model):
 
     def is_immanuel(self):
         return (self.white_player_is_human == False or self.black_player_is_human == False)
-
-
-    @classmethod
-    def add_thread(cls, thread):
-        with cls._matches_thread_lock:
-            cls._matches_thread_list.append(thread)
-
-
-    @classmethod
-    def get_active_thread(cls, match):
-        with cls._matches_thread_lock:
-            print("get_active_thread length: " + str(len(cls._matches_thread_list)))
-            for item in cls._matches_thread_list:
-                if(item.match.id == match.id and item.running): # and item.is_alive() 
-                    return item
-            return None
-
-
-    @classmethod
-    def deactivate_threads(cls, match):
-        with cls._matches_thread_lock:
-            for item in cls._matches_thread_list:
-                if(item.match.id == match.id):
-                    item.running = False
-
-    @classmethod
-    def remove_outdated_threads(cls):
-        with cls._matches_thread_lock:
-            for item in cls._matches_thread_list:
-                if(item.running == False): # item.is_alive() == False or 
-                    item.running = False
-                    cls._matches_thread_list.remove(item)
-                    item.join(3.0)
 
 
 class Move(models.Model):

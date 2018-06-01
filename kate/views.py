@@ -1,12 +1,13 @@
-import re, time
+import time
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.template import RequestContext
 from django.utils import timezone
+from .utils import *
+from .engine.helper import coord_to_index
 from .forms import *
-from .utils import preformat_board, fmttime, fmtmove
 from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from .modules import interface
 from .engine.match import *
@@ -27,9 +28,12 @@ def index(request):
 
 def match(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', '0')
+
+    switch = int(request.GET.get('switch', '0'))
+
     msgcode = request.GET.get('msgcode', None)
-    debug = request.GET.get('debug', "false")
+    if(msgcode):
+        msgcode = int(msgcode)
 
     currentsearch = ""
 
@@ -40,11 +44,12 @@ def match(request, matchid=None):
             modelmatch = ModelMatch.objects.get(id=matchid)
         except ObjectDoesNotExist: #ModelMatch.DoesNotExist:
             return HttpResponseRedirect('/kate')
-        
-        thread = ModelMatch.get_active_thread(modelmatch)
-        if(thread):
-            for candidate in thread.currentsearch:
-                currentsearch += fmtmove(candidate)
+
+        job = get_active_job(modelmatch.id)
+        if(job):
+            currentsearch = job.meta['currentsearch']
+        else:
+            currentsearch = ""
 
     match = Match()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
@@ -85,34 +90,28 @@ def match(request, matchid=None):
         else:
             urgent = False
             msg = ""
-    elif(int(msgcode) == RETURN_CODES['ok']):
+    elif(msgcode == RETURN_CODES['ok']):
         urgent = False
-        msg = RETURN_MSGS[int(msgcode)]
+        msg = RETURN_MSGS[msgcode]
     else:
         urgent = True
-        msg = RETURN_MSGS[int(msgcode)]
+        msg = RETURN_MSGS[msgcode]
 
-    thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread):
-        msg += " calculation is running..."
+    #job = get_active_job(modelmatch.id)
+    #if(job):
+    #    msg += " calculation is running..."
 
     form = DoMoveForm()
 
-    if(debug == "true" or debug == "t"):
-        importform = ImportMatchForm()
-        debug_data = str_attributes(match, "<br>")
-    else:
-        debug_data = ""
-
     fmtboard = preformat_board(modelmatch.board, switch)
 
-    return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'urgent': urgent, 'msg': msg, "currentsearch": currentsearch, 'debug': debug, 'debug_data': debug_data } )
+    return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'form': form, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'urgent': urgent, 'msg': msg, "currentsearch": currentsearch } )
 
 
 def settings(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', '0')
-    debug = request.GET.get('debug', "false")
+
+    switch = int(request.GET.get('switch', '0'))
 
     if(matchid is None):
         modelmatch = ModelMatch()
@@ -136,7 +135,7 @@ def settings(request, matchid=None):
 
             return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
         else:
-            return render(request, 'kate/settings.html', { 'form': form, 'matchid': matchid, 'switch': switch } )
+            return render(request, 'kate/settings.html', { 'form': form, 'matchid': modelmatch.id, 'switch': switch } )
     else:
         if(matchid is None):
             form = MatchForm()
@@ -149,11 +148,12 @@ def settings(request, matchid=None):
                 'black_player_name': modelmatch.black_player_name, 
                 'black_player_is_human': modelmatch.black_player_is_human })
 
-            return render(request, 'kate/settings.html', { 'form': form, 'matchid': matchid, 'switch': switch } )
+            return render(request, 'kate/settings.html', { 'form': form, 'matchid': modelmatch.id, 'switch': switch } )
 
 
 def delete(request, matchid=None):
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+
     ModelMatch.objects.filter(id=modelmatch.id).delete()
 
     return HttpResponseRedirect('/kate')
@@ -161,7 +161,8 @@ def delete(request, matchid=None):
 
 def do_move(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', '0')
+
+    switch = int(request.GET.get('switch', '0'))
 
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
@@ -181,21 +182,21 @@ def do_move(request, matchid=None):
             else:
                 msgcode= RETURN_CODES['format-error']
 
-        return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(matchid,)), switch, msgcode))
+        return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
     else:
         return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(matchid,)), switch))
 
 
 def undo_move(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', '0')
+
+    switch = int(request.GET.get('switch', '0'))
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
-    thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread):
-        ModelMatch.deactivate_threads(modelmatch)
-        ModelMatch.remove_outdated_threads()
+    job = get_active_job(modelmatch.id)
+    if(job):
+        job.delete()
 
     interface.undo_move(modelmatch)
 
@@ -204,20 +205,15 @@ def undo_move(request, matchid=None):
 
 def force_move(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', '0')
+
+    switch = int(request.GET.get('switch', '0'))
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
-    thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread and len(thread.currentsearch) > 0):
-        ModelMatch.deactivate_threads(modelmatch)
-
-        gmove = thread.currentsearch[0]
-
-        interface.do_move(modelmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-
-        ModelMatch.remove_outdated_threads()
-
+    job = get_active_job(modelmatch.id)
+    if(job):
+        job.meta['terminate'] = 1
+        job.save_meta()
         return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
     else:
         msgcode = RETURN_CODES['general-error']
@@ -226,7 +222,8 @@ def force_move(request, matchid=None):
 
 def pause(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', '0')
+
+    switch = int(request.GET.get('switch', '0'))
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
@@ -250,15 +247,16 @@ def pause(request, matchid=None):
 
 def resume(request, matchid=None):
     context = RequestContext(request)
-    switch = request.GET.get('switch', '0')
+
+    switch = int(request.GET.get('switch', '0'))
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     if(modelmatch.status == STATUS['paused']):
         modelmatch.status = STATUS['open']
         modelmatch.save()
 
-    thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread is None):
+    job = get_active_job(modelmatch.id)
+    if(job is None):
         flag, msgcode = interface.calc_move_for_immanuel(modelmatch)
         if(flag == False):
             return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
@@ -268,7 +266,8 @@ def resume(request, matchid=None):
 
 def add_comment(request, matchid):
     context = RequestContext(request)
-    switch = request.GET.get('switch', '0')
+
+    switch = int(request.GET.get('switch', '0'))
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     if(request.method == 'POST'):
@@ -286,19 +285,31 @@ def fetch_comments(request):
     context = RequestContext(request)
 
     if(request.method == 'GET'):
-        matchid = request.GET['matchid']
-        comments = ModelComment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:3]
-        data = ""
-        for comment in reversed(comments):
-            data += "<p>" + comment.text + "</p>"
+        matchid = request.GET.get('matchid', None)
+        if(matchid):
+            matchid = int(matchid)
+            comments = ModelComment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:3]
+            data = ""
+            for comment in reversed(comments):
+                data += "<p>" + comment.text + "</p>"
 
-        return HttpResponse(data)
+            return HttpResponse(data)
 
 
 def fetch_match(request):
     context = RequestContext(request)
-    matchid = request.GET['matchid']
-    movecnt = request.GET['movecnt']
+
+    matchid = request.GET.get('matchid', None)
+    if(matchid):
+        matchid = int(matchid)
+    else:
+        return
+
+    movecnt = request.GET.get('movecnt', None)
+    if(movecnt):
+        movecnt = int(movecnt)
+    else:
+        return
 
     modelmatch = ModelMatch.objects.get(id=matchid)
     match = Match()
@@ -313,49 +324,18 @@ def fetch_match(request):
     else:
         match.black_elapsed_seconds += elapsed_time
 
-    currentsearch = ""
-    thread = ModelMatch.get_active_thread(modelmatch)
-    if(thread):
-        print("thread found in fetch_match")
-        for candidate in thread.currentsearch:
-            currentsearch += fmtmove(candidate)
+    job = get_active_job(modelmatch.id)
+    if(job):
+        currentsearch = job.meta['currentsearch']
     else:
-        print("no thread found in fetch_match")
+        currentsearch = ""
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
 
-    if(modelmatch and lastmove and lastmove.count > int(movecnt)):
+    if(modelmatch and lastmove and lastmove.count > movecnt):
         data = "1" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds) + "|" + currentsearch
     else:
         data = "0" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds) + "|" + currentsearch
 
     return HttpResponse(data)
-
-
-def debug(request, matchid=None):
-    context = RequestContext(request)
-    fcode = request.GET.get('fcode', None)
-
-    if(matchid is None or fcode is None):
-        return HttpResponseRedirect('/kate')
-    else:
-        try:
-            modelmatch = ModelMatch.objects.get(id=matchid)
-        except ObjectDoesNotExist:
-            return HttpResponseRedirect('/kate')
-
-    match = Match()
-    interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
-
-    functioncode = int(fcode)
-    if(functioncode == 0):
-        #interface.debug_score_position(modelmatch)
-        score = score_position(match, 1)
-        print("from function score_position")
-        print("match.score: " + str(match.score) + " score: " + str(score))
-    elif(functioncode == 1):
-        print("from function is_stormy")
-        print(str(is_stormy(match)))
-
-    return HttpResponseRedirect('/kate')
 

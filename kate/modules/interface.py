@@ -1,9 +1,15 @@
 import random, threading, copy, time
+import django_rq
+from rq.job import Job
+from rq import Queue
+from tasks import job_calc_and_do_move
 from django.conf import settings
+from .. utils import fmtmove, get_active_job
 from .. models import Match as ModelMatch, Move as ModelMove
 from .. engine.match import *
 from .. engine.move import *
 from .. engine import matchmove, rules, calc
+
 
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
@@ -122,47 +128,31 @@ def undo_move(modelmatch):
             modelmove.delete()
 
 
-class immanuelsThread(threading.Thread):
-    def __init__(self, name, match):
+class FetchCandidatesThread(threading.Thread):
+    def __init__(self, matchid, searchcomm):
         threading.Thread.__init__(self)
-        self.name = name
-        self.running = True
-        self.match = copy.deepcopy(match)
-        self.currentsearch = []
-
-        ModelMatch.add_thread(self)
-
+        self.matchid = matchid
+        self.searchcomm = searchcomm
 
     def run(self):
-        print("Thread starting " + str(self.name))
-        candidates = calc.calc_move(self.match, self.currentsearch) 
-<<<<<<< HEAD
-        if(len(candidates) > 0 and ModelMatch.get_active_thread(self.match)): #  and self.running
-=======
-        if(len(candidates) > 0 and self.running): #ModelMatch.get_active_thread(self.match)
->>>>>>> a974c662302f6511b3cec88806efd20b22af4f2f
-            gmove = candidates[0]
+        print("Thread starting")
 
-            move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+        while(True):
+            job = get_active_job(self.matchid)
+            if(job):
+                print("meta: " + str(job.meta))
+                if(self.searchcomm.currentsearch):
+                    currentsearch = ""
+                    for gmove in self.searchcomm.currentsearch:
+                        currentsearch += fmtmove(gmove)
+                        job.meta['currentsearch'] = currentsearch
+                        job.save_meta()
 
-            self.match.status = rules.status(self.match)
+                if(self.searchcomm.terminate != job.meta['terminate']):
+                    self.searchcomm.terminate = job.meta['terminate']
 
-            modelmatch = ModelMatch.objects.get(id=self.match.id) #modelmatch = ModelMatch()
-            if(modelmatch.status == STATUS['paused']):
-                print("paused - reject calculated move")
-            else:
-                ModelMatch.deactivate_threads(modelmatch)
-
-                map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
-                modelmatch.save()
-
-                modelmove = ModelMove()            
-                map_moves(move, modelmove, MAP_DIR['engine-to-model'])
-                modelmove.match = modelmatch
-                modelmove.save()
-                print("move saved")
-        else:
-            print("no move found or thread outdated!")
+            print("Thread waits 10 seconds")
+            time.sleep(20.0)
 
 
 def calc_move_for_immanuel(modelmatch):
@@ -173,8 +163,8 @@ def calc_move_for_immanuel(modelmatch):
     elif(match.is_next_color_human()):
         return False, rules.RETURN_CODES['wrong-color']
     else:
-        thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
-        thread.start()
+        queue = django_rq.get_queue('default')
+        job = queue.enqueue(job_calc_and_do_move, modelmatch, match)
         return True, rules.RETURN_CODES['ok']
 
 

@@ -7,19 +7,20 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Database
-"""DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.path.join('kate_db'),
-    }
-}
-"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR , 'katedb.sqlite3'),
     }
+}
+
+RQ_QUEUES = {
+     'default': {
+     'HOST': 'localhost',
+     'PORT': 6379,
+     'DB': 0,
+     'DEFAULT_TIMEOUT': 3600,
+     },
 }
 
 ALLOWED_HOSTS = ['127.0.0.1']
