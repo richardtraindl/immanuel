@@ -10,6 +10,7 @@ __pycache__
 __init__.py
 *.sqlite3
 *.dat
+*.rdb
 .venv
 local_settings.py
 
