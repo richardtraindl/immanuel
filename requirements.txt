@@ -18,3 +18,4 @@ rq==0.10.0
 static3==0.7.0
 virtualenv==15.1.0
 whitenoise==3.3.0
+gobject-introspection-1.0==1.46.0
