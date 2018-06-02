@@ -1,14 +1,10 @@
-anytree==2.4.3
 appdirs==1.4.3
-click==6.7
-crc16==0.1.1
 dj-database-url==0.4.2
 dj-static==0.0.6
 Django==1.11.13
 django-rq==1.1.0
 django-toolbelt==0.0.1
 gunicorn==19.6.0
-lxml==4.2.1
 packaging==17.1
 psycopg2==2.7.4
 Pygments==2.2.0
@@ -19,8 +15,6 @@ pytz==2018.4
 PyYAML==3.12
 redis==2.10.6
 rq==0.10.0
-six==1.11.0
 static3==0.7.0
 virtualenv==15.1.0
 whitenoise==3.3.0
-youtube-dl==2018.6.2
