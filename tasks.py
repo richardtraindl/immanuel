@@ -1,13 +1,10 @@
 from django_rq import job 
 from rq import get_current_job
 from kate.engine.calc import calc_move, SearchComm
-from kate.models import Match as ModelMatch
-from kate.engine.match import Match
 from kate.modules import interface
 
 
-#@job("high")
-@job("default")
+@job("high")
 def job_calc_and_do_move(modelmatch, match):
     job = get_current_job()
     job.meta['matchid'] = match.id
