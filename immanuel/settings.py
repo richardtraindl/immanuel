@@ -69,16 +69,16 @@ DATABASES = {}
 import dj_database_url
 DATABASES['default'] = dj_database_url.config()
 
-"""DJANGO_SETTINGS_MODULE="settings rq worker default"
+DJANGO_SETTINGS_MODULE="settings rq worker default"
 
 RQ_QUEUES = {
     'default': {
         'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
         'DEFAULT_TIMEOUT': 3600,
     }
-}"""
+}
 
-DJANGO_SETTINGS_MODULE="settings rq worker high default low"
+"""DJANGO_SETTINGS_MODULE="settings rq worker high default low"
 
 RQ_QUEUES = {
     'default': {
@@ -97,7 +97,7 @@ RQ_QUEUES = {
         'DB': 0,
         'DEFAULT_TIMEOUT': 3600,
     }
-}
+}"""
 
 
 # Password validation
