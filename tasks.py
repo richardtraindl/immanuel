@@ -1,6 +1,8 @@
 from django_rq import job 
 from rq import get_current_job
 from kate.engine.calc import calc_move, SearchComm
+from kate.models import Match as ModelMatch
+from kate.engine.match import Match
 from kate.modules import interface
 
 
