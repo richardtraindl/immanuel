@@ -1,3 +1,4 @@
 web: gunicorn wsgi --log-file -
 
-worker: python worker.py
+worker: python immanuel/manage.py rqworker high default low
+# worker: python worker.py
