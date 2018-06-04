@@ -299,19 +299,19 @@ def fetch_comments(request):
 
 def fetch_match(request):
     context = RequestContext(request)
-
+    print("1")
     matchid = request.GET.get('matchid', None)
     if(matchid):
         matchid = int(matchid)
     else:
         return
-
+    print("2")
     movecnt = request.GET.get('movecnt', None)
     if(movecnt):
         movecnt = int(movecnt)
     else:
         return
-
+    print("3")
     modelmatch = ModelMatch.objects.get(id=matchid)
     match = Match()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
@@ -319,24 +319,24 @@ def fetch_match(request):
         elapsed_time = time.time() - match.time_start
     else:
         elapsed_time = 0
-
+    print("4")
     if(match.next_color() == COLORS['white']):
         match.white_elapsed_seconds += elapsed_time
     else:
         match.black_elapsed_seconds += elapsed_time
-
+    print("5")
     job = get_active_job(modelmatch.id)
     if(job):
         currentsearch = job.meta['currentsearch']
     else:
         currentsearch = ""
-
+    print("6")
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
-
+    print("7")
     if(modelmatch and lastmove and lastmove.count > movecnt):
         data = "1" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds) + "|" + currentsearch
     else:
         data = "0" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds) + "|" + currentsearch
-
+    print("8")
     return HttpResponse(data)
 
