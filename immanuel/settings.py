@@ -114,13 +114,13 @@ USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'assets'),
-)
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Override production variables if DJANGO_DEVELOPMENT env variable is set
 if os.environ.get('DJANGO_DEVELOPMENT') is not None:
