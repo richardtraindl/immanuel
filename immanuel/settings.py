@@ -2,8 +2,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '2bn+w*o&$(x7--v6(3^xpy%!d#04j-lx)4t(u6t1k1qr@8n&s5'
 
@@ -28,7 +26,6 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware', 
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'immanuel.urls'
@@ -117,13 +114,15 @@ USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') #STATIC_ROOT = 'staticfiles'
+#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') #STATIC_ROOT = 'staticfiles'
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'assets'),
 )
+
+django_heroku.settings(locals())
 
 # Override production variables if DJANGO_DEVELOPMENT env variable is set
 if os.environ.get('DJANGO_DEVELOPMENT') is not None:
