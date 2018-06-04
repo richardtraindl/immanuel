@@ -5,6 +5,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '2bn+w*o&$(x7--v6(3^xpy%!d#04j-lx)4t(u6t1k1qr@8n&s5'
 
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -51,29 +52,20 @@ DATABASES = {}
 import dj_database_url
 DATABASES['default'] = dj_database_url.config()
 
-"""DJANGO_SETTINGS_MODULE="settings rq worker default"
-
-RQ_QUEUES = {
-    'default': {
-        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
-        'DEFAULT_TIMEOUT': 3600,
-    }
-}"""
-
 DJANGO_SETTINGS_MODULE="settings rq worker high default low"
 
 RQ_QUEUES = {
     'default': {
         'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
-        'DEFAULT_TIMEOUT': 3600,
+        'DEFAULT_TIMEOUT': 300,
     },
     'high': {
         'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
-        'DEFAULT_TIMEOUT': 3600,
+        'DEFAULT_TIMEOUT': 300,
     },
     'low': {
         'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
-        'DEFAULT_TIMEOUT': 3600,
+        'DEFAULT_TIMEOUT': 300,
     }
 }
 
@@ -102,6 +94,7 @@ WSGI_APPLICATION = 'immanuel.wsgi.application'
 
 DEBUG = False
 
+
 # Internationalization
 LANGUAGE_CODE = 'de-at'
 
@@ -113,6 +106,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
@@ -122,6 +116,12 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+
 # Override production variables if DJANGO_DEVELOPMENT env variable is set
 if os.environ.get('DJANGO_DEVELOPMENT') is not None:
     from immanuel.settings_dev import *
+

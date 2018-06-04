@@ -74,7 +74,7 @@
                 var result;
                 matchid = $('#board').attr("matchid");
                 movecnt = $('#board').attr("movecnt");
-                $.get('/kate/fetchmatch', { matchid: matchid, movecnt: movecnt }, function(data){
+                $.get('/kate/fetchmatch/', { matchid: matchid, movecnt: movecnt }, function(data){
                     result = data.split("|");
                     if(result[0] == 1){
                         location.reload();
@@ -95,7 +95,7 @@
             setInterval(function() {
                 var matchid;
                 matchid = $('#addcomment').attr("matchid");
-                $.get('/kate/fetchcomments', { matchid: matchid }, function(data){
+                $.get('/kate/fetchcomments/', { matchid: matchid }, function(data){
                     if(data.length > 0){
                         $('#comments').html(data);
                     }
