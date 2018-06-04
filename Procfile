@@ -1,3 +1,3 @@
 web: gunicorn wsgi --log-file -
 
-worker: python chesswithkate/manage.py rqworker high default low
+worker: python manage.py rqworker high default low
