@@ -12,6 +12,7 @@ from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComm
 from .modules import interface
 from .engine.match import *
 from .engine.move import *
+from .engine.calc import SearchComm
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
 from .modules.interface import read_searchmoves
@@ -211,8 +212,8 @@ def force_move(request, matchid=None):
 
     job = get_active_job(modelmatch.id)
     if(job):
-        job.meta['terminate'] = 1
-        job.save_meta()
+        searchcomm = job.meta['searchcomm']
+        searchcomm.terminate = 1
         return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
     else:
         msgcode = RETURN_CODES['general-error']
@@ -325,7 +326,10 @@ def fetch_match(request):
 
     job = get_active_job(modelmatch.id)
     if(job):
-        currentsearch = job.meta['currentsearch']
+        searchcomm = job.meta['searchcomm']
+        currentsearch = ""
+        for gmove in searchcomm.currentsearch:
+            currentsearch += fmtmove(gmove)
     else:
         currentsearch = ""
 
