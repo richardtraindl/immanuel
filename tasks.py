@@ -13,10 +13,10 @@ def job_calc_and_do_move(modelmatch, match):
     job.save_meta()
 
     searchcomm = SearchComm()
-    fetchcandidates = interface.FetchCandidatesThread(match.id, searchcomm)
-    fetchcandidates.start()
+    #fetchcandidates = interface.FetchCandidatesThread(match.id, searchcomm)
+    #fetchcandidates.start()
     candidates = calc_move(match, searchcomm)
-    fetchcandidates.join(3.0)
+    #fetchcandidates.join(3.0)
     gmove = candidates[0]
     interface.do_move(modelmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
