@@ -133,33 +133,6 @@ def undo_move(modelmatch):
             modelmove.delete()
 
 
-class FetchCandidatesThread(threading.Thread):
-    def __init__(self, matchid, searchcomm):
-        threading.Thread.__init__(self)
-        self.matchid = matchid
-        self.searchcomm = searchcomm
-
-    def run(self):
-        print("Thread starting")
-
-        while(True):
-            job = get_active_job(self.matchid)
-            if(job):
-                print("meta: " + str(job.meta))
-                if(self.searchcomm.currentsearch):
-                    currentsearch = ""
-                    for gmove in self.searchcomm.currentsearch:
-                        currentsearch += fmtmove(gmove)
-                        job.meta['currentsearch'] = currentsearch
-                        job.save_meta()
-
-                if(self.searchcomm.terminate != job.meta['terminate']):
-                    self.searchcomm.terminate = job.meta['terminate']
-
-            print("Thread waits 10 seconds")
-            time.sleep(20.0)
-
-
 def calc_move_for_immanuel(modelmatch):
     match = Match()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
