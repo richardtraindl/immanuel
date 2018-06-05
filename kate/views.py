@@ -47,9 +47,9 @@ def match(request, matchid=None):
 
         job = get_active_job(modelmatch.id)
         if(job):
-            currentsearch = job.meta['currentsearch']
-        else:
-            currentsearch = ""
+            searchcomm = job.meta['searchcomm']
+            for gmove in searchcomm.currentsearch:
+                currentsearch += fmtmove(gmove)
 
     match = Match()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
