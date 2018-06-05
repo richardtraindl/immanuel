@@ -114,10 +114,10 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     modelmove.match = modelmatch
     modelmove.save()
 
-    job = get_active_job(modelmatch.id)
-    if(job):
-        print("meta: " + str(job.meta))
-        job.delete()
+    #job = get_active_job(modelmatch.id)
+    #if(job):
+        #print("meta: " + str(job.meta))
+        #job.delete()
 
 
 def undo_move(modelmatch):
