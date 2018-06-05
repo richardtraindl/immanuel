@@ -330,6 +330,7 @@ def fetch_match(request):
         searchcomm = job.meta['searchcomm']
         print("searchcomm: " + str(searchcomm))
         print("len searchcomm: " + str(len(searchcomm.currentsearch)))
+        print("terminate: " + str(searchcomm.terminate))
         currentsearch = ""
         for gmove in searchcomm.currentsearch:
             currentsearch += fmtmove(gmove)
