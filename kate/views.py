@@ -329,7 +329,7 @@ def fetch_match(request):
         print("job found, id: " + str(modelmatch.id))
         searchcomm = job.meta['searchcomm']
         print("searchcomm: " + str(searchcomm))
-        print("len searchcomm: " + str(len(searchcomm)))
+        print("len searchcomm: " + str(len(searchcomm.currentsearch)))
         currentsearch = ""
         for gmove in searchcomm.currentsearch:
             currentsearch += fmtmove(gmove)
