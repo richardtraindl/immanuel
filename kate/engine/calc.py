@@ -280,7 +280,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return 0
 
 
-def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, searchcomm):
+def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     color = match.next_color()
     nodecandidates = []
     newcandidates = []
@@ -331,7 +331,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, search
         else:
             matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-            score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, beta, not maximizing, priomove, searchcomm)
+            score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, beta, not maximizing, priomove, msgs)
 
             #score += score_mupltiple_piece_moves_in_opening(match, color)
 
@@ -343,9 +343,10 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, search
                 append_newmove(gmove, nodecandidates, newcandidates)
 
             if(depth == 1):
-                searchcomm.currentsearch.clear()
+                currentsearch = []
                 for candidate in nodecandidates:
-                    searchcomm.currentsearch.append(candidate)
+                    currentsearch.append(candidate)
+                    msgs.write_currentsearch(currentsearch)
 
                 prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
                 prnt_moves("", newcandidates)
@@ -361,9 +362,10 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, search
                 append_newmove(gmove, nodecandidates, newcandidates)
 
             if(depth == 1):
-                searchcomm.currentsearch.clear()
+                currentsearch = []
                 for candidate in nodecandidates:
-                    searchcomm.currentsearch.append(candidate)
+                    currentsearch.append(candidate)
+                    msgs.write_currentsearch(currentsearch)
 
                 prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
                 prnt_moves("", newcandidates)
@@ -379,16 +381,18 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, search
             #exceeded = True
         #else:
             #exceeded = False
-        if(count >= maxcnt or searchcomm.terminate == 1):
+        if(count >= maxcnt or msgs.read_terminate()):
             break
 
     return nodescore, nodecandidates
 
 
-class SearchComm:
+class SearchMsgs:
     def __init__(self):
+        self.created_at = time.time()
+        self.isalivee = True
+        self.terminate = False
         self.currentsearch = []
-        self.terminate = 0
 
 
 class SearchLimits:
@@ -418,7 +422,7 @@ class SearchLimits:
             self.dpth_stage2 = 8
 
 
-def calc_move(match, searchcomm):
+def calc_move(match, msgs):
     print("is opening: " + str(is_opening(match)) + " is endgame: " + str(is_endgame(match)))
 
     candidates = []
@@ -435,7 +439,7 @@ def calc_move(match, searchcomm):
         maximizing = match.next_color() == COLORS['white']
         alpha = SCORES[PIECES['wKg']] * 10
         beta = SCORES[PIECES['bKg']] * 10 
-        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, searchcomm)
+        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, msgs)
 
     ### time
     elapsed_time = time.time() - match.time_start

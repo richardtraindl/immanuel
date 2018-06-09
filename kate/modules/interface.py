@@ -1,6 +1,5 @@
 import random, threading, copy, time
 import django_rq
-from rq.job import Job
 from rq import Queue
 from tasks import job_calc_and_do_move
 from django.conf import settings
@@ -132,6 +131,25 @@ def undo_move(modelmatch):
         if(modelmove):
             modelmove.delete()
 
+
+class Msgs:
+    def __init__(self, job):
+        self.job = job
+
+    def read_terminate(self):
+        try:
+            meta = self.job.meta['terminate']
+        except KeyError:
+            meta = False
+        return meta
+
+    def write_currentsearch(self, currentsearch):
+        try:
+            self.job.meta['currentsearch'] = currentsearch
+            self.job.save_meta()
+            return True
+        except KeyError:
+            return False
 
 def calc_move_for_immanuel(modelmatch):
     match = Match()

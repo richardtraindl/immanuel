@@ -6,16 +6,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.template import RequestContext
 from django.utils import timezone
 from .utils import *
-from .engine.helper import coord_to_index
 from .forms import *
 from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from .modules import interface
 from .engine.match import *
 from .engine.move import *
-from .engine.calc import SearchComm
+from .engine.calc import SearchMsgs
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
-from .modules.interface import read_searchmoves
 from .engine.analyze_position import score_position, is_stormy
 
 
@@ -43,13 +41,15 @@ def match(request, matchid=None):
         try:
             modelmatch = ModelMatch.objects.get(id=matchid)
         except ObjectDoesNotExist: #ModelMatch.DoesNotExist:
-            return HttpResponseRedirect('/kate')
+            return HttpResponseRedirect('/kate/')
 
         job = get_active_job(modelmatch.id)
         if(job):
-            searchcomm = job.meta['searchcomm']
-            for gmove in searchcomm.currentsearch:
-                currentsearch += fmtmove(gmove)
+            if(job.meta['terminate'] == False):
+                currsearch = job.meta['currentsearch']
+                if(currsearch):
+                    for gmove in currsearch:
+                        currentsearch += fmtmove(gmove)
 
     match = Match()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
@@ -196,7 +196,8 @@ def undo_move(request, matchid=None):
 
     job = get_active_job(modelmatch.id)
     if(job):
-        job.delete()
+        job.meta['isalive'] = False
+        job.save_meta()
 
     interface.undo_move(modelmatch)
 
@@ -212,12 +213,10 @@ def force_move(request, matchid=None):
 
     job = get_active_job(modelmatch.id)
     if(job):
-        searchcomm = job.meta['searchcomm']
-        searchcomm.terminate = 1
-        return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
-    else:
-        msgcode = RETURN_CODES['general-error']
-        return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
+        job.meta['terminate'] = True
+        job.save_meta()
+
+    return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
 
 def pause(request, matchid=None):
@@ -324,18 +323,15 @@ def fetch_match(request):
     else:
         match.black_elapsed_seconds += elapsed_time
 
+    currentsearch = ""
+
     job = get_active_job(modelmatch.id)
     if(job):
-        print("job found, id: " + str(modelmatch.id))
-        searchcomm = job.meta['searchcomm']
-        print("searchcomm: " + str(searchcomm))
-        print("len searchcomm: " + str(len(searchcomm.currentsearch)))
-        print("terminate: " + str(searchcomm.terminate))
-        currentsearch = ""
-        for gmove in searchcomm.currentsearch:
-            currentsearch += fmtmove(gmove)
-    else:
-        currentsearch = ""
+        if(job.meta['terminate'] == False):
+            currsearch = job.meta['currentsearch']
+            if(currsearch):
+                for gmove in currsearch:
+                    currentsearch += fmtmove(gmove)
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
 

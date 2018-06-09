@@ -1,4 +1,4 @@
-import django_rq
+import django_rq, gc
 from rq.registry import StartedJobRegistry # FinishedJobRegistry
 from rq.job import Job
 from rq.exceptions import NoSuchJobError
@@ -77,15 +77,22 @@ def get_active_job(matchid):
         try:
             job = Job.fetch(job_id, redis_conn)
         except NoSuchJobError:
-            return None
-        
-        try:
-            job_matchid = job.meta['matchid']
-        except KeyError:
-            return None
+            continue
 
-        if(job_matchid == matchid):
-            return job
+        try:
+            if(job.meta['matchid'] == matchid):
+                return job
+        except KeyError:
+            continue
 
     return None
 
+
+def get_object_by_id(objectid):
+    for obj in gc.get_objects():
+        if id(obj) == objectid:
+            return obj
+
+    return None
+    
+  
