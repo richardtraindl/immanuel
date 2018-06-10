@@ -281,6 +281,37 @@ def is_rook_locked(match, color):
 
     return score"""
 
+def piece_movecnt(match):
+    count = 0
+    last_srcx = None
+    last_srcy = None
+
+    for move in reversed(match.move_list):
+        if(last_srcx == move.dstx and last_srcy == move.dsty):
+            count += 1
+            last_srcx = move.srcx
+            last_srcy = move.srcy
+        elif(last_srcx is None):
+            count += 1
+            last_srcx = move.srcx
+            last_srcy = move.srcy
+
+    return count
+
+def pieces_movecnt(match, color):
+    count = 0
+
+    if(color == match.next_color()):
+        idx = 1
+    else:
+        idx = 0
+
+    for move in reversed(match.move_list):
+        if(idx % 2 == 0):
+            count += piece_movecnt(match)
+        idx += 1
+
+    return count
 
 def score_opening(match):
     value = 0
@@ -298,6 +329,12 @@ def score_opening(match):
             cnt += 1
     if(cnt > 1):
         value += cnt * blackrate
+    ###
+
+    # multiple moves 
+    cnt = pieces_movecnt(match, COLORS['white'])
+    value += cnt * blackrate
+    ###
 
     # white king
     if(is_king_guarded(match, COLORS['white'])):
@@ -307,10 +344,12 @@ def score_opening(match):
        match.white_movecnt_long_castling_lost > 0 and 
        is_king_exposed(match, COLORS['white'])):
         value += blackrate
+    ###
 
     # white rook
     if(is_rook_locked(match, COLORS['white'])):
         value += blackrate
+    ###
 
     # black position
     y = 7
@@ -321,6 +360,12 @@ def score_opening(match):
             cnt += 1
     if(cnt > 1):
         value += cnt * whiterate
+    ###
+
+    # multiple moves 
+    cnt = pieces_movecnt(match, COLORS['black'])
+    value += cnt * whiterate
+    ###
 
     # black king
     if(is_king_guarded(match, COLORS['black'])):
@@ -330,10 +375,12 @@ def score_opening(match):
        match.black_movecnt_long_castling_lost > 0 and 
        is_king_exposed(match, COLORS['black'])):
         value += whiterate
+    ###
 
     # black rook
     if(is_rook_locked(match, COLORS['black'])):
         value += whiterate
+    ###
 
     return value
 

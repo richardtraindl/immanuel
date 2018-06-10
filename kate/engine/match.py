@@ -297,24 +297,6 @@ class Match:
             return None
 
 
-    def piece_movecnt(self):
-        count = 0
-        last_srcx = None
-        last_srcy = None
-
-        for move in reversed(self.move_list):
-            if(last_srcx == move.dstx and last_srcy == move.dsty):
-                count += 1
-                last_srcx = move.srcx
-                last_srcy = move.srcy
-            elif(last_srcx is None):
-                count += 1
-                last_srcx = move.srcx
-                last_srcy = move.srcy
-
-        return count
-
-
     @staticmethod
     def color_of_piece(piece):
         return PIECES_COLOR[piece]

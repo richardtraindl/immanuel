@@ -333,8 +333,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
 
             score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, beta, not maximizing, priomove, msgs)
 
-            #score += score_mupltiple_piece_moves_in_opening(match, color)
-
             matchmove.undo_move(match)
 
         if(maximizing):
