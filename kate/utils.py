@@ -4,6 +4,7 @@ from rq.job import Job
 from rq.exceptions import NoSuchJobError
 from .engine.helper import index_to_coord, reverse_lookup
 from .engine.match import PIECES
+from kate.modules.interface import Msgs
 
 
 def preformat_board(board, switch):
@@ -80,7 +81,7 @@ def get_active_job(matchid):
             continue
 
         try:
-            if(job.meta['matchid'] == matchid):
+            if(job.meta[Msgs.META_MATCHID] == matchid):
                 return job
         except KeyError:
             continue

@@ -346,7 +346,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
                 currentsearch = []
                 for candidate in nodecandidates:
                     currentsearch.append(candidate)
-                    msgs.write_currentsearch(currentsearch)
+                    msgs.write_meta(msgs.META_CURRENTSEARCH, currentsearch)
 
                 prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
                 prnt_moves("", newcandidates)
@@ -365,7 +365,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
                 currentsearch = []
                 for candidate in nodecandidates:
                     currentsearch.append(candidate)
-                    msgs.write_currentsearch(currentsearch)
+                    msgs.write_meta(msgs.META_CURRENTSEARCH, currentsearch)
 
                 prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
                 prnt_moves("", newcandidates)
@@ -381,7 +381,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             #exceeded = True
         #else:
             #exceeded = False
-        if(count >= maxcnt or msgs.read_terminate()):
+        if(count >= maxcnt or msgs.read_meta(msgs.META_TERMINATE)):
             break
 
     return nodescore, nodecandidates

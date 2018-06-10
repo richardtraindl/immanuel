@@ -3,7 +3,6 @@ import django_rq
 from rq import Queue
 from tasks import job_calc_and_do_move
 from django.conf import settings
-from .. utils import fmtmove, get_active_job
 from .. models import Match as ModelMatch, Move as ModelMove
 from .. engine.match import *
 from .. engine.move import *
@@ -97,10 +96,7 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
         else:
             match.black_elapsed_seconds += elapsed_time
 
-    #if(match.is_next_color_human()):
     match.time_start = time.time()
-    #else:
-        #match.time_start = 0
     ###
 
     move = matchmove.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
@@ -112,11 +108,6 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     map_moves(move, modelmove, MAP_DIR['engine-to-model'])
     modelmove.match = modelmatch
     modelmove.save()
-
-    #job = get_active_job(modelmatch.id)
-    #if(job):
-        #print("meta: " + str(job.meta))
-        #job.delete()
 
 
 def undo_move(modelmatch):
@@ -133,23 +124,28 @@ def undo_move(modelmatch):
 
 
 class Msgs:
+    META_MATCHID = 'matchid'
+    META_ISALIVE = 'isalive'
+    META_TERMINATE = 'terminate'
+    META_CURRENTSEARCH = 'currentsearch'
+
     def __init__(self, job):
         self.job = job
 
-    def read_terminate(self):
+    def read_meta(self, key):
         try:
-            meta = self.job.meta['terminate']
+            return self.job.meta[key]
         except KeyError:
-            meta = False
-        return meta
+            return None
 
-    def write_currentsearch(self, currentsearch):
+    def write_meta(self, key, value):
         try:
-            self.job.meta['currentsearch'] = currentsearch
+            self.job.meta[key] = value
             self.job.save_meta()
             return True
         except KeyError:
             return False
+
 
 def calc_move_for_immanuel(modelmatch):
     match = Match()
