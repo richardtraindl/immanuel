@@ -298,7 +298,7 @@ def piece_movecnt(match):
 
     return count
 
-def pieces_movecnt(match, color):
+def multiple_pieces_movecnt(match, color):
     count = 0
 
     if(color == match.next_color()):
@@ -308,7 +308,8 @@ def pieces_movecnt(match, color):
 
     for move in reversed(match.move_list):
         if(idx % 2 == 0):
-            count += piece_movecnt(match)
+            if(piece_movecnt(match) > 2):
+                count += 1
         idx += 1
 
     return count
@@ -332,8 +333,8 @@ def score_opening(match):
     ###
 
     # multiple moves 
-    cnt = pieces_movecnt(match, COLORS['white'])
-    value += cnt * blackrate
+    cnt = multiple_pieces_movecnt(match, COLORS['white'])
+    value += cnt * blackrate * 4
     ###
 
     # white king
@@ -363,8 +364,8 @@ def score_opening(match):
     ###
 
     # multiple moves 
-    cnt = pieces_movecnt(match, COLORS['black'])
-    value += cnt * whiterate
+    cnt = multiple_pieces_movecnt(match, COLORS['black'])
+    value += cnt * whiterate * 4
     ###
 
     # black king
