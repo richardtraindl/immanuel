@@ -285,7 +285,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     nodecandidates = []
     newcandidates = []
     count = 0
-    score_before_move = 
 
     if(maximizing):
         nodescore = SCORES[PIECES['wKg']] * 2
