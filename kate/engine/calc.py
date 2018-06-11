@@ -285,6 +285,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     nodecandidates = []
     newcandidates = []
     count = 0
+    score_before_move = 
 
     if(maximizing):
         nodescore = SCORES[PIECES['wKg']] * 2
@@ -379,7 +380,11 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             #exceeded = True
         #else:
             #exceeded = False
-        if(count >= maxcnt or msgs.read_meta(msgs.META_TERMINATE)):
+        if(msgs.read_meta(msgs.META_TERMINATE)):
+            break
+        elif(depth == 1 and abs(match.score) - abs(nodescore) > abs(SCORES[PIECES['wPw']]) * 2):
+            continue
+        elif(count >= maxcnt):
             break
 
     return nodescore, nodecandidates
