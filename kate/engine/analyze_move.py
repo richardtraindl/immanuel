@@ -1,11 +1,11 @@
 from operator import attrgetter
+import copy
 from .match import *
 from .cvalues import *
 from .matchmove import do_move, undo_move
-#from .move import *
-#from .calc import *
 from . import rules
 from .analyze_position import score_supports, score_attacks, score_opening, score_endgame, is_endgame, is_stormy
+from .helper import reverse_lookup
 from .analyze_helper import *
 from .pieces import pawn, knight, bishop, rook, king, queen
 
@@ -295,43 +295,37 @@ def controles_file(match, gmove):
     return False
 
 
-def is_repetition(match, gmove):
+def is_tactical_draw(match, gmove):
+    newmatch = copy.deepcopy(match)
+    do_move(newmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+
+    #if(newmatch.fifty_moves_count >= 49):
+        #return True
+
+    if(len(newmatch.move_list) < 5):
+        return False
+
+    boards = []
+    for idx in range(min(len(newmatch.move_list), 10)):
+        board = ""
+        for y in range(8):
+            for x in range(8):
+                piece = newmatch.readfield(x, y)
+                board += reverse_lookup(PIECES, piece)
+        boards.append(board)
+
+        undo_move(newmatch)
+
+    idx = 0
     count = 0
-    
-    if(match.next_color() == COLORS['white']):
-        last_even_srcx = gmove.srcx
-        last_even_srcy = gmove.srcy
-        last_odd_srcx = None
-        last_odd_srcy = None
-    else:
-        last_even_srcx = None
-        last_even_srcy = None
-        last_odd_srcx = gmove.srcx
-        last_odd_srcy = gmove.srcy
-
-    for move in reversed(match.move_list):
-        if(move.count % 2 == 1):
-            if(last_even_srcx is None):
-                last_even_srcx = move.srcx
-                last_even_srcy = move.srcy
-            elif(last_even_srcx == move.dstx and last_even_srcy == move.dsty):
+    lastboard = boards[-1]
+    for board in boards:
+        idx += 1
+        if(idx > 1 and idx % 2 == 1):
+            if(board == lastboard):
                 count += 1
-                last_even_srcx = move.srcx
-                last_even_srcy = move.srcy
-            else:
-                break
-        else:
-            if(last_odd_srcx is None):
-                last_odd_srcx = move.srcx
-                last_odd_srcy = move.srcy
-            elif(last_odd_srcx == move.dstx and last_odd_srcy == move.dsty):
-                count += 1
-                last_odd_srcx = move.srcx
-                last_odd_srcy = move.srcy
-            else:
-                break
 
-    if(count > 7):
+    if(count >= 3):
         return True
     else:
         return False
@@ -363,8 +357,8 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
         if(castles(match, priomove.gmove)):
             priomove.tactics.append(TACTICS['castling'])
 
-        if(is_repetition(match, priomove.gmove)):
-            priomove.tactics.append(TACTICS['position-repeat'])
+        if(is_tactical_draw(match, priomove.gmove)):
+            priomove.tactics.append(TACTICS['tactical-draw'])
 
         if(promotes(match, priomove.gmove)):
             priomove.tactics.append(TACTICS['promotion'])

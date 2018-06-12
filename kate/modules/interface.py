@@ -32,8 +32,8 @@ def map_matches(src, dst, map_dir):
     dst.black_player_is_human = src.black_player_is_human
     dst.black_elapsed_seconds = src.black_elapsed_seconds
 
-    for y in range(0, 8, 1):
-        for x in range(0, 8, 1):
+    for y in range(8):
+        for x in range(8):
             piece = src.readfield(x, y)
             dst.writefield(x, y, piece)
 

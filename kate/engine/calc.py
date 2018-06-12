@@ -304,7 +304,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             pmove = priomoves[0]
             nodecandidates.append(pmove.gmove)
             nodecandidates.append(None)
-            if(pmove.find_tactic(TACTICS['position-repeat'])):
+            if(pmove.find_tactic(TACTICS['tactical-draw'])):
                 return 0, nodecandidates
             else:
                 return score_position(match, len(priomoves)), nodecandidates
@@ -324,7 +324,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             prnt_tactics(priomove.tactics)
             print(" | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
 
-        if(priomove.find_tactic(TACTICS['position-repeat'])):
+        if(priomove.find_tactic(TACTICS['tactical-draw'])):
             newcandidates.clear()
             newcandidates.append(None)
             score = 0
