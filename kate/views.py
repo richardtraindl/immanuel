@@ -15,6 +15,7 @@ from .engine.calc import SearchMsgs
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
 from .engine.analyze_position import score_position, is_stormy
+from .engine.debug import list_attributes
 
 
 def index(request):
@@ -160,6 +161,21 @@ def delete(request, matchid=None):
     ModelMatch.objects.filter(id=modelmatch.id).delete()
 
     return HttpResponseRedirect('/kate/')
+
+
+def dbginfo(request, matchid=None):
+    context = RequestContext(request)
+
+    switch = int(request.GET.get('switch', '0'))
+
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+
+    match = Match()
+    interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
+
+    attributes = list_attributes(match)
+
+    return render(request, 'kate/dbginfo.html', { 'match': match, 'attributes': attributes, 'switch': switch } )
 
 
 def do_move(request, matchid=None):

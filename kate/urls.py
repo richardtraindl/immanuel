@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^settings/$', views.settings, name='settings'),
     url(r'^settings/(?P<matchid>[0-9]+)/$', views.settings, name='settings'),
     url(r'^delete/(?P<matchid>[0-9]+)/$', views.delete, name='delete'),
+    url(r'^dbginfo/(?P<matchid>[0-9]+)/$', views.dbginfo, name='dbginfo'),
     url(r'^addcomment/(?P<matchid>[0-9]+)/$', views.add_comment, name='addcomment'),
     url(r'^fetchcomments/$', views.fetch_comments, name='fetchcomments'),
     url(r'^fetchmatch/$', views.fetch_match, name='fetchmatch'),

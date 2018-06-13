@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load kate_extras %}
+
+
+{% block header %}
+    <h1 class="tiny-gap"><a href="{% url 'kate:match' match.id %}?switch={{ switch }}">Game</a></h1>
+
+    <div style="display: table; width: 100%">
+        <div style="display: table-row;">
+            <div style="display: table-cell; width: 60%">
+                <h2>{{ match.white_player_name }} : {{ match.black_player_name }}</h2>
+            </div>
+            <div style="display: table-cell">
+                <p style="font-size: 12px; text-align: right;">Created on: {{ match.begin|fmtdate }}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block nav %}
+    <ul>
+        <li><a href="{% url 'kate:match' match.id %}?switch={{ switch|invert }}">Switch Board</a></li>
+
+        <li><a href="{% url 'kate:undomove' match.id %}?switch={{ switch }}" onclick="return confirm('Withdraw last move?')">Withdraw Move</a></li>
+
+        <li><a href="{% url 'kate:pause' match.id %}?switch={{ switch }}">Pause</a></li>
+        
+        <li><a href="{% url 'kate:resume' match.id %}?switch={{ switch }}">Resume</a></li>
+
+        <li><a href="{% url 'kate:forcemove' match.id %}?switch={{ switch }}">Force Move</a></li>
+
+        <li><a href="{% url 'kate:settings' match.id %}?switch={{ switch }}">Change Settings</a></li>
+
+        <li><a href="{% url 'kate:index' %}">Overview</a></li>
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+    <div id="debug">
+      {% for attribute in attributes %}
+        <p>{{ attribute }}</p>
+      {% endfor %}
+    </div>
+{% endblock %}

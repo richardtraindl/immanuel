@@ -18,49 +18,47 @@ def prnt_minutes(match):
 
 
 def prnt_attributes(match, delimiter):
-    print("------------------------------------------------------")
-    
-    print(str_attributes(match, delimiter))
+    attribute_list = list_attributes(match)
 
     print("------------------------------------------------------")
 
+    for attribute in attribute_list:
+        print(attribute + delimiter, end="\n")
 
-def str_attributes(match, delimiter):
-    attr = "status: " + str(match.status) + delimiter + \
-           "movecnt: " + str(match.movecnt) + delimiter + \
-           "score: " + str(match.score) + delimiter + \
-           "level: " + str(match.level) + delimiter + \
-           "seconds_per_move " + str(match.seconds_per_move) + delimiter + \
-           "begin: " + match.begin.strftime("%Y-%m-%d-%H:%M:%S") + delimiter + \
-           "time_start: " + str(match.time_start) + delimiter + \
-           "white_player_name: " + match.white_player_name + delimiter + \
-           "white_player_is_human: " + str(match.white_player_is_human) + delimiter + \
-           "white_elapsed_seconds: " + str(match.white_elapsed_seconds) + delimiter + \
-           "black_player_name: " + match.black_player_name + delimiter + \
-           "black_player_is_human: " + str(match.black_player_is_human) + delimiter + \
-           "black_elapsed_seconds: " + str(match.black_elapsed_seconds) + delimiter + \
-           "fifty_moves_count: " + str(match.fifty_moves_count) + delimiter + \
-           "white_movecnt_short_castling_lost: " + str(match.white_movecnt_short_castling_lost) + delimiter + \
-           "white_movecnt_long_castling_lost: " + str(match.white_movecnt_long_castling_lost) + delimiter + \
-           "black_movecnt_short_castling_lost: " + str(match.black_movecnt_short_castling_lost) + delimiter + \
-           "black_movecnt_long_castling_lost: " + str(match.black_movecnt_long_castling_lost) + delimiter + \
-           "wKg_x: " + str(match.wKg_x) + delimiter + \
-           "wKg_y: " + str(match.wKg_y) + delimiter + \
-           "bKg_x: " + str(match.bKg_x) + delimiter + \
-           "bKg_y: " + str(match.bKg_y) + delimiter + \
-           "wQu_cnt: " + str(match.wQu_cnt) + delimiter + \
-           "bQu_cnt: " + str(match.bQu_cnt) + delimiter + \
-           "wOfficer_cnt: " + str(match.wOfficer_cnt) + delimiter + \
-           "bOfficer_cnt: " + str(match.bOfficer_cnt) + delimiter
+    print("------------------------------------------------------")
 
-    for i in range(7, -1, -1):
-        for j in range(8):
-            piece = match.readfield(j, i)
-            attr += reverse_lookup(PIECES, piece)
 
-        attr += delimiter
-        
-    return attr
+def list_attributes(match):
+    attributes = []
+
+    attributes.append("status: " + str(match.status))
+    attributes.append("movecnt: " + str(match.movecnt))
+    attributes.append("score: " + str(match.score))
+    attributes.append("level: " + str(match.level))
+    attributes.append("seconds_per_move " + str(match.seconds_per_move))
+    attributes.append("begin: " + match.begin.strftime("%Y-%m-%d-%H:%M:%S"))
+    attributes.append("time_start: " + str(match.time_start))
+    attributes.append("white_player_name: " + match.white_player_name)
+    attributes.append("white_player_is_human: " + str(match.white_player_is_human))
+    attributes.append("white_elapsed_seconds: " + str(match.white_elapsed_seconds))
+    attributes.append("black_player_name: " + match.black_player_name)
+    attributes.append("black_player_is_human: " + str(match.black_player_is_human))
+    attributes.append("black_elapsed_seconds: " + str(match.black_elapsed_seconds))
+    attributes.append("fifty_moves_count: " + str(match.fifty_moves_count))
+    attributes.append("white_movecnt_short_castling_lost: " + str(match.white_movecnt_short_castling_lost))
+    attributes.append("white_movecnt_long_castling_lost: " + str(match.white_movecnt_long_castling_lost))
+    attributes.append("black_movecnt_short_castling_lost: " + str(match.black_movecnt_short_castling_lost))
+    attributes.append("black_movecnt_long_castling_lost: " + str(match.black_movecnt_long_castling_lost))
+    attributes.append("wKg_x: " + str(match.wKg_x))
+    attributes.append("wKg_y: " + str(match.wKg_y))
+    attributes.append("bKg_x: " + str(match.bKg_x))
+    attributes.append("bKg_y: " + str(match.bKg_y))
+    attributes.append("wQu_cnt: " + str(match.wQu_cnt))
+    attributes.append("bQu_cnt: " + str(match.bQu_cnt))
+    attributes.append("wOfficer_cnt: " + str(match.wOfficer_cnt))
+    attributes.append("bOfficer_cnt: " + str(match.bOfficer_cnt))
+
+    return attributes
 
 
 def prnt_generator(generator):
