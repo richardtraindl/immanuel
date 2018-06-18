@@ -100,7 +100,7 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     ###
 
     move = matchmove.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
-    match.status = STATUS['open']
+    match.status = rules.status(match) #STATUS['open']
     map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
     modelmatch.save()
 

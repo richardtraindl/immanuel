@@ -27,12 +27,14 @@
         <li><a href="{% url 'kate:undomove' match.id %}?switch={{ switch }}" onclick="return confirm('Withdraw last move?')">Withdraw Move</a></li>
 
         <li><a href="{% url 'kate:pause' match.id %}?switch={{ switch }}">Pause</a></li>
-        
+
         <li><a href="{% url 'kate:resume' match.id %}?switch={{ switch }}">Resume</a></li>
 
         <li><a href="{% url 'kate:forcemove' match.id %}?switch={{ switch }}">Force Move</a></li>
 
         <li><a href="{% url 'kate:settings' match.id %}?switch={{ switch }}">Change Settings</a></li>
+
+        <li><a href="{% url 'kate:dbginfo' match.id %}">Debug Info</a></li>
 
         <li><a href="{% url 'kate:index' %}">Overview</a></li>
     </ul>
@@ -72,12 +74,16 @@
                 var movecnt;
                 var newcomment;
                 var result;
+                var url;
                 matchid = $('#board').attr("matchid");
                 movecnt = $('#board').attr("movecnt");
+                url = $('h1 > a').first().attr("href");
+
                 $.get('/kate/fetchmatch/', { matchid: matchid, movecnt: movecnt }, function(data){
                     result = data.split("|");
                     if(result[0] == 1){
-                        location.reload();
+                        location.href = url;
+                        /* location.reload(); */
                     }
                     else{
                         $('#white-time').text(result[1]);

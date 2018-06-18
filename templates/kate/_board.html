@@ -20,8 +20,13 @@
         <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-gap: 4px;">
             <p>Level:</p>
             <p>{{ match.level|matchlevel }}</p>
+            
             <p>Status:</p>
-            <p>{{ match.status|matchstatus }}</p>
+            {% if urgent %}
+              <p class="error">{{ match.status|matchstatus }}</p>
+            {% else %}
+              <p>{{ match.status|matchstatus }}</p>
+            {% endif %}
         </div>
 
         <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-gap: 4px;">

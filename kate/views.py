@@ -13,7 +13,7 @@ from .engine.match import *
 from .engine.move import *
 from .engine.calc import SearchMsgs
 from .engine.helper import index_to_coord, coord_to_index
-from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS
+from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS, status
 from .engine.analyze_position import score_position, is_stormy
 from .engine.debug import list_attributes
 
@@ -54,6 +54,7 @@ def match(request, matchid=None):
 
     match = Match()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
+    match.status = status(match)
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(lastmove):
@@ -78,8 +79,11 @@ def match(request, matchid=None):
 
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:5]
 
+    urgent = False
+
     if(msgcode is None):
-        if(match.status == STATUS['winner_white']):
+        msg = ""
+        """if(match.status == STATUS['winner_white']):
             urgent = True
             msg = RETURN_MSGS[RETURN_CODES['winner_white']]
         elif(match.status == STATUS['winner_black']):
@@ -90,13 +94,16 @@ def match(request, matchid=None):
             msg = RETURN_MSGS[RETURN_CODES['draw']]
         else:
             urgent = False
-            msg = ""
+            msg = "" """
     elif(msgcode == RETURN_CODES['ok']):
-        urgent = False
+        #urgent = False
         msg = RETURN_MSGS[msgcode]
     else:
         urgent = True
         msg = RETURN_MSGS[msgcode]
+
+    if(match.status == STATUS['winner_white'] or match.status == STATUS['winner_black'] or match.status == STATUS['draw']):
+        urgent = True
 
     domoveform = DoMoveForm()
 
@@ -185,21 +192,18 @@ def do_move(request, matchid=None):
 
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-        if(interface.is_next_color_human(modelmatch) == False):
-            msgcode = RETURN_CODES['wrong-color']
-        else:
-            form = DoMoveForm(request.POST)
-            if(form.is_valid()):
-                srcx,srcy = coord_to_index(form.move_src)
-                dstx,dsty = coord_to_index(form.move_dst)
-                prom_piece = PIECES[form.prom_piece]
-                valid, msgcode = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-                if(valid):
-                    interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+        form = DoMoveForm(request.POST)
+        if(form.is_valid()):
+            srcx,srcy = coord_to_index(form.move_src)
+            dstx,dsty = coord_to_index(form.move_dst)
+            prom_piece = PIECES[form.prom_piece]
+            valid, msgcode = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+            if(valid):
+                interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
 
-                    interface.calc_move_for_immanuel(modelmatch)
-            else:
-                msgcode= RETURN_CODES['format-error']
+                interface.calc_move_for_immanuel(modelmatch)
+        else:
+            msgcode= RETURN_CODES['format-error']
 
         return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
     else:
