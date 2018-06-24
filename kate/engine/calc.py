@@ -381,7 +381,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             #exceeded = False
         if(msgs.read_meta(msgs.META_TERMINATE)):
             break
-        elif(depth == 1 and count < 30 and abs(match.score) - abs(nodescore) > abs(SCORES[PIECES['wPw']]) * 2):
+        elif(depth == 1 and count <= 24 and abs(match.score) - abs(nodescore) > abs(SCORES[PIECES['wPw']]) * 2):
             continue
         elif(count >= maxcnt):
             break
