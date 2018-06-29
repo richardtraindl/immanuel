@@ -1,4 +1,4 @@
-import time
+import time, re
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
@@ -112,79 +112,6 @@ def match(request, matchid=None):
     return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'domoveform': domoveform, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'urgent': urgent, 'msg': msg, "currentsearch": currentsearch } )
 
 
-def settings(request, matchid=None):
-    context = RequestContext(request)
-
-    switch = int(request.GET.get('switch', '0'))
-
-    if(matchid is None):
-        modelmatch = ModelMatch()
-        create = True
-    else:
-        modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-        create = False
-
-    if(request.method == 'POST'):
-        form = MatchForm(request.POST)
-        if(form.is_valid()):
-            modelmatch.white_player_name = form.white_player_name
-            modelmatch.white_player_is_human = form.white_player_is_human
-            modelmatch.black_player_name = form.black_player_name
-            modelmatch.black_player_is_human = form.black_player_is_human
-            modelmatch.level = form.level
-            modelmatch.save()
-            
-            if(create):
-                interface.calc_move_for_immanuel(modelmatch)
-
-            return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
-        else:
-            return render(request, 'kate/settings.html', { 'form': form, 'matchid': modelmatch.id, 'switch': switch } )
-    else:
-        if(matchid is None):
-            form = MatchForm()
-            return render(request, 'kate/settings.html', { 'form': form } )
-        else:
-            form = MatchForm(initial={
-                'level': modelmatch.level,
-                'white_player_name': modelmatch.white_player_name, 
-                'white_player_is_human': modelmatch.white_player_is_human, 
-                'black_player_name': modelmatch.black_player_name, 
-                'black_player_is_human': modelmatch.black_player_is_human })
-
-            return render(request, 'kate/settings.html', { 'form': form, 'matchid': modelmatch.id, 'switch': switch } )
-
-
-def delete(request, matchid=None):
-    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-    
-    job = get_active_job(modelmatch.id)
-    if(job):
-        job.meta['isalive'] = False
-        job.meta['terminate'] = True
-        job.save_meta()
-        time.sleep(1)
-
-    ModelMatch.objects.filter(id=modelmatch.id).delete()
-
-    return HttpResponseRedirect('/kate/')
-
-
-def dbginfo(request, matchid=None):
-    context = RequestContext(request)
-
-    switch = int(request.GET.get('switch', '0'))
-
-    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-
-    match = Match()
-    interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
-
-    attributes = list_attributes(match)
-
-    return render(request, 'kate/dbginfo.html', { 'match': match, 'attributes': attributes, 'switch': switch } )
-
-
 def do_move(request, matchid=None):
     context = RequestContext(request)
 
@@ -290,36 +217,62 @@ def resume(request, matchid=None):
     return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
 
-def add_comment(request, matchid):
+def settings(request, matchid=None):
     context = RequestContext(request)
 
     switch = int(request.GET.get('switch', '0'))
 
-    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+    if(matchid is None):
+        modelmatch = ModelMatch()
+        create = True
+    else:
+        modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+        create = False
+
     if(request.method == 'POST'):
-        newcomment = request.POST['newcomment']
-        if(len(newcomment) > 0):
-            comment = ModelComment()
-            comment.match_id = modelmatch.id
-            comment.text = newcomment
-            comment.save()
+        form = MatchForm(request.POST)
+        if(form.is_valid()):
+            modelmatch.white_player_name = form.white_player_name
+            modelmatch.white_player_is_human = form.white_player_is_human
+            modelmatch.black_player_name = form.black_player_name
+            modelmatch.black_player_is_human = form.black_player_is_human
+            modelmatch.level = form.level
+            modelmatch.save()
+            
+            if(create):
+                interface.calc_move_for_immanuel(modelmatch)
 
-        return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
+            return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
+        else:
+            return render(request, 'kate/settings.html', { 'form': form, 'matchid': modelmatch.id, 'switch': switch } )
+    else:
+        if(matchid is None):
+            form = MatchForm()
+            return render(request, 'kate/settings.html', { 'form': form } )
+        else:
+            form = MatchForm(initial={
+                'level': modelmatch.level,
+                'white_player_name': modelmatch.white_player_name, 
+                'white_player_is_human': modelmatch.white_player_is_human, 
+                'black_player_name': modelmatch.black_player_name, 
+                'black_player_is_human': modelmatch.black_player_is_human })
+
+            return render(request, 'kate/settings.html', { 'form': form, 'matchid': modelmatch.id, 'switch': switch } )
 
 
-def fetch_comments(request):
-    context = RequestContext(request)
+def delete(request, matchid=None):
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+    
+    job = get_active_job(modelmatch.id)
+    if(job):
+        job.meta['isalive'] = False
+        job.meta['terminate'] = True
+        job.save_meta()
+        time.sleep(1)
 
-    if(request.method == 'GET'):
-        matchid = request.GET.get('matchid', None)
-        if(matchid):
-            matchid = int(matchid)
-            comments = ModelComment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:3]
-            data = ""
-            for comment in reversed(comments):
-                data += "<p>" + comment.text + "</p>"
+    ModelMatch.objects.filter(id=modelmatch.id).delete()
 
-            return HttpResponse(data)
+    return HttpResponseRedirect('/kate/')
 
 
 def fetch_match(request):
@@ -368,4 +321,147 @@ def fetch_match(request):
         data = "0" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds) + "|" + currentsearch
 
     return HttpResponse(data)
+
+
+def add_comment(request, matchid):
+    context = RequestContext(request)
+
+    switch = int(request.GET.get('switch', '0'))
+
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+    if(request.method == 'POST'):
+        newcomment = request.POST['newcomment']
+        if(len(newcomment) > 0):
+            comment = ModelComment()
+            comment.match_id = modelmatch.id
+            comment.text = newcomment
+            comment.save()
+
+        return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
+
+
+def fetch_comments(request):
+    context = RequestContext(request)
+
+    if(request.method == 'GET'):
+        matchid = request.GET.get('matchid', None)
+        if(matchid):
+            matchid = int(matchid)
+            comments = ModelComment.objects.filter(match_id=matchid).order_by("created_at").reverse()[:3]
+            data = ""
+            for comment in reversed(comments):
+                data += "<p>" + comment.text + "</p>"
+
+            return HttpResponse(data)
+
+
+def dbginfo(request, matchid=None):
+    context = RequestContext(request)
+
+    switch = int(request.GET.get('switch', '0'))
+
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+
+    match = Match()
+    interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
+    
+    moves = "moves: "
+    modelmoves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")
+    idx = 0
+    for modelmove in reversed(modelmoves):
+        idx += 1
+        move = Move()
+        interface.map_moves(modelmove, move, interface.MAP_DIR['model-to-engine'])
+        if(idx == 1):
+            moves += move.format_move()
+        else:
+            moves += "|" + move.format_move()
+
+    attributes = list_attributes(match)
+
+    return render(request, 'kate/dbginfo.html', { 'match': match, 'moves': moves, 'attributes': attributes, 'switch': switch } )
+
+
+def import_match(request):
+    context = RequestContext(request)
+
+    if(request.method == 'POST'):
+        form = ImportMatchForm(request.POST)
+        if(form.is_valid()):
+            modelmatch = ModelMatch()
+
+            result = re.search(r"level:\s*(?P<level>\w+)", form.match_data)
+            modelmatch.level = int(result.group("level"))
+
+            result = re.search(r"begin:\s*(?P<begin>\w+-\w+-\w+\-\w+:\w+:\w+)", form.match_data)
+            strdatetime = result.group("begin")
+            modelmatch.begin = datetime.strptime(strdatetime, '%Y-%m-%d-%H:%M:%S') # timezone.now
+
+            result = re.search(r"white_player_name:\s*(?P<white_player_name>\w+)", form.match_data)
+            modelmatch.white_player_name = result.group("white_player_name")
+            
+            result = re.search(r"white_player_is_human:\s*(?P<white_player_is_human>\w+)", form.match_data)
+            if(result.group("white_player_is_human") == "True"):
+                modelmatch.white_player_is_human = True
+            else:
+                modelmatch.white_player_is_human = False
+
+            result = re.search(r"white_elapsed_seconds:\s*(?P<white_elapsed_seconds>\w+)", form.match_data)
+            modelmatch.white_elapsed_seconds = int(result.group("white_elapsed_seconds"))
+
+            result = re.search(r"black_player_name:\s*(?P<black_player_name>\w+)", form.match_data)
+            modelmatch.black_player_name = result.group("black_player_name")
+            
+            result = re.search(r"black_player_is_human:\s*(?P<black_player_is_human>\w+)", form.match_data)
+            if(result.group("black_player_is_human") == "True"):
+                modelmatch.black_player_is_human = True
+            else:
+                modelmatch.black_player_is_human = False
+
+            result = re.search(r"black_elapsed_seconds:\s*(?P<black_elapsed_seconds>\w+)", form.match_data)
+            modelmatch.black_elapsed_seconds = int(result.group("black_elapsed_seconds"))
+
+            modelmatch.save()
+
+            result = re.search(r"moves:\s*(?P<moves>[\w+\W\w+|]+)", form.match_data)
+            strmoves = result.group("moves")
+            print(strmoves)
+
+            moves = strmoves.split("|")
+            idx = 0
+            for move in moves:
+                idx += 1
+                print("move: " + move)
+                if(move == "0-0"):
+                    if(idx % 2 == 1):
+                        y = 0
+                    else:
+                        y = 7
+                    srcx = 4
+                    srcy = y
+                    dstx = 6
+                    dsty = y
+                elif(move == "0-0-0"):
+                    if(idx % 2 == 1):
+                        y = 0
+                    else:
+                        y = 7
+                    srcx = 4
+                    srcy = y
+                    dstx = 2
+                    dsty = y
+                else:
+                    srcx, srcy = coord_to_index(move[0:2])
+                    dstx, dsty = coord_to_index(move[3:5])
+
+                if(len(move) == 9):
+                    prom_piece = PIECES[move[6:9]]
+                else:
+                    prom_piece = PIECES['blk']
+                interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+
+            return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id,)))
+    else:
+        form = ImportMatchForm()
+        return render(request, 'kate/import.html', { 'form': form } )
 
