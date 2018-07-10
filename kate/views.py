@@ -1,4 +1,4 @@
-import time, re
+import datetime, time, re
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
@@ -395,7 +395,7 @@ def import_match(request):
 
             result = re.search(r"begin:\s*(?P<begin>\w+-\w+-\w+\-\w+:\w+:\w+)", form.match_data)
             strdatetime = result.group("begin")
-            modelmatch.begin = datetime.strptime(strdatetime, '%Y-%m-%d-%H:%M:%S') # timezone.now
+            modelmatch.begin = datetime.strptime(strdatetime, '%Y-%m-%d-%H:%M:%S')
 
             result = re.search(r"white_player_name:\s*(?P<white_player_name>\w+)", form.match_data)
             modelmatch.white_player_name = result.group("white_player_name")

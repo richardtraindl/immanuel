@@ -106,7 +106,7 @@ def is_piece_stuck(match, srcx, srcy):
 def is_move_stuck(match, piece, srcx, srcy, dstx, dsty):
     move_dir = pw_dir(srcx, srcy, dstx, dsty, piece)
     pin_dir = rules.pin_dir(match, None, srcx, srcy)
-    if(pin_dir == rules.DIRS['undefined'] or move_dir == pin_dir):
+    if(pin_dir == rules.DIRS['undefined'] or move_dir == pin_dir or move_dir == rules.REVERSE_DIRS[pin_dir]):
         return False
     else:
         return True

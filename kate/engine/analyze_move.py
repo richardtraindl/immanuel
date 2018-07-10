@@ -258,7 +258,17 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
 
 def blocks(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
-    return False
+    color = Match.color_of_piece(piece)
+
+    oppenents = search_opposed_pieces(match, color, gmove.dstx, gmove.dsty, gmove.srcx, gmove.srcy)
+
+    count = 0
+    for oppenent in oppenents:
+        if(PIECES_RANK[oppenent[0].piece] > PIECES_RANK[oppenent[1].piece] or
+           PIECES_RANK[oppenent[0].piece] >= PIECES_RANK[piece]):
+            count += 1
+
+    return count > 0
 
 
 def running_pawn_in_endgame(match, gmove):
@@ -342,16 +352,22 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
     all_discl_supporting = []
     all_fleeing = []
     excludes = []
-
+    
     for priomove in priomoves:
         if(defends_check(match)):
             priomove.tactics.append(TACTICS['defend-check'])
+
+        attacked, supported = attacks_and_supports(match, priomove.gmove)
+
+        dstflield_cnt_of_supporter_is_equal_or_higher_than_cnt_of_attacker = dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove)
+        dstflield_is_attacked = dstfield_is_attacked(match, priomove.gmove)
+        piece_is_lower_fequal_than_enmy_on_dstflield = piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, priomove.gmove)
 
         defends_king, urgent = defends_king_attack(match, priomove.gmove)
         if(urgent):
             priomove.tactics.append(TACTICS['defend-king-attack-urgent'])
         elif(defends_king and 
-             dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove)):
+             dstflield_cnt_of_supporter_is_equal_or_higher_than_cnt_of_attacker):
             priomove.tactics.append(TACTICS['defend-king-attack'])
 
         if(castles(match, priomove.gmove)):
@@ -365,9 +381,9 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
 
         if(captures(match, priomove.gmove)):
             if(piece_is_lower_equal_than_captured(match, priomove.gmove) or
-               dstfield_is_attacked(match, priomove.gmove) == False or
-               (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) and 
-                piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, priomove.gmove))):
+               dstflield_is_attacked == False or
+               (dstflield_cnt_of_supporter_is_equal_or_higher_than_cnt_of_attacker and 
+                piece_is_lower_fequal_than_enmy_on_dstflield)):
                 priomove.tactics.append(TACTICS['capture-good-deal'])
             else:
                 priomove.tactics.append(TACTICS['capture-bad-deal'])
@@ -376,18 +392,18 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
             priomove.tactics.append(TACTICS['does-unpin'])
 
         if(defends_fork(match, priomove.gmove)):
-            if(dstfield_is_attacked(match, priomove.gmove) == False or 
-               (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) and 
-                piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, priomove.gmove))):
+            if(dstflield_is_attacked == False or 
+               (dstflield_cnt_of_supporter_is_equal_or_higher_than_cnt_of_attacker and 
+                piece_is_lower_fequal_than_enmy_on_dstflield)):
                 priomove.tactics.append(TACTICS['defend-fork'])
                 all_fork_defending.append(priomove)
             else:
                 priomove.tactics.append(TACTICS['support-bad-deal'])
 
         if(flees(match, priomove.gmove)):
-            if(dstfield_is_attacked(match, priomove.gmove) == False or
-                (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) and 
-                 piece_is_lower_equal_than_enemy_on_dstfield(match, priomove.gmove))):
+            if(dstflield_is_attacked == False or
+                (dstflield_cnt_of_supporter_is_equal_or_higher_than_cnt_of_attacker 
+                 and piece_is_lower_equal_than_enemy_on_dstfield(match, priomove.gmove))):
                 if(srcfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) == False or
                    piece_is_lower_equal_than_enemy_on_srcfield(match, priomove.gmove) == False):
                     priomove.tactics.append(TACTICS['flee-urgent'])
@@ -395,26 +411,24 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
                 elif(srcfield_is_supported(match, priomove.gmove) == False):
                     priomove.tactics.append(TACTICS['flee'])
 
-        attacked, supported = attacks_and_supports(match, priomove.gmove)
-
         if(len(attacked) > 0):
             if(is_piece_attacked(attacked, PIECES['wKg'], PIECES['bKg'])):
-                if(dstfield_is_attacked(match, priomove.gmove) == False or 
-                   (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) and 
-                    piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, priomove.gmove))):
+                if(dstflield_is_attacked == False or 
+                   (dstflield_cnt_of_supporter_is_equal_or_higher_than_cnt_of_attacker and 
+                    piece_is_lower_fequal_than_enmy_on_dstflield)):
                     priomove.tactics.append(TACTICS['attack-king-good-deal'])
                 else:
                     priomove.tactics.append(TACTICS['attack-king-bad-deal'])
             else:
-                if(dstfield_is_attacked(match, priomove.gmove) == False or 
-                   (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) and 
-                    piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, priomove.gmove))):
+                if(dstflield_is_attacked == False or 
+                   (dstflield_cnt_of_supporter_is_equal_or_higher_than_cnt_of_attacker and 
+                    piece_is_lower_fequal_than_enmy_on_dstflield)):
                     if(is_attacked_pinned(match, attacked) or 
                        is_attacked_soft_pinned(match, attacked)):
                         priomove.tactics.append(TACTICS['attack-stormy'])
                         all_attacking.append(priomove)
                     elif(is_attacked_supported(attacked) == False or 
-                         is_attacked_higher_than_piece(match, attacked)):
+                         is_attacked_higher_equal_than_piece(match, attacked)):
                         priomove.tactics.append(TACTICS['attack-good-deal'])
                         all_attacking.append(priomove)
                     else:
@@ -424,9 +438,9 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
 
         if(len(supported) > 0):
             if(is_supported_weak(supported)): # is_supported_attacked(supported)
-                if(dstfield_is_attacked(match, priomove.gmove) == False or 
-                   (dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) and 
-                    piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, priomove.gmove))):
+                if(dstflield_is_attacked == False or 
+                   (dstflield_cnt_of_supporter_is_equal_or_higher_than_cnt_of_attacker and 
+                    piece_is_lower_fequal_than_enmy_on_dstflield)):
                     if(is_supported_lower_equal_than_attacker(supported)):
                         priomove.tactics.append(TACTICS['support-good-deal'])
                         all_supporting.append(priomove)
@@ -435,8 +449,8 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
                 else:
                     priomove.tactics.append(TACTICS['support-bad-deal'])
             else:
-                if(dstfield_is_attacked(match, priomove.gmove) == False or 
-                   dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove)):
+                if(dstflield_is_attacked == False or 
+                   dstflield_cnt_of_supporter_is_equal_or_higher_than_cnt_of_attacker):
                     priomove.tactics.append(TACTICS['support-unattacked'])
                 else:
                     priomove.tactics.append(TACTICS['support-bad-deal'])
@@ -457,16 +471,16 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
             else:
                 priomove.tactics.append(TACTICS['support-bad-deal'])
 
-        #if(blocks(match, priomove.gmove)):
-
+        if(blocks(match, priomove.gmove)):
+            priomove.tactics.append(TACTICS['block'])
 
         if(running_pawn_in_endgame(match, priomove.gmove)):
             priomove.tactics.append(TACTICS['running-pawn-in-endgame'])
 
         """if(controles_file(match, priomove.gmove)):
-            if(dstfield_is_attacked(match, priomove.gmove) == False or 
+            if(dstflield_is_attacked == False or 
                (dstfield_is_supported(match, priomove.gmove) and 
-                piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, priomove.gmove))):
+                piece_is_lower_fequal_than_enmy_on_dstflield)):
                 priomove.tactics.append(TACTICS['controles-file-good-deal'])"""
 
         if(len(priomove.tactics) > 0):

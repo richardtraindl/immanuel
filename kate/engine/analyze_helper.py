@@ -2,6 +2,65 @@ from .match import *
 from .cvalues import *
 from . import rules
 from .pieces import pawn, rook, knight, bishop, queen, king
+from .pieces.generic_piece import cTouch
+
+
+def search_opposed_pieces(match, color, fieldx, fieldy, excl_srcx, excl_srcy):
+    oppenents = []
+
+    STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+
+    oppcolor = REVERSED_COLORS[color]
+    
+    for i in range(0, 8, 2):
+        touches = [None, None]
+        
+        for k in range(2):
+            stepx = STEPS[i+k][0]
+            stepy = STEPS[i+k][1]
+
+            x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
+            if(x1 == excl_srcx and y1 == excl_srcy):
+                break
+
+            if(x1 != rules.UNDEF_X):
+                piece = match.readfield(x1, y1)
+
+                if(Match.color_of_piece(piece) == color):
+                    if(touches[0] is None):
+                        touches[0] = cTouch(piece, x1, y1)
+                else:
+                    if(touches[1] is None):
+                        if(piece == PIECES['wQu'] or piece == PIECES['bQu'] or
+                          (i <= 2 and (piece == PIECES['wRk'] or piece == PIECES['bRk'])) or
+                          (i >= 4 and (piece == PIECES['wBp'] or piece == PIECES['bBp']))):
+                            touches[1] = cTouch(piece, x1, y1)
+
+        if(touches[0] and touches[1]):
+            oppenents.append(touches)
+
+    return oppenents
+
+
+def search(match, searchpieces, fieldx, fieldy):
+    foundpieces = []
+    
+    rook.search(match, searchpieces, fieldx, fieldy, foundpieces)
+    
+    bishop.search(match, searchpieces, fieldx, fieldy, foundpieces)
+    
+    return foundpieces
+
+
+def rook_and_bishop_enemies(match, color, fieldx, fieldy):
+    frdlytouches = []
+    enmytouches = []
+
+    rook.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
+
+    bishop.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
+
+    return enmytouches
 
 
 def is_soft_pin(match, srcx, srcy):
@@ -216,8 +275,10 @@ def dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match,
     match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
 
     frdlytouches, enmytouches = field_touches(match, Match.color_of_piece(piece), gmove.dstx, gmove.dsty)
-    
+
     match.writefield(gmove.srcx, gmove.srcy, piece)
+    
+    # print(str(len(frdlytouches)) + " " + str(len(enmytouches)))
 
     return len(frdlytouches) >= len(enmytouches)
 
@@ -340,6 +401,16 @@ def is_attacked_higher_than_piece(match, attacked):
     for ctouch_beyond in attacked:
         piece = match.readfield(ctouch_beyond.agent_srcx, ctouch_beyond.agent_srcy)
         if(PIECES_RANK[ctouch_beyond.piece] > PIECES_RANK[piece]):
+            return True
+
+    return False
+
+
+def is_attacked_higher_equal_than_piece(match, attacked):
+    for ctouch_beyond in attacked:
+        piece = match.readfield(ctouch_beyond.agent_srcx, ctouch_beyond.agent_srcy)
+
+        if(PIECES_RANK[ctouch_beyond.piece] >= PIECES_RANK[piece]):
             return True
 
     return False

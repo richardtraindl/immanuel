@@ -27,6 +27,21 @@ GEN_STEPS = [ [[1, 1, blank], [2, 2, blank], [3, 3, blank], [4, 4, blank], [5, 5
               [[-1, 1, blank], [-2, 2, blank], [-3, 3, blank], [-4, 4, blank], [-5, 5, blank], [-6, 6, blank], [-7, 7, blank]] ]
 
 
+def search(match, searchpieces, fieldx, fieldy, foundpieces):
+    for i in range(4):
+        stepx = STEPS[i][0]
+        stepy = STEPS[i][1]
+        x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if(searchpieces):
+                for searchpiece in searchpieces:
+                    if(piece == searchpiece):
+                        foundpieces.append(cTouch(piece, x1, y1))
+            else:
+                foundpieces.append(cTouch(piece, x1, y1))
+
+
 def is_field_touched(match, color, fieldx, fieldy, mode):
     for i in range(4):
         stepx = STEPS[i][0]
@@ -79,7 +94,7 @@ def is_piece_stuck(match, srcx, srcy):
 def is_move_stuck(match, srcx, srcy, dstx, dsty):
     move_dir = bp_dir(srcx, srcy, dstx, dsty)
     pin_dir = rules.pin_dir(match, None, srcx, srcy)
-    if(pin_dir == rules.DIRS['undefined'] or move_dir == pin_dir):
+    if(pin_dir == rules.DIRS['undefined'] or move_dir == pin_dir or move_dir == rules.REVERSE_DIRS[pin_dir]):
         return False
     else:
         return True
