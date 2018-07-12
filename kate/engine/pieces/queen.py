@@ -8,6 +8,8 @@ from .generic_piece import cFork
 
 STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
 
+MAX_STEP_IDX_FOR_RK = 3
+
 blank = PIECES['blk']
 GEN_STEPS = [ [[0, 1, blank], [0, 2, blank], [0, 3, blank], [0, 4, blank], [0, 5, blank], [0, 6, blank], [0, 7, blank]],
               [[0, -1, blank], [0, -2, blank], [0, -3, blank], [0, -4, blank], [0, -5, blank], [0, -6, blank], [0, -7, blank]],
@@ -116,25 +118,32 @@ def count_touches(match, color, fieldx, fieldy):
 
 
 def qu_dir(srcx, srcy, dstx, dsty):
-    DIRS = rules.DIRS
     if( (srcx == dstx) and (srcy < dsty) ):
-        return DIRS['north']
+        return rules.DIRS['north']
     elif( (srcx == dstx) and (srcy > dsty) ):
-        return DIRS['south']
+        return rules.DIRS['south']
     elif( (srcx < dstx) and (srcy == dsty) ):
-        return DIRS['east']
+        return rules.DIRS['east']
     elif( (srcx > dstx) and (srcy == dsty) ):
-        return DIRS['west']
+        return rules.DIRS['west']
     elif( (srcx - dstx) == (srcy - dsty) and (srcy < dsty) ):
-        return DIRS['north-east']
+        return rules.DIRS['north-east']
     elif( (srcx - dstx) == (srcy - dsty) and (srcy > dsty) ):
-        return DIRS['south-west']
+        return rules.DIRS['south-west']
     elif( (srcx - dstx) == ((srcy - dsty) * -1) and (srcy < dsty) ):
-        return DIRS['north-west']
+        return rules.DIRS['north-west']
     elif( (srcx - dstx) == ((srcy - dsty) * -1) and (srcy > dsty) ):
-        return DIRS['south-east']
+        return rules.DIRS['south-east']
     else:
-        return DIRS['undefined']
+        return rules.DIRS['undefined']
+
+
+def dir_to_step(direction):
+    stepx, stepy = rook.dir_to_step(direction)
+    if(stepx == rules.UNDEF_X):
+        stepx, stepy = bishop.dir_to_step(direction)
+
+    return stepx, stepy
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, piece):

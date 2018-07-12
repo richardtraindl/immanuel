@@ -5,22 +5,78 @@ from .pieces import pawn, rook, knight, bishop, queen, king
 from .pieces.generic_piece import cTouch
 
 
-def search_opposed_pieces(match, color, fieldx, fieldy, excl_srcx, excl_srcy):
-    oppenents = []
+class cDirTouch:
+    def __init__(self, piece, direction, fieldx, fieldy):
+        self.piece = piece
+        self.direction = direction
+        self.fieldx = fieldx
+        self.fieldy = fieldy
 
-    STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+def search_dir(match, fieldx, fieldy, direction):
+    srcx = fieldx
+    srcy = fieldy
+    stepx, stepy = queen.dir_to_step(direction)
+    dirtouches = []
+
+    for i in range(7):
+        x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
+        if(x1 != rules.UNDEF_X):
+            piece = match.readfield(x1, y1)
+            dirtouches.append(cDirTouch(piece, direction, x1, y1))
+            srcx = x1
+            srcy = y1
+        else:
+            break
+
+    return dirtouches
+
+
+def search_lines_of_pin(match, color, fieldx, fieldy):
+    pinlines = []
+
+    piece = match.readfield(fieldx, fieldy)
 
     oppcolor = REVERSED_COLORS[color]
     
+    DIRS = [rules.DIRS['north'], rules.DIRS['south'], rules.DIRS['east'], rules.DIRS['west'], rules.DIRS['north-east'], rules.DIRS['south-west'], rules.DIRS['north-west'], rules.DIRS['south-east']]
+ 
+    for i in range(8):
+        dirtouches = search_dir(match, fieldx, fieldy, DIRS[i])
+
+        if(len(dirtouches) < 2):
+            continue
+
+        if(Match.color_of_piece(dirtouches[0].piece) == color and 
+           Match.color_of_piece(dirtouches[1].piece) == oppcolor and
+           PIECES_RANK[piece] > PIECES_RANK[dirtouches[0].piece] and 
+           PIECES_RANK[piece] > PIECES_RANK[dirtouches[1].piece]):
+
+            if(dirtouches[1].piece == PIECES['wQu'] or dirtouches[1].piece == PIECES['bQu']):
+                pinlines.append([dirtouches[0], dirtouches[1]])
+
+            elif(i < 4 and (dirtouches[1].piece == PIECES['wRk'] or dirtouches[1].piece == PIECES['bRk'])): 
+                pinlines.append([dirtouches[0], dirtouches[1]])
+
+            elif(i >= 4 and (dirtouches[1].piece == PIECES['wBp'] or dirtouches[1].piece == PIECES['bBp'])):
+                pinlines.append([dirtouches[0], dirtouches[1]])
+
+    return pinlines
+
+
+def search_opposed_pieces(match, color, fieldx, fieldy, excl_fieldx, excl_fieldy):
+    oppenents = []
+
+    oppcolor = REVERSED_COLORS[color]
+
     for i in range(0, 8, 2):
         touches = [None, None]
-        
+
         for k in range(2):
-            stepx = STEPS[i+k][0]
-            stepy = STEPS[i+k][1]
+            stepx = queen.STEPS[i+k][0]
+            stepy = queen.STEPS[i+k][1]
 
             x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
-            if(x1 == excl_srcx and y1 == excl_srcy):
+            if(x1 == excl_fieldx and y1 == excl_fieldy):
                 break
 
             if(x1 != rules.UNDEF_X):
@@ -32,35 +88,14 @@ def search_opposed_pieces(match, color, fieldx, fieldy, excl_srcx, excl_srcy):
                 else:
                     if(touches[1] is None):
                         if(piece == PIECES['wQu'] or piece == PIECES['bQu'] or
-                          (i <= 2 and (piece == PIECES['wRk'] or piece == PIECES['bRk'])) or
-                          (i >= 4 and (piece == PIECES['wBp'] or piece == PIECES['bBp']))):
+                          (i+k <= queen.MAX_STEP_IDX_FOR_RK and (piece == PIECES['wRk'] or piece == PIECES['bRk'])) or
+                          (i+k > queen.MAX_STEP_IDX_FOR_RK and (piece == PIECES['wBp'] or piece == PIECES['bBp']))):
                             touches[1] = cTouch(piece, x1, y1)
 
         if(touches[0] and touches[1]):
             oppenents.append(touches)
 
     return oppenents
-
-
-def search(match, searchpieces, fieldx, fieldy):
-    foundpieces = []
-    
-    rook.search(match, searchpieces, fieldx, fieldy, foundpieces)
-    
-    bishop.search(match, searchpieces, fieldx, fieldy, foundpieces)
-    
-    return foundpieces
-
-
-def rook_and_bishop_enemies(match, color, fieldx, fieldy):
-    frdlytouches = []
-    enmytouches = []
-
-    rook.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
-
-    bishop.field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches)
-
-    return enmytouches
 
 
 def is_soft_pin(match, srcx, srcy):

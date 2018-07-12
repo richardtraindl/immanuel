@@ -420,51 +420,61 @@ def controles_file(match, piece, color, srcx, srcy, dstx, dsty):
 
 
 def bp_dir(srcx, srcy, dstx, dsty):
-    DIRS = rules.DIRS
     if( (srcx - dstx) == (srcy - dsty) and (srcy < dsty) ):
-        return DIRS['north-east']
+        return rules.DIRS['north-east']
     elif( (srcx - dstx) == (srcy - dsty) and (srcy > dsty) ):
-        return DIRS['south-west']
+        return rules.DIRS['south-west']
     elif( (srcx - dstx) == ((srcy - dsty) * -1) and (srcy < dsty) ):
-        return DIRS['north-west']
+        return rules.DIRS['north-west']
     elif( (srcx - dstx) == ((srcy - dsty) * -1) and (srcy > dsty) ):
-        return DIRS['south-east']
+        return rules.DIRS['south-east']
     else:
-        return DIRS['undefined']
+        return rules.DIRS['undefined']
 
 
 def bp_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
-    DIRS = rules.DIRS
     if(direction is None):
         direction = bp_dir(srcx, srcy, dstx, dsty)
 
-    if(direction == DIRS['north-east']):
+    if(direction == rules.DIRS['north-east']):
         return direction, NEAST_X, NEAST_Y
-    elif(direction == DIRS['south-west']):
+    elif(direction == rules.DIRS['south-west']):
         return direction, SWEST_X, SWEST_Y
-    elif(direction == DIRS['north-west']):
+    elif(direction == rules.DIRS['north-west']):
         return direction, NWEST_X, NWEST_Y
-    elif(direction == DIRS['south-east']):
+    elif(direction == rules.DIRS['south-east']):
         return direction, SEAST_X, SEAST_Y
     else:
         return direction, rules.UNDEF_X, rules.UNDEF_Y
 
-    
+
+def dir_to_step(direction):
+    if(direction == rules.DIRS['north-east']):
+        return NEAST_X, NEAST_Y
+    elif(direction == rules.DIRS['south-west']):
+        return SWEST_X, SWEST_Y
+    elif(direction == rules.DIRS['north-west']):
+        return NWEST_X, NWEST_Y
+    elif(direction == rules.DIRS['south-east']):
+        return SEAST_X, SEAST_Y
+    else:
+        return rules.UNDEF_X, rules.UNDEF_Y
+
+
 def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
-    DIRS = rules.DIRS
     direction, stepx, stepy = bp_step(None, srcx, srcy, dstx, dsty)
-    if(direction == DIRS['undefined']):
+    if(direction == rules.DIRS['undefined']):
         return False
 
     color = Match.color_of_piece(piece)
 
     pin_dir = rules.pin_dir(match, color, srcx, srcy)
 
-    if(direction == DIRS['north-east'] or direction == DIRS['south-west']):
-        if(pin_dir != DIRS['north-east'] and pin_dir != DIRS['south-west'] and pin_dir != DIRS['undefined']):
+    if(direction == rules.DIRS['north-east'] or direction == rules.DIRS['south-west']):
+        if(pin_dir != rules.DIRS['north-east'] and pin_dir != rules.DIRS['south-west'] and pin_dir != rules.DIRS['undefined']):
             return False
-    elif(direction == DIRS['north-west'] or direction == DIRS['south-east']):
-        if(pin_dir != DIRS['north-west'] and pin_dir != DIRS['south-east'] and pin_dir != DIRS['undefined']):
+    elif(direction == rules.DIRS['north-west'] or direction == rules.DIRS['south-east']):
+        if(pin_dir != rules.DIRS['north-west'] and pin_dir != rules.DIRS['south-east'] and pin_dir != rules.DIRS['undefined']):
             return False
 
     x = srcx + stepx

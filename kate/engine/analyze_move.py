@@ -110,42 +110,32 @@ def attacks_and_supports(match, gmove):
     return attacked, supported
 
 
-def is_soft_pinned(match, x, y):
-    piece = match.readfield(x, y)
+def does_unpin(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+    color = Match.color_of_piece(piece)
 
-    for i in range(8):
-        x1, y1 = rules.search(match, x, y, queen.STEPS[i][0], queen.STEPS[i][1])
-        if(x1 == rules.UNDEF_X):
-            continue
-        neighb = match.readfield(x1, y1)
-        if(Match.color_of_piece(piece) == Match.color_of_piece(neighb) and 
-           PIECES_RANK[piece] > PIECES_RANK[neighb]):
-            x2, y2 = rules.search(match, x1, y1, queen.STEPS[i][0], queen.STEPS[i][1])
-            if(x2 == rules.UNDEF_X):
-                continue
-            neighbsneighb = match.readfield(x2, y2)
-            if(Match.color_of_piece(neighb) == Match.oppcolor_of_piece(neighbsneighb)):
-                if(rook.rk_dir(x, y, x1, y1) != rules.DIRS['undefined'] and
-                   (neighbsneighb == PIECES['wQu'] or neighbsneighb == PIECES['bQu'] or
-                    neighbsneighb == PIECES['wRk'] or neighbsneighb == PIECES['bRk'])):
-                    return True
-                if(bishop.bp_dir(x, y, x1, y1) != rules.DIRS['undefined'] and
-                   (neighbsneighb == PIECES['wQu'] or neighbsneighb == PIECES['bQu'] or
-                    neighbsneighb == PIECES['wBp'] or neighbsneighb == PIECES['bBp'])):
-                    return True
+    pinlines_before = search_lines_of_pin(match, color, gmove.srcx, gmove.srcy)
+
+    ###
+    do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    
+    pinlines_after = search_lines_of_pin(match, color, gmove.dstx, gmove.dsty)
+
+    undo_move(match)
+    ###
+
+    if(len(pinlines_after) < len(pinlines_before)):
+        return True
+
+    for pbefore in pinlines_before:
+        identical = False
+        for pafter in pinlines_after:
+            if(pbefore[0].fieldx == pafter[0].fieldx and pbefore[0].fieldy == pafter[0].fieldy):
+                identical = True
+        if(identical == False):
+            return True
 
     return False
-
-def does_unpin(match, gmove):
-    flag = False
-
-    if(is_soft_pinned(match, gmove.srcx, gmove.srcy)):
-        do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-        flag = not is_soft_pinned(match, gmove.dstx, gmove.dsty)
-        undo_move(match)
-
-    return flag        
-
 
 
 def defends_check(match):

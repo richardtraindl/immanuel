@@ -294,11 +294,11 @@ def is_king_safe(match, color):
             continue
 
         direction = rook.rk_dir(Kg_x, Kg_y, enemy[1], enemy[2])
-        if(direction != DIRS['undefined']):
+        if(direction != rules.DIRS['undefined']):
             direction, step_x, step_y = rook.rk_step(direction, None, None, None, None)
         else:
             direction = bishop.bp_dir(Kg_x, Kg_y, enemy[1], enemy[2])
-            if(direction != DIRS['undefined']):
+            if(direction != rules.DIRS['undefined']):
                 direction, step_x, step_y = bishop.bp_step(direction, None, None, None, None)
             else:
                 return False
@@ -314,31 +314,30 @@ def is_king_safe(match, color):
 
 
 def kg_dir(srcx, srcy, dstx, dsty):
-    DIRS = rules.DIRS
     step_x = dstx - srcx
     step_y = dsty - srcy
     if(step_x == STEP_1N_X and step_y == STEP_1N_Y):
-        return DIRS['valid']
+        return rules.DIRS['valid']
     elif(step_x == STEP_1N1E_X and step_y == STEP_1N1E_Y):
-        return DIRS['valid']
+        return rules.DIRS['valid']
     elif(step_x == STEP_1E_X and step_y == STEP_1E_Y):
-        return DIRS['valid']
+        return rules.DIRS['valid']
     elif(step_x == STEP_1S1E_X and step_y == STEP_1S1E_Y):
-        return DIRS['valid']
+        return rules.DIRS['valid']
     elif(step_x == STEP_1S_X and step_y == STEP_1S_Y):
-        return DIRS['valid']
+        return rules.DIRS['valid']
     elif(step_x == STEP_1S1W_X and step_y == STEP_1S1W_Y):
-        return DIRS['valid']
+        return rules.DIRS['valid']
     elif(step_x == STEP_1W_X and step_y == STEP_1W_Y):
-        return DIRS['valid']
+        return rules.DIRS['valid']
     elif(step_x == STEP_1N1W_X and step_y == STEP_1N1W_Y):
-        return DIRS['valid']
+        return rules.DIRS['valid']
     elif(step_x == STEP_SH_CASTLING_X and step_y == STEP_SH_CASTLING_Y):
-        return DIRS['sh-castling']
+        return rules.DIRS['sh-castling']
     elif(step_x == STEP_LG_CASTLING_X and step_y == STEP_LG_CASTLING_Y):
-        return DIRS['lg-castling']
+        return rules.DIRS['lg-castling']
     else:
-        return DIRS['undefined']
+        return rules.DIRS['undefined']
 
 
 def is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece):
@@ -412,17 +411,15 @@ def is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece):
 
 
 def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
-    DIRS = rules.DIRS
-
     color = Match.color_of_piece(piece)
     opp_color = Match.oppcolor_of_piece(piece)
 
     direction = kg_dir(srcx, srcy, dstx, dsty)
-    if(direction == DIRS['sh-castling']):
+    if(direction == rules.DIRS['sh-castling']):
         return is_sh_castling_ok(match, srcx, srcy, dstx, dsty, piece)
-    if(direction == DIRS['lg-castling']):
+    if(direction == rules.DIRS['lg-castling']):
         return is_lg_castling_ok(match, srcx, srcy, dstx, dsty, piece)
-    if(direction == DIRS['undefined']):
+    if(direction == rules.DIRS['undefined']):
         return False
 
     king = match.readfield(srcx, srcy)
