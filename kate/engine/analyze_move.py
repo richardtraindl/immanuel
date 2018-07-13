@@ -114,12 +114,12 @@ def does_unpin(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
     color = Match.color_of_piece(piece)
 
-    pinlines_before = search_lines_of_pin(match, color, gmove.srcx, gmove.srcy)
+    pinlines_before = search_lines_of_pin(match, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
 
     ###
     do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
     
-    pinlines_after = search_lines_of_pin(match, color, gmove.dstx, gmove.dsty)
+    pinlines_after = search_lines_of_pin(match, color, gmove.dstx, gmove.dsty, None, None)
 
     undo_move(match)
     ###

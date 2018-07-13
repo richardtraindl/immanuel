@@ -12,7 +12,7 @@ class cDirTouch:
         self.fieldx = fieldx
         self.fieldy = fieldy
 
-def search_dir(match, fieldx, fieldy, direction):
+def search_dir(match, fieldx, fieldy, direction, exclx, excly):
     srcx = fieldx
     srcy = fieldy
     stepx, stepy = queen.dir_to_step(direction)
@@ -20,7 +20,7 @@ def search_dir(match, fieldx, fieldy, direction):
 
     for i in range(7):
         x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
+        if(x1 != rules.UNDEF_X and x1 != exclx and y1 != excly):
             piece = match.readfield(x1, y1)
             dirtouches.append(cDirTouch(piece, direction, x1, y1))
             srcx = x1
@@ -31,7 +31,7 @@ def search_dir(match, fieldx, fieldy, direction):
     return dirtouches
 
 
-def search_lines_of_pin(match, color, fieldx, fieldy):
+def search_lines_of_pin(match, color, fieldx, fieldy, exclx, excly):
     pinlines = []
 
     piece = match.readfield(fieldx, fieldy)
@@ -41,7 +41,7 @@ def search_lines_of_pin(match, color, fieldx, fieldy):
     DIRS = [rules.DIRS['north'], rules.DIRS['south'], rules.DIRS['east'], rules.DIRS['west'], rules.DIRS['north-east'], rules.DIRS['south-west'], rules.DIRS['north-west'], rules.DIRS['south-east']]
  
     for i in range(8):
-        dirtouches = search_dir(match, fieldx, fieldy, DIRS[i])
+        dirtouches = search_dir(match, fieldx, fieldy, DIRS[i], exclx, excly)
 
         if(len(dirtouches) < 2):
             continue
