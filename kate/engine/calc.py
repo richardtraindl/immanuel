@@ -375,14 +375,20 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             if(beta <= alpha):
                 break # alpha cut-off
 
-        elapsed_time = time.time() - starttime
-        if(elapsed_time > match.seconds_per_move):
-            exceeded = True
+        if(depth == 1):
+            huge_diff = (abs(match.score) - abs(nodescore)) > abs(SCORES[PIECES['wPw']]) * 2
+            elapsed_time = time.time() - starttime
+            if(elapsed_time > (match.seconds_per_move / maxcnt) * count):
+                exceeded = True
+            else:
+                exceeded = False
         else:
+            huge_diff = False
             exceeded = False
+
         if(msgs.read_meta(msgs.META_TERMINATE)):
             break
-        elif(depth == 1 and exceeded == False and count <= 24 and abs(match.score) - abs(nodescore) > abs(SCORES[PIECES['wPw']]) * 2):
+        elif(huge_diff and exceeded == False and count <= 24):
             continue
         elif(count >= maxcnt):
             break
