@@ -451,12 +451,14 @@ def is_attacked_higher_equal_than_piece(match, attacked):
     return False
 
 
-def is_supported_weak(supported):
+def is_supported_weak(match, supported):
     if(len(supported) == 0):
         return False
 
     for ctouch_beyond in supported:
         if(len(ctouch_beyond.attacker_beyond) > len(ctouch_beyond.supporter_beyond)):
+            return True
+        elif(is_soft_pin(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)):
             return True
 
     return False

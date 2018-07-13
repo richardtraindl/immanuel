@@ -427,7 +427,7 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
                     priomove.tactics.append(TACTICS['attack-bad-deal'])
 
         if(len(supported) > 0):
-            if(is_supported_weak(supported)): # is_supported_attacked(supported)
+            if(is_supported_weak(match, supported)): # is_supported_attacked(supported)
                 if(dstflield_is_attacked == False or 
                    (dstflield_cnt_of_supporter_is_equal_or_higher_than_cnt_of_attacker and 
                     piece_is_lower_fequal_than_enmy_on_dstflield)):
