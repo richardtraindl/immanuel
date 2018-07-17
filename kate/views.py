@@ -11,7 +11,6 @@ from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComm
 from .modules import interface
 from .engine.match import *
 from .engine.move import *
-from .engine.calc import SearchMsgs
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS, status
 from .engine.analyze_position import score_position, is_stormy
@@ -34,8 +33,6 @@ def match(request, matchid=None):
     if(msgcode):
         msgcode = int(msgcode)
 
-    currentsearch = ""
-
     if(matchid is None):
         modelmatch = ModelMatch(white_player_name=None, black_player_name=None)
     else:
@@ -43,14 +40,6 @@ def match(request, matchid=None):
             modelmatch = ModelMatch.objects.get(id=matchid)
         except ObjectDoesNotExist: #ModelMatch.DoesNotExist:
             return HttpResponseRedirect('/kate/')
-
-        job = get_active_job(modelmatch.id)
-        if(job):
-            if(job.meta['isalive'] == True and job.meta['terminate'] == False):
-                currsearch = job.meta['currentsearch']
-                if(currsearch):
-                    for gmove in currsearch:
-                        currentsearch += fmtmove(gmove)
 
     match = Match()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
@@ -109,7 +98,7 @@ def match(request, matchid=None):
 
     fmtboard = preformat_board(modelmatch.board, switch)
 
-    return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'domoveform': domoveform, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'urgent': urgent, 'msg': msg, "currentsearch": currentsearch } )
+    return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'domoveform': domoveform, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'urgent': urgent, 'msg': msg } )
 
 
 def do_move(request, matchid=None):
@@ -144,31 +133,7 @@ def undo_move(request, matchid=None):
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
-    job = get_active_job(modelmatch.id)
-    if(job):
-        job.meta['isalive'] = False
-        job.meta['terminate'] = True
-        job.save_meta()
-        time.sleep(1)
-
     interface.undo_move(modelmatch)
-
-    return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
-
-
-def force_move(request, matchid=None):
-    context = RequestContext(request)
-
-    switch = int(request.GET.get('switch', '0'))
-
-    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-
-    job = get_active_job(modelmatch.id)
-    if(job):
-        if(job.meta['isalive'] == True and job.meta['terminate'] == False):
-            job.meta['terminate'] = True
-            job.save_meta()
-            time.sleep(1)
 
     return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
@@ -208,11 +173,10 @@ def resume(request, matchid=None):
         modelmatch.status = STATUS['open']
         modelmatch.save()
 
-    job = get_active_job(modelmatch.id)
-    if(job is None or job.meta['isalive'] == False):
-        flag, msgcode = interface.calc_move_for_immanuel(modelmatch)
-        if(flag == False):
-            return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
+    # TODO: check if calculation is already running
+    flag, msgcode = interface.calc_move_for_immanuel(modelmatch)
+    if(flag == False):
+        return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
 
     return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
@@ -263,13 +227,6 @@ def settings(request, matchid=None):
 def delete(request, matchid=None):
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     
-    job = get_active_job(modelmatch.id)
-    if(job):
-        job.meta['isalive'] = False
-        job.meta['terminate'] = True
-        job.save_meta()
-        time.sleep(1)
-
     ModelMatch.objects.filter(id=modelmatch.id).delete()
 
     return HttpResponseRedirect('/kate/')
@@ -303,22 +260,12 @@ def fetch_match(request):
     else:
         match.black_elapsed_seconds += elapsed_time
 
-    currentsearch = ""
-
-    job = get_active_job(modelmatch.id)
-    if(job):
-        if(job.meta['isalive'] == True):
-            currsearch = job.meta['currentsearch']
-            if(currsearch):
-                for gmove in currsearch:
-                    currentsearch += fmtmove(gmove)
-
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
 
     if(modelmatch and lastmove and lastmove.count > movecnt):
-        data = "1" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds) + "|" + currentsearch
+        data = "1" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds)
     else:
-        data = "0" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds) + "|" + currentsearch
+        data = "0" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds)
 
     return HttpResponse(data)
 

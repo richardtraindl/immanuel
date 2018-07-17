@@ -320,7 +320,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         count += 1
 
         if(depth == 1):
-            msg = "\nmatch.id: " + str(match.id) + "   count: " + str(count) + "   calculate: "
+            msg = "\nmatch: " + str(match) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove, " | ")
             prnt_tactics(priomove.tactics)
             print(" | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
@@ -342,10 +342,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
                 append_newmove(gmove, nodecandidates, newcandidates)
 
             if(depth == 1):
-                currentsearch = []
+                msgs.currentsearch.clear()
                 for candidate in nodecandidates:
-                    currentsearch.append(candidate)
-                    msgs.write_meta(msgs.META_CURRENTSEARCH, currentsearch)
+                    msgs.currentsearch.append(candidate)
 
                 prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
                 prnt_moves("", newcandidates)
@@ -361,10 +360,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
                 append_newmove(gmove, nodecandidates, newcandidates)
 
             if(depth == 1):
-                currentsearch = []
+                msgs.currentsearch.clear()
                 for candidate in nodecandidates:
-                    currentsearch.append(candidate)
-                    msgs.write_meta(msgs.META_CURRENTSEARCH, currentsearch)
+                    msgs.currentsearch.append(candidate)
 
                 prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
                 prnt_moves("", newcandidates)
@@ -386,7 +384,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             huge_diff = False
             exceeded = False
 
-        if(msgs.read_meta(msgs.META_TERMINATE)):
+        if(msgs.terminate):
             break
         elif(huge_diff and exceeded == False and count <= 24):
             continue
@@ -396,10 +394,10 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     return nodescore, nodecandidates
 
 
-class SearchMsgs:
+class Msgs:
     def __init__(self):
         self.created_at = time.time()
-        self.isalivee = True
+        self.is_alive = True
         self.terminate = False
         self.currentsearch = []
 
@@ -460,7 +458,7 @@ def calc_move(match, msgs):
     match.time_start = time.time()
     ###
 
-    msg = "result: " + str(score) + " match.id: " + str(match.id) + " "
+    msg = "result: " + str(score) + " match: " + str(match) + " "
     prnt_moves(msg, candidates)
     prnt_fmttime("\ncalc-time: ", elapsed_time)
     return candidates

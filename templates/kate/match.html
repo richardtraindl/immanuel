@@ -30,8 +30,6 @@
 
         <li><a href="{% url 'kate:resume' match.id %}?switch={{ switch }}">Resume</a></li>
 
-        <li><a href="{% url 'kate:forcemove' match.id %}?switch={{ switch }}">Force Move</a></li>
-
         <li><a href="{% url 'kate:settings' match.id %}?switch={{ switch }}">Change Settings</a></li>
 
         <li><a href="{% url 'kate:dbginfo' match.id %}">Debug Info</a></li>
@@ -88,7 +86,6 @@
                     else{
                         $('#white-time').text(result[1]);
                         $('#black-time').text(result[2]);
-                        $('#currentsearch').text(result[3]);                        
                     }
                 });
           {% if match.level == 0 %}

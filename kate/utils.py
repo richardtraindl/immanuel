@@ -4,7 +4,6 @@ from rq.job import Job
 from rq.exceptions import NoSuchJobError
 from .engine.helper import index_to_coord, reverse_lookup
 from .engine.match import PIECES
-from kate.modules.interface import Msgs
 
 
 def preformat_board(board, switch):
@@ -68,32 +67,3 @@ def fmtmove(gmove):
     strmove += "]"
     return strmove
 
-
-def get_active_job(matchid):
-    redis_conn = django_rq.get_connection()
-    registry = StartedJobRegistry('default', redis_conn)
-    
-    job_ids = registry.get_job_ids()
-    for job_id in job_ids:
-        try:
-            job = Job.fetch(job_id, redis_conn)
-        except NoSuchJobError:
-            continue
-
-        try:
-            if(job.meta[Msgs.META_MATCHID] == matchid):
-                return job
-        except KeyError:
-            continue
-
-    return None
-
-
-def get_object_by_id(objectid):
-    for obj in gc.get_objects():
-        if id(obj) == objectid:
-            return obj
-
-    return None
-    
-  

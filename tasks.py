@@ -9,7 +9,7 @@ from kate.modules import interface
 @job("high")
 def job_calc_and_do_move(modelmatch, match):
     job = get_current_job()
-    job.meta[interface.Msgs.META_MATCHID] = match.id
+    job.meta[interface.Msgs.META_MATCHID] = modelmatch.id
     job.meta[interface.Msgs.META_ISALIVE] = True
     job.meta[interface.Msgs.META_TERMINATE] = False
     job.meta[interface.Msgs.META_CURRENTSEARCH] = None

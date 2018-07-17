@@ -14,7 +14,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_rq',
     'kate',
 ]
 
@@ -51,24 +50,6 @@ DATABASES = {}
 
 import dj_database_url
 DATABASES['default'] = dj_database_url.config()
-
-DJANGO_SETTINGS_MODULE="settings rq worker high default low"
-
-RQ_QUEUES = {
-    'default': {
-        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
-        'DEFAULT_TIMEOUT': 3600,
-    },
-    'high': {
-        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
-        'DEFAULT_TIMEOUT': 3600,
-    },
-    'low': {
-        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
-        'DEFAULT_TIMEOUT': 3600,
-    }
-}
-
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

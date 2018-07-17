@@ -22,6 +22,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.index, name='index'),
     url(r'^kate/', include('kate.urls')),
-    url(r'^django-rq/', include('django_rq.urls')),
 ]
 

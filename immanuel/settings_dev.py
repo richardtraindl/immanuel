@@ -14,17 +14,6 @@ DATABASES = {
     }
 }
 
-DJANGO_SETTINGS_MODULE="settings rq worker default"
-
-RQ_QUEUES = {
-     'default': {
-     'HOST': 'localhost',
-     'PORT': 6379,
-     'DB': 0,
-     'DEFAULT_TIMEOUT': 3600,
-     },
-}
-
 ALLOWED_HOSTS = ['127.0.0.1']
 
 DEBUG = True

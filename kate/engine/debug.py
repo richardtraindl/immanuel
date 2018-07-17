@@ -61,6 +61,22 @@ def list_attributes(match):
     return attributes
 
 
+def prnt_board(match):
+
+    print("–––––––––––––––––––––––––––––––––")
+
+    for y in range(7, -1, -1):
+        line = "|"
+        for x in range(8):
+            piece = match.readfield(x, y)
+            if(piece == PIECES['blk']):
+                line += "   |"
+            else:
+                line += reverse_lookup(PIECES, piece) + "|"
+        print(line)
+        print("–––––––––––––––––––––––––––––––––")
+
+
 def prnt_generator(generator):
     print("------------------------------------------------------")
     print("steps: " + str(generator.steps))

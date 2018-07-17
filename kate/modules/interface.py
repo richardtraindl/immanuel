@@ -1,7 +1,4 @@
 import random, threading, copy, time
-import django_rq
-from rq import Queue
-from tasks import job_calc_and_do_move
 from django.conf import settings
 from .. models import Match as ModelMatch, Move as ModelMove
 from .. engine.match import *
@@ -123,28 +120,34 @@ def undo_move(modelmatch):
             modelmove.delete()
 
 
-class Msgs:
-    META_MATCHID = 'matchid'
-    META_ISALIVE = 'isalive'
-    META_TERMINATE = 'terminate'
-    META_CURRENTSEARCH = 'currentsearch'
+class immanuelsThread(threading.Thread):
+    def __init__(self, name, match):
+        threading.Thread.__init__(self)
+        self.name = name
+        self.running = True
+        self.match = copy.deepcopy(match)
+        self.msgs = calc.Msgs()
 
-    def __init__(self, job):
-        self.job = job
+    def run(self):
+        print("Thread starting " + str(self.name))
+        candidates = calc.calc_move(self.match, self.msgs) 
+        if(len(candidates) > 0 and self.msgs.is_alive):
+            gmove = candidates[0]
 
-    def read_meta(self, key):
-        try:
-            return self.job.meta[key]
-        except KeyError:
-            return None
+            move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-    def write_meta(self, key, value):
-        try:
-            self.job.meta[key] = value
-            self.job.save_meta()
-            return True
-        except KeyError:
-            return False
+            modelmatch = ModelMatch()
+            map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
+            modelmatch.save()
+
+            modelmove = ModelMove()            
+            map_moves(move, modelmove, MAP_DIR['engine-to-model'])
+            modelmove.match = modelmatch
+            modelmove.save()
+            self.running = False
+            print("move saved")
+        else:
+            print("no move found or thread outdated!")
 
 
 def calc_move_for_immanuel(modelmatch):
@@ -155,11 +158,7 @@ def calc_move_for_immanuel(modelmatch):
     elif(match.is_next_color_human()):
         return False, rules.RETURN_CODES['wrong-color']
     else:
-        queue = django_rq.get_queue('default')
-        job = queue.enqueue(job_calc_and_do_move, modelmatch, match)
+        thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
+        thread.start()
         return True, rules.RETURN_CODES['ok']
-
-
-def read_searchmoves(): 
-    return debug.read_searchmoves(settings.BASE_DIR + "/kate/engine")
 
