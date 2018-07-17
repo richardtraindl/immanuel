@@ -1,7 +1,3 @@
-import django_rq, gc
-from rq.registry import StartedJobRegistry # FinishedJobRegistry
-from rq.job import Job
-from rq.exceptions import NoSuchJobError
 from .engine.helper import index_to_coord, reverse_lookup
 from .engine.match import PIECES
 
