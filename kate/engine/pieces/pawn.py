@@ -480,6 +480,8 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
         # check promotion
         if(dsty == 7 and prom_piece != PIECES['wQu'] and prom_piece != PIECES['wRk'] and prom_piece != PIECES['wBp'] and prom_piece != PIECES['wKn']):
             return False
+        elif(dsty < 7 and prom_piece != PIECES['blk']):
+            return False
     else:
         # check pins
         if(direction == DIRS['south'] or direction == DIRS['2south']):
@@ -505,6 +507,8 @@ def is_move_valid(match, srcx, srcy, dstx, dsty, piece, prom_piece):
 
         # check promotion
         if(dsty == 0 and prom_piece != PIECES['bQu'] and prom_piece != PIECES['bRk'] and prom_piece != PIECES['bBp'] and prom_piece != PIECES['bKn']):
+            return False
+        elif(dsty > 0 and prom_piece != PIECES['blk']):
             return False
 
     return True

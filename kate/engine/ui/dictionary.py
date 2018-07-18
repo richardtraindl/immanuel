@@ -94,15 +94,59 @@ def word_set(match, params):
 
 
 def word_domove(match, params):
-    matchobj = re.search(r"\s*(?P<src>[a-hA-H][1-8])\s*[-xX]*\s*(?P<dst>[a-hA-H][1-8])", params)
+    prom_piece = "blk"
+
+    matchobj = re.search(r"^\s*(?P<src>[a-hA-H][1-8])\s*[-xX]*\s*(?P<dst>[a-hA-H][1-8])\s*$", params)
     if(matchobj):
         srcx, srcy = coord_to_index(matchobj.group("src"))
         dstx, dsty = coord_to_index(matchobj.group("dst"))
-        if(is_move_valid(match, srcx, srcy, dstx, dsty, PIECES['blk'])[0]):
-            do_move(match, srcx, srcy, dstx, dsty, PIECES['blk'])
-            prnt_board(match)
+    else:
+        matchobj = re.search(r"^\s*(?P<src>[a-hA-H][1-8])\s*[-xX]*\s*(?P<dst>[a-hA-H][1-8])\s*[-,;]*\s*(?P<prom>\w+)\s*$", params)
+        if(matchobj):
+            srcx, srcy = coord_to_index(matchobj.group("src"))
+            dstx, dsty = coord_to_index(matchobj.group("dst"))
+            prom_piece = matchobj.group("prom")
+
+            valid = False
+            for piece in PIECES:
+                if(piece == prom_piece):
+                    valid = True
+                    break
+            if(valid == False):
+                print("invalid move!")
+                return True
         else:
-            print("invalid move!")
+            matchobj = re.search(r"^\s*(?P<short>[0oO][-][0oO])\s*$", params)
+            if(matchobj):
+                if(match.next_color() == COLORS['white']):
+                    srcx = match.wKg_x
+                    srcy = match.wKg_y
+                else:
+                    srcx = match.bKg_x
+                    srcy = match.bKg_y
+                dstx = srcx + 2
+                dsty = srcy
+            else:
+                matchobj = re.search(r"^\s*(?P<long>[0oO][-][0oO][-][0oO])\s*$", params)
+                if(matchobj):
+                    if(match.next_color() == COLORS['white']):
+                        srcx = match.wKg_x
+                        srcy = match.wKg_y
+                    else:
+                        srcx = match.bKg_x
+                        srcy = match.bKg_y
+                    dstx = srcx - 2
+                    dsty = srcy
+                else:
+                    print("invalid move!")
+                    return True
+
+    if(is_move_valid(match, srcx, srcy, dstx, dsty, PIECES[prom_piece])[0]):
+        do_move(match, srcx, srcy, dstx, dsty, PIECES[prom_piece])
+        prnt_board(match)
+    else:
+        print("invalid move!")
+
     return True
 
 
