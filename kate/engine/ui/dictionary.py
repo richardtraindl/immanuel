@@ -35,7 +35,9 @@ def init_words():
         return False
     if(new_word("set",    word_set) == False):
         return False
-    if(new_word("domove", word_domove) == False):
+    if(new_word("move", word_move) == False):
+        return False
+    if(new_word("undo", word_undo) == False):
         return False
     if(new_word("bye",    word_bye) == False):
         return False
@@ -93,7 +95,7 @@ def word_set(match, params):
     return True
 
 
-def word_domove(match, params):
+def word_move(match, params):
     prom_piece = "blk"
 
     matchobj = re.search(r"^\s*(?P<src>[a-hA-H][1-8])\s*[-xX]*\s*(?P<dst>[a-hA-H][1-8])\s*$", params)
@@ -147,6 +149,11 @@ def word_domove(match, params):
     else:
         print("invalid move!")
 
+    return True
+
+
+def word_undo(match, params):
+    undo_move(match)
     return True
 
 
