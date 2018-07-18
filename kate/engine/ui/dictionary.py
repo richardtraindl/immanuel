@@ -2,7 +2,7 @@ from .. match import *
 from .. rules import *
 from .. calc import Msgs, calc_move
 from .. debug import prnt_attributes, prnt_board
-from .. matchmove import do_move
+from .. matchmove import do_move, undo_move
 from .. helper import coord_to_index
 import re
 
