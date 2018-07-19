@@ -1,10 +1,10 @@
-from .. match import *
-from .. rules import *
-from .. calc import Msgs, calc_move
-from .. debug import prnt_attributes, prnt_board
-from .. matchmove import do_move, undo_move
-from .. helper import coord_to_index
 import re
+from engine.match import *
+from engine.rules import *
+from engine.calc import Msgs, calc_move
+from engine.debug import prnt_attributes, prnt_board
+from engine.matchmove import do_move, undo_move
+from engine.helper import coord_to_index
 
 
 dictionary = []
@@ -23,6 +23,7 @@ def new_word(name, code):
 
     word = Word(name, code)
     dictionary.append(word)
+
     return True
 
 
@@ -46,7 +47,7 @@ def init_words():
 
 
 def calc_and_domove(match):
-    if(match.status == STATUS['open'] and match.is_next_color_human() == False):
+    if(status(match) == STATUS['open'] and match.is_next_color_human() == False):
         candidates = calc_move(match, Msgs())
         gmove = candidates[0]
         do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -74,28 +75,40 @@ def new_match(lstparam):
 
 
 def word_pause(match, params):
-    match.status = STATUS['paused']
+    if(status(match) == STATUS['open']):
+        match.status = STATUS['paused']
+
     return True
 
 
 def word_resume(match, params):
-    match.status = rules.status(match)
+    if(status(match) == STATUS['open']):
+        match.status = STATUS['open']
+
     calc_and_domove(match)
+
     return True
 
 
 def word_show(match, params):
     prnt_attributes(match, ", ")
     prnt_board(match)
+
     return True
 
 
 def word_set(match, params):
     print("under construction...")
+
     return True
 
 
 def word_move(match, params):
+    match.status = status(match)
+    if(match.status != STATUS['open']):
+        print(reverse_lookup(STATUS, match.status))
+        return True
+
     prom_piece = "blk"
 
     matchobj = re.search(r"^\s*(?P<src>[a-hA-H][1-8])\s*[-xX]*\s*(?P<dst>[a-hA-H][1-8])\s*$", params)
@@ -154,10 +167,16 @@ def word_move(match, params):
 
 def word_undo(match, params):
     undo_move(match)
+    prnt_board(match)
+
+    if(status(match) == STATUS['open']):
+        match.status = STATUS['paused']
+
     return True
 
 
 def word_bye(match, params):
     print("bye")
+
     return False
 

@@ -15,7 +15,7 @@ def interpret(match, inputstr):
         params = ""
 
     for dword in dictionary:
-        if(dword.name == tokens[0]):
+        if(dword.name == tokens[0].lower()):
             return dword.code(match, params)
 
     print("???")
@@ -30,7 +30,8 @@ def forth():
         return
 
     while(True):
-        calc_and_domove(match)
+        if(match.status == STATUS['open']):
+            calc_and_domove(match)
 
         inputstr = input("OK ")
 
