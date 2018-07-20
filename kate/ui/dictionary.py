@@ -11,38 +11,50 @@ dictionary = []
 
 
 class Word():
-    def __init__(self, name=None, code=None):
+    def __init__(self, name=None, code=None, info=None):
         self.name = name
         self.code = code
+        self.info = info
 
-def new_word(name, code):
+def new_word(name, code, info):
     for dword in dictionary:
         if(dword.name == name):
             print("naming error...")
             return False
 
-    word = Word(name, code)
+    word = Word(name, code, info)
     dictionary.append(word)
 
     return True
 
 
 def init_words():
-    if(new_word("pause",  word_pause) == False):
+    if(new_word("help", word_help, "this help") == False):
         return False
-    if(new_word("resume", word_resume) == False):
+    if(new_word("?", word_help, "this help") == False):
         return False
-    if(new_word("show",   word_show) == False):
+    if(new_word("bye",    word_bye, "exit") == False):
         return False
-    if(new_word("set",    word_set) == False):
+    if(new_word("pause",  word_pause, "pauses match") == False):
         return False
-    if(new_word("move", word_move) == False):
+    if(new_word("resume", word_resume, "resumes (paused) match") == False):
         return False
-    if(new_word("undo", word_undo) == False):
+    if(new_word("show",   word_show, "prints debug info") == False):
         return False
-    if(new_word("bye",    word_bye) == False):
+    if(new_word("set",    word_set, "sets attributes, e.g. set level medium") == False):
         return False
-
+    if(new_word("move", word_move, "moves piece(s), e.g. move e2-e4") == False):
+        return False
+    if(new_word("undo", word_undo, "undos last move") == False):
+        return False
+    if(new_word("list", word_list, "lists all saved matches") == False):
+        return False
+    if(new_word("save", word_save, "saves match") == False):
+        return False
+    if(new_word("load", word_load, "loads match with id, e.g. load 3") == False):
+        return False
+    if(new_word("delete", word_delete, "deletes match with id, e.g. delete 3") == False):
+        return False
     return True
 
 
@@ -55,6 +67,10 @@ def calc_and_domove(match):
 
 
 def new_match(lstparam):
+    if(len(lstparam) != 4):
+        print("")
+        return None
+
     match = Match()
 
     match.white_player_name = lstparam[0]
@@ -92,13 +108,51 @@ def word_resume(match, params):
 
 def word_show(match, params):
     prnt_attributes(match, ", ")
+
     prnt_board(match)
 
     return True
 
 
 def word_set(match, params):
-    print("under construction...")
+    if(params == "?"):
+        print("set level blitz | low | medium | high")
+        print("set white-player Richard")
+        print("set black-player Hermann")
+        print("set white-human j | n")
+        print("set black-human j | n")
+        return True
+
+    tokens = params.split(" ")
+
+    if(len(tokens) != 2):
+        print("??? params...")
+        return True
+
+    if(tokens[0] == "level"):
+        try:
+            match.level = LEVELS[tokens[1]]
+            match.seconds_per_move = SECONDS_PER_MOVE[match.level]
+        except KeyError:
+            print("??? value")
+    elif(tokens[0] == "white-player"):
+        match.white_player_name = tokens[1]
+    elif(tokens[0] == "black-player"):
+        match.black_player_name = tokens[1]
+    elif(tokens[0] == "white-human"):
+        if(tokens[1] == "J" or tokens[1] == "j"):
+            match.white_player_is_human = True
+        else:
+            match.white_player_is_human = False
+            match.black_player_is_human = True
+    elif(tokens[0] == "black-human"):
+        if(tokens[1] == "J" or tokens[1] == "j"):
+            match.black_player_is_human = True
+        else:
+            match.black_player_is_human = False
+            match.white_player_is_human = True
+    else:
+        print("??? params...")
 
     return True
 
@@ -171,6 +225,39 @@ def word_undo(match, params):
 
     if(status(match) == STATUS['open']):
         match.status = STATUS['paused']
+
+    return True
+
+
+def word_list(match, params):
+    print("under construction")
+
+    return False
+
+
+def word_save(match, params):
+    print("under construction")
+
+    return False
+
+
+def word_load(match, params):
+    print("under construction")
+
+    return False
+
+
+def word_delete(match, params):
+    print("under construction")
+
+    return False
+
+
+def word_help(match, params):
+    for dword in dictionary:
+        if(dword.name == "?"):
+            continue
+        print(dword.name + " *** " + dword.info)
 
     return True
 

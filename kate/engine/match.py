@@ -15,6 +15,12 @@ LEVELS = {
         'medium' : 2,
         'high' : 3 }
 
+SECONDS_PER_MOVE = {
+        LEVELS['blitz'] : 30,
+        LEVELS['low'] : 60,
+        LEVELS['medium'] : 90,
+        LEVELS['high'] : 120 }
+
 
 PIECES = {
         'blk' : 0,
@@ -178,14 +184,7 @@ class Match:
 
 
     def update_attributes(self):
-        if(self.level == LEVELS['blitz']):
-            self.seconds_per_move = 30
-        elif(self.level == LEVELS['low']):
-            self.seconds_per_move = 60
-        elif(self.level == LEVELS['medium']):
-            self.seconds_per_move = 90
-        else:
-            self.seconds_per_move = 120
+        self.seconds_per_move = SECONDS_PER_MOVE[self.level]
 
         self.movecnt = len(self.move_list)
         if(self.movecnt > 0):
