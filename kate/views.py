@@ -14,7 +14,7 @@ from .engine.move import *
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS, status
 from .engine.analyze_position import score_position, is_stormy
-from .engine.debug import list_attributes
+from .engine.debug import list_match_attributes
 
 
 def index(request):
@@ -312,7 +312,7 @@ def dbginfo(request, matchid=None):
     match = Match()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
     
-    moves = "moves: "
+    moves = "moves:"
     modelmoves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")
     idx = 0
     for modelmove in reversed(modelmoves):
@@ -324,7 +324,7 @@ def dbginfo(request, matchid=None):
         else:
             moves += "|" + move.format_move()
 
-    attributes = list_attributes(match)
+    attributes = list_match_attributes(match)
 
     return render(request, 'kate/dbginfo.html', { 'match': match, 'moves': moves, 'attributes': attributes, 'switch': switch } )
 

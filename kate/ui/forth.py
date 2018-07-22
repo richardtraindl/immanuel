@@ -2,8 +2,13 @@ import sys
 from . dictionary import *
 
 
-def interpret(match, inputstr):
+class Session:
+    def __init__(self, match=None, msgs=None):
+        self.match = match
+        self.msgs = msgs
 
+
+def interpret(session, inputstr):
     inputstr = inputstr.strip()
     if(len(inputstr) == 0):
         return True
@@ -16,7 +21,7 @@ def interpret(match, inputstr):
 
     for dword in dictionary:
         if(dword.name == tokens[0].lower()):
-            return dword.code(match, params)
+            return dword.code(session, params)
 
     print("???")
     return True
@@ -24,17 +29,17 @@ def interpret(match, inputstr):
 
 def forth():
     lstparam = ['White', 'm', 'Black', "h"]
-    match = new_match(lstparam)
+    session = Session(new_match(lstparam), Msgs())
 
     if(init_words() == False):
         return
 
     while(True):
-        if(match.status == STATUS['open']):
-            calc_and_domove(match)
+        if(session.match.status == STATUS['open']):
+            calc_and_domove(session)
 
         inputstr = input("OK ")
 
-        if(interpret(match, inputstr) == False):
+        if(interpret(session, inputstr) == False):
             break
 
