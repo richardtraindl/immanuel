@@ -397,7 +397,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
 class Msgs:
     def __init__(self):
         self.created_at = time.time()
-        self.is_alive = True
         self.terminate = False
         self.currentsearch = []
 

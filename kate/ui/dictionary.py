@@ -1,4 +1,4 @@
-import re, os, types
+import re, os, threading, copy
 from engine.match import *
 from engine.move import *
 from engine.rules import *
@@ -41,6 +41,8 @@ def init_words():
         return False
     if(new_word("resume", word_resume, "resumes (paused) match") == False):
         return False
+    if(new_word("terminate", word_terminate, "terminates match") == False):
+        return False
     if(new_word("show",   word_show, "prints debug info") == False):
         return False
     if(new_word("set",    word_set, "sets attributes, e.g. set level medium") == False):
@@ -60,12 +62,30 @@ def init_words():
     return True
 
 
+class CalcThread(threading.Thread):
+    def __init__(self, session):
+        threading.Thread.__init__(self)
+        self.session = session
+        self.calc_match = copy.deepcopy(session.match)
+
+    def run(self):
+        self.session.thread_is_busy = True
+        print("Thread starting...")
+        candidates = calc_move(self.calc_match, self.session.msgs)
+        if(len(candidates) > 0):
+            gmove = candidates[0]
+            do_move(self.session.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+            prnt_board(self.session.match)
+        else:
+            print("no move found!")
+
+        self.session.thread_is_busy = False
+
+
 def calc_and_domove(session):
-    if(status(session.match) == STATUS['open'] and session.match.is_next_color_human() == False):
-        candidates = calc_move(session.match, session.msgs)
-        gmove = candidates[0]
-        do_move(session.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-        prnt_board(session.match)
+    if(session.thread_is_busy == False and status(session.match) == STATUS['open'] and session.match.is_next_color_human() == False):
+        session.thread = CalcThread(session)
+        session.thread.start()
 
 
 def new_match(lstparam):
@@ -100,10 +120,18 @@ def word_pause(session, params):
 
 
 def word_resume(session, params):
-    if(session.status(match) == STATUS['open']):
+    if(status(session.match) == STATUS['open']):
         session.match.status = STATUS['open']
 
     calc_and_domove(session)
+
+    return True
+
+
+def word_terminate(session, params):
+    if(session.thread_is_busy):
+        session.msgs.terminate = True
+        print("try to terminante calculation...")
 
     return True
 
@@ -162,7 +190,10 @@ def word_set(session, params):
 def word_move(session, params):
     session.match.status = status(session.match)
     if(session.match.status != STATUS['open']):
-        print(reverse_lookup(STATUS, session.match.status))
+        print("??? " + reverse_lookup(STATUS, session.match.status))
+        return True
+    elif(session.match.is_next_color_human() == False):
+        print("??? wrong color")
         return True
 
     prom_piece = "blk"
@@ -369,7 +400,12 @@ def word_load(session, params):
 
 
 def word_delete(session, params):
-    print("under construction")
+    delfile = immanuels_dir + "/" + params.strip() + ".txt"
+
+    if os.path.isfile(delfile):
+        os.remove(delfile)
+    else:
+        print("Error: %s file not found" % delfile)
 
     return True
 
@@ -384,6 +420,12 @@ def word_help(session, params):
 
 
 def word_bye(session, params):
+    if(session.thread and session.thread_is_busy):
+        print("terminate calculation. please wait...")
+        session.terminate = True
+        session.thread.join()
+        session.thread = None
+        session.terminate = False
     print("bye")
 
     return False

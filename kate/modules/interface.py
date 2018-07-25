@@ -120,18 +120,17 @@ def undo_move(modelmatch):
             modelmove.delete()
 
 
-class immanuelsThread(threading.Thread):
+class ImmanuelsThread(threading.Thread):
     def __init__(self, name, match):
         threading.Thread.__init__(self)
         self.name = name
-        self.running = True
         self.match = copy.deepcopy(match)
         self.msgs = calc.Msgs()
 
     def run(self):
         print("Thread starting " + str(self.name))
         candidates = calc.calc_move(self.match, self.msgs) 
-        if(len(candidates) > 0 and self.msgs.is_alive):
+        if(len(candidates) > 0):
             gmove = candidates[0]
 
             move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -144,7 +143,6 @@ class immanuelsThread(threading.Thread):
             map_moves(move, modelmove, MAP_DIR['engine-to-model'])
             modelmove.match = modelmatch
             modelmove.save()
-            self.running = False
             print("move saved")
         else:
             print("no move found or thread outdated!")
@@ -158,7 +156,7 @@ def calc_move_for_immanuel(modelmatch):
     elif(match.is_next_color_human()):
         return False, rules.RETURN_CODES['wrong-color']
     else:
-        thread = immanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
+        thread = ImmanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
         thread.start()
         return True, rules.RETURN_CODES['ok']
 

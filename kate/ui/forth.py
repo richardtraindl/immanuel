@@ -4,6 +4,8 @@ from . dictionary import *
 
 class Session:
     def __init__(self, match=None, msgs=None):
+        self.thread = None
+        self.thread_is_busy = False
         self.match = match
         self.msgs = msgs
 
@@ -31,12 +33,13 @@ def forth():
     lstparam = ['White', 'm', 'Black', "h"]
     session = Session(new_match(lstparam), Msgs())
 
+    thread = None
+
     if(init_words() == False):
         return
 
     while(True):
-        if(session.match.status == STATUS['open']):
-            calc_and_domove(session)
+        calc_and_domove(session)
 
         inputstr = input("OK ")
 
