@@ -1,4 +1,5 @@
-import os
+import os, colorama
+from colorama import Fore, Back, Style, init
 from .match import *
 from .cvalues import *
 from .move import *
@@ -67,19 +68,33 @@ def prnt_match_attributes(match, delimiter):
 
 
 def prnt_board(match):
+    init(autoreset=True)
 
-    print("–––––––––––––––––––––––––––––––––")
-
+    endstr = ""
     for y in range(7, -1, -1):
-        line = "|"
+        Style.RESET_ALL 
         for x in range(8):
             piece = match.readfield(x, y)
-            if(piece == PIECES['blk']):
-                line += "   |"
+            if(x == 7):
+                endstr = "\n"
             else:
-                line += reverse_lookup(PIECES, piece) + "|"
-        print(line)
-        print("–––––––––––––––––––––––––––––––––")
+                endstr = ""
+
+            if((y % 2 + x) % 2 == 1):
+                back = Back.WHITE
+            else:
+                back = Back.BLUE
+
+            if(piece == PIECES['blk']):
+                print(back + PIECES_UNICODE[piece] + " ", end=endstr)
+                continue
+
+            if(Match.color_of_piece(piece) == COLORS['white']):
+                fore = Fore.YELLOW
+            else:
+                fore = Fore.BLACK
+
+            print(back + fore + Style.BRIGHT + PIECES_UNICODE[piece] + " ", end=endstr)
 
 
 def list_move_attributes(move):

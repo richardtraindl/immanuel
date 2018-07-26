@@ -130,6 +130,21 @@ SUPPORTED_SCORES = {
         PIECES['bBp'] : -8,
         PIECES['bQu'] : -16 }
 
+PIECES_UNICODE = {
+        PIECES['blk'] : "\u0020",
+        PIECES['wKg'] : "\u2654",
+        PIECES['wPw'] : "\u2659",
+        PIECES['wRk'] : "\u2656",
+        PIECES['wKn'] : "\u2658",
+        PIECES['wBp'] : "\u2657",
+        PIECES['wQu'] : "\u2655",
+        PIECES['bKg'] : "\u265A",
+        PIECES['bPw'] : "\u265F",
+        PIECES['bRk'] : "\u265C",
+        PIECES['bKn'] : "\u265E",
+        PIECES['bBp'] : "\u265D",
+        PIECES['bQu'] : "\u265B" }
+
 E1_X = 4
 E1_Y = 0
 A1_X = 0
