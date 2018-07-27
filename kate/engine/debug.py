@@ -67,12 +67,50 @@ def prnt_match_attributes(match, delimiter):
     print("------------------------------------------------------")
 
 
-def prnt_board(match):
-    init(autoreset=True)
+    
+BLANK  = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+KING   = "000000+0000000000+++++0000000000+0000000++000+000++0++++00+00++++0+++++++++++00+++0+++0+++0"
+QUEEN  = "000000000000000+000+000+000+++0+++0+++0+++++++++++++++0+++0+++0++0+++++++++++00+++0+++0+++0"
+ROOK   = "00000000000000++00+++00++00++00+++00++00+++++++++++000++0+++0++0000+++++++++000+++0+++0+++0"
+BISHOP = "000000+00000000000+++000000000++0++0000000++000++00000++++0++++000+++++++++++000+++++++++00"
+KNIGHT = "000000++0000000000++++0000000+++++++00000+++000+++000++00000++++000000+++++000000++++++++00"
+PAWN   = "0000000000000000000000000000000+++000000000+++++000000+++++++++00000+++++++0000+++++++++++0"
 
+def prnt_piece(piece, backcolor, forecolor):
+    if(forecolor == 0):
+        invert = False
+    else:
+        invert = True
+
+    if(piece == PIECES['blk']):
+        map = BLANK
+        invert = False
+    elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+        map = PAWN
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+        map = KNIGHT
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+        map = BISHOP
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+        map = ROOK
+    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+        map = QUEEN
+    else:
+        map = KING
+
+    for i in range(7):
+        print("")
+        for k in range(13):
+            character = map[(i * 7) + k]
+            if((character == "0" and invert == False) or (character == "+" and invert)):
+                print(" ", end="")
+            else:
+                print("*", end="")
+
+
+def prnt_board(match):
     endstr = ""
     for y in range(7, -1, -1):
-        Style.RESET_ALL 
         for x in range(8):
             piece = match.readfield(x, y)
             if(x == 7):
@@ -81,20 +119,16 @@ def prnt_board(match):
                 endstr = ""
 
             if((y % 2 + x) % 2 == 1):
-                back = Back.WHITE
+                backcolor = 0
             else:
-                back = Back.BLUE
-
-            if(piece == PIECES['blk']):
-                print(back + PIECES_UNICODE[piece] + " ", end=endstr)
-                continue
+                backcolor = 1
 
             if(Match.color_of_piece(piece) == COLORS['white']):
-                fore = Fore.YELLOW
+                forecolor = 0
             else:
-                fore = Fore.BLACK
+                forecolor = 1
 
-            print(back + fore + Style.BRIGHT + PIECES_UNICODE[piece] + " ", end=endstr)
+            prnt_piece(piece, backcolor, forecolor)
 
 
 def list_move_attributes(move):
