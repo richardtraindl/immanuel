@@ -1,5 +1,3 @@
-import os, colorama
-from colorama import Fore, Back, Style, init
 from .match import *
 from .cvalues import *
 from .move import *
