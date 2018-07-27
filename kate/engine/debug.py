@@ -74,59 +74,54 @@ BISHOP = "000000+00000000000+++000000000++0++0000000++000++00000++++0++++000++++
 KNIGHT = "000000++0000000000++++0000000+++++++00000+++000+++000++00000++++000000+++++000000++++++++00"
 PAWN   = "0000000000000000000000000000000+++000000000+++++000000+++++++++00000+++++++0000+++++++++++0"
 
-def prnt_piece(piece, backcolor, forecolor):
-    if(forecolor == 0):
-        invert = False
-    else:
-        invert = True
-
-    if(piece == PIECES['blk']):
-        map = BLANK
-        invert = False
-    elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        map = PAWN
-    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        map = KNIGHT
-    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        map = BISHOP
-    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        map = ROOK
-    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        map = QUEEN
-    else:
-        map = KING
-
+def prnt_line(pieces):
     for i in range(7):
-        print("")
-        for k in range(13):
-            character = map[(i * 7) + k]
-            if((character == "0" and invert == False) or (character == "+" and invert)):
-                print(" ", end="")
-            else:
-                print("*", end="")
-
-
-def prnt_board(match):
-    endstr = ""
-    for y in range(7, -1, -1):
-        for x in range(8):
-            piece = match.readfield(x, y)
-            if(x == 7):
-                endstr = "\n"
-            else:
-                endstr = ""
-
-            if((y % 2 + x) % 2 == 1):
-                backcolor = 0
-            else:
-                backcolor = 1
-
-            if(Match.color_of_piece(piece) == COLORS['white']):
+        for k in range(8):
+            if(Match.color_of_piece(pieces[i]) == COLORS['white']):
                 forecolor = 0
             else:
                 forecolor = 1
 
-            prnt_piece(piece, backcolor, forecolor)
+            """if((y % 2 + x) % 2 == 1):
+                backcolor = 0
+            else:
+                backcolor = 1"""
+
+        if(forecolor == 0):
+            invert = False
+        else:
+            invert = True
+
+        if(pieces[k] == PIECES['blk']):
+            map = BLANK
+            invert = False
+        elif(pieces[k] == PIECES['wPw'] or pieces[k] == PIECES['bPw']):
+            map = PAWN
+        elif(pieces[k] == PIECES['wKn'] or pieces[k] == PIECES['bKn']):
+            map = KNIGHT
+        elif(pieces[k] == PIECES['wBp'] or pieces[k] == PIECES['bBp']):
+            map = BISHOP
+        elif(pieces[k] == PIECES['wRk'] or pieces[k] == PIECES['bRk']):
+            map = ROOK
+        elif(pieces[k] == PIECES['wQu'] or pieces[k] == PIECES['bQu']):
+            map = QUEEN
+        else:
+            map = KING
+
+        for j in range(13):
+            character = map[(i * 13) + j]
+            if((character == "0" and invert == False) or (character == "+" and invert)):
+                print(" ", end="")
+            else:
+                print("*", end="")
+    print("")
+
+def prnt_board(match):
+    pieces = [8]
+    for y in range(7, -1, -1):
+        for x in range(8):
+            pieces[x] = match.readfield(x, y)
+        prnt_line(pieces)
 
 
 def list_move_attributes(move):
