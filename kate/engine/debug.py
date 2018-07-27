@@ -74,10 +74,10 @@ BISHOP = "000000+00000000000+++000000000++0++0000000++000++00000++++0++++000++++
 KNIGHT = "000000++0000000000++++0000000+++++++00000+++000+++000++00000++++000000+++++000000++++++++00"
 PAWN   = "0000000000000000000000000000000+++000000000+++++000000+++++++++00000+++++++0000+++++++++++0"
 
-def prnt_line(pieces):
+def prnt_row(pieces):
     for i in range(7):
         for k in range(8):
-            if(Match.color_of_piece(pieces[i]) == COLORS['white']):
+            if(Match.color_of_piece(pieces[k]) == COLORS['white']):
                 forecolor = 0
             else:
                 forecolor = 1
@@ -87,41 +87,42 @@ def prnt_line(pieces):
             else:
                 backcolor = 1"""
 
-        if(forecolor == 0):
-            invert = False
-        else:
-            invert = True
-
-        if(pieces[k] == PIECES['blk']):
-            map = BLANK
-            invert = False
-        elif(pieces[k] == PIECES['wPw'] or pieces[k] == PIECES['bPw']):
-            map = PAWN
-        elif(pieces[k] == PIECES['wKn'] or pieces[k] == PIECES['bKn']):
-            map = KNIGHT
-        elif(pieces[k] == PIECES['wBp'] or pieces[k] == PIECES['bBp']):
-            map = BISHOP
-        elif(pieces[k] == PIECES['wRk'] or pieces[k] == PIECES['bRk']):
-            map = ROOK
-        elif(pieces[k] == PIECES['wQu'] or pieces[k] == PIECES['bQu']):
-            map = QUEEN
-        else:
-            map = KING
-
-        for j in range(13):
-            character = map[(i * 13) + j]
-            if((character == "0" and invert == False) or (character == "+" and invert)):
-                print(" ", end="")
+            if(forecolor == 0):
+                invert = False
             else:
-                print("*", end="")
-    print("")
+                invert = True
+
+            if(pieces[k] == PIECES['blk']):
+                map = BLANK
+                invert = False
+            elif(pieces[k] == PIECES['wPw'] or pieces[k] == PIECES['bPw']):
+                map = PAWN
+            elif(pieces[k] == PIECES['wKn'] or pieces[k] == PIECES['bKn']):
+                map = KNIGHT
+            elif(pieces[k] == PIECES['wBp'] or pieces[k] == PIECES['bBp']):
+                map = BISHOP
+            elif(pieces[k] == PIECES['wRk'] or pieces[k] == PIECES['bRk']):
+                map = ROOK
+            elif(pieces[k] == PIECES['wQu'] or pieces[k] == PIECES['bQu']):
+                map = QUEEN
+            else:
+                map = KING
+
+            linestr = ""
+            for j in range(13):
+                character = map[(i * 13) + j]
+                if((character == "0" and invert == False) or (character == "+" and invert)):
+                    linestr += " "
+                else:
+                    linestr += "*"
+        print(linestr)
 
 def prnt_board(match):
     pieces = [0, 0, 0, 0, 0, 0, 0, 0]
     for y in range(7, -1, -1):
         for x in range(8):
             pieces[x] = match.readfield(x, y)
-        prnt_line(pieces)
+        prnt_row(pieces)
 
 
 def list_move_attributes(move):
