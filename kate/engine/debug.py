@@ -117,7 +117,7 @@ def prnt_line(pieces):
     print("")
 
 def prnt_board(match):
-    pieces = [8]
+    pieces = [0, 0, 0, 0, 0, 0, 0, 0]
     for y in range(7, -1, -1):
         for x in range(8):
             pieces[x] = match.readfield(x, y)
