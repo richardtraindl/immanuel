@@ -1,3 +1,4 @@
+from colorama import Fore, Back, Style
 from .match import *
 from .cvalues import *
 from .move import *
@@ -66,63 +67,95 @@ def prnt_match_attributes(match, delimiter):
 
 
     
-BLANK  = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-KING   = "000000+0000000000+++++0000000000+0000000++000+000++0++++00+00++++0+++++++++++00+++0+++0+++0"
-QUEEN  = "000000000000000+000+000+000+++0+++0+++0+++++++++++++++0+++0+++0++0+++++++++++00+++0+++0+++0"
-ROOK   = "00000000000000++00+++00++00++00+++00++00+++++++++++000++0+++0++0000+++++++++000+++0+++0+++0"
-BISHOP = "000000+00000000000+++000000000++0++0000000++000++00000++++0++++000+++++++++++000+++++++++00"
-KNIGHT = "000000++0000000000++++0000000+++++++00000+++000+++000++00000++++000000+++++000000++++++++00"
-PAWN   = "0000000000000000000000000000000+++000000000+++++000000+++++++++00000+++++++0000+++++++++++0"
+BLANK  = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020" ] * 4
+
+KING   = [ u"\u0020\u0020\u0020\u2542\u0020\u0020\u0020", 
+           u"\u0020\u0020\u2599\u2584\u259F\u0020\u0020", 
+           u"\u0020\u0020\u2587\u2587\u2587\u0020\u0020",
+           u"\u0020\u0020\u2580\u2580\u2580\u0020\u0020" ]
+
+QUEEN   = [ u"\u0020\u0020\u0020\u25D3\u0020\u0020\u0020", 
+            u"\u0020\u0020\u2599\u2584\u259F\u0020\u0020", 
+            u"\u0020\u0020\u2590\u2588\u258D\u0020\u0020",
+            u"\u0020\u0020\u259D\u2580\u2598\u0020\u0020" ]
+
+ROOK   = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020", 
+           u"\u0020\u0020\u2596\u2584\u2597\u0020\u0020",
+           u"\u0020\u0020\u2590\u2588\u258D\u0020\u0020",
+           u"\u0020\u0020\u2580\u2580\u2580\u0020\u0020" ] 
+
+BISHOP   = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020", 
+             u"\u0020\u0020\u0020\u2584\u0020\u0020\u0020",
+             u"\u0020\u0020\u2590\u2588\u258D\u0020\u0020",
+             u"\u0020\u0020\u2580\u2580\u2580\u0020\u0020" ]
+
+KNIGHT   = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020", 
+             u"\u0020\u0020\u0020\u2584\u2584\u0020\u0020",
+             u"\u0020\u2584\u2580\u259C\u2588\u2599\u0020", 
+             u"\u0020\u0020\u0020\u2580\u2580\u2580\u2580" ]
+
+PAWN     = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020",
+             u"\u0020\u0020\u2597\u2584\u2596\u0020\u0020", 
+             u"\u0020\u0020\u2588\u2588\u2588\u0020\u0020",
+             u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020" ]
 
 def prnt_row(pieces):
-    for i in range(7):
+    for i in range(4):
         for k in range(8):
-            if(Match.color_of_piece(pieces[k]) == COLORS['white']):
+            piece = pieces[k][0]
+            backcolor = pieces[k][1]
+
+            if(Match.color_of_piece(piece) == COLORS['white']):
                 forecolor = 0
             else:
                 forecolor = 1
 
-            """if((y % 2 + x) % 2 == 1):
-                backcolor = 0
+            if(piece == PIECES['blk']):
+                piecemap = BLANK
+            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                piecemap = PAWN
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+                piecemap = KNIGHT
+            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                piecemap = BISHOP
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+                piecemap = ROOK
+            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                piecemap = QUEEN
             else:
-                backcolor = 1"""
+                piecemap = KING
+
+            if(k == 7):
+                endstr = "\n"
+            else:
+                endstr = ""
+
+            offset = i * 9
+
 
             if(forecolor == 0):
-                invert = False
-            else:
-                invert = True
-
-            if(pieces[k] == PIECES['blk']):
-                map = BLANK
-                invert = False
-            elif(pieces[k] == PIECES['wPw'] or pieces[k] == PIECES['bPw']):
-                map = PAWN
-            elif(pieces[k] == PIECES['wKn'] or pieces[k] == PIECES['bKn']):
-                map = KNIGHT
-            elif(pieces[k] == PIECES['wBp'] or pieces[k] == PIECES['bBp']):
-                map = BISHOP
-            elif(pieces[k] == PIECES['wRk'] or pieces[k] == PIECES['bRk']):
-                map = ROOK
-            elif(pieces[k] == PIECES['wQu'] or pieces[k] == PIECES['bQu']):
-                map = QUEEN
-            else:
-                map = KING
-
-            linestr = ""
-            for j in range(13):
-                character = map[(i * 13) + j]
-                if((character == "0" and invert == False) or (character == "+" and invert)):
-                    linestr += " "
+                if(backcolor == 0):
+                    print(Back.WHITE + Fore.YELLOW + piecemap[i] + Style.RESET_ALL, end=endstr)
                 else:
-                    linestr += "*"
-        print(linestr)
+                    print(Back.BLACK + Fore.YELLOW + piecemap[i] + Style.RESET_ALL, end=endstr)
+            else:
+                if(backcolor == 0):
+                    print(Back.WHITE + Fore.BLUE + piecemap[i] + Style.RESET_ALL, end=endstr)
+                else:
+                    print(Back.BLACK + Fore.BLUE + piecemap[i] + Style.RESET_ALL, end=endstr)
+
 
 def prnt_board(match):
-    pieces = [0, 0, 0, 0, 0, 0, 0, 0]
+    pieces = []
     for y in range(7, -1, -1):
         for x in range(8):
-            pieces[x] = match.readfield(x, y)
+            if((y % 2 + x) % 2 == 1):
+                backcolor = 0
+            else:
+                backcolor = 1
+            pieces.append([match.readfield(x, y), backcolor])
         prnt_row(pieces)
+        pieces.clear()
 
 
 def list_move_attributes(move):
