@@ -320,7 +320,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         count += 1
 
         if(depth == 1):
-            msg = "\nmatch: " + str(match) + "   count: " + str(count) + "   calculate: "
+            msg = "\nmatch: " + str(match.begin) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove, " | ")
             prnt_tactics(priomove.tactics)
             print(" | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))

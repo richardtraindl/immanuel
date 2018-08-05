@@ -204,9 +204,10 @@ class Match:
         self.movecnt = len(self.move_list)
         if(self.movecnt > 0):
             move = self.move_list[-1]
-            fifty_moves_count = move.fifty_moves_count
+            self.fifty_moves_count = move.fifty_moves_count
 
             for move in self.move_list:
+                print(str(move.count))
                 if(move.count % 2 == 1):
                     if(self.white_movecnt_short_castling_lost == 0):
                         if(move.srcx == E1_X and move.srcy == E1_Y):

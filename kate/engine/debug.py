@@ -69,7 +69,7 @@ def prnt_match_attributes(match, delimiter):
     
 BLANK  = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020" ] * 4
 
-KING   = [ u"\u0020\u0020\u0020\u2542\u0020\u0020\u0020", 
+KING   = [ u"\u0020\u0020\u0020\u254B\u0020\u0020\u0020", # 253C 2542
            u"\u0020\u0020\u2599\u2584\u259F\u0020\u0020", 
            u"\u0020\u0020\u2587\u2587\u2587\u0020\u0020",
            u"\u0020\u0020\u2580\u2580\u2580\u0020\u0020" ]
@@ -106,9 +106,9 @@ def prnt_row(pieces):
             backcolor = pieces[k][1]
 
             if(Match.color_of_piece(piece) == COLORS['white']):
-                forecolor = 0
+                forecolor = "white"
             else:
-                forecolor = 1
+                forecolor = "black"
 
             if(piece == PIECES['blk']):
                 piecemap = BLANK
@@ -133,16 +133,16 @@ def prnt_row(pieces):
             offset = i * 9
 
 
-            if(forecolor == 0):
-                if(backcolor == 0):
-                    print(Back.WHITE + Fore.YELLOW + piecemap[i] + Style.RESET_ALL, end=endstr)
+            if(forecolor == "white"):
+                if(backcolor == "white"):
+                    print(Back.WHITE + Fore.WHITE + Style.DIM + piecemap[i] + Style.RESET_ALL, end=endstr)
                 else:
-                    print(Back.BLACK + Fore.YELLOW + piecemap[i] + Style.RESET_ALL, end=endstr)
+                    print(Back.BLUE + Fore.WHITE + Style.DIM + piecemap[i] + Style.RESET_ALL, end=endstr)
             else:
-                if(backcolor == 0):
-                    print(Back.WHITE + Fore.BLUE + piecemap[i] + Style.RESET_ALL, end=endstr)
+                if(backcolor == "white"):
+                    print(Back.WHITE + Fore.BLACK + piecemap[i] + Style.RESET_ALL, end=endstr)
                 else:
-                    print(Back.BLACK + Fore.BLUE + piecemap[i] + Style.RESET_ALL, end=endstr)
+                    print(Back.BLUE + Fore.BLACK + piecemap[i] + Style.RESET_ALL, end=endstr)
 
 
 def prnt_board(match):
@@ -150,9 +150,9 @@ def prnt_board(match):
     for y in range(7, -1, -1):
         for x in range(8):
             if((y % 2 + x) % 2 == 1):
-                backcolor = 0
+                backcolor = "white"
             else:
-                backcolor = 1
+                backcolor = "black"
             pieces.append([match.readfield(x, y), backcolor])
         prnt_row(pieces)
         pieces.clear()

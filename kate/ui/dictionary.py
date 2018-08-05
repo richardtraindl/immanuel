@@ -307,7 +307,7 @@ def word_save(session, params):
             strboard += reverse_lookup(PIECES, session.match.readfield(x, y))
     fobject.write(strboard + ";")
 
-    fobject.write("movecnt:" + str(len(session.match.move_list)) + ";")
+    fobject.write("movelistcnt:" + str(len(session.match.move_list)) + ";")
     for move in session.match.move_list:
         attributes = list_move_attributes(move)
         for classattr in attributes:
@@ -340,16 +340,24 @@ def word_load(session, params):
             label_len = len(classattr.label)
             if(classattr.label == tokens[index][:label_len]):
                 if(classattr.label == "begin"):
-                    match.begin = datetime.now()
+                    value = datetime.now()
                 elif(classattr.label == "time_start"):
-                    match.time_start = 0
+                    value = 0
                 else:
-                    if(type(classattr.attribute) == bool):
-                        classattr.attribute = bool(tokens[index].replace(classattr.label + ":", ""))
-                    elif(type(classattr.attribute) == int):
-                        classattr.attribute = int(float(tokens[index].replace(classattr.label + ":", "")))
+                    strvalue= tokens[index].replace(classattr.label + ":", "")
+                    if(strvalue == "None"):
+                        value = None
+                    elif(strvalue == "True"):
+                        value = True
+                    elif(strvalue == "False"):
+                        value = False
                     else:
-                        classattr.attribute = tokens[index].replace(classattr.label + ":", "")
+                        try: 
+                            value = int(strvalue)
+                        except ValueError:
+                            value = strvalue
+
+                setattr(match, classattr.label, value)
                 break
         index += 1
     # -----------------------
@@ -366,10 +374,8 @@ def word_load(session, params):
     # -----------------------
 
     # -----------------------
-    strmovecnt = tokens[index].replace("movecnt:", "")
+    movecnt = int(tokens[index].replace("movelistcnt:", ""))
     index += 1
-
-    movecnt = int(strmovecnt)
     
     for i in range(movecnt):
         move = Move()
@@ -378,11 +384,23 @@ def word_load(session, params):
             label_len = len(classattr.label)
             if(classattr.label == tokens[index][:label_len]):
                 if(classattr.label == "match"):
-                    move.match = match
-                elif(tokens[index] == "None"):
-                    classattr.attribute = None
+                    value = match
                 else:
-                    classattr.attribute = int(tokens[index].replace(classattr.label + ":", ""))
+                    strvalue= tokens[index].replace(classattr.label + ":", "")
+                    if(strvalue == "None"):
+                        value = None
+                    elif(strvalue == "True"):
+                        value = True
+                    elif(strvalue == "False"):
+                        value = False
+                    else:
+                        try: 
+                            value = int(strvalue)
+                        except ValueError:
+                            value = strvalue
+
+                setattr(move, classattr.label, value)
+                index += 1
 
         match.move_list.append(move)
         index += 1
@@ -390,6 +408,7 @@ def word_load(session, params):
 
     fobject.close()
 
+    match.update_attributes()
     session.match = match
     session.msgs = Msgs()
     
