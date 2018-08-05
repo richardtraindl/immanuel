@@ -220,23 +220,23 @@ def word_move(session, params):
         else:
             matchobj = re.search(r"^\s*(?P<short>[0oO][-][0oO])\s*$", params)
             if(matchobj):
-                if(match.next_color() == COLORS['white']):
-                    srcx = match.wKg_x
-                    srcy = match.wKg_y
+                if(session.match.next_color() == COLORS['white']):
+                    srcx = session.match.wKg_x
+                    srcy = session.match.wKg_y
                 else:
-                    srcx = match.bKg_x
-                    srcy = match.bKg_y
+                    srcx = session.match.bKg_x
+                    srcy = session.match.bKg_y
                 dstx = srcx + 2
                 dsty = srcy
             else:
                 matchobj = re.search(r"^\s*(?P<long>[0oO][-][0oO][-][0oO])\s*$", params)
                 if(matchobj):
-                    if(match.next_color() == COLORS['white']):
-                        srcx = match.wKg_x
-                        srcy = match.wKg_y
+                    if(session.match.next_color() == COLORS['white']):
+                        srcx = session.match.wKg_x
+                        srcy = session.match.wKg_y
                     else:
-                        srcx = match.bKg_x
-                        srcy = match.bKg_y
+                        srcx = session.match.bKg_x
+                        srcy = session.match.bKg_y
                     dstx = srcx - 2
                     dsty = srcy
                 else:

@@ -457,7 +457,7 @@ def calc_move(match, msgs):
     match.time_start = time.time()
     ###
 
-    msg = "result: " + str(score) + " match: " + str(match) + " "
+    msg = "result: " + str(score) + " match: " + str(match.begin) + " "
     prnt_moves(msg, candidates)
     prnt_fmttime("\ncalc-time: ", elapsed_time)
     return candidates
