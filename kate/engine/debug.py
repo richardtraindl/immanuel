@@ -1,6 +1,5 @@
 from colorama import Fore, Back, Style
 from .match import *
-from .cvalues import *
 from .move import *
 from .helper import *
 
@@ -12,7 +11,7 @@ def prnt_minutes(match):
         print(str(count) + ":" + 
               index_to_coord(move.srcx, move.srcy) + " " +
               index_to_coord(move.dstx, move.dsty) + " " +
-              reverse_lookup(PIECES, move.prom_piece))
+              reverse_lookup(match.PIECES, move.prom_piece))
         count += 1
     print("------------------------------------------------------")
 
@@ -99,28 +98,28 @@ PAWN     = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020",
              u"\u0020\u0020\u2588\u2588\u2588\u0020\u0020",
              u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020" ]
 
-def prnt_row(pieces):
+def prnt_row(match, pieces):
     for i in range(4):
         for k in range(8):
             piece = pieces[k][0]
             backcolor = pieces[k][1]
 
-            if(Match.color_of_piece(piece) == COLORS['white']):
+            if(match.color_of_piece(piece) == match.COLORS['white']):
                 forecolor = "white"
             else:
                 forecolor = "black"
 
-            if(piece == PIECES['blk']):
+            if(piece == match.PIECES['blk']):
                 piecemap = BLANK
-            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+            elif(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
                 piecemap = PAWN
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+            elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
                 piecemap = KNIGHT
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+            elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
                 piecemap = BISHOP
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+            elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
                 piecemap = ROOK
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+            elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
                 piecemap = QUEEN
             else:
                 piecemap = KING
@@ -154,7 +153,7 @@ def prnt_board(match):
             else:
                 backcolor = "black"
             pieces.append([match.readfield(x, y), backcolor])
-        prnt_row(pieces)
+        prnt_row(match, pieces)
         pieces.clear()
 
 

@@ -1,6 +1,3 @@
-from .. match import *
-#from .. import rules
-from .. cvalues import *
 
 
 class cTouch:

@@ -1,496 +1,70 @@
-from .. match import *
-from .. cvalues import *
-from .. import rules
-from .. import analyze_helper
-from .generic_piece import cTouch, cTouchBeyond, cFork
+from . piece import cPiece
 
 
-NEAST_X = 1
-NEAST_Y = 1
-SWEST_X = -1
-SWEST_Y = -1
-NWEST_X = -1
-NWEST_Y = 1
-SEAST_X = 1
-SEAST_Y = -1
+class cBishop(cPiece):
+    DIRS = { 'north-east' : 5,
+             'south-west' : 6,
+             'north-west' : 7,
+             'south-east' : 8,
+             'undefined'  : 14 }
 
-STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+    REVERSE_DIRS = { DIRS['north-east'] : DIRS['south-west'],
+                     DIRS['south-west'] : DIRS['north-east'],
+                     DIRS['north-west'] : DIRS['south-east'],
+                     DIRS['south-east'] : DIRS['north-west'],
+                     DIRS['undefined']  : DIRS['undefined'] }
 
-NE_SW_STEPS = [ [1, 1], [-1, -1] ]
+    STEPS = [ [1, 1], [-1, -1], [-1, 1], [1, -1] ]
 
-NW_SE_STEPS = [ [-1, 1], [1, -1] ]
+    STEP_NEAST_X = 1
+    STEP_NEAST_Y = 1
+    STEP_SWEST_X = -1
+    STEP_SWEST_Y = -1
+    STEP_NWEST_X = -1
+    STEP_NWEST_Y = 1
+    STEP_SEAST_X = 1
+    STEP_SEAST_Y = -1
 
-blank = PIECES['blk']
-GEN_STEPS = [ [[1, 1, blank], [2, 2, blank], [3, 3, blank], [4, 4, blank], [5, 5, blank], [6, 6, blank], [7, 7, blank]],
-              [[-1, -1, blank], [-2, -2, blank], [-3, -3, blank], [-4, -4, blank], [-5, -5, blank], [-6, -6, blank], [-7, -7, blank]],
-              [[1, -1, blank], [2, -2, blank], [3, -3, blank], [4, -4, blank], [5, -5, blank], [6, -6, blank], [7, -7, blank]],
-              [[-1, 1, blank], [-2, 2, blank], [-3, 3, blank], [-4, 4, blank], [-5, 5, blank], [-6, 6, blank], [-7, 7, blank]] ]
+    def __init__(self, match, xpos, ypos):
+        super().__init__(match, xpos, ypos)
 
+    @classmethod
+    def dir_for_move(cls, srcx, srcy, dstx, dsty):
+        if( (srcx - dstx) == (srcy - dsty) and (srcy < dsty) ):
+            return cls.DIRS['north-east']
+        elif( (srcx - dstx) == (srcy - dsty) and (srcy > dsty) ):
+            return cls.DIRS['south-west']
+        elif( (srcx - dstx) == ((srcy - dsty) * -1) and (srcy < dsty) ):
+            return cls.DIRS['north-west']
+        elif( (srcx - dstx) == ((srcy - dsty) * -1) and (srcy > dsty) ):
+            return cls.DIRS['south-east']
+        else:
+            return cls.DIRS['undefined']
 
-def search(match, searchpieces, fieldx, fieldy, foundpieces):
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            piece = match.readfield(x1, y1)
-            if(searchpieces):
-                for searchpiece in searchpieces:
-                    if(piece == searchpiece):
-                        foundpieces.append(cTouch(piece, x1, y1))
-            else:
-                foundpieces.append(cTouch(piece, x1, y1))
+    @classmethod
+    def step_for_dir(cls, direction):
+        if(direction == cls.DIRS['north-east']):
+            return cls.STEP_NEAST_X, cls.STEP_NEAST_Y
+        elif(direction == cls.DIRS['south-west']):
+            return cls.STEP_SWEST_X, cls.STEP_SWEST_Y
+        elif(direction == cls.DIRS['north-west']):
+            return cls.STEP_NWEST_X, cls.STEP_NWEST_Y
+        elif(direction == cls.DIRS['south-east']):
+            return cls.STEP_SEAST_X, cls.STEP_SEAST_Y
+        else:
+            return cls.UNDEF_X, cls.UNDEF_Y
 
+    #is_piece_trapped(self)
+        # works with inherited class
 
-def is_field_touched(match, color, fieldx, fieldy, mode):
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            piece = match.readfield(x1, y1)
-            if( (color == COLORS['white'] and piece == PIECES['wBp']) or
-                (color == COLORS['black'] and piece == PIECES['bBp']) ):
-                if(mode == 0):
-                    return True
-                elif(mode == 1):
-                    if(is_move_stuck(match, fieldx, fieldy, x1, y1)):
-                        continue
-                    else:
-                        return True
-                else: #mode == 2
-                    if(is_move_stuck(match, fieldx, fieldy, x1, y1) or analyze_helper.is_soft_pin(match, x1, y1)):
-                        continue
-                    else:
-                        return True
-
-    return False
-
-
-def is_piece_stuck(match, srcx, srcy):
-    bishop = match.readfield(srcx, srcy)
-    color = Match.color_of_piece(bishop)
-
-    for i in range(4):
-        x1 = srcx + STEPS[i][0]
-        y1 = srcy + STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-
-            if(piece == PIECES['blk']):
-                return False
-            elif(Match.color_of_piece(piece) == color):
-                continue
-            else:
-                if(rules.is_field_touched(match, Match.oppcolor_of_piece(bishop), x1, y1, 0)):
-                    if(PIECES_RANK[bishop] <= PIECES_RANK[piece]):
-                        return False
-                else:
-                    return False
-
-    return True
-
-
-def is_move_stuck(match, srcx, srcy, dstx, dsty):
-    move_dir = bp_dir(srcx, srcy, dstx, dsty)
-    pin_dir = rules.pin_dir(match, None, srcx, srcy)
-    if(pin_dir == rules.DIRS['undefined'] or move_dir == pin_dir or move_dir == rules.REVERSE_DIRS[pin_dir]):
-        return False
-    else:
-        return True
-
-
-def field_color_touches(match, color, fieldx, fieldy, frdlytouches, enmytouches):
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            piece = match.readfield(x1, y1)
-            if(piece == PIECES['wQu'] or piece == PIECES['bQu'] or piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                if(is_move_stuck(match, x1, y1, fieldx, fieldy)):
-                    continue
-
-                if(Match.color_of_piece(piece) == color):
-                    frdlytouches.append(cTouch(piece, x1, y1))
-                else:
-                    enmytouches.append(cTouch(piece, x1, y1))
-
-
-def field_color_touches_beyond(match, color, ctouch_beyond):
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            piece = match.readfield(x1, y1)
-            if(piece == PIECES['wQu'] or piece == PIECES['bQu'] or piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                if(is_move_stuck(match, x1, y1, ctouch_beyond.fieldx, ctouch_beyond.fieldy)):
-                    continue
-
-                if(Match.color_of_piece(piece) == color):
-                    ctouch_beyond.supporter_beyond.append(cTouch(piece, x1, y1))
-                else:
-                    ctouch_beyond.attacker_beyond.append(cTouch(piece, x1, y1))
-
-
-def list_field_touches(match, color, fieldx, fieldy):
-    touches = []
+    #is_piece_stuck_new(self):
+        # works with inherited class
     
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            if(is_move_stuck(match, x1, y1, fieldx, fieldy)):
-                continue
+    #is_move_stuck(self, srcx, srcy, dstx, dsty)
+        # works with inherited class
 
-            piece = match.readfield(x1, y1)
-            if( (color == COLORS['white'] and (piece == PIECES['wQu'] or piece == PIECES['wBp'])) or
-                (color == COLORS['black'] and (piece == PIECES['bQu'] or piece == PIECES['bBp'])) ):
-                touches.append(cTouch(piece, x1, y1))
+    #is_move_valid(self, dstx, dsty)
+        # works with inherited class
 
-    return touches
-
-  
-def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
-    bishop = match.readfield(srcx, srcy)
-
-    color = Match.color_of_piece(bishop)
-    opp_color = Match.oppcolor_of_piece(bishop)
-
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, dstx, dsty, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            if(x1 == srcx and y1 == srcy):
-                continue
-            
-            if(is_move_stuck(match, dstx, dsty, x1, y1)):
-                continue
-
-            piece = match.readfield(x1, y1)
-            
-            if(Match.color_of_piece(piece) == opp_color):
-                ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                attacked.append(ctouch_beyond)
-
-                ###
-                match.writefield(srcx, srcy, PIECES['blk'])
-
-                analyze_helper.field_touches_beyond(match, opp_color, ctouch_beyond)
-
-                match.writefield(srcx, srcy, bishop)
-                ###
-
-            else:
-                if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                    continue
-
-                ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                supported.append(ctouch_beyond)
-
-                ###
-                match.writefield(srcx, srcy, PIECES['blk'])
-
-                analyze_helper.field_touches_beyond(match, color, ctouch_beyond)
-
-                match.writefield(srcx, srcy, bishop)
-                ###
-
-
-def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_supported):
-    for j in range(0, 4, 2):
-        first = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
-        second = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
-
-        for i in range(0, 2, 1):
-            stepx = STEPS[j+i][0]
-            stepy = STEPS[j+i][1]
-            direction = bp_dir(srcx, srcy, (srcx + stepx), (srcy + stepy))
-            if(direction == excluded_dir or direction == rules.REVERSE_DIRS[excluded_dir]):
-                break
-            x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
-            if(x1 != rules.UNDEF_X):
-                piece = match.readfield(x1, y1)
-                if(first.piece == PIECES['blk']):
-                    first.piece = piece
-                    first.fieldx = x1
-                    first.fieldy = y1
-                    continue
-                elif(second.piece == PIECES['blk']):
-                    second.piece = piece
-                    second.fieldx = x1
-                    second.fieldy = y1
-                    if(Match.color_of_piece(first.piece) != Match.color_of_piece(second.piece) and 
-                       first.piece != PIECES['blk'] and second.piece != PIECES['blk']):
-                        if(Match.color_of_piece(first.piece) == color):
-                            if(first.piece == PIECES['wBp'] or first.piece == PIECES['bBp'] or 
-                               first.piece == PIECES['wQu'] or first.piece == PIECES['bQu']):
-                                discl_attacked.append(second)
-                        else:
-                            if(second.piece == PIECES['wBp'] or second.piece == PIECES['bBp'] or 
-                               second.piece == PIECES['wQu'] or second.piece == PIECES['bQu']):
-                                discl_attacked.append(first)
-                    elif(Match.color_of_piece(first.piece) == Match.color_of_piece(second.piece) and 
-                         Match.color_of_piece(first.piece) == color and
-                         first.piece != PIECES['blk'] and second.piece != PIECES['blk']):
-                        if(first.piece == PIECES['wBp'] or first.piece == PIECES['bBp'] or 
-                           first.piece == PIECES['wQu'] or first.piece == PIECES['bQu']):
-                            discl_supported.append(second)
-                        elif(second.piece == PIECES['wBp'] or second.piece == PIECES['bBp'] or 
-                             second.piece == PIECES['wQu'] or second.piece == PIECES['bQu']):
-                            discl_supported.append(first)
-                    else:
-                        break
-                else:
-                    break
-
-
-def score_attacks(match, srcx, srcy):
-    score = 0
-
-    bishop = match.readfield(srcx, srcy)
-
-    color = Match.color_of_piece(bishop)
-    opp_color = Match.oppcolor_of_piece(bishop)
-
-    frdlytouches, enmytouches = analyze_helper.field_touches(match, color, srcx, srcy)
-    if(len(frdlytouches) < len(enmytouches)):
-        return score
-
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            if(is_move_stuck(match, srcx, srcy, x1, y1)):
-                continue
-
-            frdlytouches, enmytouches = analyze_helper.field_touches(match, color, x1, y1)
-            #if(len(frdlytouches) < len(enmytouches)):
-                #continue
-
-            piece = match.readfield(x1, y1)
-
-            if(match.color_of_piece(piece) == opp_color):
-                if(len(enmytouches) == 0 or PIECES_RANK[bishop] <= PIECES_RANK[piece]):
-                    score += ATTACKED_SCORES[piece]
-
-                # score if attacked is pinned
-                direction = bp_dir(srcx, srcy, x1, y1)
-                enmy_pin = rules.pin_dir(match, opp_color, x1, y1)
-                if(enmy_pin != rules.DIRS['undefined']):
-                    if(enmy_pin != direction and enmy_pin != rules.REVERSE_DIRS[direction]):
-                        score += ATTACKED_SCORES[piece]
-                    else:
-                        if(piece != PIECES['wBp'] and piece != PIECES['bBp'] and
-                           piece != PIECES['wPw'] and piece != PIECES['bPw']):
-                            score += ATTACKED_SCORES[piece]
-
-                if(analyze_helper.is_soft_pin(match, x1, y1)):
-                    score += ATTACKED_SCORES[piece]
-
-    return score
-
-
-def score_supports(match, srcx, srcy):
-    score = 0
-
-    bishop = match.readfield(srcx, srcy)
-
-    color = Match.color_of_piece(bishop)
-    opp_color = Match.oppcolor_of_piece(bishop)
-
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, srcx, srcy, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            if(x1 == srcx and y1 == srcy):
-                continue
-
-            if(is_move_stuck(match, srcx, srcy, x1, y1, 1)):
-                continue
-
-            piece = match.readfield(x1, y1)
-
-            if(Match.color_of_piece(piece) == color):
-                if(rules.is_field_touched(match, opp_color, x1, y1, 1)):
-                    score += SUPPORTED_SCORES[piece]
-
-    return score 
-
-
-def count_touches(match, color, fieldx, fieldy):
-    count = 0
-
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = rules.search(match, fieldx, fieldy, stepx, stepy)
-        if(x1 != rules.UNDEF_X):
-            if(is_move_stuck(match, fieldx, fieldy, x1, y1)):
-                continue
-
-            piece = match.readfield(x1, y1)
-            if(piece == PIECES['blk']):
-                continue
-            elif(match.color_of_piece(piece) == color):
-                if(rules.is_field_touched(match, color, x1, y1, 1) == False):
-                    count += 1
-                elif(PIECES_RANK[piece] > PIECES_RANK[PIECES['wBp']]):
-                    count += 1
-            """else:
-                count -= 1"""
-
-    return count
-
-
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): #, analyses
-    if(is_move_stuck(match, srcx, srcy, dstx, dsty)):
-        return False
-
-    color = Match.color_of_piece(piece)
-    opp_color = Match.oppcolor_of_piece(piece)
-
-    direction = bp_dir(srcx, srcy, dstx, dsty)
-    if(direction == rules.DIRS['north-east'] or direction == rules.DIRS['south-west']):
-        BP_STEPS = NW_SE_STEPS
-    else:
-        BP_STEPS = NE_SW_STEPS
-
-    for i in range(2):
-        stepx = BP_STEPS[i][0]
-        stepy = BP_STEPS[i][1]
-
-        x1 = dstx + stepx
-        y1 = dsty + stepy
-        while(rules.is_inbounds(x1, y1)):
-            fork_field = match.readfield(x1, y1)
-
-            if(Match.color_of_piece(fork_field) == opp_color):
-                break
-
-            if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
-                #analyses.lst_fork_defended.append(cfork)
-                return True
-
-            if(Match.color_of_piece(fork_field) == color):
-                break
-
-            x1 += stepx
-            y1 += stepy
-
-    return False
-
-
-def controles_file(match, piece, color, srcx, srcy, dstx, dsty):
-    cnt = 0
-
-    move_dir = bp_dir(srcx, srcy, dstx, dsty)
-
-    move_opp_dir = rules.REVERSE_DIRS[move_dir]
-    
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-
-        direction = bp_dir(dstx, dsty, dstx + stepx, dsty + stepy)
-        if(direction == move_dir or direction == move_opp_dir):
-            continue
-
-        x1 = dstx + stepx
-        y1 = dsty + stepy
-        while(rules.is_inbounds(x1, y1)):
-            piece = match.readfield(x1, y1)
-            if(Match.color_of_piece(piece) == color):
-                break
-            else:
-                cnt += 1
-                x1 += stepx
-                y1 += stepy
-
-    if(cnt >= 5):
-        return True
-    else:
-        return False
-
-
-def bp_dir(srcx, srcy, dstx, dsty):
-    if( (srcx - dstx) == (srcy - dsty) and (srcy < dsty) ):
-        return rules.DIRS['north-east']
-    elif( (srcx - dstx) == (srcy - dsty) and (srcy > dsty) ):
-        return rules.DIRS['south-west']
-    elif( (srcx - dstx) == ((srcy - dsty) * -1) and (srcy < dsty) ):
-        return rules.DIRS['north-west']
-    elif( (srcx - dstx) == ((srcy - dsty) * -1) and (srcy > dsty) ):
-        return rules.DIRS['south-east']
-    else:
-        return rules.DIRS['undefined']
-
-
-def bp_step(direction=None, srcx=None, srcy=None, dstx=None, dsty=None):
-    if(direction is None):
-        direction = bp_dir(srcx, srcy, dstx, dsty)
-
-    if(direction == rules.DIRS['north-east']):
-        return direction, NEAST_X, NEAST_Y
-    elif(direction == rules.DIRS['south-west']):
-        return direction, SWEST_X, SWEST_Y
-    elif(direction == rules.DIRS['north-west']):
-        return direction, NWEST_X, NWEST_Y
-    elif(direction == rules.DIRS['south-east']):
-        return direction, SEAST_X, SEAST_Y
-    else:
-        return direction, rules.UNDEF_X, rules.UNDEF_Y
-
-
-def dir_to_step(direction):
-    if(direction == rules.DIRS['north-east']):
-        return NEAST_X, NEAST_Y
-    elif(direction == rules.DIRS['south-west']):
-        return SWEST_X, SWEST_Y
-    elif(direction == rules.DIRS['north-west']):
-        return NWEST_X, NWEST_Y
-    elif(direction == rules.DIRS['south-east']):
-        return SEAST_X, SEAST_Y
-    else:
-        return rules.UNDEF_X, rules.UNDEF_Y
-
-
-def is_move_valid(match, srcx, srcy, dstx, dsty, piece):
-    direction, stepx, stepy = bp_step(None, srcx, srcy, dstx, dsty)
-    if(direction == rules.DIRS['undefined']):
-        return False
-
-    color = Match.color_of_piece(piece)
-
-    pin_dir = rules.pin_dir(match, color, srcx, srcy)
-
-    if(direction == rules.DIRS['north-east'] or direction == rules.DIRS['south-west']):
-        if(pin_dir != rules.DIRS['north-east'] and pin_dir != rules.DIRS['south-west'] and pin_dir != rules.DIRS['undefined']):
-            return False
-    elif(direction == rules.DIRS['north-west'] or direction == rules.DIRS['south-east']):
-        if(pin_dir != rules.DIRS['north-west'] and pin_dir != rules.DIRS['south-east'] and pin_dir != rules.DIRS['undefined']):
-            return False
-
-    x = srcx + stepx
-    y = srcy + stepy
-    while(x >= 0 and x <= 7 and y >= 0 and y <= 7):
-        field = match.readfield(x, y)
-        if(x == dstx and y == dsty):
-            if(Match.color_of_piece(field) == color):
-                return False
-            else:
-                return True
-        elif(field != PIECES['blk']):
-            return False
-
-        x += stepx
-        y += stepy
-
-    return False
+# class end
 

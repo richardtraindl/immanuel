@@ -12,8 +12,8 @@ from .modules import interface
 from .engine.match import *
 from .engine.move import *
 from .engine.helper import index_to_coord, coord_to_index
-from .engine.rules import RETURN_CODES, RETURN_MSGS, STATUS, status
-from .engine.analyze_position import score_position, is_stormy
+from .engine.validator import cValidator
+#from .engine.analyze_position import score_position, is_stormy
 from .engine.debug import list_match_attributes
 
 
@@ -41,9 +41,9 @@ def match(request, matchid=None):
         except ObjectDoesNotExist: #ModelMatch.DoesNotExist:
             return HttpResponseRedirect('/kate/')
 
-    match = Match()
+    match = cMatch()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
-    match.status = status(match)
+    match.status = match.evaluate_status()
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
     if(lastmove):
@@ -62,7 +62,7 @@ def match(request, matchid=None):
             limit = 21
         qmoves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")[:limit]
         for qmove in reversed(qmoves):
-            move = Move()
+            move = cMove()
             interface.map_moves(qmove, move, interface.MAP_DIR['model-to-engine'])
             moves.append(move)
 
@@ -84,14 +84,15 @@ def match(request, matchid=None):
         else:
             urgent = False
             msg = "" """
-    elif(msgcode == RETURN_CODES['ok']):
+    elif(msgcode == cValidator.RETURN_CODES['ok']):
         #urgent = False
-        msg = RETURN_MSGS[msgcode]
+        msg = cValidator.RETURN_MSGS[msgcode]
     else:
         urgent = True
-        msg = RETURN_MSGS[msgcode]
+        msg = cValidator.RETURN_MSGS[msgcode]
 
-    if(match.status == STATUS['winner_white'] or match.status == STATUS['winner_black'] or match.status == STATUS['draw']):
+    status = match.evaluate_status()
+    if(status == match.STATUS['winner_white'] or status == match.STATUS['winner_black'] or status == match.STATUS['draw']):
         urgent = True
 
     domoveform = DoMoveForm()
@@ -112,14 +113,14 @@ def do_move(request, matchid=None):
         if(form.is_valid()):
             srcx,srcy = coord_to_index(form.move_src)
             dstx,dsty = coord_to_index(form.move_dst)
-            prom_piece = PIECES[form.prom_piece]
+            prom_piece = cMatch.PIECES[form.prom_piece]
             valid, msgcode = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
             if(valid):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
 
                 interface.calc_move_for_immanuel(modelmatch)
         else:
-            msgcode= RETURN_CODES['format-error']
+            msgcode= cValidator.RETURN_CODES['format-error']
 
         return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
     else:
@@ -157,7 +158,7 @@ def pause(request, matchid=None):
 
             modelmatch.time_start = 0
 
-        modelmatch.status = STATUS['paused']
+        modelmatch.status = cMatch.STATUS['paused']
         modelmatch.save()
 
     return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
@@ -169,8 +170,8 @@ def resume(request, matchid=None):
     switch = int(request.GET.get('switch', '0'))
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-    if(modelmatch.status == STATUS['paused']):
-        modelmatch.status = STATUS['open']
+    if(modelmatch.status == cMatch.STATUS['paused']):
+        modelmatch.status = cMatch.STATUS['open']
         modelmatch.save()
 
     # TODO: check if calculation is already running
@@ -248,14 +249,14 @@ def fetch_match(request):
         return
 
     modelmatch = ModelMatch.objects.get(id=matchid)
-    match = Match()
+    match = cMatch()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
     if(match.time_start > 0):
         elapsed_time = time.time() - match.time_start
     else:
         elapsed_time = 0
 
-    if(match.next_color() == COLORS['white']):
+    if(match.next_color() == match.COLORS['white']):
         match.white_elapsed_seconds += elapsed_time
     else:
         match.black_elapsed_seconds += elapsed_time
@@ -309,7 +310,7 @@ def dbginfo(request, matchid=None):
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
-    match = Match()
+    match = cMatch()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
     
     moves = "moves:"
@@ -317,7 +318,7 @@ def dbginfo(request, matchid=None):
     idx = 0
     for modelmove in reversed(modelmoves):
         idx += 1
-        move = Move()
+        move = cMove()
         interface.map_moves(modelmove, move, interface.MAP_DIR['model-to-engine'])
         if(idx == 1):
             moves += move.format_move()

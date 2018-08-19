@@ -1,9 +1,8 @@
 from .match import *
-from .cvalues import *
-from . import rules
 from .pieces import pawn, knight, bishop, rook, king 
+from .pieces import pawn_ext, knight_ext, bishop_ext, rook_ext, king_ext
 from .pieces.generic_piece import cTouchBeyond
-from .analyze_helper import field_touches_beyond, field_touches, is_soft_pin, is_piece_stuck
+from .analyze_helper import field_touches_beyond, field_touches, is_piece_stuck_new
 
 
 def score_supports(match, color):
@@ -13,19 +12,19 @@ def score_supports(match, color):
         for x in range(8):
             piece = match.readfield(x, y)
 
-            if(piece == PIECES['blk']):
+            if(piece == match.PIECES['blk']):
                 continue
             elif(Match.color_of_piece(piece) != color):
                 continue
-            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+            elif(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
                 score += pawn.score_supports(match, x, y)
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+            elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
                 score += knight.score_supports(match, x, y)
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+            elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
                 score += bishop.score_supports(match, x, y)
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+            elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
                 score += rook.score_supports(match, x, y)
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+            elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
                 score += bishop.score_supports(match, x, y)
                 score += rook.score_supports(match, x, y)
             else:
@@ -41,19 +40,19 @@ def score_attacks(match, color):
         for x in range(8):
             piece = match.readfield(x, y)
 
-            if(piece == PIECES['blk']):
+            if(piece == match.PIECES['blk']):
                 continue
             #elif(Match.color_of_piece(piece) != color):
                 #continue
-            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+            elif(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
                 score += pawn.score_attacks(match, x, y)
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+            elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
                 score += knight.score_attacks(match, x, y)
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+            elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
                 score += bishop.score_attacks(match, x, y)
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+            elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
                 score += rook.score_attacks(match, x, y)    
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+            elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
                 score += bishop.score_attacks(match, x, y)
                 score += rook.score_attacks(match, x, y)
             else:
@@ -65,18 +64,18 @@ def score_attacks(match, color):
 def score_controled_horizontal_files(match):
     score = 0
 
-    whiterate = ATTACKED_SCORES[PIECES['bKn']]
+    whiterate = match.ATTACKED_SCORES[match.PIECES['bKn']]
     
-    blackrate = ATTACKED_SCORES[PIECES['wKn']]
+    blackrate = match.ATTACKED_SCORES[match.PIECES['wKn']]
 
     for y in range(0, 2, 1):
         wcnt = 0
         bcnt = 0
         for x in range(8):
             piece = match.readfield(x, y)
-            if(piece == PIECES['wRk'] or piece == PIECES['wQu']):
+            if(piece == match.PIECES['wRk'] or piece == match.PIECES['wQu']):
                 wcnt += 1
-            elif(piece == PIECES['bRk'] or piece == PIECES['bQu']):
+            elif(piece == match.PIECES['bRk'] or piece == match.PIECES['bQu']):
                 bcnt += 1
             else:
                 continue
@@ -89,9 +88,9 @@ def score_controled_horizontal_files(match):
         bcnt = 0
         for x in range(8):
             piece = match.readfield(x, y)
-            if(piece == PIECES['bRk'] or piece == PIECES['bQu']):
+            if(piece == match.PIECES['bRk'] or piece == match.PIECES['bQu']):
                 bcnt += 1
-            elif(piece == PIECES['wRk'] or piece == PIECES['wQu']):
+            elif(piece == match.PIECES['wRk'] or piece == match.PIECES['wQu']):
                 wcnt += 1
             else:
                 continue
@@ -105,9 +104,9 @@ def score_controled_horizontal_files(match):
 def score_controled_vertical_files(match):
     score = 0
 
-    whiterate = ATTACKED_SCORES[PIECES['bKn']]
+    whiterate = match.ATTACKED_SCORES[match.PIECES['bKn']]
     
-    blackrate = ATTACKED_SCORES[PIECES['wKn']]
+    blackrate = match.ATTACKED_SCORES[match.PIECES['wKn']]
 
     for x in range(8):
         wcnt = 0
@@ -116,18 +115,18 @@ def score_controled_vertical_files(match):
         bpwcnt = 0
         for y in range(8):
             piece = match.readfield(x, y)
-            if(piece == PIECES['blk']):
+            if(piece == match.PIECES['blk']):
                 continue
-            elif(piece == PIECES['wPw']):
+            elif(piece == match.PIECES['wPw']):
                 wpwcnt += 1
                 continue
-            elif(piece == PIECES['bPw']):
+            elif(piece == match.PIECES['bPw']):
                 bpwcnt += 1
                 continue
-            elif(piece == PIECES['wRk'] or piece == PIECES['wQu']):
+            elif(piece == match.PIECES['wRk'] or piece == match.PIECES['wQu']):
                 wcnt += 1
                 continue
-            elif(piece == PIECES['bRk'] or piece == PIECES['bQu']):
+            elif(piece == match.PIECES['bRk'] or piece == match.PIECES['bQu']):
                 bcnt += 1
                 continue
             else:
@@ -153,17 +152,17 @@ def is_endgame(match):
 
 
 def is_king_guarded(match, color):
-    if(color == COLORS['white']):
+    if(color == match.COLORS['white']):
         Kg_x = match.wKg_x
         Kg_y = match.wKg_y
-        pawn = PIECES['wPw']
+        pawn = match.PIECES['wPw']
 
         if(is_endgame(match) == False and Kg_y > 0):
             return False
     else:
         Kg_x = match.bKg_x
         Kg_y = match.bKg_y
-        pawn = PIECES['bPw']
+        pawn = match.PIECES['bPw']
 
         if(is_endgame(match) == False and Kg_y < 7):
             return False
@@ -171,13 +170,13 @@ def is_king_guarded(match, color):
     count = 0
 
     for i in range(8):
-        x1 = Kg_x + king.STEPS[i][0]
-        y1 = Kg_y + king.STEPS[i][1]
-        if(rules.is_inbounds(x1, y1)):
+        x1 = Kg_x + king.cKing.STEPS[i][0]
+        y1 = Kg_y + king.cKing.STEPS[i][1]
+        if(match.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(piece == pawn):
                 count += 2
-            elif(Match.color_of_piece(piece) == color):
+            elif(match.color_of_piece(piece) == color):
                 count += 1
 
     if(count >= 3):
@@ -187,7 +186,7 @@ def is_king_guarded(match, color):
 
 
 def is_king_centered(match, color):
-    if(color == COLORS['white']):
+    if(color == match.COLORS['white']):
         x = match.wKg_x
         y = match.wKg_y
     else:
@@ -201,7 +200,7 @@ def is_king_centered(match, color):
 
 
 def is_king_exposed(match, color):
-    if(color == COLORS['white']):
+    if(color == match.COLORS['white']):
         x = match.wKg_x
     else:
         x = match.bKg_x
@@ -213,14 +212,14 @@ def is_king_exposed(match, color):
 
 
 def is_rook_locked(match, color):
-    if(color == COLORS['white']):
+    if(color == match.COLORS['white']):
         y = 0
-        rook = PIECES['wRk']
-        king = PIECES['wKg']
+        rook = match.PIECES['wRk']
+        king = match.PIECES['wKg']
     else:
         y = 7
-        rook = PIECES['bRk']
-        king = PIECES['bKg']
+        rook = match.PIECES['bRk']
+        king = match.PIECES['bKg']
 
     for i in range(2):
         if(i == 0):
@@ -237,7 +236,7 @@ def is_rook_locked(match, color):
         for x in range(start, end, step):
             piece = match.readfield(x, y)
 
-            if(piece == PIECES['blk']):
+            if(piece == match.PIECES['blk']):
                 continue
             elif(piece == rook):
                 if(first is None):
@@ -258,26 +257,26 @@ def is_rook_locked(match, color):
     return False
 
 
-"""def score_baseline_pieces(match):
+"""def score_baseline_cMatch.PIECES(match):
     score = 0
 
     cnt = 0
     y = 0
     for x in range(8):
         piece = match.readfield(x, y)
-        if(piece == PIECES['wKn'] or piece == PIECES['wBp']):
+        if(piece == match.PIECES['wKn'] or piece == match.PIECES['wBp']):
             cnt += 1
 
-    score += (cnt * ATTACKED_SCORES[PIECES['wKn']])
+    score += (cnt * match.ATTACKED_SCORES[match.PIECES['wKn']])
 
     cnt = 0
     y = 7
     for x in range(8):
         piece = match.readfield(x, y)
-        if(piece == PIECES['bKn'] or piece == PIECES['bBp']):
+        if(piece == match.PIECES['bKn'] or piece == match.PIECES['bBp']):
             cnt += 1
 
-    score += (cnt * ATTACKED_SCORES[PIECES['bKn']])
+    score += (cnt * match.ATTACKED_SCORES[match.PIECES['bKn']])
 
     return score"""
 
@@ -317,38 +316,38 @@ def multiple_pieces_movecnt(match, color):
 def score_opening(match):
     value = 0
 
-    whiterate = ATTACKED_SCORES[PIECES['bKn']]
+    whiterate = match.ATTACKED_SCORES[match.PIECES['bKn']]
 
-    blackrate = ATTACKED_SCORES[PIECES['wKn']]
+    blackrate = match.ATTACKED_SCORES[match.PIECES['wKn']]
     
     # white position
     y = 0
     cnt = 0
     for x in range(8):
         piece = match.readfield(x, y)
-        if(piece == PIECES['wKn'] or piece == PIECES['wBp']):
+        if(piece == match.PIECES['wKn'] or piece == match.PIECES['wBp']):
             cnt += 1
     if(cnt > 1):
         value += cnt * blackrate
     ###
 
     # multiple moves 
-    cnt = multiple_pieces_movecnt(match, COLORS['white'])
+    cnt = multiple_pieces_movecnt(match, match.COLORS['white'])
     value += cnt * blackrate * 4
     ###
 
     # white king
-    if(is_king_guarded(match, COLORS['white'])):
+    if(is_king_guarded(match, match.COLORS['white'])):
         value += whiterate
 
     if(match.white_movecnt_short_castling_lost > 0 and 
        match.white_movecnt_long_castling_lost > 0 and 
-       is_king_exposed(match, COLORS['white'])):
+       is_king_exposed(match, match.COLORS['white'])):
         value += blackrate
     ###
 
     # white rook
-    if(is_rook_locked(match, COLORS['white'])):
+    if(is_rook_locked(match, match.COLORS['white'])):
         value += blackrate
     ###
 
@@ -357,29 +356,29 @@ def score_opening(match):
     cnt = 0
     for x in range(8):
         piece = match.readfield(x, y)
-        if(piece == PIECES['bKn'] or piece == PIECES['bBp']):
+        if(piece == match.PIECES['bKn'] or piece == match.PIECES['bBp']):
             cnt += 1
     if(cnt > 1):
         value += cnt * whiterate
     ###
 
     # multiple moves 
-    cnt = multiple_pieces_movecnt(match, COLORS['black'])
+    cnt = multiple_pieces_movecnt(match, match.COLORS['black'])
     value += cnt * whiterate * 4
     ###
 
     # black king
-    if(is_king_guarded(match, COLORS['black'])):
+    if(is_king_guarded(match, match.COLORS['black'])):
         value += blackrate
 
     if(match.black_movecnt_short_castling_lost > 0 and
        match.black_movecnt_long_castling_lost > 0 and 
-       is_king_exposed(match, COLORS['black'])):
+       is_king_exposed(match, match.COLORS['black'])):
         value += whiterate
     ###
 
     # black rook
-    if(is_rook_locked(match, COLORS['black'])):
+    if(is_rook_locked(match, match.COLORS['black'])):
         value += whiterate
     ###
 
@@ -389,28 +388,28 @@ def score_opening(match):
 def score_game(match):
     value = 0
 
-    whiterate = ATTACKED_SCORES[PIECES['bKn']]
+    whiterate = match.ATTACKED_SCORES[match.PIECES['bKn']]
 
-    blackrate = ATTACKED_SCORES[PIECES['wKn']]
+    blackrate = match.ATTACKED_SCORES[match.PIECES['wKn']]
 
     # white
-    if(is_king_guarded(match, COLORS['white'])):
+    if(is_king_guarded(match, match.COLORS['white'])):
         value += whiterate
 
-    if(is_king_exposed(match, COLORS['white'])):
+    if(is_king_exposed(match, match.COLORS['white'])):
         value += blackrate
 
-    if(is_rook_locked(match, COLORS['white'])):
+    if(is_rook_locked(match, match.COLORS['white'])):
         value += blackrate
 
     # black
-    if(is_king_guarded(match, COLORS['black'])):
+    if(is_king_guarded(match, match.COLORS['black'])):
         value += blackrate
 
-    if(is_king_exposed(match, COLORS['black'])):
+    if(is_king_exposed(match, match.COLORS['black'])):
         value += whiterate
 
-    if(is_rook_locked(match, COLORS['black'])):
+    if(is_rook_locked(match, match.COLORS['black'])):
         value += whiterate
 
     return value
@@ -419,28 +418,28 @@ def score_game(match):
 def score_endgame(match):
     value = 0
 
-    whiterate = ATTACKED_SCORES[PIECES['bPw']]
+    whiterate = match.ATTACKED_SCORES[match.PIECES['bPw']]
     white_step_rate = whiterate // 2
 
-    blackrate = ATTACKED_SCORES[PIECES['wPw']]
+    blackrate = match.ATTACKED_SCORES[match.PIECES['wPw']]
     black_step_rate = blackrate // 2
 
     for y in range(0, 8, 1):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
-            if(piece == PIECES['wPw']):
-                if(pawn.is_running(match, x, y)):
+            if(piece == match.PIECES['wPw']):
+                if(pawn_ext.is_running(match, x, y)):
                     value += whiterate
                     value += white_step_rate * y
-            elif(piece == PIECES['bPw']):
-                if(pawn.is_running(match, x, y)):
+            elif(piece == match.PIECES['bPw']):
+                if(pawn_ext.is_running(match, x, y)):
                     value += blackrate
                     value += black_step_rate * (7 - y)
 
-    if(is_king_centered(match, COLORS['white'])):
+    if(is_king_centered(match, match.COLORS['white'])):
         value += whiterate
 
-    if(is_king_centered(match, COLORS['black'])):
+    if(is_king_centered(match, match.COLORS['black'])):
           value += blackrate
 
     return value
@@ -449,26 +448,26 @@ def score_endgame(match):
 def score_mupltiple_piece_moves_in_opening(match, color):
     if(is_opening(match)):
         if(match.piece_movecnt() == 3):
-            if(color == COLORS['white']):
-                return ATTACKED_SCORES[PIECES['wPw']]
+            if(color == match.COLORS['white']):
+                return match.ATTACKED_SCORES[match.PIECES['wPw']]
             else:
-                return ATTACKED_SCORES[PIECES['bPw']]
+                return match.ATTACKED_SCORES[match.PIECES['bPw']]
     return 0
 
 
 def score_stucks(match):
-    whiterate = ATTACKED_SCORES[PIECES['bPw']]
-    blackrate = ATTACKED_SCORES[PIECES['wPw']]
+    whiterate = match.ATTACKED_SCORES[match.PIECES['bPw']]
+    blackrate = match.ATTACKED_SCORES[match.PIECES['wPw']]
     score = 0
 
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
-            if(piece == PIECES['blk']):
+            if(piece == match.PIECES['blk']):
                 continue
 
-            if(is_piece_stuck(match, x, y)):
-                if(Match.color_of_piece(piece) == COLORS['white']):
+            if(is_piece_stuck_new(match, x, y)):
+                if(match.color_of_piece(piece) == match.COLORS['white']):
                     score += blackrate
                 else:
                     score += whiterate
@@ -477,15 +476,15 @@ def score_stucks(match):
 
 
 def score_position(match, movecnt):
-    status = rules.status(match)
+    status = match.evaluate_status()
 
-    if(movecnt == 0 and status != STATUS['open']):
-        if(status == STATUS['winner_black']):
-            return ( SCORES[PIECES['wKg']] + match.movecnt )
-        elif(status == STATUS['winner_white']):
-            return ( SCORES[PIECES['bKg']] - match.movecnt )
+    if(movecnt == 0 and status != match.STATUS['open']):
+        if(status == match.STATUS['winner_black']):
+            return ( match.SCORES[match.PIECES['wKg']] + match.movecnt )
+        elif(status == match.STATUS['winner_white']):
+            return ( match.SCORES[match.PIECES['bKg']] - match.movecnt )
         else: # draw
-            return SCORES[PIECES['blk']]
+            return match.SCORES[match.PIECES['blk']]
     else:
         score = match.score
         
@@ -495,7 +494,7 @@ def score_position(match, movecnt):
 
         #score += score_attacks(match, color)
 
-        #score += score_supports(match, REVERSED_COLORS[color])
+        #score += score_supports(match, match.REVERSED_COLORS[color])
 
         #score += score_controled_horizontal_files(match)
 
@@ -516,23 +515,23 @@ def score_position(match, movecnt):
         for x in range(8):
             piece = match.readfield(x, y)
 
-            if(piece == PIECES['blk']):
+            if(piece == match.PIECES['blk']):
                 continue
             elif(Match.color_of_piece(piece) != color):
                 continue
-            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+            elif(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
                 if(pawn.is_capture_possible(match, x, y)):
                     return True
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+            elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
                 if(knight.is_capture_possible(match, x, y)):
                     return True
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+            elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
                 if(bishop.is_capture_possible(match, x, y)):
                     return True
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+            elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
                 if(rook.is_capture_possible(match, x, y)):
                     return True
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+            elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
                 if(bishop.is_capture_possible(match, x, y)):
                     return True
                 if(rook.is_capture_possible(match, x, y)):
@@ -549,7 +548,7 @@ def are_attacks_or_captures_possible(match):
         for x in range(8):
             piece = match.readfield(x, y)
 
-            if(piece == PIECES['blk']):
+            if(piece == match.PIECES['blk']):
                 continue
             else:
                 friends, enemies = field_touches(match, Match.color_of_piece(piece), x, y)
@@ -557,7 +556,7 @@ def are_attacks_or_captures_possible(match):
                     return True
                 else:
                     for enemy in enemies:
-                        if(PIECES_RANK[enemy.piece] <= PIECES_RANK[piece]):
+                        if(match.PIECES_RANK[enemy.piece] <= match.PIECES_RANK[piece]):
                             return True
 
     return False
@@ -567,12 +566,12 @@ def is_stormy(match):
     color = match.next_color()
 
     ### is pawn on last row before promotion
-    if(color == COLORS['white']):
+    if(color == match.COLORS['white']):
         y = 6
-        pw = PIECES['wPw']
+        pw = match.PIECES['wPw']
     else:
         y = 1
-        pw = PIECES['bPw']
+        pw = match.PIECES['bPw']
     for x in range(8):
         piece = match.readfield(x, y)
         if(piece == pw):
@@ -583,14 +582,14 @@ def is_stormy(match):
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
-            if(piece == PIECES['blk']):
+            if(piece == match.PIECES['blk']):
                 continue
 
-            piece_color = Match.color_of_piece(piece)
+            piece_color = match.color_of_piece(piece)
 
             frdlytouches, enmytouches = field_touches(match, piece_color, x, y)
 
-            if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+            if(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
                 if(len(enmytouches) > 0):
                     return True
                 else:
@@ -599,11 +598,11 @@ def is_stormy(match):
             #if(len(enmytouches) > len(frdlytouches)):
                 #return True
 
-            if(rules.is_pinned(match, x, y)[0] or is_soft_pin(match, x, y)):
+            if(match.is_pinned(x, y)[0] or match.is_soft_pin(x, y)):
                 return True
 
             for enmy in enmytouches:
-                if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
+                if(match.PIECES_RANK[enmy.piece] < match.PIECES_RANK[piece]):
                     return True
 
                 """enmyfriends, enmyenemies = field_touches(match, Match.color_of_piece(enmy.piece), enmy.fieldx, enmy.fieldy)
@@ -614,39 +613,4 @@ def is_stormy(match):
 
     return False
 
-
-ANALYZE = {
-        'IS_ATTACKED' : 0x10,
-        'IS_PINNED' : 0x01,
-        'IS_SUPPORTED' : 0x001 }
-
-class cAnalyzer:
-    def __init__(self, prio, piece, fieldx, fieldy, pin_dir):
-        self.prio = prio
-        self.piece = piece
-        self.fieldx = fieldx
-        self.fieldy = fieldy
-        self.pin_dir = pin_dir
-        self.attacker = []
-        self.supporter = []
-
-def analyze_position(match):
-    analysis = []
-
-    for y in range(8):
-        for x in range(8):
-            piece = match.readfield(x, y)
-
-            if(piece == PIECES['blk']):
-                continue
-            else:
-                frdlytouches, enmytouches = field_touches(match, Match.color_of_piece(piece), x, y)
-                if(len(frdlytouches) > 0 or len(enmytouches) > 0):
-                    pin_dir = rules.pin_dir(match, None, x, y)
-                    analyzer = cAnalyzer(10, piece, x, y, pin_dir)
-                    analyzer.attacker = enmytouches
-                    analyzer.supporter = frdlytouches
-                    analysis.append(analyzer)
-
-    return analysis
 

@@ -1,7 +1,6 @@
 import re, os, threading, copy
 from engine.match import *
 from engine.move import *
-from engine.rules import *
 from engine.calc import calc_move, Msgs
 from engine.debug import prnt_match_attributes, prnt_board, list_match_attributes, list_move_attributes
 from engine.matchmove import do_move, undo_move
@@ -26,7 +25,6 @@ def new_word(name, code, info):
 
     word = Word(name, code, info)
     dictionary.append(word)
-
     return True
 
 
@@ -83,7 +81,8 @@ class CalcThread(threading.Thread):
 
 
 def calc_and_domove(session):
-    if(session.thread_is_busy == False and status(session.match) == STATUS['open'] and session.match.is_next_color_human() == False):
+    match = session.match
+    if(session.thread_is_busy == False and match.evaluate_status() == match.STATUS['open'] and match.is_next_color_human() == False):
         session.thread = CalcThread(session)
         session.thread.start()
 
@@ -93,7 +92,7 @@ def new_match(lstparam):
         print("??? params")
         return None
 
-    match = Match()
+    match = cMatch()
 
     match.white_player_name = lstparam[0]
 
@@ -113,18 +112,17 @@ def new_match(lstparam):
 
 
 def word_pause(session, params):
-    if(status(session.match) == STATUS['open']):
-        session.match.status = STATUS['paused']
-
+    m = session.match
+    if(m.evaluate_status() == m.STATUS['open']):
+        m.status = m.STATUS['paused']
     return True
 
 
 def word_resume(session, params):
-    if(status(session.match) == STATUS['open']):
-        session.match.status = STATUS['open']
-
+    match = session.match
+    if(match.evaluate_status() == match.STATUS['open']):
+        match.status = match.STATUS['open']
     calc_and_domove(session)
-
     return True
 
 
@@ -132,15 +130,12 @@ def word_terminate(session, params):
     if(session.thread_is_busy):
         session.msgs.terminate = True
         print("try to terminante calculation...")
-
     return True
 
 
 def word_show(session, params):
     prnt_match_attributes(session.match, ", ")
-
     prnt_board(session.match)
-
     return True
 
 
@@ -188,11 +183,12 @@ def word_set(session, params):
 
 
 def word_move(session, params):
-    session.match.status = status(session.match)
-    if(session.match.status != STATUS['open']):
-        print("??? " + reverse_lookup(STATUS, session.match.status))
+    match = session.match
+    match.status = match.evaluate_status()
+    if(match.status != match.STATUS['open']):
+        print("??? " + reverse_lookup(match.STATUS, match.status))
         return True
-    elif(session.match.is_next_color_human() == False):
+    elif(match.is_next_color_human() == False):
         print("??? wrong color")
         return True
 
@@ -210,42 +206,40 @@ def word_move(session, params):
             prom_piece = matchobj.group("prom")
 
             valid = False
-            for piece in PIECES:
+            for piece in m.PIECES:
                 if(piece == prom_piece):
                     valid = True
                     break
             if(valid == False):
-                print("invalid move!")
                 return True
         else:
             matchobj = re.search(r"^\s*(?P<short>[0oO][-][0oO])\s*$", params)
             if(matchobj):
-                if(session.match.next_color() == COLORS['white']):
-                    srcx = session.match.wKg_x
-                    srcy = session.match.wKg_y
+                if(match.next_color() == match.COLORS['white']):
+                    srcx = match.wKg_x
+                    srcy = match.wKg_y
                 else:
-                    srcx = session.match.bKg_x
-                    srcy = session.match.bKg_y
+                    srcx = match.bKg_x
+                    srcy = match.bKg_y
                 dstx = srcx + 2
                 dsty = srcy
             else:
                 matchobj = re.search(r"^\s*(?P<long>[0oO][-][0oO][-][0oO])\s*$", params)
                 if(matchobj):
-                    if(session.match.next_color() == COLORS['white']):
-                        srcx = session.match.wKg_x
-                        srcy = session.match.wKg_y
+                    if(match.next_color() == match.COLORS['white']):
+                        srcx = match.wKg_x
+                        srcy = match.wKg_y
                     else:
-                        srcx = session.match.bKg_x
-                        srcy = session.match.bKg_y
+                        srcx = match.bKg_x
+                        srcy = match.bKg_y
                     dstx = srcx - 2
                     dsty = srcy
                 else:
-                    print("invalid move!")
                     return True
 
-    if(is_move_valid(session.match, srcx, srcy, dstx, dsty, PIECES[prom_piece])[0]):
-        do_move(session.match, srcx, srcy, dstx, dsty, PIECES[prom_piece])
-        prnt_board(session.match)
+    if(match.is_move_valid(srcx, srcy, dstx, dsty, match.PIECES[prom_piece])[0]):
+        do_move(match, srcx, srcy, dstx, dsty, match.PIECES[prom_piece])
+        prnt_board(match)
     else:
         print("invalid move!")
 
@@ -253,12 +247,13 @@ def word_move(session, params):
 
 
 def word_undo(session, params):
-    undo_move(session.match)
-    prnt_board(session.match)
+    match = session.match
+    
+    undo_move(match)
+    prnt_board(match)
 
-    if(status(session.match) == STATUS['open']):
-        session.match.status = STATUS['paused']
-
+    if(match.evaluate_status() == match.STATUS['open']):
+        match.status = match.STATUS['paused']
     return True
 
 

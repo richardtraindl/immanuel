@@ -3,7 +3,7 @@ from django.conf import settings
 from .. models import Match as ModelMatch, Move as ModelMove
 from .. engine.match import *
 from .. engine.move import *
-from .. engine import matchmove, rules, calc
+from .. engine import matchmove, calc
 
 
 
@@ -57,15 +57,15 @@ def map_moves(src, dst, map_dir):
 
 
 def status(modelmatch):
-    match = Match()
+    match = cMatch()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    return rules.status(match)
+    return match.evaluate_status()
 
 
 def is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
-    match = Match()
+    match = cMatch()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    return rules.is_move_valid(match, srcx, srcy, dstx, dsty, prom_piece)
+    return match.is_move_valid(srcx, srcy, dstx, dsty, prom_piece)
 
 
 def movecnt(modelmatch):
@@ -82,13 +82,13 @@ def is_next_color_human(modelmatch):
 
 
 def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
-    match = Match()
+    match = cMatch()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
 
     ### time
     if(match.time_start > 0):
         elapsed_time = time.time() - match.time_start
-        if(match.next_color() == COLORS['white']):
+        if(match.next_color() == match.COLORS['white']):
             match.white_elapsed_seconds += elapsed_time
         else:
             match.black_elapsed_seconds += elapsed_time
@@ -97,7 +97,7 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     ###
 
     move = matchmove.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
-    match.status = rules.status(match) #STATUS['open']
+    match.status = match.evaluate_status() #STATUS['open']
     map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
     modelmatch.save()
 
@@ -108,7 +108,7 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
 
 
 def undo_move(modelmatch):
-    match = Match()
+    match = cMatch()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
     move = matchmove.undo_move(match)
     if(move):
@@ -149,14 +149,15 @@ class ImmanuelsThread(threading.Thread):
 
 
 def calc_move_for_immanuel(modelmatch):
-    match = Match()
+    match = cMatch()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    if(rules.status(match) != STATUS['open']):
-        return False, rules.status(match)
+    status = match.evaluate_status()
+    if(status != match.STATUS['open']):
+        return False, status
     elif(match.is_next_color_human()):
-        return False, rules.RETURN_CODES['wrong-color']
+        return False, cValidator.RETURN_CODES['wrong-color']
     else:
         thread = ImmanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
         thread.start()
-        return True, rules.RETURN_CODES['ok']
+        return True, cValidator.RETURN_CODES['ok']
 

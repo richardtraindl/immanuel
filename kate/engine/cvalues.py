@@ -1,3 +1,4 @@
+from .move import PrioMove
 
 
 TACTICS = {
@@ -34,49 +35,36 @@ TACTICS = {
     'undefined' : 30 }
 
 
-PRIO = {
-    'prio1' : 0,
-    'prio2' : 1,
-    'prio3' : 2,
-    'prio4' : 3,
-    'prio5' : 4,
-    'prio6' : 5,
-    'prio7' : 6,
-    'prio8' : 7,
-    'prio9' : 8,
-    'prio10' : 9 }
-
-
 TACTICS_TO_PRIO = {
-      TACTICS['defend-check'] : PRIO['prio1'],
-      TACTICS['defend-king-attack-urgent'] : PRIO['prio2'],
-      TACTICS['defend-king-attack'] : PRIO['prio2'],
-      TACTICS['promotion'] : PRIO['prio2'],
-      TACTICS['tactical-draw'] : PRIO['prio2'],
-      TACTICS['capture-good-deal'] : PRIO['prio2'],
-      TACTICS['running-pawn-in-endgame'] : PRIO['prio2'], 
-      TACTICS['attack-king-good-deal'] : PRIO['prio2'],
-      TACTICS['does-unpin'] : PRIO['prio2'], 
-      TACTICS['attack-stormy'] : PRIO['prio3'],
-      TACTICS['flee-urgent'] : PRIO['prio3'], 
-      TACTICS['support-good-deal'] : PRIO['prio4'], 
-      TACTICS['block'] : PRIO['prio4'], 
-      TACTICS['discl-support-good-deal'] : PRIO['prio4'], 
-      TACTICS['defend-fork'] : PRIO['prio4'], 
-      TACTICS['attack-good-deal'] : PRIO['prio4'], 
-      TACTICS['discl-attack-good-deal'] : PRIO['prio4'], 
-      TACTICS['controles-file-good-deal'] : PRIO['prio5'], 
-      TACTICS['castling'] : PRIO['prio5'],
-      TACTICS['capture-bad-deal'] : PRIO['prio6'], 
-      TACTICS['attack-king-bad-deal'] : PRIO['prio6'], 
-      TACTICS['defend-fork-downgraded'] : PRIO['prio7'], 
-      TACTICS['flee-downgraded'] : PRIO['prio7'], 
-      TACTICS['support-downgraded'] : PRIO['prio7'], 
-      TACTICS['attack-downgraded'] : PRIO['prio7'],
-      TACTICS['support-unattacked'] : PRIO['prio8'], 
-      TACTICS['progress'] : PRIO['prio8'], 
-      TACTICS['flee'] : PRIO['prio8'],
-      TACTICS['attack-bad-deal'] : PRIO['prio9'], 
-      TACTICS['support-bad-deal'] : PRIO['prio9'],
-      TACTICS['undefined'] : PRIO['prio10'] }
+      TACTICS['defend-check'] : PrioMove.PRIO['prio1'],
+      TACTICS['defend-king-attack-urgent'] : PrioMove.PRIO['prio2'],
+      TACTICS['defend-king-attack'] : PrioMove.PRIO['prio2'],
+      TACTICS['promotion'] : PrioMove.PRIO['prio2'],
+      TACTICS['tactical-draw'] : PrioMove.PRIO['prio2'],
+      TACTICS['capture-good-deal'] : PrioMove.PRIO['prio2'],
+      TACTICS['running-pawn-in-endgame'] : PrioMove.PRIO['prio2'], 
+      TACTICS['attack-king-good-deal'] : PrioMove.PRIO['prio2'],
+      TACTICS['does-unpin'] : PrioMove.PRIO['prio2'], 
+      TACTICS['attack-stormy'] : PrioMove.PRIO['prio3'],
+      TACTICS['flee-urgent'] : PrioMove.PRIO['prio3'], 
+      TACTICS['support-good-deal'] : PrioMove.PRIO['prio4'], 
+      TACTICS['block'] : PrioMove.PRIO['prio4'], 
+      TACTICS['discl-support-good-deal'] : PrioMove.PRIO['prio4'], 
+      TACTICS['defend-fork'] : PrioMove.PRIO['prio4'], 
+      TACTICS['attack-good-deal'] : PrioMove.PRIO['prio4'], 
+      TACTICS['discl-attack-good-deal'] : PrioMove.PRIO['prio4'], 
+      TACTICS['controles-file-good-deal'] : PrioMove.PRIO['prio5'], 
+      TACTICS['castling'] : PrioMove.PRIO['prio5'],
+      TACTICS['capture-bad-deal'] : PrioMove.PRIO['prio6'], 
+      TACTICS['attack-king-bad-deal'] : PrioMove.PRIO['prio6'], 
+      TACTICS['defend-fork-downgraded'] : PrioMove.PRIO['prio7'], 
+      TACTICS['flee-downgraded'] : PrioMove.PRIO['prio7'], 
+      TACTICS['support-downgraded'] : PrioMove.PRIO['prio7'], 
+      TACTICS['attack-downgraded'] : PrioMove.PRIO['prio7'],
+      TACTICS['support-unattacked'] : PrioMove.PRIO['prio8'], 
+      TACTICS['progress'] : PrioMove.PRIO['prio8'], 
+      TACTICS['flee'] : PrioMove.PRIO['prio8'],
+      TACTICS['attack-bad-deal'] : PrioMove.PRIO['prio9'], 
+      TACTICS['support-bad-deal'] : PrioMove.PRIO['prio9'],
+      TACTICS['undefined'] : PrioMove.PRIO['prio10'] }
 

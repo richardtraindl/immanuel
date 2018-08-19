@@ -7,8 +7,8 @@ from .openingmove import retrieve_move
 from .analyze_move import *
 from .analyze_position import *
 from .helper import *
-from .cvalues import *
-from .rules import is_move_valid, RETURN_CODES, is_field_touched
+from .validator import *
+from .generator import cGenerator
 from .pieces import pawn, rook, bishop, knight, queen, king
 
 
@@ -19,8 +19,8 @@ def prnt_move(headmsg, move, tailmsg):
         print(headmsg + 
             index_to_coord(move.srcx, move.srcy) + "-" +
             index_to_coord(move.dstx, move.dsty), end="")
-        if(move.prom_piece != PIECES['blk']):
-            print(" " + reverse_lookup(PIECES, move.prom_piece), end="")
+        if(move.prom_piece != cMatch.PIECES['blk']):
+            print(" " + reverse_lookup(cMatch.PIECES, move.prom_piece), end="")
         print(tailmsg, end="")
 
 
@@ -45,9 +45,9 @@ def prnt_tactics(tactics):
     i = 1
     for tactic in tactics:
         if(i < length):
-            print(reverse_lookup(TACTICS, tactic), end=" | ")
+            print(reverse_lookup(PrioMove.TACTICS, tactic), end=" | ")
         else:
-            print(reverse_lookup(TACTICS, tactic), end="")
+            print(reverse_lookup(PrioMove.TACTICS, tactic), end="")
         i += 1
 
 
@@ -61,138 +61,6 @@ def prnt_fmttime(msg, seconds):
     minute, sec = divmod(seconds, 60)
     hour, minute = divmod(minute, 60)
     print( msg + "%02d:%02d:%02d" % (hour, minute, sec))
-
-
-class Analyses:
-    def __init__(self):
-        self.core_token = 0x0
-        self.srcfield_token = 0x0
-        self.dstfield_token = 0x0
-        self.lst_attacked = []
-        self.lst_supported = []
-        self.lst_disclosed_attacked = []
-        self.lst_fork_defended = []
-
-class PrioMove:
-    def __init__(self, gmove=None):
-        self.gmove = gmove
-        self.tactics = []
-        self.prio = PRIO['prio10']
-        self.prio_sec = PRIO['prio10']
-
-    def downgrade(self, old_tactic, new_tactic):
-        self.prio = TACTICS_TO_PRIO[new_tactic]
-        for idx in range(len(self.tactics)):
-            if(self.tactics[idx] == old_tactic):
-                self.tactics[idx] = new_tactic
-                return
-
-    def fetch_tactics(self, idx):
-        if(len(self.tactics) > idx):
-            return self.tactics[idx]
-        else:
-            return TACTICS['undefined']
-    
-    def find_tactic(self, tactic):
-        for tactic_item in self.tactics:
-            if(tactic_item == tactic):
-                return True
-        return False
-
-    def is_tactic_stormy(self):
-        for tactic in self.tactics:
-            if(tactic == TACTICS['defend-check'] or
-               tactic == TACTICS['defend-king-attack-urgent'] or
-               tactic == TACTICS['defend-king-attack'] or
-               tactic == TACTICS['promotion'] or
-               tactic == TACTICS['capture-good-deal'] or
-               tactic == TACTICS['attack-king-good-deal'] or 
-               tactic == TACTICS['capture-bad-deal'] or 
-               tactic == TACTICS['attack-king-bad-deal'] or
-               tactic == TACTICS['attack-stormy']):
-                return True
-        return False
-
-    def is_tactic_urgent(self):
-        for tactic in self.tactics:
-            if(tactic == TACTICS['defend-king-attack-urgent'] or
-               tactic == TACTICS['capture-good-deal'] or
-               tactic == TACTICS['capture-bad-deal']):
-                return True
-        return False
-
-
-def read_steps(steps, dir_idx, step_idx):
-    stepx = steps[dir_idx][step_idx][0]
-    stepy = steps[dir_idx][step_idx][1]
-    prom_piece = steps[dir_idx][step_idx][2]
-    return stepx, stepy, prom_piece
-
-def generate_moves(match):
-    color = match.next_color()
-    priomoves = []
-
-    for y in range(0, 8, 1):
-        for x in range(0, 8, 1):
-            piece = match.readfield(x, y)
-            if(piece == PIECES['blk'] or color != Match.color_of_piece(piece)):
-                continue
-            else:
-                dir_idx = 0
-                step_idx = 0
-                if(piece == PIECES['wPw']):
-                    if(y < 6):
-                        steps = pawn.GEN_WSTEPS
-                        max_dir = 4
-                        max_step = 1
-                    else:
-                        steps = pawn.GEN_WPROM_STEPS
-                        max_dir = 3
-                        max_step = 4
-                elif(piece == PIECES['bPw']):
-                    if(y > 1):
-                        steps = pawn.GEN_BSTEPS
-                        max_dir = 4
-                        max_step = 1
-                    else:
-                        steps = pawn.GEN_BPROM_STEPS
-                        max_dir = 3
-                        max_step = 4
-                elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                    steps = rook.GEN_STEPS
-                    max_dir = 4
-                    max_step = 7
-                elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                    steps = bishop.GEN_STEPS
-                    max_dir = 4
-                    max_step = 7
-                elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                    steps = knight.GEN_STEPS
-                    max_dir = 8
-                    max_step = 1
-                elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                    steps = queen.GEN_STEPS
-                    max_dir = 8
-                    max_step = 7
-                else:
-                    steps = king.GEN_STEPS
-                    max_dir = 10
-                    max_step = 1
-
-            for dir_idx in range(0, max_dir, 1):
-                for step_idx in range(0, max_step, 1):
-                    stepx, stepy, prom_piece = read_steps(steps, dir_idx, step_idx)
-                    dstx = x + stepx
-                    dsty = y + stepy
-                    flag, errmsg = rules.is_move_valid(match, x, y, dstx, dsty, prom_piece)
-                    if(flag):
-                        gmove = GenMove(x, y, dstx, dsty, prom_piece)
-                        priomove = PrioMove(gmove)
-                        priomoves.append(priomove)
-                    elif(errmsg != rules.RETURN_CODES['king-error']):
-                        break
-
-    return priomoves
 
 
 def append_newmove(gmove, nodecandidates, newcandidates):
@@ -220,35 +88,35 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     if(len(priomoves) == 0):
         return 0
     
-    if(priomoves[0].find_tactic(TACTICS['defend-check'])):
+    if(priomoves[0].find_tactic(PrioMove.TACTICS['defend-check'])):
         return len(priomoves)
     
     if(depth <= slimits.dpth_stage1):
-        return max(slimits.count, count_up_to_prio(priomoves, PRIO['prio5']))
+        return max(slimits.count, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
     elif(depth <= slimits.dpth_stage2 and 
          (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
         silent_move_cnt = 0
 
         for priomove in priomoves:
-            if(priomove.find_tactic(TACTICS['defend-king-attack-urgent']) or
-               priomove.find_tactic(TACTICS['defend-king-attack']) or
-               priomove.find_tactic(TACTICS['attack-king-good-deal']) or 
-               priomove.find_tactic(TACTICS['capture-good-deal'])):
+            if(priomove.find_tactic(PrioMove.TACTICS['defend-king-attack-urgent']) or
+               priomove.find_tactic(PrioMove.TACTICS['defend-king-attack']) or
+               priomove.find_tactic(PrioMove.TACTICS['attack-king-good-deal']) or 
+               priomove.find_tactic(PrioMove.TACTICS['capture-good-deal'])):
                 count += 1
-                priomove.prio = PRIO['prio1']
+                priomove.prio = PrioMove.PRIO['prio1']
                 continue
-            elif(priomove.find_tactic(TACTICS['attack-king-bad-deal']) or priomove.find_tactic(TACTICS['capture-bad-deal'])):
+            elif(priomove.find_tactic(PrioMove.TACTICS['attack-king-bad-deal']) or priomove.find_tactic(PrioMove.TACTICS['capture-bad-deal'])):
                 count += 1
-                priomove.prio = PRIO['prio3']
+                priomove.prio = PrioMove.PRIO['prio3']
                 continue
             elif(silent_move_cnt < 2):
                 count += 1
                 silent_move_cnt += 1
-                priomove.prio = PRIO['prio2']
+                priomove.prio = PrioMove.PRIO['prio2']
                 continue
             else:
-                priomove.prio = PRIO['prio10']
+                priomove.prio = PrioMove.PRIO['prio10']
 
         priomoves.sort(key=attrgetter('prio'))
         return count
@@ -257,22 +125,22 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         silent_move_cnt = 0
 
         for priomove in priomoves:
-            if(priomove.find_tactic(TACTICS['defend-king-attack-urgent']) or
-               priomove.find_tactic(TACTICS['capture-good-deal'])):
+            if(priomove.find_tactic(PrioMove.TACTICS['defend-king-attack-urgent']) or
+               priomove.find_tactic(PrioMove.TACTICS['capture-good-deal'])):
                 count += 1
-                priomove.prio = PRIO['prio2']
+                priomove.prio = PrioMove.PRIO['prio2']
                 continue
-            elif(priomove.find_tactic(TACTICS['capture-bad-deal'])):
+            elif(priomove.find_tactic(PrioMove.TACTICS['capture-bad-deal'])):
                 count += 1
-                priomove.prio = PRIO['prio3']
+                priomove.prio = PrioMove.PRIO['prio3']
                 continue
             elif(silent_move_cnt < 1):
                 count += 1
                 silent_move_cnt += 1
-                priomove.prio = PRIO['prio1']
+                priomove.prio = PrioMove.PRIO['prio1']
                 continue
             else:
-                priomove.prio = PRIO['prio10']
+                priomove.prio = PrioMove.PRIO['prio10']
 
         priomoves.sort(key=attrgetter('prio'))
         return count
@@ -288,24 +156,24 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     starttime = time.time()
 
     if(maximizing):
-        nodescore = SCORES[PIECES['wKg']] * 2
+        nodescore = match.SCORES[match.PIECES['wKg']] * 2
     else:
-        nodescore = SCORES[PIECES['bKg']] * 2
+        nodescore = match.SCORES[match.PIECES['bKg']] * 2
 
-    priomoves = generate_moves(match)
-    
+    cgenerator = cGenerator(match)
+    priomoves = cgenerator.generate_moves()
+
     rank_gmoves(match, priomoves, depth, slimits, last_pmove)    
     
     maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 
     if(depth == 1):
-        print("maxcount: " + str(maxcnt))
         prnt_priomoves(priomoves)
         if(len(priomoves) == 1):
             pmove = priomoves[0]
             nodecandidates.append(pmove.gmove)
             nodecandidates.append(None)
-            if(pmove.find_tactic(TACTICS['tactical-draw'])):
+            if(pmove.find_tactic(PrioMove.TACTICS['tactical-draw'])):
                 return 0, nodecandidates
             else:
                 return score_position(match, len(priomoves)), nodecandidates
@@ -323,9 +191,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             msg = "\nmatch: " + str(match.begin) + "   count: " + str(count) + "   calculate: "
             prnt_move(msg, gmove, " | ")
             prnt_tactics(priomove.tactics)
-            print(" | " + reverse_lookup(PRIO, priomove.prio) + " | " + reverse_lookup(PRIO, priomove.prio_sec))
+            print(" | " + reverse_lookup(priomove.PRIO, priomove.prio) + " | " + reverse_lookup(priomove.PRIO, priomove.prio_sec))
 
-        if(priomove.find_tactic(TACTICS['tactical-draw'])):
+        if(priomove.find_tactic(PrioMove.TACTICS['tactical-draw'])):
             newcandidates.clear()
             newcandidates.append(None)
             score = 0
@@ -374,7 +242,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
                 break # alpha cut-off
 
         if(depth == 1):
-            huge_diff = (abs(match.score) - abs(nodescore)) > abs(SCORES[PIECES['wPw']]) * 2
+            huge_diff = (abs(match.score) - abs(nodescore)) > abs(match.SCORES[match.PIECES['wPw']]) * 2
             elapsed_time = time.time() - starttime
             if(elapsed_time > (match.seconds_per_move / maxcnt) * count):
                 exceeded = True
@@ -410,15 +278,15 @@ class SearchLimits:
         self.setlimits(match)
 
     def setlimits(self, match):
-        if(match.level == LEVELS['blitz']):
+        if(match.level == match.LEVELS['blitz']):
             self.count = 6
             self.dpth_stage1 = 2
             self.dpth_stage2 = 5
-        elif(match.level == LEVELS['low']):
+        elif(match.level == match.LEVELS['low']):
             self.count = 8
             self.dpth_stage1 = 3
             self.dpth_stage2 = 6
-        elif(match.level == LEVELS['medium']):
+        elif(match.level == match.LEVELS['medium']):
             self.count = 12
             self.dpth_stage1 = 4
             self.dpth_stage2 = 7
@@ -442,14 +310,14 @@ def calc_move(match, msgs):
         candidates.append(gmove)
         score = match.score
     else:
-        maximizing = match.next_color() == COLORS['white']
-        alpha = SCORES[PIECES['wKg']] * 10
-        beta = SCORES[PIECES['bKg']] * 10 
+        maximizing = match.next_color() == match.COLORS['white']
+        alpha = match.SCORES[match.PIECES['wKg']] * 10
+        beta = match.SCORES[match.PIECES['bKg']] * 10 
         score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, msgs)
 
     ### time
     elapsed_time = time.time() - match.time_start
-    if(match.next_color() == COLORS['white']):
+    if(match.next_color() == match.COLORS['white']):
         match.white_elapsed_seconds += elapsed_time
     else:
         match.black_elapsed_seconds += elapsed_time

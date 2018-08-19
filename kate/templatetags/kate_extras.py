@@ -1,6 +1,6 @@
 from django import template
 import datetime
-from kate.engine.match import LEVELS, STATUS
+from kate.engine.match import *
 from kate.engine import helper
 
 register = template.Library()
@@ -23,11 +23,11 @@ def chesscnt(count):
 
 @register.filter(name='matchlevel')
 def matchlevel(level):
-    return helper.reverse_lookup(LEVELS, level)
+    return helper.reverse_lookup(cMatch.LEVELS, level)
 
 @register.filter(name='matchstatus')
 def matchstatus(status):
-    return helper.reverse_lookup(STATUS, status)
+    return helper.reverse_lookup(cMatch.STATUS, status)
 
 @register.filter(name='fmtdate')
 def fmtdate(value):
