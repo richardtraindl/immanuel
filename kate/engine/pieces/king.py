@@ -159,5 +159,35 @@ class cKing(cPiece):
         self.match.writefield(self.xpos, self.ypos, self.piece)
         return True
 
+    def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+        opp_color = self.match.oppcolor_of_piece(self.piece)
+        for step in self.STEPS:
+            x1 = dstx + step[0]
+            y1 = dsty + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                if(x1 == self.xpos and y1 == self.ypos):
+                    continue
+    
+                piece = self.match.readfield(x1, y1)
+                if(piece == self.match.PIECES['blk']):
+                    continue
+
+                if(self.match.color_of_piece(piece) == opp_color):
+                    ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
+                    attacked.append(ctouch_beyond)
+                    ###
+                    self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+                    field_touches_beyond(self.match, opp_color, ctouch_beyond)
+                    self.match.writefield(self.xpos, self.ypos, self.piece)
+                    ###
+                else:
+                    ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
+                    supported.append(ctouch_beyond)
+                    ###
+                    self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+                    field_touches_beyond(self.match, self.color, ctouch_beyond)
+                    self.match.writefield(self.xpos, self.ypos, self.piece)
+                    ###
+
 # class end
 
