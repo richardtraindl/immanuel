@@ -79,7 +79,7 @@ class cKnight(cPiece):
         if(cknight.is_piece_stuck_new()):
             return
 
-        opp_color = match.oppcolor_of_piece(self.piece)
+        opp_color =  self.match.oppcolor_of_piece(self.piece)
         for step in self.STEPS:
             x1 = dstx + step[0]
             y1 = dsty + step[1]
