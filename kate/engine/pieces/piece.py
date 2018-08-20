@@ -99,7 +99,7 @@ class cPiece:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(dstx, dsty, stepx , stepy)
-            if(x1 != match.UNDEF_X):
+            if(x1 !=  self.match.UNDEF_X):
                 if(x1 == self.xpos and y1 == self.ypos):
                     continue
 
