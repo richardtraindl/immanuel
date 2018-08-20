@@ -4,7 +4,7 @@ class cPiece:
     DIRS = { 'valid' : 13, 'undefined' : 14 }
     DIRS_ARY = [DIRS['undefined'], DIRS['undefined'], DIRS['undefined'], DIRS['undefined']]
 
-    REVERSE_DIRS = { 'valid' : 13, 'undefined' : 14 }
+    REVERSE_DIRS = { DIRS['valid'] : DIRS['valid'], DIRS['undefined'] : DIRS['undefined'] }
 
     STEPS = []
 
@@ -12,7 +12,6 @@ class cPiece:
     UNDEF_Y = 8
 
     def __init__(self, match, xpos, ypos):
-        from .. analyze_helper import field_touches_beyond
         self.match = match
         self.xpos = xpos
         self.ypos = ypos
@@ -54,7 +53,7 @@ class cPiece:
 
     def is_move_stuck(self, dstx, dsty):
         mv_dir = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
-        pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos) #self.color, 
+        pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos)
         if(pin_dir == self.DIRS['undefined'] or mv_dir == pin_dir or self.REVERSE_DIRS[mv_dir] == pin_dir):
             return False
         else:
@@ -94,6 +93,8 @@ class cPiece:
 
     # version for rook and bishop - other pieces override function
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+        from .. analyze_helper import field_touches_beyond
+
         opp_color = self.match.oppcolor_of_piece(self.color)
         for step in self.STEPS:
             stepx = step[0]

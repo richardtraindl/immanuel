@@ -598,7 +598,7 @@ def is_stormy(match):
             #if(len(enmytouches) > len(frdlytouches)):
                 #return True
 
-            if(match.is_pinned(x, y)[0] or match.is_soft_pin(x, y)):
+            if(match.is_pinned(x, y) or match.is_soft_pin(x, y)):
                 return True
 
             for enmy in enmytouches:

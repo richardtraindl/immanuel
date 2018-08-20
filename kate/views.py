@@ -146,7 +146,7 @@ def pause(request, matchid=None):
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
 
-    if(modelmatch.status == STATUS['open']):
+    if(modelmatch.status == cMatch.STATUS['open']):
         if(modelmatch.time_start > 0):
             elapsed_time = time.time() - modelmatch.time_start
 

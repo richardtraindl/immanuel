@@ -1,4 +1,4 @@
-from . piece import cPiece
+from . piece import *
 
 
 class cKing(cPiece):
@@ -160,6 +160,8 @@ class cKing(cPiece):
         return True
 
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+        from .. analyze_helper import field_touches_beyond
+
         opp_color = self.match.oppcolor_of_piece(self.piece)
         for step in self.STEPS:
             x1 = dstx + step[0]

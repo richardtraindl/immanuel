@@ -183,7 +183,7 @@ class cMatch:
         self.movecnt = 0
         self.score = 0
         self.level = self.LEVELS['blitz']
-        self.seconds_per_move = 30
+        self.seconds_per_move = self.SECONDS_PER_MOVE[self.level]
         self.begin = datetime.now()
         self.time_start = 0
         self.white_player_name = ""
@@ -497,70 +497,49 @@ class cMatch:
                     return self.STATUS['winner_white']
         return self.STATUS['draw']
 
-    def evaluate_pin_dir(self, srcx, srcy): #color
-        piece = self.readfield(srcx, srcy)        
-        #if(color is None):
-        color = self.color_of_piece(piece)
-        if(color == self.COLORS['white']):
-            kgx = self.wKg_x
-            kgy = self.wKg_y
-        else:
-            kgx = self.bKg_x
-            kgy = self.bKg_y
-        direction = rook.cRook.dir_for_move(srcx, srcy, kgx, kgy)
-        if(direction != self.DIRS['undefined']):
-            stepx, stepy = rook.cRook.step_for_dir(direction)
-            dstx, dsty = self.search(srcx, srcy, stepx, stepy)
-            if(dstx != self.UNDEF_X):
-                piece = self.readfield(dstx, dsty)
-                if( (color == self.COLORS['white'] and piece == self.PIECES['wKg']) or
-                    (color == self.COLORS['black'] and piece == self.PIECES['bKg']) ):
-                    reverse_dir = self.REVERSE_DIRS[direction]
-                    stepx, stepy = rook.cRook.step_for_dir(reverse_dir)
-                    dstx, dsty = self.search(srcx, srcy, stepx, stepy)
-                    if(dstx != self.UNDEF_X):
-                        piece = self.readfield(dstx, dsty)
-                        if(color == self.COLORS['white']):
-                            if(piece == self.PIECES['bQu'] or piece == self.PIECES['bRk']):
-                                return direction
-                            else:
-                                return self.DIRS['undefined']
-                        else:
-                            if(piece == self.PIECES['wQu'] or piece == self.PIECES['wRk']):
-                                return direction
-                            else:
-                                return self.DIRS['undefined']
+    def evaluate_pin_dir(self, srcx, srcy):
+        cpieces = [rook.cRook, bishop.cBishop]
+        white_faces = [self.PIECES['wRk'], self.PIECES['wBp']]
+        black_faces = [self.PIECES['bRk'], self.PIECES['bBp']]
 
-        direction = bishop.cBishop.dir_for_move(srcx, srcy, kgx, kgy)
-        if(direction != self.DIRS['undefined']):
-            stepx, stepy = bishop.cBishop.step_for_dir(direction)
-            dstx, dsty = self.search(srcx, srcy, stepx, stepy)
-            if(dstx != self.UNDEF_X):
-                piece = self.readfield(dstx, dsty)
-                if( (color == self.COLORS['white'] and piece == self.PIECES['wKg']) or
-                    (color == self.COLORS['black'] and piece == self.PIECES['bKg']) ):
-                    reverse_dir = self.REVERSE_DIRS[direction]
-                    stepx, stepy = bishop.cBishop.step_for_dir(reverse_dir)
-                    dstx, dsty = self.search(srcx, srcy, stepx, stepy)
-                    if(dstx != self.UNDEF_X):
-                        piece = self.readfield(dstx, dsty)
-                        if(color == self.COLORS['white']):
-                            if(piece == self.PIECES['bQu'] or piece == self.PIECES['bBp']):
-                                return direction
+        for idx in range(2):
+            piece = self.readfield(srcx, srcy)
+            color = self.color_of_piece(piece)
+            if(color == self.COLORS['white']):
+                kgx = self.wKg_x
+                kgy = self.wKg_y
+            else:
+                kgx = self.bKg_x
+                kgy = self.bKg_y
+            direction = cpieces[idx].dir_for_move(srcx, srcy, kgx, kgy)
+            if(direction != self.DIRS['undefined']):
+                stepx, stepy = cpieces[idx].step_for_dir(direction)
+                dstx, dsty = self.search(srcx, srcy, stepx, stepy)
+                if(dstx != self.UNDEF_X):
+                    piece = self.readfield(dstx, dsty)
+                    if( (color == self.COLORS['white'] and piece == self.PIECES['wKg']) or
+                        (color == self.COLORS['black'] and piece == self.PIECES['bKg']) ):
+                        reverse_dir = self.REVERSE_DIRS[direction]
+                        stepx, stepy = cpieces[idx].step_for_dir(reverse_dir)
+                        dstx, dsty = self.search(srcx, srcy, stepx, stepy)
+                        if(dstx != self.UNDEF_X):
+                            piece = self.readfield(dstx, dsty)
+                            if(color == self.COLORS['white']):
+                                if(piece == self.PIECES['bQu'] or piece == black_faces[idx]):
+                                    return direction
+                                else:
+                                    return self.DIRS['undefined']
                             else:
-                                return self.DIRS['undefined']
-                        else:
-                            if(piece == self.PIECES['wQu'] or piece == self.PIECES['wBp']):
-                                return direction
-                            else:
-                                return self.DIRS['undefined']
+                                if(piece == self.PIECES['wQu'] or piece == white_faces[idx]):
+                                    return direction
+                                else:
+                                    return self.DIRS['undefined']
         return self.DIRS['undefined']
 
     def is_pinned(self, x, y):
         piece = self.readfield(x, y)
-        #color = self.color_of_piece(piece)
-        direction = self.evaluate_pin_dir(x, y) # color, 
-        return direction != self.DIRS['undefined'], direction
+        direction = self.evaluate_pin_dir(x, y)
+        return direction != self.DIRS['undefined']
 
     def is_soft_pin(self, srcx, srcy):
         piece = self.readfield(srcx, srcy)

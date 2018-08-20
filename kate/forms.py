@@ -36,7 +36,7 @@ class MatchForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(MatchForm, self).clean()
-        self.level = cleaned_data.get("level")
+        self.level = int(cleaned_data.get("level"))
         self.white_player_name = cleaned_data.get("white_player_name")
         self.white_player_is_human = cleaned_data.get("white_player_is_human")
         self.black_player_name = cleaned_data.get("black_player_name")

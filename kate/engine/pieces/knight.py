@@ -1,4 +1,4 @@
-from . piece import cPiece
+from . piece import *
 
 
 class cKnight(cPiece):
@@ -75,6 +75,8 @@ class cKnight(cPiece):
         return True
 
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+        from .. analyze_helper import field_touches_beyond
+
         cknight = cKnight(self.match, dstx, dsty)
         if(cknight.is_piece_stuck_new()):
             return

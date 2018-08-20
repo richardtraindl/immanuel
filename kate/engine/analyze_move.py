@@ -4,9 +4,15 @@ from .match import *
 from .matchmove import do_move, undo_move
 from . import analyze_position # score_supports, score_attacks, score_opening, score_endgame, is_endgame
 from .helper import reverse_lookup
-from .analyze_helper import * #dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker, dstfield_is_attacked, piece_is_lower_fairy_equal_than_enemy_on_dstfield, field_touches, search_lines_of_pin, list_field_touches, field_touches_beyond, is_discl_supported_weak, search_opposed_pieces, is_piece_attacked, is_supported_attacked
-from .pieces import pawn, knight, bishop, rook, king, queen
+from .analyze_helper import *
+from .pieces.pawn import cPawn
+from .pieces.knight import cKnight
+from .pieces.bishop import cBishop
+from .pieces.rook import cRook
+from .pieces.king import cKing
+from .pieces.queen import cQueen
 from .pieces import pawn_ext, knight_ext, bishop_ext, rook_ext, king_ext, queen_ext
+
 
 def castles(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)

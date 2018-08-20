@@ -1,4 +1,4 @@
-from . piece import cPiece
+from . piece import *
 
 
 class cBishop(cPiece):
