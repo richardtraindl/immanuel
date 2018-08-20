@@ -1,4 +1,3 @@
-from .. analyze_helper import field_touches_beyond
 
 
 class cPiece:
@@ -13,6 +12,7 @@ class cPiece:
     UNDEF_Y = 8
 
     def __init__(self, match, xpos, ypos):
+        from .. analyze_helper import field_touches_beyond
         self.match = match
         self.xpos = xpos
         self.ypos = ypos
