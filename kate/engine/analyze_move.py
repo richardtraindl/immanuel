@@ -81,7 +81,7 @@ def flees(match, gmove):
         return False
 
 
-def attacks_and_supports(match, gmove):
+def find_attacks_and_supports(match, gmove):
     attacked = []
     supported = []
 
@@ -356,7 +356,7 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
         if(defends_check(match)):
             priomove.tactics.append(priomove.TACTICS['defend-check'])
 
-        attacked, supported = attacks_and_supports(match, priomove.gmove)
+        attacked, supported = find_attacks_and_supports(match, priomove.gmove)
 
         dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att = dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove)
         dstflield_is_attacked = dstfield_is_attacked(match, priomove.gmove)
