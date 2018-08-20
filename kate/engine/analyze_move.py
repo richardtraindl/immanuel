@@ -88,22 +88,31 @@ def attacks_and_supports(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
     if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
-        pawn_ext.attacks_and_supports(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, attacked, supported)
+        cpawn = cPawn(match, gmove.srcx, gmove.srcy)
+        cpawn.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
     elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
-        knight_ext.attacks_and_supports(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, attacked, supported)
+        cknight = cKnight(match, gmove.srcx, gmove.srcy)
+        cknight.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
     elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
-        bishop_ext.attacks_and_supports(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, attacked, supported)
+        cbishop = cBishop(match, gmove.srcx, gmove.srcy)
+        cbishop.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
     elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
-        rook_ext.attacks_and_supports(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, attacked, supported)
+        crook = cRook(match, gmove.srcx, gmove.srcy)
+        crook.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
     elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
-        rook_ext.attacks_and_supports(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, attacked, supported)
-        bishop_ext.attacks_and_supports(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, attacked, supported)
+        crook = cRook(match, gmove.srcx, gmove.srcy)
+        crook.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
+        cbishop = cBishop(match, gmove.srcx, gmove.srcy)
+        cbishop.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
     elif(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
-        king_ext.attacks_and_supports(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, attacked, supported)
+        cking = cKing(match, gmove.srcx, gmove.srcy)
+        cking.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
         if(gmove.srcx - gmove.dstx == -2):
-            rook_ext.attacks_and_supports(match, gmove.dstx + 1, gmove.srcy, gmove.dstx - 1, gmove.dsty, attacked, supported)
+            crook = cRook(match, gmove.dstx + 1, gmove.srcy)
+            crook.find_attacks_and_supports(gmove.dstx - 1, gmove.dsty, attacked, supported)
         elif(gmove.srcx - gmove.dstx == 2):
-            rook_ext.attacks_and_supports(match, gmove.dstx - 2, gmove.srcy, gmove.dstx + 1, gmove.dsty, attacked, supported)
+            crook = cRook(match, gmove.dstx - 2, gmove.srcy)
+            crook.find_attacks_and_supports(gmove.dstx + 1, gmove.dsty, attacked, supported)
 
     return attacked, supported
 
