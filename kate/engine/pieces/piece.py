@@ -1,3 +1,4 @@
+from .. analyze_helper import field_touches_beyond
 
 
 class cPiece:
@@ -92,7 +93,7 @@ class cPiece:
         return False
 
     # version for rook and bishop - other pieces override function
-    def attacks_and_supports(self, dstx, dsty, attacked, supported):
+    def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
         opp_color = self.match.oppcolor_of_piece(self.color)
         for step in self.STEPS:
             stepx = step[0]
@@ -112,7 +113,7 @@ class cPiece:
                     attacked.append(ctouch_beyond)
                     ###
                     self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
-                    analyze_helper.field_touches_beyond(self.match, opp_color, ctouch_beyond)
+                    field_touches_beyond(self.match, opp_color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
                 else:
@@ -122,7 +123,7 @@ class cPiece:
                     supported.append(ctouch_beyond)
                     ###
                     self.match.writefield(srcx, srcy, self.match.PIECES['blk'])
-                    analyze_helper.field_touches_beyond(self.match, self.color, ctouch_beyond)
+                    field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
 # class end
