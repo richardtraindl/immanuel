@@ -5,48 +5,6 @@ from .. import analyze_helper
 
 STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
 
-def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
-    king = match.readfield(srcx, srcy)
-
-    color = match.color_of_piece(king)
-    opp_color = match.oppcolor_of_piece(king)
-
-    for i in range(8):
-        x1 = dstx + STEPS[i][0]
-        y1 = dsty + STEPS[i][1]
-        if(match.is_inbounds(x1, y1)):
-            if(x1 == srcx and y1 == srcy):
-                continue
-
-            piece = match.readfield(x1, y1)
-
-            if(piece == match.PIECES['blk']):
-                continue
-
-            if(match.color_of_piece(piece) == opp_color):
-                ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                attacked.append(ctouch_beyond)
-
-                ###
-                match.writefield(srcx, srcy, match.PIECES['blk'])
-
-                analyze_helper.field_touches_beyond(match, opp_color, ctouch_beyond)
-
-                match.writefield(srcx, srcy, king)
-                ###
-            else:
-                ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                supported.append(ctouch_beyond)
-
-                ###
-                match.writefield(srcx, srcy, match.PIECES['blk'])
-
-                analyze_helper.field_touches_beyond(match, color, ctouch_beyond)
-
-                match.writefield(srcx, srcy, king)
-                ###
-
-
 def score_attacks(match, srcx, srcy):
     score = 0
 
