@@ -9,52 +9,6 @@ def is_move_stuck(match, srcx, srcy, dstx, dsty):
     crook = cRook(match, srcx, srcy)
     return crook.is_move_stuck(dstx, dsty)
 
-def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
-    rook = match.readfield(srcx, srcy)
-
-    color = match.color_of_piece(rook)
-    opp_color = match.oppcolor_of_piece(rook)
-
-    for i in range(4):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = match.search(dstx, dsty, stepx , stepy)
-        if(x1 != match.UNDEF_X):
-            if(x1 == srcx and y1 == srcy):
-                continue
-
-            if(is_move_stuck(match, x1, y1, dstx, dsty)):
-                continue
-
-            piece = match.readfield(x1, y1)
-
-            if(match.color_of_piece(piece) == opp_color):
-                ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                attacked.append(ctouch_beyond)
-
-                ###
-                match.writefield(srcx, srcy, match.PIECES['blk'])
-
-                analyze_helper.field_touches_beyond(match, opp_color, ctouch_beyond)
-
-                match.writefield(srcx, srcy, rook)
-                ###
-            else:
-                if(piece == match.PIECES['blk'] or piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
-                    continue
-
-                ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                supported.append(ctouch_beyond)
-
-                ###
-                match.writefield(srcx, srcy, match.PIECES['blk'])
-
-                analyze_helper.field_touches_beyond(match, color, ctouch_beyond)
-
-                match.writefield(srcx, srcy, rook)
-                ###
-
-
 def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_supported):
     for j in range(0, 4, 2):
         first = cTouchBeyond(None, None, None, None, match.PIECES['blk'], 0, 0)
