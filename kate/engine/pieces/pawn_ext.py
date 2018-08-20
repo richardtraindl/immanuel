@@ -14,59 +14,6 @@ def is_move_stuck(match, srcx, srcy, dstx, dsty):
     return cpawn.is_move_stuck(dstx, dsty)
 
 
-def attacks_and_supports(match, srcx, srcy, dstx, dsty, attacked, supported):
-    pawn = match.readfield(srcx, srcy)
-
-    color = match.color_of_piece(pawn)
-    opp_color = match.oppcolor_of_piece(pawn)
-
-    if(color == match.COLORS['white']):
-        STEPS = WPW_STEPS
-    else:
-        STEPS = BPW_STEPS
-
-    for i in range(2):
-        x1 = dstx + STEPS[i][0]
-        y1 = dsty + STEPS[i][1]
-        if(match.is_inbounds(x1, y1)):
-            if(x1 == srcx and y1 == srcy):
-                continue
-
-            piece = match.readfield(x1, y1)
-            
-            if(piece == match.PIECES['blk']):
-                continue
-
-            if(is_move_stuck(match, dstx, dsty, x1, y1)):
-                continue
-
-            if(match.color_of_piece(piece) == opp_color):
-                ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                attacked.append(ctouch_beyond)
-
-                ###
-                match.writefield(srcx, srcy, match.PIECES['blk'])
-
-                analyze_helper.field_touches_beyond(match, opp_color, ctouch_beyond)
-
-                match.writefield(srcx, srcy, pawn)
-                ###
-            else:
-                if(piece == match.PIECES['blk'] or piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
-                    continue
-
-                ctouch_beyond = cTouchBeyond(srcx, srcy, dstx, dsty, piece, x1, y1)
-                supported.append(ctouch_beyond)
-
-                ###
-                match.writefield(srcx, srcy, match.PIECES['blk'])
-
-                analyze_helper.field_touches_beyond(match, color, ctouch_beyond)
-
-                match.writefield(srcx, srcy, pawn)
-                ###
-
-
 def score_attacks(match, srcx, srcy):
     score = 0
 
