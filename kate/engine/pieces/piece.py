@@ -122,7 +122,7 @@ class cPiece:
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     supported.append(ctouch_beyond)
                     ###
-                    self.match.writefield(srcx, srcy, self.match.PIECES['blk'])
+                    self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
                     field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
