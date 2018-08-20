@@ -91,6 +91,40 @@ class cPiece:
 
         return False
 
+    # version for rook and bishop - other pieces override function
+    def attacks_and_supports(self, dstx, dsty, attacked, supported):
+        opp_color = self.match.oppcolor_of_piece(self.color)
+        for step in self.STEPS:
+            stepx = step[0]
+            stepy = step[1]
+            x1, y1 = self.match.search(dstx, dsty, stepx , stepy)
+            if(x1 != match.UNDEF_X):
+                if(x1 == self.xpos and y1 == self.ypos):
+                    continue
+
+                cpiece = cPiece(self.match, dstx, dsty)
+                if(cpiece.is_move_stuck(x1, y1)):
+                    continue
+
+                piece = self.match.readfield(x1, y1)
+                if(self.match.color_of_piece(piece) == opp_color):
+                    ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
+                    attacked.append(ctouch_beyond)
+                    ###
+                    self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+                    analyze_helper.field_touches_beyond(self.match, opp_color, ctouch_beyond)
+                    self.match.writefield(self.xpos, self.ypos, self.piece)
+                    ###
+                else:
+                    if(piece == self.match.PIECES['blk'] or piece == self.match.PIECES['wKg'] or piece == self.match.PIECES['bKg']):
+                        continue
+                    ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
+                    supported.append(ctouch_beyond)
+                    ###
+                    self.match.writefield(srcx, srcy, self.match.PIECES['blk'])
+                    analyze_helper.field_touches_beyond(self.match, self.color, ctouch_beyond)
+                    self.match.writefield(self.xpos, self.ypos, self.piece)
+                    ###
 # class end
 
 
