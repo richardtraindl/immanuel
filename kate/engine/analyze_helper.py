@@ -340,7 +340,7 @@ def is_discl_supported_weak(discl_supported):
 
     return False
 
-def is_field_forked(match, piece, forkedx, forkedy)):
+def is_field_forked(match, piece, forkedx, forkedy):
     color = match.color_of_piece(piece)
     opp_color = match.oppcolor_of_piece(piece)
 
