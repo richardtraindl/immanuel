@@ -68,9 +68,6 @@ class cBishop(cPiece):
     #is_move_valid(self, dstx, dsty)
         # works with inherited class
 
-    #is_move_disclosure(self, dstx, dsty, discl_attacked, discl_supported):
-        # works with inherited class
-
     #move_defends_fork_field(self, dstx, dsty)
         # works with inherited class
 
