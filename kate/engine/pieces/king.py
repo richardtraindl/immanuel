@@ -3,7 +3,6 @@ from . piece import *
 
 class cKing(cPiece):
     DIRS = { 'sh-castling' : 11, 'lg-castling' : 12, 'valid' : 13, 'undefined' : 14 }
-    DIRS_ARY = []
     STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
 
     STEP_1N_X = 0
