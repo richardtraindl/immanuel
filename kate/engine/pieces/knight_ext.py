@@ -102,29 +102,3 @@ def count_touches(match, color, fieldx, fieldy):
 
     return count
 
-
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): #, analyses
-    color = match.color_of_piece(piece)
-    opp_color = match.oppcolor_of_piece(piece)
-    
-    for i in range(8):
-        x1 = dstx + STEPS[i][0]
-        y1 = dsty + STEPS[i][1]
-
-        if(x1 == srcx and y1 == srcy):
-            continue
-
-        if(match.is_inbounds(x1, y1)):
-            forkfield = match.readfield(x1, y1)
-
-            if(match.color_of_piece(forkfield) == opp_color):
-                continue
-
-            if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
-                #analyses.lst_fork_defended.append(cfork)
-                return True
-
-    return False
-
-
