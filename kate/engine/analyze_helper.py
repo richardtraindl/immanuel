@@ -340,47 +340,46 @@ def is_discl_supported_weak(discl_supported):
 
     return False
 
-
-def is_fork_field(match, piece, forkx, forky):
+def is_field_forked(match, piece, forkedx, forkedy)):
     color = match.color_of_piece(piece)
     opp_color = match.oppcolor_of_piece(piece)
-    
-    fork_piece = match.readfield(forkx, forky)
-    if(match.color_of_piece(fork_piece) == opp_color):
-        return False
 
-    frdlytouches, enmytouches = field_touches(match, color, forkx, forky)
+    #fork_piece = match.readfield(forkedx, forkedy)
+    #if(match.color_of_piece(fork_piece) == opp_color):
+        #return False
+
+    frdlytouches, enmytouches = field_touches(match, color, forkedx, forkedy)
     if(len(frdlytouches) >= len(enmytouches)):
         return False
 
-    cqueenfield = queenfield.cQueenField(match, forkx, forky)
+    cqueenfield = queenfield.cQueenField(match, forkedx, forkedy)
     if(cqueenfield.is_field_touched(opp_color, 2)):
-        if(queen_ext.count_touches(match, color, forkx, forky) > 1):
+        if(queen_ext.count_touches(match, color, forkedx, forkedy) > 1):
             return True
 
-    crookfield = rookfield.cRookField(match, forkx, forky)
+    crookfield = rookfield.cRookField(match, forkedx, forky)
     if(crookfield.is_field_touched(opp_color, 2)):
-        if(rook_ext.count_touches(match, color, forkx, forky) > 1):
+        if(rook_ext.count_touches(match, color, forkedx, forkedy) > 1):
             return True
 
-    cbishopfield = bishopfield.cBishopField(match, forkx, forky)
+    cbishopfield = bishopfield.cBishopField(match, forkedx, forkedy)
     if(cbishopfield.is_field_touched(opp_color, 2)):
-        if(bishop_ext.count_touches(match, color, forkx, forky) > 1):
+        if(bishop_ext.count_touches(match, color, forkedx, forkedy) > 1):
             return True
 
-    cknightfield = knightfield.cKnightField(match, forkx, forky)
+    cknightfield = knightfield.cKnightField(match, forkedx, forkedy)
     if(cknightfield.is_field_touched(opp_color, 2)):
-        if(knight_ext.count_touches(match, color, forkx, forky) > 1):
+        if(knight_ext.count_touches(match, color, forkedx, forkedy) > 1):
             return True
 
-    cpawnfield = pawnfield.cPawnField(match, forkx, forky)
+    cpawnfield = pawnfield.cPawnField(match, forkedx, forky)
     if(cpawnfield.is_field_touched(opp_color, 2)):
-        if(pawn_ext.count_touches(match, color, forkx, forky) > 1):
+        if(pawn_ext.count_touches(match, color, forkedx, forkedy) > 1):
             return True
 
-    ckingfield = kingfield.cKingField(match, forkx, forky)
+    ckingfield = kingfield.cKingField(match, forkedx, forkedy)
     if(ckingfield.is_field_touched(opp_color)):
-        if(king_ext.count_touches(match, color, forkx, forky) > 1):
+        if(king_ext.count_touches(match, color, forkedx, forkedy) > 1):
             return True
 
     return False
