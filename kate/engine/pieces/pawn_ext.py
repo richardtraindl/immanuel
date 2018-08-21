@@ -118,36 +118,6 @@ def count_touches(match, color, fieldx, fieldy):
     return count
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): #, analyses
-    if(is_move_stuck(match, srcx, srcy, dstx, dsty)):
-        return False
-
-    color = match.color_of_piece(piece)
-    opp_color = match.oppcolor_of_piece(piece)
-
-    if(color == match.COLORS['white']):
-        STEPS = WPW_STEPS
-    else:
-        STEPS = BPW_STEPS
-
-    for i in range(2):
-        x1 = dstx + STEPS[i][0]
-        y1 = dsty + STEPS[i][1]
-
-        if(match.is_inbounds(x1, y1)):
-            fork_field = match.readfield(x1, y1)
-
-            if(match.color_of_piece(fork_field) == opp_color):
-                continue
-
-            if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
-                #analyses.lst_fork_defended.append(cfork)
-                return True
-
-    return False
-
-
 def is_running(match, srcx, srcy):
     piece = match.readfield(srcx, srcy)
     if(piece == match.PIECES['wPw']):
