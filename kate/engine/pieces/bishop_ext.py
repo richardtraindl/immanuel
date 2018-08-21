@@ -9,55 +9,6 @@ def is_move_stuck(match, srcx, srcy, dstx, dsty):
     cbishop = cBishop(match, srcx, srcy)
     return cbishop.is_move_stuck(dstx, dsty)
 
-  
-def disclosures(match, color, excluded_dir, srcx, srcy, discl_attacked, discl_supported):
-    for j in range(0, 4, 2):
-        first = cTouchBeyond(None, None, None, None, match.PIECES['blk'], 0, 0)
-        second = cTouchBeyond(None, None, None, None, match.PIECES['blk'], 0, 0)
-
-        for i in range(0, 2, 1):
-            stepx = STEPS[j+i][0]
-            stepy = STEPS[j+i][1]
-            direction = cBishop.dir_for_move(srcx, srcy, (srcx + stepx), (srcy + stepy))
-            if(direction == excluded_dir or direction == match.REVERSE_DIRS[excluded_dir]):
-                break
-            x1, y1 = match.search(srcx, srcy, stepx, stepy)
-            if(x1 != match.UNDEF_X):
-                piece = match.readfield(x1, y1)
-                if(first.piece == match.PIECES['blk']):
-                    first.piece = piece
-                    first.fieldx = x1
-                    first.fieldy = y1
-                    continue
-                elif(second.piece == match.PIECES['blk']):
-                    second.piece = piece
-                    second.fieldx = x1
-                    second.fieldy = y1
-                    if(match.color_of_piece(first.piece) != match.color_of_piece(second.piece) and 
-                       first.piece != match.PIECES['blk'] and second.piece != match.PIECES['blk']):
-                        if(match.color_of_piece(first.piece) == color):
-                            if(first.piece == match.PIECES['wBp'] or first.piece == match.PIECES['bBp'] or 
-                               first.piece == match.PIECES['wQu'] or first.piece == match.PIECES['bQu']):
-                                discl_attacked.append(second)
-                        else:
-                            if(second.piece == match.PIECES['wBp'] or second.piece == match.PIECES['bBp'] or 
-                               second.piece == match.PIECES['wQu'] or second.piece == match.PIECES['bQu']):
-                                discl_attacked.append(first)
-                    elif(match.color_of_piece(first.piece) == match.color_of_piece(second.piece) and 
-                         match.color_of_piece(first.piece) == color and
-                         first.piece != match.PIECES['blk'] and second.piece != match.PIECES['blk']):
-                        if(first.piece == match.PIECES['wBp'] or first.piece == match.PIECES['bBp'] or 
-                           first.piece == match.PIECES['wQu'] or first.piece == match.PIECES['bQu']):
-                            discl_supported.append(second)
-                        elif(second.piece == match.PIECES['wBp'] or second.piece == match.PIECES['bBp'] or 
-                             second.piece == match.PIECES['wQu'] or second.piece == match.PIECES['bQu']):
-                            discl_supported.append(first)
-                    else:
-                        break
-                else:
-                    break
-
-
 def score_attacks(match, srcx, srcy):
     score = 0
 
