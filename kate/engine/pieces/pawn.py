@@ -227,6 +227,29 @@ class cPawn(cPiece):
                     field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
+                    
+    def move_defends_forked_field(self, dstx, dsty)
+        from .. analyze_helper import is_field_forked
+
+        if(is_move_stuck(self, self.xpos, self.ypos, dstx, dsty)):
+            return False
+
+        for step in self.STEPS:
+            x1 = dstx + step[0]
+            y1 = dsty + step[1]
+
+            if(self.match.is_inbounds(x1, y1)):
+                piece = self.match.readfield(x1, y1)
+
+                if(self.match.color_of_piece(piece) == self.color):
+                    if(is_field_forked(self.match, piece, x1, y1)):
+                        #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
+                        #analyses.lst_fork_defended.append(cfork)
+                        return True
+        return False
+
+    def move_controles_file(self, dstx, dsty)
+        return False
 
 # class end
 
