@@ -357,7 +357,7 @@ def is_field_forked(match, piece, forkedx, forkedy):
         if(queen_ext.count_touches(match, color, forkedx, forkedy) > 1):
             return True
 
-    crookfield = rookfield.cRookField(match, forkedx, forky)
+    crookfield = rookfield.cRookField(match, forkedx, forkedy)
     if(crookfield.is_field_touched(opp_color, 2)):
         if(rook_ext.count_touches(match, color, forkedx, forkedy) > 1):
             return True
@@ -372,7 +372,7 @@ def is_field_forked(match, piece, forkedx, forkedy):
         if(knight_ext.count_touches(match, color, forkedx, forkedy) > 1):
             return True
 
-    cpawnfield = pawnfield.cPawnField(match, forkedx, forky)
+    cpawnfield = pawnfield.cPawnField(match, forkedx, forkedy)
     if(cpawnfield.is_field_touched(opp_color, 2)):
         if(pawn_ext.count_touches(match, color, forkedx, forkedy) > 1):
             return True
