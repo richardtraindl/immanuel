@@ -116,7 +116,7 @@ class cKnight(cPiece):
         if(self.is_move_stuck(dstx, dsty)):
             return False
 
-        for step in slef.STEPS:
+        for step in self.STEPS:
             x1 = dstx + step[0]
             y1 = dsty + step[1]
 
