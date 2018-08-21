@@ -14,45 +14,6 @@ def is_move_stuck(match, srcx, srcy, dstx, dsty):
     rk_flag = crook.is_move_stuck(dstx, dsty)
     return bp_flag or rk_flag
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , analyses
-    if(is_move_stuck(match, srcx, srcy, dstx, dsty)):
-        return False
-
-    color = match.color_of_piece(piece)
-    opp_color = match.oppcolor_of_piece(piece)
-
-    direction = qu_dir(srcx, srcy, dstx, dsty)
-
-    for i in range(8):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-
-        x1 = dstx + stepx
-        y1 = dsty + stepy
-
-        step_dir = qu_dir(dstx, dsty, x1, y1)
-        if(direction == step_dir or direction == match.REVERSE_DIRS[step_dir]):
-            continue
-
-        while(match.is_inbounds(x1, y1)):
-            fork_field = match.readfield(x1, y1)
-            
-            if(match.color_of_piece(fork_field) == opp_color):
-                break
-
-            if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
-                #analyses.lst_fork_defended.append(cfork)
-                return True
-
-            if(match.color_of_piece(fork_field) == color):
-                break
-
-            x1 += stepx
-            y1 += stepy
-
-    return False
-
 
 def count_touches(match, color, fieldx, fieldy):
     count = 0
