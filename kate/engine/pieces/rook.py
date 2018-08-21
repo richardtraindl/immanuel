@@ -8,6 +8,8 @@ class cRook(cPiece):
              'west'      : 4,
              'undefined' : 14 }
 
+    DIRS_ARY = [DIRS['north'], DIRS['south'], DIRS['east'], DIRS['west']]
+
     REVERSE_DIRS = { DIRS['north']     : DIRS['south'],
                      DIRS['south']     : DIRS['north'],
                      DIRS['east']      : DIRS['west'],
@@ -64,6 +66,12 @@ class cRook(cPiece):
         # works with inherited class
 
     #is_move_valid(self, dstx, dsty)
+        # works with inherited class
+
+    #move_defends_fork_field(self, dstx, dsty)
+        # works with inherited class
+
+    #move_controles_file(self, dstx, dsty)
         # works with inherited class
 
 # class end
