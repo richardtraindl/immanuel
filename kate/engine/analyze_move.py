@@ -209,24 +209,77 @@ def defends_king_attack(match, gmove):
         return False, False
 
 
+def find_disclosures(match, srcx, srcy, dstx, dsty, discl_attacked, discl_supported):
+    piece = match.readfield(srcx, srcy)
+    color = match.color_of_piece(piece)
+    idx = 0
+    for step in cQueen.STEPS:
+        if(idx % 2 == 0):
+            first = cTouchBeyond(None, None, None, None, match.PIECES['blk'], 0, 0)
+            second = cTouchBeyond(None, None, None, None, match.PIECES['blk'], 0, 0)
+        if(idx < 4):
+            cpiece = cRook
+            excluded_dir = cRook.dir_for_move(srcx, srcy, dstx, dsty)
+            faces = [match.PIECES['wRk'], match.PIECES['bRk'], match.PIECES['wQu'], match.PIECES['bQu']]
+        else:
+            cpiece = cBishop
+            excluded_dir = cBishop.dir_for_move(srcx, srcy, dstx, dsty)
+            faces = [match.PIECES['wBp'], match.PIECES['bBp'], match.PIECES['wQu'], match.PIECES['bQu']]
+        idx += 1
+
+        stepx = step[0]
+        stepy = step[1]
+        direction = cpiece.dir_for_move(srcx, srcy, (srcx + stepx), (srcy + stepy))
+        if(direction == excluded_dir or direction == match.REVERSE_DIRS[excluded_dir]):
+            break
+        x1, y1 = match.search(srcx, srcy, stepx, stepy)
+        if(x1 != match.UNDEF_X):
+            piece = match.readfield(x1, y1)
+            if(first.piece == match.PIECES['blk']):
+                first.piece = piece
+                first.fieldx = x1
+                first.fieldy = y1
+                continue
+            elif(second.piece == match.PIECES['blk']):
+                second.piece = piece
+                second.fieldx = x1
+                second.fieldy = y1
+
+            if(first.piece == match.PIECES['blk'] or second.piece == match.PIECES['blk']):
+                continue
+                
+            if(match.color_of_piece(first.piece) != match.color_of_piece(second.piece)):
+                if(match.color_of_piece(first.piece) == color):
+                    for face in faces:
+                        if(first.piece == face):
+                            discl_attacked.append(second)
+                            break
+                else:
+                    for face in faces:
+                        if(second.piece == face):
+                            discl_attacked.append(first)
+                            break
+            elif(match.color_of_piece(first.piece) == match.color_of_piece(second.piece)):
+                if(match.color_of_piece(first.piece) == color):
+                    for face in faces:
+                        if(first.piece == face):
+                            discl_supported.append(second)
+                            break
+                    for face in faces:
+                        if(second.piece == face):
+                            discl_supported.append(first)
+                            break
+
 def disclosures(match, gmove):
     discl_attacked = []
     discl_supported = []
 
     piece = match.readfield(gmove.srcx, gmove.srcy)
-
     color = match.color_of_piece(piece)
 
     do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-
-    excluded_dir = rook.cRook.dir_for_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
-    rook_ext.disclosures(match, color, excluded_dir, gmove.srcx, gmove.srcy, discl_attacked, discl_supported)
-
-    excluded_dir = bishop.cBishop.dir_for_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
-    bishop_ext.disclosures(match, color, excluded_dir, gmove.srcx, gmove.srcy, discl_attacked, discl_supported)
-
+    find_disclosures(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, discl_attacked, discl_supported)
     undo_move(match)
-
     ###
     match.writefield(gmove.srcx, gmove.srcy, match.PIECES['blk'])
 
