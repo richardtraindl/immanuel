@@ -12,6 +12,7 @@ from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
 from .pieces import pawn_ext, knight_ext, bishop_ext, rook_ext, king_ext, queen_ext
+from .pieces.piece import cTouchBeyond
 
 
 def castles(match, gmove):
