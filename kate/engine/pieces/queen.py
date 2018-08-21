@@ -51,5 +51,25 @@ class cQueen(cPiece):
         bflag = cbishop.is_move_valid(dstx, dsty)
         return rflag or bflag
 
+    def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+        cbishop = cBishop(self.match, self.xpos, self.ypos)
+        cbishop.find_attacks_and_supports(dstx, dsty, attacked, supported)
+        crook = cRook(self.match, self.xpos, self.ypos)
+        crook.find_attacks_and_supports(dstx, dsty, attacked, supported)
+    
+    def move_defends_forked_field(self, dstx, dsty)
+        cbishop = cBishop(self.match, self.xpos, self.ypos)
+        bp_flag = cbishop.move_defends_forked_field(dstx, dsty)
+        crook = cRook(self.match, self.xpos, self.ypos)
+        rk_flag = crook.move_defends_forked_field(dstx, dsty)
+        return bp_flag or rk_flag
+
+     def move_controles_file(self, dstx, dsty)
+        cbishop = cBishop(self.match, self.xpos, self.ypos)
+        bp_flag = cbishop.move_controles_file(dstx, dsty)
+        crook = cRook(self.match, self.xpos, self.ypos)
+        rk_flag = crook.move_controles_file(dstx, dsty)
+        return bp_flag or rk_flag
+
 # class end
 
