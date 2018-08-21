@@ -298,19 +298,23 @@ def disclosures(match, gmove):
 
 def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
     if(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
-        rflag = rook_ext.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
-        bflag = bishop_ext.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
-        return rflag or bflag
+        cqueen = cQueen(match, srcx, srcy)
+        return cqueen.move_defends_forked_field(dstx, dsty)
     elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
-        return rook_ext.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+        crook = cRook(match, srcx, srcy)
+        return crook.move_defends_forked_field(dstx, dsty)
     elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
-        return bishop_ext.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+        cbishop = cBishop(match, srcx, srcy)
+        return cbishop.move_defends_forked_field(dstx, dsty)
     elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
-        return knight_ext.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+        cknight = cKnight(match, srcx, srcy)
+        return cknight.move_defends_forked_field(dstx, dsty)
     elif(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
-        return king_ext.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+        cking = cKing(match, srcx, srcy)
+        return cking.move_defends_forked_field(dstx, dsty)
     elif(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
-        return pawn_ext.defends_fork_field(match, piece, srcx, srcy, dstx, dsty) # , forked
+        cpawn = cPawn(match, srcx, srcy)
+        return cpawn.move_defends_forked_field(dstx, dsty)
     else:
         return False
 
