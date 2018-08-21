@@ -191,5 +191,8 @@ class cKing(cPiece):
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
 
+    def is_move_disclosure(self, dstx, dsty, discl_attacked, discl_supported):
+        return False
+
 # class end
 
