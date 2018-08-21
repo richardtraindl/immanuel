@@ -88,37 +88,6 @@ def count_touches(match, color, fieldx, fieldy):
     return count
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): #, analyses
-    color = match.color_of_piece(piece)
-    opp_color = match.oppcolor_of_piece(piece)
-
-    for i in range(8):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-
-        x1 = dstx + stepx
-        y1 = dsty + stepy
-        
-        if(x1 == srcx and y1 == srcy):
-            continue
-
-        if(match.is_inbounds(x1, y1)):
-            if(match.is_king_attacked(x1, y1)):
-                continue
-
-            fork_field = match.readfield(x1, y1)
-
-            if(match.color_of_piece(fork_field) == opp_color):
-                continue
-
-            if(analyze_helper.is_fork_field(match, piece, x1, y1)):
-                #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
-                #analyses.lst_fork_defended.append(cfork)
-                return True
-
-    return False
-
-
 def is_king_safe(match, color):
     if(color == match.COLORS['white']):
         Kg_x = match.wKg_x
