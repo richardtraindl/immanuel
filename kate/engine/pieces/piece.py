@@ -125,8 +125,8 @@ class cPiece:
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
 
-    def move_defends_fork_field(self, dstx, dsty):
-        from .. analyze_helper import is_fork_field
+    def move_defends_forked_field(self, dstx, dsty):
+        from .. analyze_helper import is_field_forked
 
         if(self.is_move_stuck(dstx, dsty)):
             return False
@@ -146,19 +146,12 @@ class cPiece:
             x1 = dstx + stepx
             y1 = dsty + stepy
             while(self.match.is_inbounds(x1, y1)):
-                fork_field = self.match.readfield(x1, y1)
-
-                if(self.match.color_of_piece(fork_field) == opp_color):
-                    break
-
-                if(is_fork_field(self.match, self.piece, x1, y1)):
-                    #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
-                    #analyses.lst_fork_defended.append(cfork)
-                    return True
-
-                if(self.match.color_of_piece(fork_field) == self.color):
-                    break
-
+                piece = self.match.readfield(x1, y1)
+                if(self.match.color_of_piece(piece) == self.color):
+                    if(is_field_forked(self.match, piece, x1, y1)):
+                        #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
+                        #analyses.lst_fork_defended.append(cfork)
+                        return True
                 x1 += stepx
                 y1 += stepy
 
