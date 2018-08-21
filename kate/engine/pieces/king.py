@@ -190,7 +190,7 @@ class cKing(cPiece):
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
 
-    def move_defends_forked_field(self, dstx, dsty)
+    def move_defends_forked_field(self, dstx, dsty):
         from .. analyze_helper import is_field_forked
 
         for step in self.STEPS:
@@ -217,7 +217,7 @@ class cKing(cPiece):
 
         return False
 
-    def move_controles_file(self, dstx, dsty)
+    def move_controles_file(self, dstx, dsty):
         return False
 
 # class end
