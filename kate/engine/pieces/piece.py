@@ -3,11 +3,8 @@
 class cPiece:
     DIRS = { 'valid' : 13, 'undefined' : 14 }
     DIRS_ARY = [DIRS['undefined'], DIRS['undefined'], DIRS['undefined'], DIRS['undefined']]
-
     REVERSE_DIRS = { DIRS['valid'] : DIRS['valid'], DIRS['undefined'] : DIRS['undefined'] }
-
     STEPS = []
-
     UNDEF_X = 8
     UNDEF_Y = 8
 
@@ -127,6 +124,73 @@ class cPiece:
                     field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
+
+    def move_defends_fork_field(self, dstx, dsty):
+        from .. analyze_helper import is_fork_field
+
+        if(self.is_move_stuck(dstx, dsty)):
+            return False
+
+        opp_color = self.match.oppcolor_of_piece(self.piece)
+
+        direction = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
+        if(direction == self.DIRS_ARY[0] or direction == self.DIRS_ARY[1]):
+            STEPS = [self.STEPS[0], self.STEPS[1]]
+        else:
+            STEPS = [self.STEPS[2], self.STEPS[3]]
+
+        for step in STEPS:
+            stepx = step[0]
+            stepy = step[1]
+
+            x1 = dstx + stepx
+            y1 = dsty + stepy
+            while(self.match.is_inbounds(x1, y1)):
+                fork_field = self.match.readfield(x1, y1)
+
+                if(self.match.color_of_piece(fork_field) == opp_color):
+                    break
+
+                if(is_fork_field(self.match, self.piece, x1, y1)):
+                    #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
+                    #analyses.lst_fork_defended.append(cfork)
+                    return True
+
+                if(self.match.color_of_piece(fork_field) == self.color):
+                    break
+
+                x1 += stepx
+                y1 += stepy
+
+        return False
+
+
+    def move_controles_file(self, dstx, dsty):
+        cnt = 0
+        move_dir = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
+        move_opp_dir = self.match.REVERSE_DIRS[move_dir]
+    
+        for step in self.STEPS:
+            stepx = step[0]
+            stepy = step[1]
+            direction = self.dir_for_move(dstx, dsty, dstx + stepx, dsty + stepy)
+            if(direction == move_dir or direction == move_opp_dir):
+                continue
+            x1 = dstx + stepx
+            y1 = dsty + stepy
+            while(self.match.is_inbounds(x1, y1)):
+                piece = self.match.readfield(x1, y1)
+                if(self.match.color_of_piece(piece) == self.color):
+                    break
+                else:
+                    cnt += 1
+                    x1 += stepx
+                    y1 += stepy
+
+        if(cnt >= 5):
+            return True
+        else:
+            return False
 
 # class end
 
