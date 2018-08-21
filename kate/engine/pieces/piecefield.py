@@ -119,6 +119,25 @@ class cPieceField:
                     touches.append(cTouch(piece, x1, y1))
         return touches
 
+    def count_touches(self, color):
+        count = 0
+
+        for step in self.STEPS:
+            stepx = step[0]
+            stepy = step[1]
+            x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
+            if(x1 != self.match.UNDEF_X):
+                piece = self.match.readfield(x1, y1)
+
+                cpiece = self.obj_for_piece(piece, self.fieldx, self.fieldy)
+                if(cpiece.is_move_stuck(x1, y1)):
+                    continue
+
+                if(self.match.color_of_piece(piece) == color):
+                    #if(self.match.is_field_touched(color, x1, y1, 1) == False):
+                    count += 1
+        return count
+
 # class end
 
 class cTouchBeyond:

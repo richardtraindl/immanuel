@@ -25,5 +25,12 @@ class cQueenField(cPieceField):
         cbishopfield = cBishopField(self.match, self.fieldx, self.fieldy)
         cbishopfield.list_field_touches(color)
 
+    def list_field_touches(self, color):
+        crookfield = cRookField(self.match, self.fieldx, self.fieldy)
+        count = crookfield.count_touches(color)
+        cbishopfield = cBishopField(self.match, self.fieldx, self.fieldy)
+        count += cbishopfield.count_touches(color)
+        return count
+
 # class end
 

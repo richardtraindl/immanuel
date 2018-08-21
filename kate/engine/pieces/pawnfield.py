@@ -74,5 +74,31 @@ class cPawnField(cPieceField):
                     touches.append(cTouch(piece, x1, y1))
         return touches
 
+    def count_touches(self, color):
+        count = 0
+
+        if(color == self.match.COLORS['white']):
+            STEPS = self.WHITE_BACK_STEPS
+        else:
+            STEPS = self.BLACK_BACK_STEPS
+
+        for step in STEPS:
+            x1 = self.fieldx + step[0]
+            y1 = self.fieldy + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                piece = self.match.readfield(x1, y1)
+
+                if(piece == self.match.PIECES['blk']):
+                    continue
+                
+                cpiece = self.obj_for_piece(piece, self.fieldx, self.fieldy)
+                if(cpiece.is_move_stuck(x1, y1)):
+                    continue
+
+                if(self.match.color_of_piece(piece) == color):
+                    #if(self.match.is_field_touched(color, x1, y1, 1) == False):
+                    count += 1
+        return count
+
 # class end
 

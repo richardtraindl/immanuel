@@ -111,7 +111,7 @@ class cKnight(cPiece):
                     ###
 
     def move_defends_forked_field(self, dstx, dsty):
-        from .. analyze_helper import is_field_forked
+        from .. analyze_helper import is_fork_field
 
         if(self.is_move_stuck(dstx, dsty)):
             return False
@@ -126,8 +126,8 @@ class cKnight(cPiece):
             if(self.match.is_inbounds(x1, y1)):
                 piece = self.match.readfield(x1, y1)
 
-                if(self.match.color_of_piece(piece) == self.color):
-                    if(is_field_forked(self.match, piece, x1, y1)):
+                if(piece == self.match.PIECES['blk'] or self.match.color_of_piece(piece) == self.color):
+                    if(is_fork_field(self.match, self.color, x1, y1)):
                         #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
                         #analyses.lst_fork_defended.append(cfork)
                         return True
@@ -136,6 +136,6 @@ class cKnight(cPiece):
 
     def move_controles_file(self, dstx, dsty):
         return False
-    
+
 # class end
 

@@ -2,7 +2,7 @@
 
 class cPiece:
     DIRS = { 'valid' : 13, 'undefined' : 14 }
-    DIRS_ARY = [DIRS['undefined'], DIRS['undefined'], DIRS['undefined'], DIRS['undefined']]
+    DIRS_ARY = [DIRS['valid'], DIRS['undefined']]
     REVERSE_DIRS = { DIRS['valid'] : DIRS['valid'], DIRS['undefined'] : DIRS['undefined'] }
     STEPS = []
     UNDEF_X = 8
@@ -42,8 +42,8 @@ class cPiece:
         return True
 
     def is_piece_stuck_new(self):
-        pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos) # self.color, 
-        for piecedir in self.DIRS:
+        pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos)
+        for piecedir in self.DIRS_ARY:
             if(pin_dir == piecedir):
                 return False
         return True
@@ -126,7 +126,7 @@ class cPiece:
                     ###
 
     def move_defends_forked_field(self, dstx, dsty):
-        from .. analyze_helper import is_field_forked
+        from .. analyze_helper import is_fork_field
 
         if(self.is_move_stuck(dstx, dsty)):
             return False
@@ -147,8 +147,8 @@ class cPiece:
             y1 = dsty + stepy
             while(self.match.is_inbounds(x1, y1)):
                 piece = self.match.readfield(x1, y1)
-                if(self.match.color_of_piece(piece) == self.color):
-                    if(is_field_forked(self.match, piece, x1, y1)):
+                if(piece == self.match.PIECES['blk'] or self.match.color_of_piece(piece) == self.color):
+                    if(is_fork_field(self.match, self.color, x1, y1)):
                         #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
                         #analyses.lst_fork_defended.append(cfork)
                         return True

@@ -191,7 +191,7 @@ class cKing(cPiece):
                     ###
 
     def move_defends_forked_field(self, dstx, dsty):
-        from .. analyze_helper import is_field_forked
+        from .. analyze_helper import is_fork_field
 
         for step in self.STEPS:
             stepx = step[0]
@@ -209,8 +209,8 @@ class cKing(cPiece):
 
                 piece = self.match.readfield(x1, y1)
 
-                if(self.match.color_of_piece(piece) == self.color):
-                    if(is_field_forked(self.match, piece, x1, y1)):
+                if(piece == self.match.PIECES['blk'] or self.match.color_of_piece(piece) == self.color):
+                    if(is_fork_field(self.match, self.color, x1, y1)):
                         #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
                         #analyses.lst_fork_defended.append(cfork)
                         return True

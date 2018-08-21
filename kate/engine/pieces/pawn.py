@@ -136,6 +136,8 @@ class cPawn(cPiece):
             elif(direction == self.DIRS['south-west']):
                 if(pin_dir != self.DIRS['north-east'] and pin_dir != self.DIRS['south-west'] and pin_dir != self.DIRS['undefined']):
                     return False
+            else:
+                return False
             
             # check fields
             if(direction == self.DIRS['south'] and dstpiece != self.match.PIECES['blk']):
@@ -147,6 +149,8 @@ class cPawn(cPiece):
             elif(direction == self.DIRS['south-east'] or direction == self.DIRS['south-west']):
                 if(self.match.color_of_piece(dstpiece) != self.match.COLORS['white']):
                     return self.is_black_ep_move_ok(dstx, dsty)
+            else:
+                return False
 
             # check promotion
             if(dsty == 0 and prom_piece != self.match.PIECES['bQu'] and prom_piece != self.match.PIECES['bRk'] and prom_piece != self.match.PIECES['bBp'] and prom_piece != self.match.PIECES['bKn']):
@@ -229,7 +233,7 @@ class cPawn(cPiece):
                     ###
                     
     def move_defends_forked_field(self, dstx, dsty):
-        from .. analyze_helper import is_field_forked
+        from .. analyze_helper import is_fork_field
 
         if(self.is_move_stuck(dstx, dsty)):
             return False
@@ -241,8 +245,8 @@ class cPawn(cPiece):
             if(self.match.is_inbounds(x1, y1)):
                 piece = self.match.readfield(x1, y1)
 
-                if(self.match.color_of_piece(piece) == self.color):
-                    if(is_field_forked(self.match, piece, x1, y1)):
+                if(piece == self.match.PIECES['blk'] or self.match.color_of_piece(piece) == self.color):
+                    if(is_fork_field(self.match, self.color, x1, y1)):
                         #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
                         #analyses.lst_fork_defended.append(cfork)
                         return True

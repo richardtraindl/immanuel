@@ -87,37 +87,6 @@ def score_supports(match, srcx, srcy):
     return score
 
 
-def count_touches(match, color, fieldx, fieldy):
-    count = 0
-
-    if(color == match.COLORS['white']):
-        STEPS = WPW_STEPS
-        pawn = match.PIECES['wPw']
-    else:
-        STEPS = BPW_STEPS
-        pawn = match.PIECES['bPw']
-
-    for i in range(2):
-        x1 = fieldx + STEPS[i][0]
-        y1 = fieldy + STEPS[i][1]
-        if(match.is_inbounds(x1, y1)):
-            if(is_move_stuck(match, fieldx, fieldy, x1, y1)):
-                continue
-
-            piece = match.readfield(x1, y1)
-            if(piece == match.PIECES['blk']):
-                continue
-            elif(match.color_of_piece(piece) == color):
-                if(match.is_field_touched(color, x1, y1, 1) == False):
-                    count += 1
-                elif(match.PIECES_RANK[piece] > match.PIECES_RANK[match.PIECES['wPw']]):
-                    count += 1
-            """else:
-                count -= 1"""
-
-    return count
-
-
 def is_running(match, srcx, srcy):
     piece = match.readfield(srcx, srcy)
     if(piece == match.PIECES['wPw']):

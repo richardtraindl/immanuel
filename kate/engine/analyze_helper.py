@@ -3,7 +3,6 @@ from .pieces import pawn, rook, knight, bishop, queen, king
 from .pieces import pawn_ext, rook_ext, knight_ext, bishop_ext, queen_ext, king_ext
 from .pieces import pawnfield, knightfield, rookfield, bishopfield, queenfield, kingfield
 from .pieces.piece import cTouch
-from .pieces.queen_ext import MAX_STEP_IDX_FOR_RK
 
 
 class cDirTouch:
@@ -67,6 +66,8 @@ def search_lines_of_pin(match, color, fieldx, fieldy, exclx, excly):
 def search_opposed_pieces(match, color, fieldx, fieldy, excl_fieldx, excl_fieldy):
     oppenents = []
 
+    MAX_STEP_IDX_FOR_RK = 3
+    
     oppcolor = match.REVERSED_COLORS[color]
 
     for i in range(0, 8, 2):
@@ -255,19 +256,25 @@ def piece_is_lower_equal_than_enemy_on_dstfield(match, gmove):
 
 
 def piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, gmove):
+    flag = True
+
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
-    enemies = list_field_touches(match, match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
+    match.writefield(gmove.srcx, gmove.srcy, match.PIECES['blk'])
 
+    enemies = list_field_touches(match, match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
     for enemy in enemies:
         if(match.PIECES_RANK[piece] > match.PIECES_RANK[enemy.piece]):
-            if(match.PIECES_RANK[piece] == match.PIECES_RANK[match.PIECES['wRk']] and 
-               match.PIECES_RANK[enemy.piece] == match.PIECES_RANK[match.PIECES['wBp']]):
-                continue
-            else:
-                return False
+            if(match.PIECES_RANK[enemy.piece] == match.PIECES_RANK[match.PIECES['wPw']]):
+                flag = False
+                break
+            if(match.PIECES_RANK[piece] == match.PIECES_RANK[match.PIECES['wQu']]):
+                flag = False
+                break
 
-    return True
+    match.writefield(gmove.srcx, gmove.srcy, piece)
+
+    return flag
 
 
 def dstfield_is_supported(match, gmove):
@@ -290,7 +297,7 @@ def dstfield_is_attacked(match, gmove):
     is_touched = match.is_field_touched( match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty, 0)
 
     match.writefield(gmove.srcx, gmove.srcy, piece)
-    
+
     return is_touched
 
 
@@ -302,8 +309,6 @@ def dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match,
     frdlytouches, enmytouches = field_touches(match, match.color_of_piece(piece), gmove.dstx, gmove.dsty)
 
     match.writefield(gmove.srcx, gmove.srcy, piece)
-    
-    # print(str(len(frdlytouches)) + " " + str(len(enmytouches)))
 
     return len(frdlytouches) >= len(enmytouches)
 
@@ -340,46 +345,41 @@ def is_discl_supported_weak(discl_supported):
 
     return False
 
-def is_field_forked(match, piece, forkedx, forkedy):
-    color = match.color_of_piece(piece)
-    opp_color = match.oppcolor_of_piece(piece)
+def is_fork_field(match, color, forkx, forky):
+    opp_color = match.REVERSED_COLORS[color]
 
-    #fork_piece = match.readfield(forkedx, forkedy)
-    #if(match.color_of_piece(fork_piece) == opp_color):
-        #return False
-
-    frdlytouches, enmytouches = field_touches(match, color, forkedx, forkedy)
+    frdlytouches, enmytouches = field_touches(match, color, forkx, forky)
     if(len(frdlytouches) >= len(enmytouches)):
         return False
 
-    cqueenfield = queenfield.cQueenField(match, forkedx, forkedy)
+    cqueenfield = queenfield.cQueenField(match, forkx, forky)
     if(cqueenfield.is_field_touched(opp_color, 2)):
-        if(queen_ext.count_touches(match, color, forkedx, forkedy) > 1):
+        if(cqueenfield.count_touches(color) > 1):
             return True
 
-    crookfield = rookfield.cRookField(match, forkedx, forkedy)
+    crookfield = rookfield.cRookField(match, forkx, forky)
     if(crookfield.is_field_touched(opp_color, 2)):
-        if(rook_ext.count_touches(match, color, forkedx, forkedy) > 1):
+        if(crookfield.count_touches(color) > 1):
             return True
 
-    cbishopfield = bishopfield.cBishopField(match, forkedx, forkedy)
+    cbishopfield = bishopfield.cBishopField(match, forkx, forky)
     if(cbishopfield.is_field_touched(opp_color, 2)):
-        if(bishop_ext.count_touches(match, color, forkedx, forkedy) > 1):
+        if(cbishopfield.count_touches(color) > 1):
             return True
 
-    cknightfield = knightfield.cKnightField(match, forkedx, forkedy)
+    cknightfield = knightfield.cKnightField(match, forkx, forky)
     if(cknightfield.is_field_touched(opp_color, 2)):
-        if(knight_ext.count_touches(match, color, forkedx, forkedy) > 1):
+        if(cknightfield.count_touches(color) > 1):
             return True
 
-    cpawnfield = pawnfield.cPawnField(match, forkedx, forkedy)
+    cpawnfield = pawnfield.cPawnField(match, forkx, forky)
     if(cpawnfield.is_field_touched(opp_color, 2)):
-        if(pawn_ext.count_touches(match, color, forkedx, forkedy) > 1):
+        if(cpawnfield.count_touches(color) > 1):
             return True
 
-    ckingfield = kingfield.cKingField(match, forkedx, forkedy)
+    ckingfield = kingfield.cKingField(match, forkx, forky)
     if(ckingfield.is_field_touched(opp_color)):
-        if(king_ext.count_touches(match, color, forkedx, forkedy) > 1):
+        if(ckingfield.count_touches(color) > 1):
             return True
 
     return False

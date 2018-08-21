@@ -2,7 +2,7 @@ from operator import attrgetter
 import copy
 from .match import *
 from .matchmove import do_move, undo_move
-from . import analyze_position # score_supports, score_attacks, score_opening, score_endgame, is_endgame
+from . import analyze_position
 from .helper import reverse_lookup
 from .analyze_helper import *
 from .pieces.pawn import cPawn

@@ -68,26 +68,6 @@ def score_supports(match, srcx, srcy):
     return score 
 
 
-def count_touches(match, color, fieldx, fieldy):
-    count = 0
-
-    for i in range(8):
-        stepx = STEPS[i][0]
-        stepy = STEPS[i][1]
-        x1, y1 = match.search(fieldx, fieldy, stepx, stepy)
-        if(x1 != match.UNDEF_X):
-            piece = match.readfield(x1, y1)
-            if(piece == match.PIECES['blk']):
-                continue
-            elif(match.color_of_piece(piece) == color):
-                if(match.is_field_touched(color, x1, y1, 1) == False):
-                    count += 1
-            """else:
-                count -= 1"""
-
-    return count
-
-
 def is_king_safe(match, color):
     if(color == match.COLORS['white']):
         Kg_x = match.wKg_x
