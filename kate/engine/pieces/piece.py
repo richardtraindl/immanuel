@@ -128,58 +128,6 @@ class cPiece:
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
 
-    # version for rook and bishop - other pieces override function
-    def is_move_disclosure(self, dstx, dsty, discl_attacked, discl_supported):
-        excluded_dir = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
-
-        idx = 0
-        for step in self.STEPS: # for i in range(0, 2, 1):
-            if(idx % 2 == 0):
-                first = cTouchBeyond(None, None, None, None, match.PIECES['blk'], 0, 0)
-                second = cTouchBeyond(None, None, None, None, match.PIECES['blk'], 0, 0)
-            idx += 1
-
-            stepx = step[0] # stepx = STEPS[j+i][0]
-            stepy = step[1] # stepy = STEPS[j+i][1]
-            direction = self.dir_for_move(self.xpos, self.ypos, (self.xpos + stepx), (self.ypos + stepy))
-            if(direction == excluded_dir or direction == self.match.REVERSE_DIRS[excluded_dir]):
-                break
-            x1, y1 = self.match.search(self.xpos, self.ypos, stepx, stepy)
-            if(x1 != self.match.UNDEF_X):
-                piece = self.match.readfield(x1, y1)
-                if(first.piece == self.match.PIECES['blk']):
-                    first.piece = piece
-                    first.fieldx = x1
-                    first.fieldy = y1
-                    continue
-                elif(second.piece == self.match.PIECES['blk']):
-                    second.piece = piece
-                    second.fieldx = x1
-                    second.fieldy = y1
-                    if(self.match.color_of_piece(first.piece) != self.match.color_of_piece(second.piece) and 
-                       first.piece != self.match.PIECES['blk'] and second.piece != self.match.PIECES['blk']):
-                        if(match.color_of_piece(first.piece) == self.color):
-                            if(self.match.PIECES_RANK[first.piece] == self.match.PIECES_RANK[self.piece] or  
-                               first.piece == self.match.PIECES['wQu'] or first.piece == self.match.PIECES['bQu']):
-                                discl_attacked.append(second)
-                        else:
-                            if(self.match.PIECES_RANK[second.piece] == self.match.PIECES_RANK[self.piece] or 
-                               second.piece == self.match.PIECES['wQu'] or second.piece == self.match.PIECES['bQu']):
-                                discl_attacked.append(first)
-                    elif(self.match.color_of_piece(first.piece) == self.match.color_of_piece(second.piece) and 
-                         self.match.color_of_piece(first.piece) == self.color and
-                         first.piece != self.match.PIECES['blk'] and second.piece != self.match.PIECES['blk']):
-                        if(self.match.PIECES_RANK[first.piece] == self.match.PIECES_RANK[self.piece] or 
-                           first.piece == self.match.PIECES['wQu'] or first.piece == self.match.PIECES['bQu']):
-                            discl_supported.append(second)
-                        elif(self.match.PIECES_RANK[second.piece] == self.match.PIECES_RANK[self.piece] or 
-                             second.piece == self.match.PIECES['wQu'] or second.piece == self.match.PIECES['bQu']):
-                            discl_supported.append(first)
-                    else:
-                        break
-                else:
-                    break
-
 # class end
 
 
