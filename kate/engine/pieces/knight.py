@@ -134,7 +134,7 @@ class cKnight(cPiece):
 
         return False
 
-    def move_controles_file(self, dstx, dsty)
+    def move_controles_file(self, dstx, dsty):
         return False
     
 # class end
