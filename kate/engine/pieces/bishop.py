@@ -8,6 +8,8 @@ class cBishop(cPiece):
              'south-east' : 8,
              'undefined'  : 14 }
 
+    DIRS_ARY = [DIRS['north-east'], DIRS['south-west'], DIRS['north-west'], DIRS['south-east']]
+
     REVERSE_DIRS = { DIRS['north-east'] : DIRS['south-west'],
                      DIRS['south-west'] : DIRS['north-east'],
                      DIRS['north-west'] : DIRS['south-east'],
@@ -67,6 +69,12 @@ class cBishop(cPiece):
         # works with inherited class
 
     #is_move_disclosure(self, dstx, dsty, discl_attacked, discl_supported):
+        # works with inherited class
+
+    #move_defends_fork_field(self, dstx, dsty)
+        # works with inherited class
+
+    #move_controles_file(self, dstx, dsty)
         # works with inherited class
 
 # class end
