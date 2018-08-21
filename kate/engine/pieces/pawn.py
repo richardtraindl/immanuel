@@ -231,7 +231,7 @@ class cPawn(cPiece):
     def move_defends_forked_field(self, dstx, dsty):
         from .. analyze_helper import is_field_forked
 
-        if(is_move_stuck(self, self.xpos, self.ypos, dstx, dsty)):
+        if(self.is_move_stuck(self.xpos, self.ypos, dstx, dsty)):
             return False
 
         for step in self.STEPS:
