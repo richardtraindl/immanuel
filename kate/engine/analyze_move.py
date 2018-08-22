@@ -11,7 +11,6 @@ from .pieces.bishop import cBishop
 from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
-from .pieces import pawn_ext, knight_ext, bishop_ext, rook_ext, king_ext, queen_ext
 from .pieces.piece import cTouchBeyond
 
 
@@ -339,8 +338,8 @@ def running_pawn_in_endgame(match, gmove):
 
     if(analyze_position.is_endgame(match)):
         if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
-            return pawn_ext.is_running(match, gmove.srcx, gmove.srcy)
-
+            cpawn = cPawn(match, gmove.srcx, gmove.srcy)
+            return cpawn.is_running()
     return False
 
 
