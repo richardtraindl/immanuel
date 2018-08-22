@@ -1,7 +1,6 @@
 from .match import *
 from .pieces import pawn, knight, bishop, rook, king 
-from .pieces import pawn_ext, knight_ext, bishop_ext, rook_ext, king_ext
-from .pieces.generic_piece import cTouchBeyond
+from .pieces.piece import cTouchBeyond
 from .analyze_helper import field_touches_beyond, field_touches, is_piece_stuck_new
 
 
@@ -428,11 +427,13 @@ def score_endgame(match):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
             if(piece == match.PIECES['wPw']):
-                if(pawn_ext.is_running(match, x, y)):
+                cpawn = pawn.cPawn(match, x, y)
+                if(cpawn.is_running()):
                     value += whiterate
                     value += white_step_rate * y
             elif(piece == match.PIECES['bPw']):
-                if(pawn_ext.is_running(match, x, y)):
+                cpawn = pawn.cPawn(match, x, y)
+                if(cpawn.is_running()):
                     value += blackrate
                     value += black_step_rate * (7 - y)
 
