@@ -255,5 +255,27 @@ class cPawn(cPiece):
     def move_controles_file(self, dstx, dsty):
         return False
 
+    def is_running(self):
+        if(self.color == self.match.COLORS['white']):
+            stepx = 0
+            stepy = 1
+            opp_pawn = self.match.PIECES['bPw']
+        else:
+            stepx = 0
+            stepy = -1
+            opp_pawn = self.match.PIECES['wPw']
+
+        STARTX = [0, 1, -1]
+        for i in range(3):
+            x1 = self.xpos + STARTX[i]
+            y1 = self.ypos
+            while(x1 != self.match.UNDEF_X and self.match.is_inbounds(x1, y1) ):
+                x1, y1 = self.match.search(x1, y1, stepx, stepy)
+                if(x1 != self.match.UNDEF_X):
+                    piece = self.match.readfield(x1, y1)
+                    if(piece == opp_pawn):
+                        return False
+        return True
+    
 # class end
 
