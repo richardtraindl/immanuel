@@ -79,8 +79,9 @@ class cKnightField(cPieceField):
                     continue
 
                 if(self.match.color_of_piece(piece) == color):
-                    #if(self.match.is_field_touched(color, x1, y1, 1) == False):
-                    count += 1
+                    if(piece == self.match.PIECES['wKg'] or piece == self.match.PIECES['bKg'] or 
+                       self.match.is_field_touched(color, x1, y1, 1) == False):
+                        count += 1
         return count
 
 # class end
