@@ -1,6 +1,5 @@
 from .match import *
 from .pieces import pawn, rook, knight, bishop, queen, king
-from .pieces import pawn_ext, rook_ext, knight_ext, bishop_ext, queen_ext, king_ext
 from .pieces import pawnfield, knightfield, rookfield, bishopfield, queenfield, kingfield
 from .pieces.piece import cTouch
 
