@@ -86,30 +86,3 @@ def score_supports(match, srcx, srcy):
 
     return score
 
-
-def is_running(match, srcx, srcy):
-    piece = match.readfield(srcx, srcy)
-    if(piece == match.PIECES['wPw']):
-        stepx = 0
-        stepy = 1
-        opp_pawn = match.PIECES['bPw']
-    elif(piece == match.PIECES['bPw']):
-        stepx = 0
-        stepy = -1
-        opp_pawn = match.PIECES['wPw']
-    else:
-        return False
-
-    STARTS = [0, 1, -1]
-    for i in range(3):
-        x1 = srcx + STARTS[i]
-        y1 = srcy
-        while( x1 != match.UNDEF_X and match.is_inbounds(x1, y1) ):
-            x1, y1 = match.search(x1, y1, stepx, stepy)
-            if(x1 != match.UNDEF_X):
-                piece = match.readfield(x1, y1)
-                if(piece == opp_pawn):
-                    return False
-
-    return True
-
