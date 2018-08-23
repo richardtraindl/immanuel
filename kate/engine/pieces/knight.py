@@ -137,5 +137,69 @@ class cKnight(cPiece):
     def move_controles_file(self, dstx, dsty):
         return False
 
+    def score_attacks(self):
+        from .. analyze_helper import field_touches
+
+        score = 0
+
+        if(self.is_stuck()):
+            return score
+
+        opp_color = match.oppcolor_of_piece(self.piece)
+
+        frdlytouches, enmytouches = field_touches(self.match, self.color, self.xpos, self.ypos)
+        if(len(frdlytouches) < len(enmytouches)):
+            return score
+
+        for Step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                frdlytouches, enmytouches = field_touches(self.match, self.color, x1, y1)
+                #if(len(frdlytouches) < len(enmytouches)):
+                    #continue
+
+                attacked = self.match.readfield(x1, y1)
+
+                if(self.match.color_of_piece(piece) == opp_color):
+                    if(len(enmytouches) == 0 or 
+                       self.match.PIECES_RANK[attacked] > self.match.PIECES_RANK[self.piece]):
+                        score += self.match.ATTACKED_SCORES[attacked]
+
+                    # extra score if attacked is pinned
+                    enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color, 
+                    if(enmy_pin != self.DIRS['undefined']):
+                        score += self.match.ATTACKED_SCORES[attacked]
+
+                    if(self.match.is_soft_pin(x1, y1)):
+                        score += self.match.ATTACKED_SCORES[attacked]
+        return score
+
+    def score_supports(self):
+        score = 0
+
+        if(self.is_stuck()):
+            return score
+
+        opp_color = self.match.oppcolor_of_piece(self.piece)
+
+        for step in self.STEPS:
+            stepx = step[0]
+            stepy = step[1]
+            x1, y1 = self.match.search(self.xpos, self.ypos, stepx , stepy)
+            if(x1 != self.match.UNDEF_X):
+                if(x1 == self.xpos and y1 == self.ypos):
+                    continue
+
+                supported = self.match.readfield(x1, y1)
+
+                if(supported == self.match.PIECES['blk']):
+                    continue
+
+                if(self.match.color_of_piece(supported) == self.color):
+                    if(self.match.is_field_touched(opp_color, x1, y1, 1)):
+                        score += self.match.SUPPORTED_SCORES[supported]
+        return score 
+
 # class end
 

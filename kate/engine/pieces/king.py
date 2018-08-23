@@ -220,5 +220,89 @@ class cKing(cPiece):
     def move_controles_file(self, dstx, dsty):
         return False
 
+    def score_attacks(self):
+        from .. analyze_helper import field_touches
+
+        score = 0
+
+        opp_color = selfmatch.oppcolor_of_piece(self.piece)
+
+        for step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                attacked = self.match.readfield(x1, y1)
+
+                if(self.match.color_of_piece(attacked) == opp_color):
+                    score += selfmatch.ATTACKED_SCORES[attacked]
+
+                    # extra score if attacked is pinned
+                    enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color, 
+                    if(enmy_pin != self.DIRS['undefined']):
+                        score += self.match.ATTACKED_SCORES[attacked]
+
+                    if(analyze_helper.is_soft_pin(self.match, x1, y1)):
+                        score += self.match.ATTACKED_SCORES[attacked]
+        return score
+
+    def score_supports(self):
+        score = 0
+
+        opp_color = match.oppcolor_of_piece(self.piece)
+
+        for step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                if(x1 == self.xpos and y1 == self.ypos):
+                    continue
+
+                supported = self.match.readfield(x1, y1)
+
+                if(self.match.color_of_piece(supported) == self.color):
+                    if(self.match.is_field_touched(opp_color, x1, y1, 1)):
+                        score += self.match.SUPPORTED_SCORES[supported]
+        return score 
+
+    def is_king_safe(match, color):
+        from .. analyze_helper import field_touches
+
+        for step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                friends, enemies = field_touches(self.match, self.color, x1, y1)
+                if(len(friends) < len(enemies)):
+                    return False
+
+        friends.clear()
+        enemies.clear()
+        friends, enemies = field_touches(self.match, self.color, self.xpos, self.ypos)
+        if(len(enemies) >= 2):
+            return False
+
+        for enemy in enemies:
+            friends_beyond, enemies_beyond = field_touches(self.match, self.color, enemy.fieldx, enemy.fieldy)
+            if(len(friends_beyond) >= len(enemies_beyond)):
+                continue
+
+            direction = cRook.dir_for_move(self.xpos, self.ypos, enemy.fieldx, enemy.fieldy)
+            if(direction != self.DIRS['undefined']):
+                direction, step_x, step_y = cRook.step_for_dir(direction)
+            else:
+                direction = cBishop.dir_for_move(self.xpos, self.ypos, enemy.fieldx, enemy.fieldy)
+                if(direction != self.DIRS['undefined']):
+                    direction, step_x, step_y = cBishop.step_for_dir(direction)
+                else:
+                    return False
+
+            x1 = self.xpos + step_x
+            y1 = self.ypos + step_y
+            while(self.match.is_inbounds(x1, y1)):
+                blocking_friends, blocking_enemies = field_touches(self.match, self.color, x1, y1)
+                if(len(blocking_friends) > 0):
+                    break
+        return True
+
 # class end
 

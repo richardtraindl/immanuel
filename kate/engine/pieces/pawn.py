@@ -276,6 +276,61 @@ class cPawn(cPiece):
                     if(piece == opp_pawn):
                         return False
         return True
-    
+
+    def score_attacks(self):
+        from .. analyze_helper import field_touches
+
+        score = 0
+
+        opp_color = self.match.oppcolor_of_piece(self.piece)
+
+        frdlytouches, enmytouches = field_touches(self.match, self.color, self.xpos, self.ypos)
+        if(len(frdlytouches) < len(enmytouches)):
+            return score
+
+        for step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                if(self.is_move_stuck(x1, y1)):
+                    continue
+
+                frdlytouches, enmytouches = field_touches(self.match, self.color, x1, y1)
+                #if(len(frdlytouches) < len(enmytouches)):
+                    #continue
+
+                piece = self.match.readfield(x1, y1)
+
+                if(self.match.color_of_piece(piece) == opp_color):
+                    score += self.match.ATTACKED_SCORES[piece]
+
+                    # extra score if attacked is pinned
+                    enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color
+                    if(enmy_pin != self.DIRS['undefined']):
+                        score += self.match.ATTACKED_SCORES[piece]
+
+                    if(self.match.is_soft_pin(x1, y1)):
+                        score += self.match.ATTACKED_SCORES[piece]
+        return score
+
+    def score_supports(self):
+        score = 0
+
+        opp_color = self.match.oppcolor_of_piece(self.piece)
+
+        for step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                if(self.is_move_stuck(x1, y1)):
+                    continue
+
+                supported = self.match.readfield(x1, y1)
+
+                if(self.match.color_of_piece(supported) == self.color):
+                    if(self.match.is_field_touched(opp_color, x1, y1, 1)):
+                        score += self.match.SUPPORTED_SCORES[supported]
+        return score
+
 # class end
 

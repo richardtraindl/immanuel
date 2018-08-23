@@ -71,5 +71,19 @@ class cQueen(cPiece):
         rk_flag = crook.move_controles_file(dstx, dsty)
         return bp_flag or rk_flag
 
+    def score_attacks(self):
+        cbishop = cBishop(self.match, self.xpos, self.ypos)
+        score = cbishop.score_attacks()
+        crook = cRook(self.match, self.xpos, self.ypos)
+        score += crook.score_attacks()
+        return score
+
+    def score_supports(self):
+        cbishop = cBishop(self.match, self.xpos, self.ypos)
+        score = cbishop.score_supports()
+        crook = cRook(self.match, self.xpos, self.ypos)
+        score += crook.score_supports()
+        return score
+
 # class end
 

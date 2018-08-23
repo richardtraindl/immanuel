@@ -1,5 +1,10 @@
 from .match import *
-from .pieces import pawn, knight, bishop, rook, king 
+from .pieces.pawn import cPawn
+from .pieces.knight import cKnight
+from .pieces.bishop import cBishop
+from .pieces.rook import cRook
+from .pieces.king import cKing
+from .pieces.queen import cQueen
 from .pieces.piece import cTouchBeyond
 from .analyze_helper import field_touches_beyond, field_touches, is_piece_stuck_new
 
@@ -13,21 +18,26 @@ def score_supports(match, color):
 
             if(piece == match.PIECES['blk']):
                 continue
-            elif(Match.color_of_piece(piece) != color):
+            elif(match.color_of_piece(piece) != color):
                 continue
             elif(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
-                score += pawn.score_supports(match, x, y)
+                cpawn= cPawn(match, x, y)
+                score += cpawn.score_supports()
             elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
-                score += knight.score_supports(match, x, y)
+                cknight= cKnight(match, x, y)
+                score += cknight.score_supports()
             elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
-                score += bishop.score_supports(match, x, y)
+                cbishop= cBishop(match, x, y)
+                score += cbishop.score_supports()
             elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
-                score += rook.score_supports(match, x, y)
+                crook= cRook(match, x, y)
+                score += crook.score_supports()
             elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
-                score += bishop.score_supports(match, x, y)
-                score += rook.score_supports(match, x, y)
+                cqueen= cQueen(match, x, y)
+                score += cqueen.score_supports()
             else:
-                score += king.score_supports(match, x, y)
+                cking= cKing(match, x, y)
+                score += cking.score_supports()
 
     return score
 
@@ -44,18 +54,23 @@ def score_attacks(match, color):
             #elif(Match.color_of_piece(piece) != color):
                 #continue
             elif(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
-                score += pawn.score_attacks(match, x, y)
+                cpawn= cPawn(match, x, y)
+                score += cpawn.score_attacks()
             elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
-                score += knight.score_attacks(match, x, y)
+                cknight= cKnight(match, x, y)
+                score += cknight.score_attacks()
             elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
-                score += bishop.score_attacks(match, x, y)
+                cbishop= cBishop(match, x, y)
+                score += cbishop.score_attacks()
             elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
-                score += rook.score_attacks(match, x, y)    
+                crook= cRook(match, x, y)
+                score += crook.score_attacks()    
             elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
-                score += bishop.score_attacks(match, x, y)
-                score += rook.score_attacks(match, x, y)
+                cqueen= cQueen(match, x, y)
+                score += cqueen.score_attacks()
             else:
-                score += king.score_attacks(match, x, y)
+                cking= cKing(match, x, y)
+                score += cking.score_attacks()
 
     return score
 

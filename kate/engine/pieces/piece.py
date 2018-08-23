@@ -185,6 +185,76 @@ class cPiece:
         else:
             return False
 
+    def score_attacks(self):
+        from .. analyze_helper import field_touches
+
+        score = 0
+
+        opp_color = match.oppcolor_of_piece(self.piece)
+
+        frdlytouches, enmytouches = field_touches(self.match, self.color, self.xpos, self.ypos)
+        if(len(frdlytouches) < len(enmytouches)):
+            return score
+
+        for step in self.STEPS:
+            stepx = step[0]
+            stepy = step[1]
+            x1, y1 = self.match.search(self.xpos, self.ypos, stepx, stepy)
+            if(x1 != self.match.UNDEF_X):
+                if(self.is_move_stuck(x1, y1)):
+                    continue
+
+                frdlytouches, enmytouches = field_touches(self.match, self.color, x1, y1)
+                #if(len(frdlytouches) < len(enmytouches)):
+                    #continue
+                    
+                attacked = self.match.readfield(x1, y1)
+
+                if(self.match.color_of_piece(attacked) == opp_color):
+                    if(len(enmytouches) == 0 or 
+                       self.match.PIECES_RANK[self.piece] <= self.match.PIECES_RANK[attacked]):
+                        score += self.match.ATTACKED_SCORES[attacked]
+
+                    # extra score if attacked is pinned
+                    direction = self.dir_for_move(self.xpos, self.ypos, x1, y1)
+                    enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color, 
+                    if(enmy_pin != self.match.DIRS['undefined']):
+                        if(enmy_pin != direction and 
+                           enmy_pin != self.match.REVERSE_DIRS[direction]):
+                            score += self.match.ATTACKED_SCORES[attacked]
+                        else:
+                            if(self.match.PIECES_RANK[attacked] != self.match.PIECES_RANK[self.piece] and
+                               attacked != self.match.PIECES['wPw'] and attacked != self.match.PIECES['bPw']):
+                                score += self.match.ATTACKED_SCORES[attacked]
+
+                    if(self.match.is_soft_pin(x1, y1)):
+                        score += self.match.ATTACKED_SCORES[attacked]
+        return score
+
+
+    def score_supports(self):
+        score = 0
+
+        opp_color = match.oppcolor_of_piece(self.piece)
+
+        for step in self.STEPS:
+            stepx = step[0]
+            stepy = step[1]
+            x1, y1 = self.match.search(self.xpos, self.ypos, stepx , stepy)
+            if(x1 != self.match.UNDEF_X):
+                if(x1 == self.xpos and y1 == self.ypos):
+                    continue
+
+                if(self.is_move_stuck(x1, y1)):
+                    continue
+
+                supported = self.match.readfield(x1, y1)
+
+                if(self.match.color_of_piece(supported) == self.color):
+                    if(self.match.is_field_touched(opp_color, x1, y1, 1)):
+                        score += self.match.SUPPORTED_SCORES[supported]
+        return score
+
 # class end
 
 
