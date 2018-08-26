@@ -10,50 +10,29 @@ from .validator import *
 from .generator import cGenerator
 
 
-def prnt_move(headmsg, move, tailmsg):
-    if(move is None):
-        print("no move.....")
-    else:
-        print(headmsg + 
-            index_to_coord(move.srcx, move.srcy) + "-" +
-            index_to_coord(move.dstx, move.dsty), end="")
-        if(move.prom_piece != cMatch.PIECES['blk']):
-            print(" " + reverse_lookup(cMatch.PIECES, move.prom_piece), end="")
-        print(tailmsg, end="")
+def prnt_before_calc(match, count, priomove):
+    print("\n***********************************************")
+    print("match: " + str(match.begin))
+    print("count: " + str(count))
+    print("calculate: " + priomove.gmove.format_genmove())
+    print("tactics: " + priomove.concat_tactics(" | "))
+    print("priorities: " + reverse_lookup(priomove.PRIO, priomove.prio) + " | " + reverse_lookup(priomove.PRIO, priomove.prio_sec))
 
+def prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescore):
+    print("CURR SEARCH: " + str(score).rjust(8, " ") + \
+          " [" + gmove.format_genmove() + "] " + concat_fmt_gmoves(newcandidates))
+    print("CANDIDATES:  " + str(nodescore).rjust(8, " ") + concat_fmt_gmoves(nodecandidates))
 
-def prnt_moves(msg, moves):
-    print(msg, end=" ")
-
-    if(len(moves) == 0):
-        print("no move.....")
-    else:
-        for move in moves:
-            if(move):
-                prnt_move("[", move, "] ")
-            else:
-                break
-        print("")
-
-
-def prnt_tactics(tactics):
-    print("tactics: ", end="")
-
-    length = len(tactics)
-    i = 1
-    for tactic in tactics:
-        if(i < length):
-            print(reverse_lookup(PrioMove.TACTICS, tactic), end=" | ")
-        else:
-            print(reverse_lookup(PrioMove.TACTICS, tactic), end="")
-        i += 1
-
+def concat_fmt_gmoves(gmoves):
+    str_gmoves = ""
+    for gmove in gmoves:
+        str_gmoves += " [" + gmove.format_genmove() + "] "
+    return str_gmoves
 
 def prnt_priomoves(priomoves):
     for priomove in priomoves:
-        prnt_move("\n", priomove.gmove, " ")
-        prnt_tactics(priomove.tactics)
-
+        print("\n" + priomove.gmove.format_genmove(), end=" ")
+        priomove.prnt_tactics()
 
 def prnt_fmttime(msg, seconds):
     minute, sec = divmod(seconds, 60)
@@ -166,7 +145,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 
     if(depth == 1):
+        print("maxcnt: " + str(maxcnt))
         prnt_priomoves(priomoves)
+
         if(len(priomoves) == 1):
             pmove = priomoves[0]
             nodecandidates.append(pmove.gmove)
@@ -186,10 +167,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         count += 1
 
         if(depth == 1):
-            msg = "\nmatch: " + str(match.begin) + "   count: " + str(count) + "   calculate: "
-            prnt_move(msg, gmove, " | ")
-            prnt_tactics(priomove.tactics)
-            print(" | " + reverse_lookup(priomove.PRIO, priomove.prio) + " | " + reverse_lookup(priomove.PRIO, priomove.prio_sec))
+            prnt_before_calc(match, count, priomove)
 
         if(priomove.find_tactic(PrioMove.TACTICS['tactical-draw'])):
             newcandidates.clear()
@@ -212,10 +190,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
                 for candidate in nodecandidates:
                     msgs.currentsearch.append(candidate)
 
-                prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
-                prnt_moves("", newcandidates)
-                prnt_moves("CANDIDATES:  " + str(nodescore).rjust(8, " "), nodecandidates)
-                print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+                prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescore)
 
             alpha = max(alpha, nodescore)
             if(beta <= alpha):
@@ -230,10 +205,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
                 for candidate in nodecandidates:
                     msgs.currentsearch.append(candidate)
 
-                prnt_move("\nCURR SEARCH: " + str(score).rjust(8, " ") + " [", gmove, "]")
-                prnt_moves("", newcandidates)
-                prnt_moves("CANDIDATES:  " + str(nodescore).rjust(8, " "), nodecandidates)
-                print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+                prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescore)
 
             beta = min(beta, nodescore)
             if(beta <= alpha):
@@ -324,7 +296,7 @@ def calc_move(match, msgs):
     ###
 
     msg = "result: " + str(score) + " match: " + str(match.begin) + " "
-    prnt_moves(msg, candidates)
+    print(msg + concat_fmt_gmoves(candidates))
     prnt_fmttime("\ncalc-time: ", elapsed_time)
     return candidates
 

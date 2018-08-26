@@ -1,7 +1,6 @@
 from operator import attrgetter
 import copy
 from .match import *
-from .matchmove import undo_move # do_move, 
 from . import analyze_position
 from .helper import reverse_lookup
 from .analyze_helper import *
@@ -76,7 +75,7 @@ def flees(match, gmove):
         else:
             new_higher_cnt += 1
 
-    undo_move(match)
+    match.undo_move()
     ###
 
     if((old_lower_cnt + old_higher_cnt) > 0 and 
@@ -132,7 +131,7 @@ def does_unpin(match, gmove):
     
     pinlines_after = search_lines_of_pin(match, color, gmove.dstx, gmove.dsty, None, None)
 
-    undo_move(match)
+    match.undo_move()
     ###
 
     if(len(pinlines_after) < len(pinlines_before)):
@@ -199,7 +198,7 @@ def defends_king_attack(match, gmove):
             if(len(friends) < len(enemies)):
                 after_cnt += 1
 
-    undo_move(match)
+    match.undo_move()
 
     if(before_cnt > after_cnt):
         return True, urgent
@@ -277,7 +276,7 @@ def disclosures(match, gmove):
 
     match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
     find_disclosures(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, discl_attacked, discl_supported)
-    undo_move(match)
+    match.undo_move()
     ###
     match.writefield(gmove.srcx, gmove.srcy, match.PIECES['blk'])
 
@@ -384,7 +383,7 @@ def is_tactical_draw(match, gmove):
                 board += reverse_lookup(match.PIECES, piece)
         boards.append(board)
 
-        undo_move(newmatch)
+        newmatch.undo_move()
 
     idx = 0
     count = 0

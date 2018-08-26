@@ -60,6 +60,16 @@ class cMove:
             fmtmove = index_to_coord(self.srcx, self.srcy) + "x" + \
                       index_to_coord(self.dstx, self.dsty) + " e.p."
             return fmtmove
+            
+    def prnt_move(self, headmsg, tailmsg):
+        print(headmsg + 
+            index_to_coord(self.srcx, self.srcy) + "-" +
+            index_to_coord(self.dstx, self.dsty), end="")
+
+        if(self.prom_piece != self.match.PIECES['blk']):
+            print(" " + reverse_lookup(self.match.PIECES, self.prom_piece), end="")
+        print(tailmsg, end="")
+
 # class end
 
 
@@ -72,9 +82,11 @@ class GenMove(object):
         self.prom_piece = prom_piece
 
     def format_genmove(self):
-        fmtmove = index_to_coord(self.srcx, self.srcy) + "-" + \
+        fmtmove = index_to_coord(self.srcx, self.srcy) + \
+                  "-" + \
                   index_to_coord(self.dstx, self.dsty)
         return fmtmove
+
 # class end
 
 
@@ -203,6 +215,28 @@ class PrioMove:
                tactic == self.TACTICS['capture-bad-deal']):
                 return True
         return False
+
+    def concat_tactics(self, delimiter):
+        str_tactics = ""
+        length = len(self.tactics)
+        i = 1
+        for tactic in self.tactics:
+            str_tactics += reverse_lookup(self.TACTICS, tactic)
+
+            if(i < length):
+                str_tactics += delimiter
+            i += 1
+        return str_tactics
+
+    def prnt_tactics(self):
+        length = len(self.tactics)
+        i = 1
+        for tactic in self.tactics:
+            if(i < length):
+                print(reverse_lookup(self.TACTICS, tactic), end=" | ")
+            else:
+                print(reverse_lookup(self.TACTICS, tactic), end="")
+            i += 1
 
 # class end
 

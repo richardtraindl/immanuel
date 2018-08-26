@@ -256,7 +256,7 @@ class cPawn(cPiece):
         elif(move.move_type == move.TYPES['en_passant']):
             piece = self.match.readfield(move.dstx, move.dsty)
             self.match.writefield(move.srcx, move.srcy, piece)
-            self.match.writefield(move.dstx, move.dsty, match.PIECES['blk'])
+            self.match.writefield(move.dstx, move.dsty, self.match.PIECES['blk'])
             self.match.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
             self.match.score -= self.match.SCORES[move.captured_piece]
             return move

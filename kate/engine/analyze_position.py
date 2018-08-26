@@ -5,8 +5,7 @@ from .pieces.bishop import cBishop
 from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
-from .pieces.piece import cTouchBeyond
-from .analyze_helper import field_touches_beyond, list_all_field_touches, is_piece_stuck_new
+from .analyze_helper import list_all_field_touches, is_piece_stuck_new
 
 
 def score_supports(match, color):
