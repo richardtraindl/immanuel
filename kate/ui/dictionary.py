@@ -205,7 +205,7 @@ def word_move(session, params):
             prom_piece = matchobj.group("prom")
 
             valid = False
-            for piece in m.PIECES:
+            for piece in match.PIECES:
                 if(piece == prom_piece):
                     valid = True
                     break
@@ -270,6 +270,8 @@ def word_list(session, params):
 
 
 def word_save(session, params):
+    match = session.match
+
     counter = None
 
     if not os.path.isdir(immanuels_dir):
@@ -298,11 +300,11 @@ def word_save(session, params):
     strboard = "board:"
     for y in range(8):
         for x in range(8):
-            strboard += reverse_lookup(PIECES, session.match.readfield(x, y))
+            strboard += reverse_lookup(match.PIECES, match.readfield(x, y))
     fobject.write(strboard + ";")
 
-    fobject.write("movelistcnt:" + str(len(session.match.move_list)) + ";")
-    for move in session.match.move_list:
+    fobject.write("movelistcnt:" + str(len(match.move_list)) + ";")
+    for move in match.move_list:
         attributes = list_move_attributes(move)
         for classattr in attributes:
             if(classattr.label == "match"):
@@ -364,7 +366,7 @@ def word_load(session, params):
         for x in range(8):
             idx = (y * 24) + (x * 3)
             strfield = strboard[idx:idx+3]
-            match.writefield(x, y, PIECES[strfield])
+            match.writefield(x, y, match.PIECES[strfield])
     # -----------------------
 
     # -----------------------
