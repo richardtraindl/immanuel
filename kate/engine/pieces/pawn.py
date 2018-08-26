@@ -89,8 +89,8 @@ class cPawn(cPiece):
         # works with inherited class
 
     def is_move_valid(self, dstx, dsty, prom_piece):
-        direction = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
-        if(direction == self.DIRS['undefined']):
+        move_dir = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
+        if(move_dir == self.DIRS['undefined']):
             return False
 
         pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos) #self.color, 
@@ -99,58 +99,61 @@ class cPawn(cPiece):
 
         if(self.color == self.match.COLORS['white']):
             # check pins
-            if(direction == self.DIRS['north'] or direction == self.DIRS['2north']):
+            if(move_dir == self.DIRS['north'] or move_dir == self.DIRS['2north']):
                 if(pin_dir != self.DIRS['north'] and pin_dir != self.DIRS['south'] and pin_dir != self.DIRS['undefined']):
                     return False
-            elif(direction == self.DIRS['north-west']):
+            elif(move_dir == self.DIRS['north-west']):
                 if(pin_dir != self.DIRS['north-west'] and pin_dir != self.DIRS['south-east'] and pin_dir != self.DIRS['undefined']):
                     return False
-            elif(direction == self.DIRS['north-east']):
+            elif(move_dir == self.DIRS['north-east']):
                 if(pin_dir != self.DIRS['north-east'] and pin_dir != self.DIRS['south-west'] and pin_dir != self.DIRS['undefined']):
                     return False
+            else:
+                return False
 
             # check fields
-            if(direction == self.DIRS['north'] and dstpiece != self.match.PIECES['blk']):
+            if(move_dir == self.DIRS['north'] and dstpiece != self.match.PIECES['blk']):
                 return False
-            elif(direction == self.DIRS['2north']):
+            elif(move_dir == self.DIRS['2north']):
                 midpiece = self.match.readfield(dstx, self.ypos + self.STEP_1N_Y)
                 if(midpiece != self.match.PIECES['blk'] or dstpiece != self.match.PIECES['blk']):
                     return False
-            elif(direction == self.DIRS['north-west'] or direction == self.DIRS['north-east']):
+            elif(move_dir == self.DIRS['north-west'] or move_dir == self.DIRS['north-east']):
                 if(self.match.color_of_piece(dstpiece) != self.match.COLORS['black']):
                     return self.is_white_ep_move_ok(dstx, dsty)
 
             # check promotion
-            if(dsty == 7 and prom_piece != self.match.PIECES['wQu'] and prom_piece != self.match.PIECES['wRk'] and prom_piece != self.match.PIECES['wBp'] and prom_piece != self.match.PIECES['wKn']):
+            if(dsty == 7 and prom_piece != self.match.PIECES['wQu'] and 
+               prom_piece != self.match.PIECES['wRk'] and 
+               prom_piece != self.match.PIECES['wBp'] and 
+               prom_piece != self.match.PIECES['wKn']):
                 return False
             elif(dsty < 7 and prom_piece != self.match.PIECES['blk']):
                 return False
         else:
             # check pins
-            if(direction == self.DIRS['south'] or direction == self.DIRS['2south']):
+            if(move_dir == self.DIRS['south'] or move_dir == self.DIRS['2south']):
                 if(pin_dir != self.DIRS['north'] and pin_dir != self.DIRS['south'] and pin_dir != self.DIRS['undefined']):
                     return False
-            elif(direction == self.DIRS['south-east']):
+            elif(move_dir == self.DIRS['south-east']):
                 if(pin_dir != self.DIRS['north-west'] and pin_dir != self.DIRS['south-east'] and pin_dir != self.DIRS['undefined']):
                     return False
-            elif(direction == self.DIRS['south-west']):
+            elif(move_dir == self.DIRS['south-west']):
                 if(pin_dir != self.DIRS['north-east'] and pin_dir != self.DIRS['south-west'] and pin_dir != self.DIRS['undefined']):
                     return False
             else:
                 return False
             
             # check fields
-            if(direction == self.DIRS['south'] and dstpiece != self.match.PIECES['blk']):
+            if(move_dir == self.DIRS['south'] and dstpiece != self.match.PIECES['blk']):
                 return False
-            elif(direction == self.DIRS['2south']):
+            elif(move_dir == self.DIRS['2south']):
                 midpiece = self.match.readfield(dstx, self.ypos + self.STEP_1S_Y)
                 if(midpiece != self.match.PIECES['blk'] or dstpiece != self.match.PIECES['blk']):
                     return False
-            elif(direction == self.DIRS['south-east'] or direction == self.DIRS['south-west']):
+            elif(move_dir == self.DIRS['south-east'] or move_dir == self.DIRS['south-west']):
                 if(self.match.color_of_piece(dstpiece) != self.match.COLORS['white']):
                     return self.is_black_ep_move_ok(dstx, dsty)
-            else:
-                return False
 
             # check promotion
             if(dsty == 0 and prom_piece != self.match.PIECES['bQu'] and prom_piece != self.match.PIECES['bRk'] and prom_piece != self.match.PIECES['bBp'] and prom_piece != self.match.PIECES['bKn']):
@@ -159,6 +162,104 @@ class cPawn(cPiece):
                 return False
 
         return True
+
+    def do_move(self, dstx, dsty, prom_piece):
+        move = cMove(self.match, 
+                    self.match.movecnt + 1, 
+                    cMove.TYPES['standard'],
+                    self.xpos, 
+                    self.ypos, 
+                    dstx, 
+                    dsty, 
+                    None,
+                    None,
+                    self.match.PIECES['blk'], 
+                    prom_piece, 
+                    self.match.fifty_moves_count)
+
+        srcpiece = self.match.readfield(move.srcx, move.srcy)
+        dstpiece = self.match.readfield(move.dstx, move.dsty)
+
+        if(prom_piece != self.match.PIECES['blk']):
+            move.move_type = move.TYPES['promotion']
+            move.captured_piece = dstpiece
+
+            self.match.movecnt += 1 
+            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx, move.dsty, move.prom_piece)
+            self.match.fifty_moves_count = 0
+            self.match.score -= (self.match.SCORES[move.prom_piece] - self.match.SCORES[srcpiece])
+            self.match.score += self.match.SCORES[dstpiece]
+            self.match.move_list.append(move)
+            return move
+        elif(dstpiece == self.match.PIECES['blk'] and move.srcx != move.dstx):
+            move.move_type = cMove.TYPES['en_passant']
+            move.e_p_fieldx = move.dstx
+            move.e_p_fieldy = move.srcy
+            enemy = self.match.readfield(move.e_p_fieldx, move.e_p_fieldy)
+            move.captured_piece = enemy
+
+            self.match.movecnt += 1 
+            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx, move.dsty, srcpiece)
+            self.match.fifty_moves_count = 0
+            self.match.writefield(move.e_p_fieldx, move.e_p_fieldy, self.match.PIECES['blk'])
+            self.match.score += self.match.SCORES[enemy]
+            self.match.move_list.append(move)
+            return move
+        else:
+            move.captured_piece = dstpiece
+
+            self.match.movecnt += 1
+            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx, move.dsty, srcpiece)
+            if(dstpiece != self.match.PIECES['blk']):
+                self.match.fifty_moves_count = 0
+                move.fifty_moves_count = self.match.fifty_moves_count
+            else:
+                self.match.fifty_moves_count += 1
+                move.fifty_moves_count = self.match.fifty_moves_count
+
+            self.match.score += self.match.SCORES[dstpiece]
+            self.match.move_list.append(move)
+            return move
+
+    def undo_move(self, move):
+        if(move.captured_piece == self.match.PIECES['wQu']):
+            self.match.wQu_cnt += 1
+        elif(move.captured_piece == self.match.PIECES['bQu']):
+            self.match.bQu_cnt += 1
+        elif(move.captured_piece == self.match.PIECES['wKn'] or move.captured_piece == self.match.PIECES['wBp'] or move.captured_piece == self.match.PIECES['wRk']):
+            self.match.wOfficer_cnt += 1
+        elif(move.captured_piece == self.match.PIECES['bKn'] or move.captured_piece == self.match.PIECES['bBp'] or move.captured_piece == self.match.PIECES['bRk']):
+            self.match.bOfficer_cnt += 1
+
+        self.match.movecnt -= 1
+        self.match.fifty_moves_count = move.fifty_moves_count
+
+        if(move.move_type == move.TYPES['standard']):
+            piece = self.match.readfield(move.dstx, move.dsty)
+            self.match.writefield(move.srcx, move.srcy, piece)
+            self.match.writefield(move.dstx, move.dsty, move.captured_piece)
+            self.match.score -= self.match.SCORES[move.captured_piece]
+            return move
+        elif(move.move_type == move.TYPES['promotion']):
+            if(move.dsty == 7):
+                piece = self.match.PIECES['wPw']
+            else:
+                piece = self.match.PIECES['bPw']
+            self.match.writefield(move.srcx, move.srcy, piece)
+            self.match.writefield(move.dstx, move.dsty, move.captured_piece)
+            self.match.score += (self.match.SCORES[move.prom_piece] - self.match.SCORES[piece])
+            self.match.score -= self.match.SCORES[move.captured_piece]
+            return move
+        elif(move.move_type == move.TYPES['en_passant']):
+            piece = self.match.readfield(move.dstx, move.dsty)
+            self.match.writefield(move.srcx, move.srcy, piece)
+            self.match.writefield(move.dstx, move.dsty, match.PIECES['blk'])
+            self.match.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
+            self.match.score -= self.match.SCORES[move.captured_piece]
+            return move
 
     def is_white_ep_move_ok(self, dstx, dsty):
         if(len(self.match.move_list) == 0):
@@ -174,7 +275,6 @@ class cPawn(cPiece):
             return True
         else:
             return False
-
 
     def is_black_ep_move_ok(self, dstx, dsty):
         if(len(self.match.move_list) == 0):
@@ -278,13 +378,13 @@ class cPawn(cPiece):
         return True
 
     def score_attacks(self):
-        from .. analyze_helper import field_touches
+        from .. analyze_helper import list_all_field_touches
 
         score = 0
 
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
-        frdlytouches, enmytouches = field_touches(self.match, self.color, self.xpos, self.ypos)
+        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
         if(len(frdlytouches) < len(enmytouches)):
             return score
 
@@ -295,7 +395,7 @@ class cPawn(cPiece):
                 if(self.is_move_stuck(x1, y1)):
                     continue
 
-                frdlytouches, enmytouches = field_touches(self.match, self.color, x1, y1)
+                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
                 #if(len(frdlytouches) < len(enmytouches)):
                     #continue
 

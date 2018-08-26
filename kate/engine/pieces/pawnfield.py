@@ -37,7 +37,7 @@ class cPawnField(cPieceField):
                             return True
         return False
 
-    def field_color_touches(self, color, frdlytouches, enmytouches):
+    def list_all_field_touches(self, color, frdlytouches, enmytouches):
         BACK_STEPS = [ [1, -1], [-1, -1], [1, 1], [-1, 1] ]
         for step in BACK_STEPS:
             x1 = self.fieldx + step[0]

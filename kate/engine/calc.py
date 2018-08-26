@@ -2,14 +2,12 @@ import time
 from operator import attrgetter
 from .match import *
 from .move import *
-from . import matchmove
 from .openingmove import retrieve_move
 from .analyze_move import *
 from .analyze_position import *
 from .helper import *
 from .validator import *
 from .generator import cGenerator
-from .pieces import pawn, rook, bishop, knight, queen, king
 
 
 def prnt_move(headmsg, move, tailmsg):
@@ -198,11 +196,11 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             newcandidates.append(None)
             score = 0
         else:
-            matchmove.do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+            match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, beta, not maximizing, priomove, msgs)
 
-            matchmove.undo_move(match)
+            match.undo_move()
 
         if(maximizing):
             if(score > nodescore):

@@ -1,4 +1,3 @@
-from .match import *
 from .helper import reverse_lookup, index_to_coord
 
 
@@ -55,7 +54,7 @@ class cMove:
                 hyphen = "x"
             fmtmove = index_to_coord(self.srcx, self.srcy) + hyphen + \
                       index_to_coord(self.dstx, self.dsty) + " " + \
-                      reverse_lookup(cMatch.PIECES, self.prom_piece)
+                      reverse_lookup(self.match.PIECES, self.prom_piece)
             return fmtmove
         else:
             fmtmove = index_to_coord(self.srcx, self.srcy) + "x" + \

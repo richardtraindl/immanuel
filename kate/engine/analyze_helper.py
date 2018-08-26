@@ -1,5 +1,10 @@
 from .match import *
-from .pieces import pawn, rook, knight, bishop, queen, king
+from .pieces.pawn import cPawn
+from .pieces.knight import cKnight
+from .pieces.bishop import cBishop
+from .pieces.rook import cRook
+from .pieces.king import cKing
+from .pieces.queen import cQueen
 from .pieces import pawnfield, knightfield, rookfield, bishopfield, queenfield, kingfield
 from .pieces.piece import cTouch
 
@@ -14,7 +19,7 @@ class cDirTouch:
 def search_dir(match, fieldx, fieldy, direction, exclx, excly):
     srcx = fieldx
     srcy = fieldy
-    stepx, stepy = queen.cQueen.step_for_dir(direction)
+    stepx, stepy = cQueen.step_for_dir(direction)
     dirtouches = []
 
     for i in range(7):
@@ -73,8 +78,8 @@ def search_opposed_pieces(match, color, fieldx, fieldy, excl_fieldx, excl_fieldy
         touches = [None, None]
 
         for k in range(2):
-            stepx = queen.cQueen.STEPS[i+k][0]
-            stepy = queen.cQueen.STEPS[i+k][1]
+            stepx = cQueen.STEPS[i+k][0]
+            stepy = cQueen.STEPS[i+k][1]
 
             x1, y1 = match.search(fieldx, fieldy, stepx, stepy)
             if(x1 == excl_fieldx and y1 == excl_fieldy):
@@ -103,63 +108,62 @@ def is_piece_stuck_new(match, srcx, srcy):
     piece = match.readfield(srcx, srcy)
 
     if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
-        cpawn = pawn.cPawn(match, srcx, srcy)
+        cpawn = cPawn(match, srcx, srcy)
         return cpawn.is_piece_stuck_new()
     elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
-        cknight = knight.cKnight(match, srcx, srcy)
+        cknight = cKnight(match, srcx, srcy)
         return cknight.is_piece_stuck_new()
     elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
-        cbishop = bishop.cBishop(match, srcx, srcy)
+        cbishop = cBishop(match, srcx, srcy)
         return cbishop.is_piece_stuck_new()
     elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
-        crook = rook.cRook(match, srcx, srcy)
+        crook = cRook(match, srcx, srcy)
         return crook.is_piece_stuck_new()
     elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
-        cbishop = bishop.cBishop(match, srcx, srcy)
-        crook = rook.cRook(match, srcx, srcy)
-        return cbishop.is_piece_stuck_new() or crook.is_piece_stuck_new()
+        cqueen = cQueen(match, srcx, srcy)
+        return cqueen.is_piece_stuck_new()
     else:
-        cking = king.cKing(match, srcx, srcy)
+        cking = cKing(match, srcx, srcy)
         return cking.is_piece_stuck_new()
 
 
-def field_touches(match, color, fieldx, fieldy):
+def list_all_field_touches(match, color, fieldx, fieldy):
     frdlytouches = []
     enmytouches = []
 
     crookfield = rookfield.cRookField(match, fieldx, fieldy)
-    crookfield.field_color_touches(color, frdlytouches, enmytouches)
+    crookfield.list_all_field_touches(color, frdlytouches, enmytouches)
 
     cbishopfield = bishopfield.cBishopField(match, fieldx, fieldy)
-    cbishopfield.field_color_touches(color, frdlytouches, enmytouches)
+    cbishopfield.list_all_field_touches(color, frdlytouches, enmytouches)
 
     cknightfield = knightfield.cKnightField(match, fieldx, fieldy)
-    cknightfield.field_color_touches(color, frdlytouches, enmytouches)
+    cknightfield.list_all_field_touches(color, frdlytouches, enmytouches)
 
     ckingfield = kingfield.cKingField(match, fieldx, fieldy)
-    ckingfield.field_color_touches(color, frdlytouches, enmytouches)
+    ckingfield.list_all_field_touches(color, frdlytouches, enmytouches)
 
     cpawnfield = pawnfield.cPawnField(match, fieldx, fieldy)
-    cpawnfield.field_color_touches(color, frdlytouches, enmytouches)
+    cpawnfield.list_all_field_touches(color, frdlytouches, enmytouches)
 
     return frdlytouches, enmytouches
 
 
 def field_touches_beyond(match, color, ctouch_beyond):
     crookfield = rookfield.cRookField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-    crookfield.field_color_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
+    crookfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
 
     cbishopfield = bishopfield.cBishopField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-    cbishopfield.field_color_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
+    cbishopfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
 
     cknightfield = knightfield.cKnightField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-    cknightfield.field_color_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
+    cknightfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
 
     ckingfield = kingfield.cKingField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-    ckingfield.field_color_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
+    ckingfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
 
     cpawnfield = pawnfield.cPawnField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-    cpawnfield.field_color_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
+    cpawnfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
 
     return
 
@@ -231,7 +235,7 @@ def srcfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match,
     
     match.writefield(gmove.srcx, gmove.srcy, match.PIECES['blk'])
 
-    frdlytouches, enmytouches = field_touches(match, match.color_of_piece(piece), gmove.srcx, gmove.srcy)
+    frdlytouches, enmytouches = list_all_field_touches(match, match.color_of_piece(piece), gmove.srcx, gmove.srcy)
     
     match.writefield(gmove.srcx, gmove.srcy, piece)
 
@@ -305,7 +309,7 @@ def dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match,
     
     match.writefield(gmove.srcx, gmove.srcy, match.PIECES['blk'])
 
-    frdlytouches, enmytouches = field_touches(match, match.color_of_piece(piece), gmove.dstx, gmove.dsty)
+    frdlytouches, enmytouches = list_all_field_touches(match, match.color_of_piece(piece), gmove.dstx, gmove.dsty)
 
     match.writefield(gmove.srcx, gmove.srcy, piece)
 
@@ -347,7 +351,7 @@ def is_discl_supported_weak(discl_supported):
 def is_fork_field(match, color, forkx, forky):
     opp_color = match.REVERSED_COLORS[color]
 
-    frdlytouches, enmytouches = field_touches(match, color, forkx, forky)
+    frdlytouches, enmytouches = list_all_field_touches(match, color, forkx, forky)
     if(len(frdlytouches) >= len(enmytouches)):
         return False
 

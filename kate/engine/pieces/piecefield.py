@@ -67,7 +67,7 @@ class cPieceField:
                             return True
         return False
 
-    def field_color_touches(self, color, frdlytouches, enmytouches):
+    def list_all_field_touches(self, color, frdlytouches, enmytouches):
         for step in self.STEPS:
             stepx = step[0]
             stepy = step[1]

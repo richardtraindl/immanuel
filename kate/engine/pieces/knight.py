@@ -138,30 +138,30 @@ class cKnight(cPiece):
         return False
 
     def score_attacks(self):
-        from .. analyze_helper import field_touches
+        from .. analyze_helper import list_all_field_touches
 
         score = 0
 
-        if(self.is_stuck()):
+        if(self.is_piece_stuck_new()):
             return score
 
-        opp_color = match.oppcolor_of_piece(self.piece)
+        opp_color = self.match.oppcolor_of_piece(self.piece)
 
-        frdlytouches, enmytouches = field_touches(self.match, self.color, self.xpos, self.ypos)
+        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
         if(len(frdlytouches) < len(enmytouches)):
             return score
 
-        for Step in self.STEPS:
+        for step in self.STEPS:
             x1 = self.xpos + step[0]
             y1 = self.ypos + step[1]
             if(self.match.is_inbounds(x1, y1)):
-                frdlytouches, enmytouches = field_touches(self.match, self.color, x1, y1)
+                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
                 #if(len(frdlytouches) < len(enmytouches)):
                     #continue
 
                 attacked = self.match.readfield(x1, y1)
 
-                if(self.match.color_of_piece(piece) == opp_color):
+                if(self.match.color_of_piece(attacked) == opp_color):
                     if(len(enmytouches) == 0 or 
                        self.match.PIECES_RANK[attacked] > self.match.PIECES_RANK[self.piece]):
                         score += self.match.ATTACKED_SCORES[attacked]
@@ -178,7 +178,7 @@ class cKnight(cPiece):
     def score_supports(self):
         score = 0
 
-        if(self.is_stuck()):
+        if(self.is_piece_stuck_new()):
             return score
 
         opp_color = self.match.oppcolor_of_piece(self.piece)

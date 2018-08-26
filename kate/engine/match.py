@@ -1,8 +1,12 @@
 from datetime import datetime
-from .pieces import pawn, knight, rook, bishop, queen, king
+from .pieces.pawn import cPawn
+from .pieces.knight import cKnight
+from .pieces.bishop import cBishop
+from .pieces.rook import cRook
+from .pieces.king import cKing
+from .pieces.queen import cQueen
 from .pieces import pawnfield, knightfield, rookfield, bishopfield, queenfield, kingfield
 from .validator import cValidator
-#from .pieces import pawn_ext, knight_ext, bishop_ext, rook_ext, queen_ext, king_ext
 
 
 class cMatch:
@@ -376,37 +380,37 @@ class cMatch:
                 return False, cValidator.RETURN_CODES['king-error']
 
         if(piece == self.PIECES['wPw'] or piece == self.PIECES['bPw']):
-            cpawn = pawn.cPawn(self, srcx, srcy)
+            cpawn = cPawn(self, srcx, srcy)
             if(cpawn.is_move_valid(dstx, dsty, prom_piece)):
                 return True, cValidator.RETURN_CODES['ok']
             else:
                 return False, cValidator.RETURN_CODES['pawn-error']
         elif(piece == self.PIECES['wRk'] or piece == self.PIECES['bRk']):
-            crook =  rook.cRook(self, srcx, srcy)
+            crook =  cRook(self, srcx, srcy)
             if(crook.is_move_valid(dstx, dsty)):
                 return True, cValidator.RETURN_CODES['ok']
             else:
                 return False, cValidator.RETURN_CODES['rook-error']
         elif(piece == self.PIECES['wKn'] or piece == self.PIECES['bKn']):
-            cknight = knight.cKnight(self, srcx, srcy)
+            cknight = cKnight(self, srcx, srcy)
             if(cknight.is_move_valid(dstx, dsty)):
                 return True, cValidator.RETURN_CODES['ok']
             else:
                 return False, cValidator.RETURN_CODES['knight-error']
         elif(piece == self.PIECES['wBp'] or piece == self.PIECES['bBp']):
-            cbishop = bishop.cBishop(self, srcx, srcy)
+            cbishop = cBishop(self, srcx, srcy)
             if(cbishop.is_move_valid(dstx, dsty)):
                 return True, cValidator.RETURN_CODES['ok']
             else:
                 return False, cValidator.RETURN_CODES['bishop-error']
         elif(piece == self.PIECES['wQu'] or piece == self.PIECES['bQu']):
-            cqueen = queen.cQueen(self, srcx, srcy)
+            cqueen = cQueen(self, srcx, srcy)
             if(cqueen.is_move_valid(dstx, dsty)):
                 return True, cValidator.RETURN_CODES['ok']
             else:
                 return False, cValidator.RETURN_CODES['queen-error']
         elif(piece == self.PIECES['wKg'] or piece == self.PIECES['bKg']):
-            cking = king.cKing(self, srcx, srcy)
+            cking = cKing(self, srcx, srcy)
             if(cking.is_move_valid(dstx, dsty)):
                 return True, cValidator.RETURN_CODES['ok']
             else:
@@ -414,17 +418,66 @@ class cMatch:
         else:
             return False, cValidator.RETURN_CODES['general-error']
 
+    def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
+        piece = self.readfield(srcx, srcy)
+
+        if(piece == self.PIECES['wPw'] or piece == self.PIECES['bPw']):
+            cpawn = cPawn(self, srcx, srcy)
+            return cpawn.do_move(dstx, dsty, prom_piece)
+        elif(piece == self.PIECES['wRk'] or piece == self.PIECES['bRk']):
+            crook =  cRook(self, srcx, srcy)
+            return crook.do_move(dstx, dsty, prom_piece)
+        elif(piece == self.PIECES['wKn'] or piece == self.PIECES['bKn']):
+            cknight = cKnight(self, srcx, srcy)
+            return cknight.do_move(dstx, dsty, prom_piece)
+        elif(piece == self.PIECES['wBp'] or piece == self.PIECES['bBp']):
+            cbishop = cBishop(self, srcx, srcy)
+            return cbishop.do_move(dstx, dsty, prom_piece)
+        elif(piece == self.PIECES['wQu'] or piece == self.PIECES['bQu']):
+            cqueen = cQueen(self, srcx, srcy)
+            return cqueen.do_move(dstx, dsty, prom_piece)
+        elif(piece == self.PIECES['wKg'] or piece == self.PIECES['bKg']):
+            cking = cKing(self, srcx, srcy)
+            return cking.do_move(dstx, dsty, prom_piece)
+
+    def undo_move(self):
+        if(len(self.move_list) > 0):
+            move = self.move_list.pop()
+        else:
+            return None
+
+        piece = self.readfield(move.dstx, move.dsty)
+
+        if(piece == self.PIECES['wPw'] or piece == self.PIECES['bPw']):
+            cpawn = cPawn(self, move.dstx, move.dsty)
+            return cpawn.undo_move(move)
+        elif(piece == self.PIECES['wRk'] or piece == self.PIECES['bRk']):
+            crook =  cRook(self, move.dstx, move.dsty)
+            return crook.undo_move(move)
+        elif(piece == self.PIECES['wKn'] or piece == self.PIECES['bKn']):
+            cknight = cKnight(self, move.dstx, move.dsty)
+            return cknight.undo_move(move)
+        elif(piece == self.PIECES['wBp'] or piece == self.PIECES['bBp']):
+            cbishop = cBishop(self, move.dstx, move.dsty)
+            return cbishop.undo_move(move)
+        elif(piece == self.PIECES['wQu'] or piece == self.PIECES['bQu']):
+            cqueen = cQueen(self, move.dstx, move.dsty)
+            return cqueen.undo_move(move)
+        elif(piece == self.PIECES['wKg'] or piece == self.PIECES['bKg']):
+            cking = cKing(self, move.dstx, move.dsty)
+            return cking.undo_move(move)
+
     def is_king_after_move_attacked(self, srcx, srcy, dstx, dsty):
         piece = self.readfield(srcx, srcy)
 
         pawnenmy = None
         if(piece == self.PIECES['wPw']):
-            cpawn = pawn.cPawn(self, srcx, srcy)
+            cpawn = cPawn(self, srcx, srcy)
             if(cpawn.is_white_ep_move_ok(dstx, dsty)):
                 pawnenmy = self.readfield(dstx, srcy)
                 self.writefield(dstx, srcy, self.PIECES['blk'])
         elif(piece == self.PIECES['bPw']):
-            cpawn = pawn.cPawn(self, srcx, srcy)
+            cpawn = cPawn(self, srcx, srcy)
             if(cpawn.is_black_ep_move_ok(dstx, dsty)):
                 pawnenmy = self.readfield(dstx, srcy)
                 self.writefield(dstx, srcy, self.PIECES['blk'])
@@ -498,7 +551,7 @@ class cMatch:
         return self.STATUS['draw']
 
     def evaluate_pin_dir(self, srcx, srcy):
-        cpieces = [rook.cRook, bishop.cBishop]
+        cpieces = [cRook, cBishop]
         white_faces = [self.PIECES['wRk'], self.PIECES['wBp']]
         black_faces = [self.PIECES['bRk'], self.PIECES['bBp']]
 
@@ -548,8 +601,8 @@ class cMatch:
         crookfield = rookfield.cRookField(self, srcx, srcy)
         enemies = crookfield.list_field_touches(opp_color)        
         for enemy in enemies:
-            enemy_dir = rook.cRook.dir_for_move(srcx, srcy, enemy.fieldx, enemy.fieldy)
-            stepx, stepy = rook.cRook.step_for_dir(self.REVERSE_DIRS[enemy_dir])
+            enemy_dir = cRook.dir_for_move(srcx, srcy, enemy.fieldx, enemy.fieldy)
+            stepx, stepy = cRook.step_for_dir(self.REVERSE_DIRS[enemy_dir])
             x1, y1 = self.search(srcx, srcy, stepx, stepy)
             if(x1 != self.UNDEF_X):
                 friend = self.readfield(x1, y1)
@@ -562,8 +615,8 @@ class cMatch:
         cbishopfield = bishopfield.cBishopField(self, srcx, srcy)
         enemies = cbishopfield.list_field_touches(opp_color) 
         for enemy in enemies:
-            enemy_dir = bishop.cBishop.dir_for_move(srcx, srcy, enemy.fieldx, enemy.fieldy)
-            stepx, stepy = bishop.cBishop.step_for_dir(self.REVERSE_DIRS[enemy_dir])
+            enemy_dir = cBishop.dir_for_move(srcx, srcy, enemy.fieldx, enemy.fieldy)
+            stepx, stepy = cBishop.step_for_dir(self.REVERSE_DIRS[enemy_dir])
             x1, y1 = self.search(srcx, srcy, stepx, stepy)
             if(x1 != self.UNDEF_X):
                 friend = self.readfield(x1, y1)

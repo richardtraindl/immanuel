@@ -3,7 +3,6 @@ from engine.match import *
 from engine.move import *
 from engine.calc import calc_move, Msgs
 from engine.debug import prnt_match_attributes, prnt_board, list_match_attributes, list_move_attributes
-from engine.matchmove import do_move, undo_move
 from engine.helper import coord_to_index, reverse_lookup
 
 
@@ -72,7 +71,7 @@ class CalcThread(threading.Thread):
         candidates = calc_move(self.calc_match, self.session.msgs)
         if(len(candidates) > 0):
             gmove = candidates[0]
-            do_move(self.session.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+            self.session.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
             prnt_board(self.session.match)
         else:
             print("no move found!")
@@ -238,7 +237,7 @@ def word_move(session, params):
                     return True
 
     if(match.is_move_valid(srcx, srcy, dstx, dsty, match.PIECES[prom_piece])[0]):
-        do_move(match, srcx, srcy, dstx, dsty, match.PIECES[prom_piece])
+        match.do_move(srcx, srcy, dstx, dsty, match.PIECES[prom_piece])
         prnt_board(match)
     else:
         print("invalid move!")
@@ -249,7 +248,7 @@ def word_move(session, params):
 def word_undo(session, params):
     match = session.match
     
-    undo_move(match)
+    match.undo_move()
     prnt_board(match)
 
     if(match.evaluate_status() == match.STATUS['open']):

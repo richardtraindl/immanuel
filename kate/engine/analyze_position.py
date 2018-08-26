@@ -6,7 +6,7 @@ from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
 from .pieces.piece import cTouchBeyond
-from .analyze_helper import field_touches_beyond, field_touches, is_piece_stuck_new
+from .analyze_helper import field_touches_beyond, list_all_field_touches, is_piece_stuck_new
 
 
 def score_supports(match, color):
@@ -184,8 +184,8 @@ def is_king_guarded(match, color):
     count = 0
 
     for i in range(8):
-        x1 = Kg_x + king.cKing.STEPS[i][0]
-        y1 = Kg_y + king.cKing.STEPS[i][1]
+        x1 = Kg_x + cKing.STEPS[i][0]
+        y1 = Kg_y + cKing.STEPS[i][1]
         if(match.is_inbounds(x1, y1)):
             piece = match.readfield(x1, y1)
             if(piece == pawn):
@@ -442,12 +442,12 @@ def score_endgame(match):
         for x in range(0, 8, 1):
             piece = match.readfield(x, y)
             if(piece == match.PIECES['wPw']):
-                cpawn = pawn.cPawn(match, x, y)
+                cpawn = cPawn(match, x, y)
                 if(cpawn.is_running()):
                     value += whiterate
                     value += white_step_rate * y
             elif(piece == match.PIECES['bPw']):
-                cpawn = pawn.cPawn(match, x, y)
+                cpawn = cPawn(match, x, y)
                 if(cpawn.is_running()):
                     value += blackrate
                     value += black_step_rate * (7 - y)
@@ -508,13 +508,15 @@ def score_position(match, movecnt):
 
         score += score_stucks(match)
 
-        #score += score_attacks(match, color)
+        #----------------------------------------
+        score += score_attacks(match, color)
 
-        #score += score_supports(match, match.REVERSED_COLORS[color])
+        score += score_supports(match, match.REVERSED_COLORS[color])
 
-        #score += score_controled_horizontal_files(match)
+        score += score_controled_horizontal_files(match)
 
-        #score += score_controled_vertical_files(match)
+        score += score_controled_vertical_files(match)
+        #----------------------------------------
 
         if(is_opening(match)):
             score += score_opening(match)
@@ -567,7 +569,7 @@ def are_attacks_or_captures_possible(match):
             if(piece == match.PIECES['blk']):
                 continue
             else:
-                friends, enemies = field_touches(match, Match.color_of_piece(piece), x, y)
+                friends, enemies = list_all_field_touches(match, Match.color_of_piece(piece), x, y)
                 if(len(friends) < len(enemies)):
                     return True
                 else:
@@ -603,7 +605,7 @@ def is_stormy(match):
 
             piece_color = match.color_of_piece(piece)
 
-            frdlytouches, enmytouches = field_touches(match, piece_color, x, y)
+            frdlytouches, enmytouches = list_all_field_touches(match, piece_color, x, y)
 
             if(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
                 if(len(enmytouches) > 0):
@@ -621,7 +623,7 @@ def is_stormy(match):
                 if(match.PIECES_RANK[enmy.piece] < match.PIECES_RANK[piece]):
                     return True
 
-                """enmyfriends, enmyenemies = field_touches(match, Match.color_of_piece(enmy.piece), enmy.fieldx, enmy.fieldy)
+                """enmyfriends, enmyenemies = list_all_field_touches(match, Match.color_of_piece(enmy.piece), enmy.fieldx, enmy.fieldy)
                 if(len(enmyenemies) == 0):
                     print("is_stormy: enmyenemies == 0")
                     return True"""

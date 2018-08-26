@@ -94,6 +94,162 @@ class cKing(cPiece):
 
         return True
 
+    def do_move(self, dstx, dsty, prom_piece):
+        move = cMove(self.match, 
+                    self.match.movecnt + 1, 
+                    cMove.TYPES['standard'],
+                    self.xpos, 
+                    self.ypos, 
+                    dstx, 
+                    dsty, 
+                    None,
+                    None,
+                    self.match.PIECES['blk'], 
+                    prom_piece, 
+                    self.match.fifty_moves_count)
+
+        srcpiece = self.match.readfield(move.srcx, move.srcy)
+        dstpiece = self.match.readfield(move.dstx, move.dsty)
+
+        if(srcpiece == self.match.PIECES['wKg']):
+            self.match.wKg_x = move.dstx
+            self.match.wKg_y = move.dsty
+
+            if(self.match.white_movecnt_short_castling_lost == 0):
+                self.match.white_movecnt_short_castling_lost = self.match.movecnt + 1
+
+            if(self.match.white_movecnt_long_castling_lost == 0):
+                self.match.white_movecnt_long_castling_lost = self.match.movecnt + 1
+        else:
+            self.match.bKg_x = move.dstx
+            self.match.bKg_y = move.dsty
+
+            if(self.match.black_movecnt_short_castling_lost == 0):
+                self.match.black_movecnt_short_castling_lost = self.match.movecnt + 1
+
+            if(self.match.black_movecnt_long_castling_lost == 0):
+                self.match.black_movecnt_long_castling_lost = self.match.movecnt + 1
+
+        if(move.dstx - move.srcx == 2):
+            move.move_type = cMove.TYPES['short_castling']
+            move.captured_piece = dstpiece
+            self.match.movecnt += 1   
+
+            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx, move.dsty, srcpiece)
+            rook = self.match.readfield(move.srcx + 3, move.srcy)
+            self.match.writefield(move.srcx + 3, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx - 1, move.dsty, rook)
+            self.match.fifty_moves_count += 1
+
+            self.match.move_list.append(move)
+            return move
+        elif(move.dstx - move.srcx == -2):
+            move.move_type = cMove.TYPES['long_castling']
+            move.captured_piece = dstpiece
+            self.match.movecnt += 1   
+
+            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx, move.dsty, srcpiece)
+            rook = self.match.readfield(move.srcx - 4, move.srcy)
+            self.match.writefield(move.srcx - 4, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx + 1, move.dsty, rook)
+            self.match.fifty_moves_count += 1
+
+            self.match.move_list.append(move)
+            return move
+        else:
+            move.captured_piece = dstpiece
+
+            self.match.movecnt += 1
+            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx, move.dsty, srcpiece)
+            if(dstpiece != self.match.PIECES['blk']):
+                self.match.fifty_moves_count = 0
+                move.fifty_moves_count = self.match.fifty_moves_count
+            else:
+                self.match.fifty_moves_count += 1
+                move.fifty_moves_count = self.match.fifty_moves_count
+
+            self.match.score += self.match.SCORES[dstpiece]
+            self.match.move_list.append(move)
+            return move
+
+    def undo_move(self, move):
+        if(move.captured_piece == self.match.PIECES['wQu']):
+            self.match.wQu_cnt += 1
+        elif(move.captured_piece == self.match.PIECES['bQu']):
+            self.match.bQu_cnt += 1
+        elif(move.captured_piece == self.match.PIECES['wKn'] or move.captured_piece == self.match.PIECES['wBp'] or move.captured_piece == self.match.PIECES['wRk']):
+            self.match.wOfficer_cnt += 1
+        elif(move.captured_piece == self.match.PIECES['bKn'] or move.captured_piece == self.match.PIECES['bBp'] or move.captured_piece == self.match.PIECES['bRk']):
+            self.match.bOfficer_cnt += 1
+
+        self.match.movecnt -= 1
+        self.match.fifty_moves_count = move.fifty_moves_count
+
+        piece = self.match.readfield(move.dstx, move.dsty)
+        self.match.writefield(move.srcx, move.srcy, piece)
+        self.match.writefield(move.dstx, move.dsty, move.captured_piece)
+
+        self.match.score -= self.match.SCORES[move.captured_piece]
+
+        if(move.move_type == move.TYPES['short_castling']):
+            rook = self.match.readfield(move.dstx - 1, move.dsty)
+            self.match.writefield(move.dstx - 1, move.dsty, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx + 1, move.dsty, rook)
+
+            if(piece == self.match.PIECES['wKg']):
+                self.match.wKg_x = move.srcx
+                self.match.wKg_y = move.srcy
+
+                self.match.white_movecnt_short_castling_lost = 0
+                if(self.match.white_movecnt_long_castling_lost == self.match.movecnt + 1):
+                    self.match.white_movecnt_long_castling_lost = 0
+            else:
+                self.match.bKg_x = move.srcx
+                self.match.bKg_y = move.srcy
+
+                self.match.black_movecnt_short_castling_lost = 0
+                if(self.match.black_movecnt_long_castling_lost == self.match.movecnt + 1):
+                    self.match.black_movecnt_long_castling_lost = 0
+        elif(move.move_type == move.TYPES['long_castling']):
+            rook = self.match.readfield(move.dstx + 1, move.dsty)
+            self.match.writefield(move.dstx + 1, move.dsty, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx - 2, move.dsty, rook)
+        
+            if(piece == self.match.PIECES['wKg']):
+                self.match.wKg_x = move.srcx
+                self.match.wKg_y = move.srcy
+
+                self.match.white_movecnt_long_castling_lost = 0
+                if(self.match.white_movecnt_short_castling_lost == self.match.movecnt + 1):
+                    self.match.white_movecnt_short_castling_lost = 0
+            else:
+                self.match.bKg_x = move.srcx
+                self.match.bKg_y = move.srcy
+
+                self.match.black_movecnt_long_castling_lost = 0
+                if(self.match.black_movecnt_short_castling_lost == self.match.movecnt + 1):
+                    self.match.black_movecnt_short_castling_lost = 0
+        else:
+            if(piece == self.match.PIECES['wKg']):
+                self.match.wKg_x = move.srcx
+                self.match.wKg_y = move.srcy
+                if(self.match.white_movecnt_short_castling_lost == self.match.movecnt + 1):
+                    self.match.white_movecnt_short_castling_lost = 0
+                if(self.match.white_movecnt_long_castling_lost == self.match.movecnt + 1):
+                    self.match.white_movecnt_long_castling_lost = 0
+            else:
+                self.match.bKg_x = move.srcx
+                self.match.bKg_y = move.srcy
+                if(self.match.black_movecnt_short_castling_lost == self.match.movecnt + 1):
+                    self.match.black_movecnt_short_castling_lost = 0
+                if(self.match.black_movecnt_long_castling_lost == self.match.movecnt + 1):
+                    self.match.black_movecnt_long_castling_lost = 0
+
+        return move
+
     def is_sh_castling_ok(self, dstx, dsty):
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
@@ -221,11 +377,11 @@ class cKing(cPiece):
         return False
 
     def score_attacks(self):
-        from .. analyze_helper import field_touches
+        from .. analyze_helper import list_all_field_touches
 
         score = 0
 
-        opp_color = selfmatch.oppcolor_of_piece(self.piece)
+        opp_color = self.match.oppcolor_of_piece(self.piece)
 
         for step in self.STEPS:
             x1 = self.xpos + step[0]
@@ -234,21 +390,21 @@ class cKing(cPiece):
                 attacked = self.match.readfield(x1, y1)
 
                 if(self.match.color_of_piece(attacked) == opp_color):
-                    score += selfmatch.ATTACKED_SCORES[attacked]
+                    score += self.match.ATTACKED_SCORES[attacked]
 
                     # extra score if attacked is pinned
                     enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color, 
                     if(enmy_pin != self.DIRS['undefined']):
                         score += self.match.ATTACKED_SCORES[attacked]
 
-                    if(analyze_helper.is_soft_pin(self.match, x1, y1)):
+                    if(self.match.is_soft_pin(x1, y1)):
                         score += self.match.ATTACKED_SCORES[attacked]
         return score
 
     def score_supports(self):
         score = 0
 
-        opp_color = match.oppcolor_of_piece(self.piece)
+        opp_color = self.match.oppcolor_of_piece(self.piece)
 
         for step in self.STEPS:
             x1 = self.xpos + step[0]
@@ -265,24 +421,24 @@ class cKing(cPiece):
         return score 
 
     def is_king_safe(match, color):
-        from .. analyze_helper import field_touches
+        from .. analyze_helper import list_all_field_touches
 
         for step in self.STEPS:
             x1 = self.xpos + step[0]
             y1 = self.ypos + step[1]
             if(self.match.is_inbounds(x1, y1)):
-                friends, enemies = field_touches(self.match, self.color, x1, y1)
+                friends, enemies = list_all_field_touches(self.match, self.color, x1, y1)
                 if(len(friends) < len(enemies)):
                     return False
 
         friends.clear()
         enemies.clear()
-        friends, enemies = field_touches(self.match, self.color, self.xpos, self.ypos)
+        friends, enemies = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
         if(len(enemies) >= 2):
             return False
 
         for enemy in enemies:
-            friends_beyond, enemies_beyond = field_touches(self.match, self.color, enemy.fieldx, enemy.fieldy)
+            friends_beyond, enemies_beyond = list_all_field_touches(self.match, self.color, enemy.fieldx, enemy.fieldy)
             if(len(friends_beyond) >= len(enemies_beyond)):
                 continue
 
@@ -299,7 +455,7 @@ class cKing(cPiece):
             x1 = self.xpos + step_x
             y1 = self.ypos + step_y
             while(self.match.is_inbounds(x1, y1)):
-                blocking_friends, blocking_enemies = field_touches(self.match, self.color, x1, y1)
+                blocking_friends, blocking_enemies = list_all_field_touches(self.match, self.color, x1, y1)
                 if(len(blocking_friends) > 0):
                     break
         return True

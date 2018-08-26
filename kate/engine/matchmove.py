@@ -2,7 +2,7 @@ from .match import *
 from .move import cMove
 
 
-def do_move(match, srcx, srcy, dstx, dsty, prom_piece):
+"""def do_move(match, srcx, srcy, dstx, dsty, prom_piece):
     move = cMove(match, 
                 match.movecnt + 1, 
                 cMove.TYPES['standard'],
@@ -70,7 +70,7 @@ def generic_do_move(match, move, srcpiece, dstpiece):
     
 def pawn_do_move(match, move, srcpiece, dstpiece):
     if(move.prom_piece != match.PIECES['blk']):
-        move.move_type = cMove.TYPES['promotion']
+        move.move_type = move.TYPES['promotion']
         move.captured_piece = dstpiece
 
         match.movecnt += 1 
@@ -153,7 +153,7 @@ def king_do_move(match, move, srcpiece, dstpiece):
 
         return move
     else:
-        return generic_do_move(match, move, srcpiece, dstpiece)
+        return generic_do_move(match, move, srcpiece, dstpiece)"""
 
 
 def undo_move(match):

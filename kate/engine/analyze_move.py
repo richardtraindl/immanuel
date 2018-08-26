@@ -1,7 +1,7 @@
 from operator import attrgetter
 import copy
 from .match import *
-from .matchmove import do_move, undo_move
+from .matchmove import undo_move # do_move, 
 from . import analyze_position
 from .helper import reverse_lookup
 from .analyze_helper import *
@@ -67,7 +67,7 @@ def flees(match, gmove):
     enmycontacts.clear()
 
     ###
-    do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
     enmycontacts = list_field_touches(match, opp_color, gmove.dstx, gmove.dsty)
     for enmy in enmycontacts:
@@ -106,10 +106,8 @@ def find_attacks_and_supports(match, gmove):
         crook = cRook(match, gmove.srcx, gmove.srcy)
         crook.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
     elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
-        crook = cRook(match, gmove.srcx, gmove.srcy)
-        crook.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
-        cbishop = cBishop(match, gmove.srcx, gmove.srcy)
-        cbishop.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
+        cqueen = cQueen(match, gmove.srcx, gmove.srcy)
+        cqueen.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
     elif(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
         cking = cKing(match, gmove.srcx, gmove.srcy)
         cking.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
@@ -130,7 +128,7 @@ def does_unpin(match, gmove):
     pinlines_before = search_lines_of_pin(match, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
 
     ###
-    do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
     
     pinlines_after = search_lines_of_pin(match, color, gmove.dstx, gmove.dsty, None, None)
 
@@ -178,26 +176,26 @@ def defends_king_attack(match, gmove):
         Kg_y = match.bKg_y
 
     for i in range(8):
-        x1 = Kg_x + king.cKing.STEPS[i][0]
-        y1 = Kg_y + king.cKing.STEPS[i][1]
+        x1 = Kg_x + cKing.STEPS[i][0]
+        y1 = Kg_y + cKing.STEPS[i][1]
         if(match.is_inbounds(x1, y1)):
-            friends, enemies = field_touches(match, color, x1, y1)
+            friends, enemies = list_all_field_touches(match, color, x1, y1)
             if(len(friends) < len(enemies)):
                 before_cnt += 1
             if(len(enemies) == 0):
                 urgent = False
 
-    do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
     if(Kg_x == gmove.srcx):
         Kg_x = gmove.dstx
         Kg_y = gmove.dsty
 
     for i in range(8):
-        x1 = Kg_x + king.cKing.STEPS[i][0]
-        y1 = Kg_y + king.cKing.STEPS[i][1]
+        x1 = Kg_x + cKing.STEPS[i][0]
+        y1 = Kg_y + cKing.STEPS[i][1]
         if(match.is_inbounds(x1, y1)):
-            friends, enemies = field_touches(match, color, x1, y1)
+            friends, enemies = list_all_field_touches(match, color, x1, y1)
             if(len(friends) < len(enemies)):
                 after_cnt += 1
 
@@ -277,7 +275,7 @@ def disclosures(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
     color = match.color_of_piece(piece)
 
-    do_move(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
     find_disclosures(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, discl_attacked, discl_supported)
     undo_move(match)
     ###
@@ -369,7 +367,7 @@ def controles_file(match, gmove):
 
 def is_tactical_draw(match, gmove):
     newmatch = copy.deepcopy(match)
-    do_move(newmatch, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    newmatch.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
     #if(newmatch.fifty_moves_count >= 49):
         #return True

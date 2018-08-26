@@ -13,11 +13,11 @@ class cQueenField(cPieceField):
         cbishopfield = cBishopField(self.match, self.fieldx, self.fieldy)
         return crookfield.is_field_touched(color, mode) or cbishopfield.is_field_touched(color, mode)
 
-    def field_color_touches(self, color, frdlytouches, enmytouches):
+    def list_all_field_touches(self, color, frdlytouches, enmytouches):
         crookfield = cRookField(self.match, self.fieldx, self.fieldy)
-        crookfield.field_color_touches(color, frdlytouches, enmytouches)
+        crookfield.list_all_field_touches(color, frdlytouches, enmytouches)
         cbishopfield = cBishopField(self.match, self.fieldx, self.fieldy)
-        cbishopfield.field_color_touches(color, frdlytouches, enmytouches)
+        cbishopfield.list_all_field_touches(color, frdlytouches, enmytouches)
 
     def list_field_touches(self, color):
         crookfield = cRookField(self.match, self.fieldx, self.fieldy)

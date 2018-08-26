@@ -3,8 +3,7 @@ from django.conf import settings
 from .. models import Match as ModelMatch, Move as ModelMove
 from .. engine.match import *
 from .. engine.move import *
-from .. engine import matchmove, calc
-
+from .. engine import calc
 
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
@@ -96,7 +95,7 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     match.time_start = time.time()
     ###
 
-    move = matchmove.do_move(match, srcx, srcy, dstx, dsty, prom_piece)
+    move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
     match.status = match.evaluate_status() #STATUS['open']
     map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
     modelmatch.save()
@@ -110,7 +109,7 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
 def undo_move(modelmatch):
     match = cMatch()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    move = matchmove.undo_move(match)
+    move = match.undo_move()
     if(move):
         map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
         modelmatch.save()
@@ -133,7 +132,7 @@ class ImmanuelsThread(threading.Thread):
         if(len(candidates) > 0):
             gmove = candidates[0]
 
-            move = matchmove.do_move(self.match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+            move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             modelmatch = ModelMatch()
             map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])

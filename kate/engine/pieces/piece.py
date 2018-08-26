@@ -1,3 +1,4 @@
+from .. move import cMove
 
 
 class cPiece:
@@ -56,7 +57,7 @@ class cPiece:
         else:
             return True
 
-    # version for rook and bishop - other pieces override function
+    # version for queen, rook and bishop - other pieces override function
     def is_move_valid(self, dstx, dsty):
         direction = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
         if(direction == self.DIRS['undefined']):
@@ -64,12 +65,10 @@ class cPiece:
 
         stepx, stepy = self.step_for_dir(direction)
         pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos) # self.color, 
-        if(direction == self.DIRS_ARY[0] or direction == self.DIRS_ARY[1]):
-            if(pin_dir != self.DIRS_ARY[0] and pin_dir != self.DIRS_ARY[1] and pin_dir != self.DIRS['undefined']):
-                return False
-        elif(direction == self.DIRS_ARY[2] or direction == self.DIRS_ARY[3]):
-            if(pin_dir != self.DIRS_ARY[2] and pin_dir != self.DIRS_ARY[3] and pin_dir != self.DIRS['undefined']):
-                return False
+        for piecedir in self.DIRS_ARY:
+            if(direction == piecedir):
+                if(pin_dir != piecedir and pin_dir != self.REVERSE_DIRS[piecedir] and pin_dir != self.DIRS['undefined']):
+                    return False
 
         x = self.xpos + stepx
         y = self.ypos + stepy
@@ -88,7 +87,95 @@ class cPiece:
 
         return False
 
-    # version for rook and bishop - other pieces override function
+    def do_move(self, dstx, dsty, prom_piece):
+        move = cMove(self.match, 
+                    self.match.movecnt + 1, 
+                    cMove.TYPES['standard'],
+                    self.xpos, 
+                    self.ypos, 
+                    dstx, 
+                    dsty, 
+                    None,
+                    None,
+                    self.match.PIECES['blk'], 
+                    prom_piece, 
+                    self.match.fifty_moves_count)
+
+        srcpiece = self.match.readfield(move.srcx, move.srcy)
+        dstpiece = self.match.readfield(move.dstx, move.dsty)
+
+        if(dstpiece == self.match.PIECES['wQu']):
+            self.match.wQu_cnt -= 1
+        elif(dstpiece == self.match.PIECES['bQu']):
+            self.match.bQu_cnt -= 1
+        elif(dstpiece == self.match.PIECES['wKn'] or dstpiece == self.match.PIECES['wBp'] or dstpiece == self.match.PIECES['wRk']):
+            self.match.wOfficer_cnt -= 1
+        elif(dstpiece == self.match.PIECES['bKn'] or dstpiece == self.match.PIECES['bBp'] or dstpiece == self.match.PIECES['bRk']):
+            self.match.bOfficer_cnt -= 1
+
+        move.captured_piece = dstpiece
+
+        self.match.movecnt += 1
+        self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
+        self.match.writefield(move.dstx, move.dsty, srcpiece)
+        if(dstpiece != self.match.PIECES['blk']):
+            self.match.fifty_moves_count = 0
+            move.fifty_moves_count = self.match.fifty_moves_count
+        else:
+            self.match.fifty_moves_count += 1
+            move.fifty_moves_count = self.match.fifty_moves_count
+
+        if(srcpiece == self.match.PIECES['wRk']):
+            if(move.srcx == 0 and move.srcy == 0 and self.match.white_movecnt_long_castling_lost == 0):
+                self.match.white_movecnt_long_castling_lost = self.match.movecnt
+            elif(move.srcx == 7 and move.srcy == 0 and self.match.white_movecnt_short_castling_lost == 0):
+                self.match.white_movecnt_short_castling_lost = self.match.movecnt
+        elif(srcpiece == self.match.PIECES['bRk']):
+            if(move.srcx == 0 and move.srcy == 7 and self.match.black_movecnt_long_castling_lost == 0):
+                self.match.black_movecnt_long_castling_lost == self.match.movecnt
+            elif(move.srcx == 7 and move.srcy == 7 and self.match.black_movecnt_short_castling_lost == 0):
+                self.match.black_movecnt_short_castling_lost == self.match.movecnt
+
+        self.match.score += self.match.SCORES[dstpiece]
+
+        self.match.move_list.append(move)
+
+        return move
+
+    def undo_move(self, move):
+        if(move.captured_piece == self.match.PIECES['wQu']):
+            self.match.wQu_cnt += 1
+        elif(move.captured_piece == self.match.PIECES['bQu']):
+            self.match.bQu_cnt += 1
+        elif(move.captured_piece == self.match.PIECES['wKn'] or move.captured_piece == self.match.PIECES['wBp'] or move.captured_piece == self.match.PIECES['wRk']):
+            self.match.wOfficer_cnt += 1
+        elif(move.captured_piece == self.match.PIECES['bKn'] or move.captured_piece == self.match.PIECES['bBp'] or move.captured_piece == self.match.PIECES['bRk']):
+            self.match.bOfficer_cnt += 1
+
+        self.match.movecnt -= 1
+        self.match.fifty_moves_count = move.fifty_moves_count
+
+        piece = self.match.readfield(move.dstx, move.dsty)
+        self.match.writefield(move.srcx, move.srcy, piece)
+        self.match.writefield(move.dstx, move.dsty, move.captured_piece)
+
+        self.match.score -= self.match.SCORES[move.captured_piece]
+
+        if(piece == self.match.PIECES['wRk']):
+            if(self.match.white_movecnt_short_castling_lost == self.match.movecnt + 1):
+                self.match.white_movecnt_short_castling_lost = 0
+            if(self.match.white_movecnt_long_castling_lost == self.match.movecnt + 1):
+                self.match.white_movecnt_long_castling_lost = 0
+        elif(piece == self.match.PIECES['bRk']):
+            if(self.match.black_movecnt_short_castling_lost == self.match.movecnt + 1):
+                self.match.black_movecnt_short_castling_lost = 0
+            if(self.match.black_movecnt_long_castling_lost == self.match.movecnt + 1):
+                self.match.black_movecnt_long_castling_lost = 0
+
+        return move
+
+
+    # version for queen, rook and bishop - other pieces override function
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
         from .. analyze_helper import field_touches_beyond
 
@@ -157,7 +244,6 @@ class cPiece:
 
         return False
 
-
     def move_controles_file(self, dstx, dsty):
         cnt = 0
         move_dir = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
@@ -186,13 +272,13 @@ class cPiece:
             return False
 
     def score_attacks(self):
-        from .. analyze_helper import field_touches
+        from .. analyze_helper import list_all_field_touches
 
         score = 0
 
-        opp_color = match.oppcolor_of_piece(self.piece)
+        opp_color = self.match.oppcolor_of_piece(self.piece)
 
-        frdlytouches, enmytouches = field_touches(self.match, self.color, self.xpos, self.ypos)
+        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
         if(len(frdlytouches) < len(enmytouches)):
             return score
 
@@ -204,7 +290,7 @@ class cPiece:
                 if(self.is_move_stuck(x1, y1)):
                     continue
 
-                frdlytouches, enmytouches = field_touches(self.match, self.color, x1, y1)
+                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
                 #if(len(frdlytouches) < len(enmytouches)):
                     #continue
                     
@@ -235,7 +321,7 @@ class cPiece:
     def score_supports(self):
         score = 0
 
-        opp_color = match.oppcolor_of_piece(self.piece)
+        opp_color = self.match.oppcolor_of_piece(self.piece)
 
         for step in self.STEPS:
             stepx = step[0]

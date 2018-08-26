@@ -68,10 +68,19 @@ class cRook(cPiece):
     #is_move_valid(self, dstx, dsty)
         # works with inherited class
 
+    #find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+        # works with inherited class
+
     #move_defends_fork_field(self, dstx, dsty)
         # works with inherited class
 
     #move_controles_file(self, dstx, dsty)
+        # works with inherited class
+
+    #score_attacks(self):
+        # works with inherited class
+
+    #score_supports(self):
         # works with inherited class
 
 # class end

@@ -1,89 +1,119 @@
 from .piece import *
-from .rook import cRook
-from .bishop import cBishop
 
 
 class cQueen(cPiece):
+    DIRS = { 'north'     : 1,
+             'south'     : 2,
+             'east'      : 3,
+             'west'      : 4,
+             'north-east' : 5,
+             'south-west' : 6,
+             'north-west' : 7,
+             'south-east' : 8,
+             'undefined'  : 14 }
+
+    DIRS_ARY = [DIRS['north'], DIRS['south'], DIRS['east'], DIRS['west'], DIRS['north-east'], DIRS['south-west'], DIRS['north-west'], DIRS['south-east']]
+ 
+    REVERSE_DIRS = { DIRS['north']     : DIRS['south'],
+                     DIRS['south']     : DIRS['north'],
+                     DIRS['east']      : DIRS['west'],
+                     DIRS['west']      : DIRS['east'],
+                     DIRS['north-east'] : DIRS['south-west'],
+                     DIRS['south-west'] : DIRS['north-east'],
+                     DIRS['north-west'] : DIRS['south-east'],
+                     DIRS['south-east'] : DIRS['north-west'],
+                     DIRS['undefined']  : DIRS['undefined'] } 
+
     STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+
+    STEP_NORTH_X = 0
+    STEP_NORTH_Y = 1
+    STEP_SOUTH_X = 0
+    STEP_SOUTH_Y = -1
+    STEP_EAST_X = 1
+    STEP_EAST_Y = 0
+    STEP_WEST_X = -1
+    STEP_WEST_Y = 0
+    STEP_NEAST_X = 1
+    STEP_NEAST_Y = 1
+    STEP_SWEST_X = -1
+    STEP_SWEST_Y = -1
+    STEP_NWEST_X = -1
+    STEP_NWEST_Y = 1
+    STEP_SEAST_X = 1
+    STEP_SEAST_Y = -1
 
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
 
     @classmethod
     def dir_for_move(cls, srcx, srcy, dstx, dsty):
-        direction = cRook.dir_for_move(srcx, srcy, dstx, dsty)
-        if(rookdir == cls.DIRS['undefined']):
-            direction = cBishop.dir_for_move(srcx, srcy, dstx, dsty)
-        return direction
+        if( (srcx == dstx) and (srcy < dsty) ):
+            return cls.DIRS['north']
+        elif( (srcx == dstx) and (srcy > dsty) ):
+            return cls.DIRS['south']
+        elif( (srcx < dstx) and (srcy == dsty) ):
+            return cls.DIRS['east']
+        elif( (srcx > dstx) and (srcy == dsty) ):
+            return cls.DIRS['west']
+        elif( (srcx - dstx) == (srcy - dsty) and (srcy < dsty) ):
+            return cls.DIRS['north-east']
+        elif( (srcx - dstx) == (srcy - dsty) and (srcy > dsty) ):
+            return cls.DIRS['south-west']
+        elif( (srcx - dstx) == ((srcy - dsty) * -1) and (srcy < dsty) ):
+            return cls.DIRS['north-west']
+        elif( (srcx - dstx) == ((srcy - dsty) * -1) and (srcy > dsty) ):
+            return cls.DIRS['south-east']
+        else:
+            return cls.DIRS['undefined']
 
     @classmethod
     def step_for_dir(cls, direction):
-        stepx, stepy = cRook.step_for_dir(direction)
-        if(stepx == cls.UNDEF_X):
-            stepx, stepy = cBishop.step_for_dir(direction)
-        return stepx, stepy
+        if(direction == cls.DIRS['north']):
+            return cls.STEP_NORTH_X, cls.STEP_NORTH_Y
+        elif(direction == cls.DIRS['south']):
+            return cls.STEP_SOUTH_X, cls.STEP_SOUTH_Y
+        elif(direction == cls.DIRS['east']):
+            return cls.STEP_EAST_X, cls.STEP_EAST_Y
+        elif(direction == cls.DIRS['west']):
+            return cls.STEP_WEST_X, cls.STEP_WEST_Y
+        elif(direction == cls.DIRS['north-east']):
+            return cls.STEP_NEAST_X, cls.STEP_NEAST_Y
+        elif(direction == cls.DIRS['south-west']):
+            return cls.STEP_SWEST_X, cls.STEP_SWEST_Y
+        elif(direction == cls.DIRS['north-west']):
+            return cls.STEP_NWEST_X, cls.STEP_NWEST_Y
+        elif(direction == cls.DIRS['south-east']):
+            return cls.STEP_SEAST_X, cls.STEP_SEAST_Y
+        else:
+            return cls.UNDEF_X, cls.UNDEF_Y
 
-    def is_piece_trapped(self):
-        crook = cRook(self.match, self.xpos, self.ypos)
-        rflag = crook.is_piece_trapped()
-        cbishop = cBishop(self.match, self.xpos, self.ypos)
-        bflag = cbishop.is_piece_trapped()
-        return rflag or bflag
+    #is_piece_trapped(self)
+        # works with inherited class
 
-    def is_piece_stuck_new(self):
-        crook = cRook(self.match, self.xpos, self.ypos)
-        rflag = crook.is_piece_stuck_new()
-        cbishop = cBishop(self.match, self.xpos, self.ypos)
-        bflag = cbishop.is_piece_stuck_new()
-        return rflag or bflag
+    #is_piece_stuck_new(self):
+        # works with inherited class
 
-    def is_move_stuck(self, dstx, dsty):
-        crook = cRook(self.match, self.xpos, self.ypos)
-        rflag = crook.is_move_stuck(dstx, dsty)
-        cbishop = cBishop(self.match, self.xpos, self.ypos)
-        bflag = cbishop.is_move_stuck(dstx, dsty)
-        return rflag or bflag
+    #is_move_stuck(self, dstx, dsty)
+        # works with inherited class
 
-    def is_move_valid(self, dstx, dsty):
-        crook = cRook(self.match, self.xpos, self.ypos)
-        rflag = crook.is_move_valid(dstx, dsty)
-        cbishop = cBishop(self.match, self.xpos, self.ypos)
-        bflag = cbishop.is_move_valid(dstx, dsty)
-        return rflag or bflag
+    #is_move_valid(self, dstx, dsty):
+        # works with inherited class
 
-    def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
-        cbishop = cBishop(self.match, self.xpos, self.ypos)
-        cbishop.find_attacks_and_supports(dstx, dsty, attacked, supported)
-        crook = cRook(self.match, self.xpos, self.ypos)
-        crook.find_attacks_and_supports(dstx, dsty, attacked, supported)
-    
-    def move_defends_forked_field(self, dstx, dsty):
-        cbishop = cBishop(self.match, self.xpos, self.ypos)
-        bp_flag = cbishop.move_defends_forked_field(dstx, dsty)
-        crook = cRook(self.match, self.xpos, self.ypos)
-        rk_flag = crook.move_defends_forked_field(dstx, dsty)
-        return bp_flag or rk_flag
+    #find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+        # works with inherited class
 
-    def move_controles_file(self, dstx, dsty):
-        cbishop = cBishop(self.match, self.xpos, self.ypos)
-        bp_flag = cbishop.move_controles_file(dstx, dsty)
-        crook = cRook(self.match, self.xpos, self.ypos)
-        rk_flag = crook.move_controles_file(dstx, dsty)
-        return bp_flag or rk_flag
+    #move_defends_fork_field(self, dstx, dsty)
+        # works with inherited class
 
-    def score_attacks(self):
-        cbishop = cBishop(self.match, self.xpos, self.ypos)
-        score = cbishop.score_attacks()
-        crook = cRook(self.match, self.xpos, self.ypos)
-        score += crook.score_attacks()
-        return score
+    #move_controles_file(self, dstx, dsty)
+        # works with inherited class
 
-    def score_supports(self):
-        cbishop = cBishop(self.match, self.xpos, self.ypos)
-        score = cbishop.score_supports()
-        crook = cRook(self.match, self.xpos, self.ypos)
-        score += crook.score_supports()
-        return score
+    #score_attacks(self):
+        # works with inherited class
+
+    #score_supports(self):
+        # works with inherited class
 
 # class end
 
