@@ -151,14 +151,9 @@ def does_unpin(match, gmove):
 def defends_check(match):
     # is king attaked
     if(match.next_color() == match.COLORS['white']):
-        kg_x = match.wKg_x
-        kg_y = match.wKg_y
+        return match.is_king_attacked(match.wKg_x, match.wKg_y)
     else:
-        kg_x = match.bKg_x
-        kg_y = match.bKg_y
-
-    if(match.is_king_attacked(kg_x, kg_y)):
-        return True
+        return match.is_king_attacked(match.bKg_x, match.bKg_y)
 
 
 def defends_king_attack(match, gmove):
@@ -417,17 +412,16 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
             priomove.tactics.append(priomove.TACTICS['defend-check'])
 
         attacked, supported = find_attacks_and_supports(match, priomove.gmove)
-
         dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att = dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove)
         dstflield_is_attacked = dstfield_is_attacked(match, priomove.gmove)
         piece_is_lower_fequal_than_enmy_on_dstflield = piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, priomove.gmove)
 
-        defends_king, urgent = defends_king_attack(match, priomove.gmove)
+        """defends_king, urgent = defends_king_attack(match, priomove.gmove)
         if(urgent):
             priomove.tactics.append(priomove.TACTICS['defend-king-attack-urgent'])
         elif(defends_king and 
              dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att):
-            priomove.tactics.append(priomove.TACTICS['defend-king-attack'])
+            priomove.tactics.append(priomove.TACTICS['defend-king-attack'])"""
 
         if(castles(match, priomove.gmove)):
             priomove.tactics.append(priomove.TACTICS['castling'])
@@ -440,7 +434,8 @@ def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
 
         if(captures(match, priomove.gmove)):
             if(piece_is_lower_equal_than_captured(match, priomove.gmove) or
-               dstflield_is_attacked == False or
+               dstflield_is_attacked == False or 
+               match.is_pinned(priomove.gmove.dstx, priomove.gmove.dsty) or
                (dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att and 
                 piece_is_lower_fequal_than_enmy_on_dstflield)):
                 priomove.tactics.append(priomove.TACTICS['capture-good-deal'])

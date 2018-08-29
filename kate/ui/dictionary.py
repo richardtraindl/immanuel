@@ -38,7 +38,7 @@ def init_words():
         return False
     if(new_word("resume", word_resume, "resumes (paused) match") == False):
         return False
-    if(new_word("terminate", word_terminate, "terminates match") == False):
+    if(new_word("terminate", word_terminate, "terminates calculation") == False):
         return False
     if(new_word("show",   word_show, "prints debug info") == False):
         return False
@@ -324,7 +324,7 @@ def word_load(session, params):
         print("??? file not found: " + params.strip())
         return True
 
-    match = Match()
+    match = cMatch()
 
     tokens = fobject.read().split(";")
     index = 0
@@ -374,7 +374,7 @@ def word_load(session, params):
     index += 1
     
     for i in range(movecnt):
-        move = Move()
+        move = cMove()
         attributes = list_move_attributes(move)
         for classattr in attributes:
             label_len = len(classattr.label)

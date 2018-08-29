@@ -70,16 +70,18 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     
     if(depth <= slimits.dpth_stage1):
         return max(slimits.count, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
-    elif(depth <= slimits.dpth_stage2 and 
-         (last_pmove.is_tactic_stormy() or is_stormy(match))):
+    elif(depth <= slimits.dpth_stage2):
+        # and 
+        # (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
         silent_move_cnt = 0
 
         for priomove in priomoves:
-            if(priomove.find_tactic(PrioMove.TACTICS['defend-king-attack-urgent']) or
-               priomove.find_tactic(PrioMove.TACTICS['defend-king-attack']) or
-               priomove.find_tactic(PrioMove.TACTICS['attack-king-good-deal']) or 
-               priomove.find_tactic(PrioMove.TACTICS['capture-good-deal'])):
+            if(priomove.is_tactic_stormy()):
+            #if(priomove.find_tactic(PrioMove.TACTICS['defend-king-attack-urgent']) or
+               #priomove.find_tactic(PrioMove.TACTICS['defend-king-attack']) or
+               #priomove.find_tactic(PrioMove.TACTICS['attack-king-good-deal']) or 
+               #priomove.find_tactic(PrioMove.TACTICS['capture-good-deal'])):
                 count += 1
                 priomove.prio = PrioMove.PRIO['prio1']
                 continue
@@ -96,13 +98,13 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                 priomove.prio = PrioMove.PRIO['prio10']
 
         priomoves.sort(key=attrgetter('prio'))
-        return count
+        return min(slimits.count, count)
     elif(last_pmove.is_tactic_urgent()):
         count = 0
         silent_move_cnt = 0
 
         for priomove in priomoves:
-            if(priomove.find_tactic(PrioMove.TACTICS['defend-king-attack-urgent']) or
+            if(priomove.find_tactic(PrioMove.TACTICS['promotion']) or #defend-check
                priomove.find_tactic(PrioMove.TACTICS['capture-good-deal'])):
                 count += 1
                 priomove.prio = PrioMove.PRIO['prio2']
@@ -120,7 +122,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                 priomove.prio = PrioMove.PRIO['prio10']
 
         priomoves.sort(key=attrgetter('prio'))
-        return count
+        return min(slimits.count, count)
     else:
         return 0
 
@@ -142,10 +144,14 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
 
     rank_gmoves(match, priomoves, depth, slimits, last_pmove)    
     
-    maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
+    if(depth <= 12):
+        maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
+    else:
+        nodecandidates.append(None)
+        return score_position(match, len(priomoves)), nodecandidates
 
     if(depth == 1):
-        print("maxcnt: " + str(maxcnt))
+        print("************ maxcnt: " + str(maxcnt) + " ******************")
         prnt_priomoves(priomoves)
 
         if(len(priomoves) == 1):
@@ -212,12 +218,11 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
                 break # alpha cut-off
 
         if(depth == 1):
-            huge_diff = (abs(match.score) - abs(nodescore)) > abs(match.SCORES[match.PIECES['wPw']]) * 2
+            diff = match.score + nodescore
+            diff_limit = abs(match.SCORES[match.PIECES['wPw']]) * 2
+            huge_diff = diff > diff_limit
             elapsed_time = time.time() - starttime
-            if(elapsed_time > (match.seconds_per_move / maxcnt) * count):
-                exceeded = True
-            else:
-                exceeded = False
+            exceeded = elapsed_time > match.seconds_per_move
         else:
             huge_diff = False
             exceeded = False

@@ -210,8 +210,8 @@ class PrioMove:
 
     def is_tactic_urgent(self):
         for tactic in self.tactics:
-            if(tactic == self.TACTICS['defend-king-attack-urgent'] or
-               tactic == self.TACTICS['capture-good-deal'] ): #or tactic == self.TACTICS['capture-bad-deal']
+            if(tactic == self.TACTICS['promotion'] or
+               tactic == self.TACTICS['capture-good-deal']): # tactic == self.TACTICS['defend-check'] or or tactic == self.TACTICS['capture-bad-deal']
                 return True
         return False
 
