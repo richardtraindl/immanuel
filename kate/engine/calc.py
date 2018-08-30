@@ -69,22 +69,16 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     if(priomoves[0].find_tactic(PrioMove.TACTICS['defend-check'])):
         return len(priomoves)
     
-    if(depth <= 1):
-        return max(12, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
-    elif(depth <= slimits.dpth_stage1):
-        return max(slimits.count, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
+    if(depth <= slimits.dpth_stage1):
+        return max(slimits.first_count, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
     elif(depth <= slimits.dpth_stage2):
-        # and 
-        # (last_pmove.is_tactic_stormy() or is_stormy(match))):
+        return max(slimits.count, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
+    elif(depth <= slimits.dpth_stage3): # and (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
         silent_move_cnt = 0
 
         for priomove in priomoves:
             if(priomove.is_tactic_stormy()):
-            #if(priomove.find_tactic(PrioMove.TACTICS['defend-king-attack-urgent']) or
-               #priomove.find_tactic(PrioMove.TACTICS['defend-king-attack']) or
-               #priomove.find_tactic(PrioMove.TACTICS['attack-king-good-deal']) or 
-               #priomove.find_tactic(PrioMove.TACTICS['capture-good-deal'])):
                 count += 1
                 priomove.prio = PrioMove.PRIO['prio1']
                 continue
@@ -249,30 +243,30 @@ class Msgs:
 
 class SearchLimits:
     def __init__(self, match):
-        """self.count = 6
-        self.count = 6
-        self.dpth_stage1 = 2
-        self.dpth_stage2 = 5"""
         if(match.level == match.LEVELS['blitz']):
-            self.firstcount = 12
+            self.first_count = 12
             self.count = 6
-            self.dpth_stage1 = 2
-            self.dpth_stage2 = 5
-        if(match.level == match.LEVELS['low']):
-            self.firstcount = 12
+            self.dpth_stage1 = 1
+            self.dpth_stage2 = 2
+            self.dpth_stage3 = 5
+        elif(match.level == match.LEVELS['low']):
+            self.first_count = 12
             self.count = 8
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 6
+            self.dpth_stage1 = 1
+            self.dpth_stage2 = 3
+            self.dpth_stage3 = 6
         elif(match.level == match.LEVELS['medium']):
-            self.firstcount = 16
+            self.first_count = 16
             self.count = 12
-            self.dpth_stage1 = 4
-            self.dpth_stage2 = 7
+            self.dpth_stage1 = 1
+            self.dpth_stage2 = 4
+            self.dpth_stage3 = 7
         else:
-            self.firstcount = 20
+            self.first_count = 20
             self.count = 16
-            self.dpth_stage1 = 5
-            self.dpth_stage2 = 8
+            self.dpth_stage1 = 1
+            self.dpth_stage2 = 5
+            self.dpth_stage3 = 8
 
 
 def calc_move(match, msgs):
