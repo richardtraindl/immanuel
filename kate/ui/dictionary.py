@@ -38,7 +38,7 @@ def init_words():
         return False
     if(new_word("resume", word_resume, "resumes (paused) match") == False):
         return False
-    if(new_word("terminate", word_terminate, "terminates calculation") == False):
+    if(new_word("force", word_force, "terminates calculation") == False):
         return False
     if(new_word("show",   word_show, "prints debug info") == False):
         return False
@@ -125,7 +125,7 @@ def word_resume(session, params):
     return True
 
 
-def word_terminate(session, params):
+def word_force(session, params):
     if(session.thread_is_busy):
         session.msgs.terminate = True
         print("try to terminante calculation...")

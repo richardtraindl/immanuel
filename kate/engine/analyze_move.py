@@ -398,7 +398,7 @@ def is_tactical_draw(match, gmove):
 def fetch_first_tactics(priomove):
     return priomove.fetch_tactics(0)
 
-def rank_gmoves(match, priomoves, depth, slimits, last_pmove):
+def rank_gmoves(match, priomoves):
     all_attacking = []
     all_supporting = []
     all_fork_defending = []

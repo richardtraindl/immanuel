@@ -211,9 +211,19 @@ class PrioMove:
     def is_tactic_urgent(self):
         for tactic in self.tactics:
             if(tactic == self.TACTICS['promotion'] or
-               tactic == self.TACTICS['capture-good-deal']): # tactic == self.TACTICS['defend-check'] or or tactic == self.TACTICS['capture-bad-deal']
+               tactic == self.TACTICS['capture-good-deal'] or 
+               tactic == self.TACTICS['capture-bad-deal']): # tactic == self.TACTICS['defend-check'] or 
                 return True
         return False
+
+    def is_tactic_silent(self):
+        for tactic in self.tactics:
+            if(tactic == self.TACTICS['capture-bad-deal'] or
+               tactic == self.TACTICS['attack-king-bad-deal'] or
+               tactic == self.TACTICS['attack-bad-deal'] or
+               tactic == self.TACTICS[ 'support-bad-deal']):
+                return False
+        return True
 
     def concat_tactics(self, delimiter):
         str_tactics = ""

@@ -26,7 +26,8 @@ def prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescor
 def concat_fmt_gmoves(gmoves):
     str_gmoves = ""
     for gmove in gmoves:
-        str_gmoves += " [" + gmove.format_genmove() + "] "
+        if(gmove):
+            str_gmoves += " [" + gmove.format_genmove() + "] "
     return str_gmoves
 
 def prnt_priomoves(priomoves):
@@ -68,7 +69,9 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     if(priomoves[0].find_tactic(PrioMove.TACTICS['defend-check'])):
         return len(priomoves)
     
-    if(depth <= slimits.dpth_stage1):
+    if(depth <= 1):
+        return max(12, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
+    elif(depth <= slimits.dpth_stage1):
         return max(slimits.count, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
     elif(depth <= slimits.dpth_stage2):
         # and 
@@ -113,7 +116,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                 count += 1
                 priomove.prio = PrioMove.PRIO['prio3']
                 continue
-            elif(silent_move_cnt < 1):
+            elif(silent_move_cnt < 1 and priomove.is_tactic_silent()):
                 count += 1
                 silent_move_cnt += 1
                 priomove.prio = PrioMove.PRIO['prio1']
@@ -142,7 +145,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     cgenerator = cGenerator(match)
     priomoves = cgenerator.generate_moves()
 
-    rank_gmoves(match, priomoves, depth, slimits, last_pmove)    
+    rank_gmoves(match, priomoves)    
     
     if(depth <= 12):
         maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
@@ -246,26 +249,27 @@ class Msgs:
 
 class SearchLimits:
     def __init__(self, match):
+        """self.count = 6
         self.count = 6
         self.dpth_stage1 = 2
-        self.dpth_stage2 = 5
-
-        self.setlimits(match)
-
-    def setlimits(self, match):
+        self.dpth_stage2 = 5"""
         if(match.level == match.LEVELS['blitz']):
+            self.firstcount = 12
             self.count = 6
             self.dpth_stage1 = 2
             self.dpth_stage2 = 5
-        elif(match.level == match.LEVELS['low']):
+        if(match.level == match.LEVELS['low']):
+            self.firstcount = 12
             self.count = 8
             self.dpth_stage1 = 3
             self.dpth_stage2 = 6
         elif(match.level == match.LEVELS['medium']):
+            self.firstcount = 16
             self.count = 12
             self.dpth_stage1 = 4
             self.dpth_stage2 = 7
         else:
+            self.firstcount = 20
             self.count = 16
             self.dpth_stage1 = 5
             self.dpth_stage2 = 8
