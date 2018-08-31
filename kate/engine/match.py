@@ -197,7 +197,7 @@ class cMatch:
         self.black_player_name = ""
         self.black_player_is_human = True
         self.black_elapsed_seconds = 0
-        self.board = cBoard(self.PIECES)
+        self.board = cBoard()
         self.fifty_moves_count = 0
         self.white_movecnt_short_castling_lost = 0
         self.white_movecnt_long_castling_lost = 0
