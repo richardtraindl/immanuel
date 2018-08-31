@@ -1,4 +1,3 @@
-from .match import cMatch
 
 
 class cBoard:
@@ -16,46 +15,47 @@ class cBoard:
     MAX_X = 7
     MAX_Y = 7
 
-    def __init__(self):
-        self.fields = [ [cMatch.PIECES['wRk'], cMatch.PIECES['wKn'], cMatch.PIECES['wBp'], cMatch.PIECES['wQu'], cMatch.PIECES['wKg'], cMatch.PIECES['wBp'], cMatch.PIECES['wKn'], cMatch.PIECES['wRk']],
-                        [cMatch.PIECES['wPw'], cMatch.PIECES['wPw'], cMatch.PIECES['wPw'], cMatch.PIECES['wPw'], cMatch.PIECES['wPw'], cMatch.PIECES['wPw'], cMatch.PIECES['wPw'], cMatch.PIECES['wPw']],
-                        [cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk']],
-                        [cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk']],
-                        [cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk']],
-                        [cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk'], cMatch.PIECES['blk']],
-                        [cMatch.PIECES['bPw'], cMatch.PIECES['bPw'], cMatch.PIECES['bPw'], cMatch.PIECES['bPw'], cMatch.PIECES['bPw'], cMatch.PIECES['bPw'], cMatch.PIECES['bPw'], cMatch.PIECES['bPw']],
-                        [cMatch.PIECES['bRk'], cMatch.PIECES['bKn'], cMatch.PIECES['bBp'], cMatch.PIECES['bQu'], cMatch.PIECES['bKg'], cMatch.PIECES['bBp'], cMatch.PIECES['bKn'], cMatch.PIECES['bRk']] ]
+    def __init__(self, PIECES):
+        self.fields = [ [PIECES['wRk'], PIECES['wKn'], PIECES['wBp'], PIECES['wQu'], PIECES['wKg'], PIECES['wBp'], PIECES['wKn'], PIECES['wRk']],
+                        [PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw']],
+                        [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                        [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                        [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                        [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                        [PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw']],
+                        [PIECES['bRk'], PIECES['bKn'], PIECES['bBp'], PIECES['bQu'], PIECES['bKg'], PIECES['bBp'], PIECES['bKn'], PIECES['bRk']] ]
+        self.PIECES = PIECES
 
     def set_to_base(self):
-        self.fields[FIRST][FIRST] = cMatch.PIECES['wRk']
-        self.fields[FIRST][SECOND] = cMatch.PIECES['wKn']
-        self.fields[FIRST][THIRD] = cMatch.PIECES['wBp']
-        self.fields[FIRST][FOURTH] = cMatch.PIECES['wQu']
-        self.fields[FIRST][FIFTH] = cMatch.PIECES['wKg']
-        self.fields[FIRST][SIXTH] = cMatch.PIECES['wBp']
-        self.fields[FIRST][SEVENTH] = cMatch.PIECES['wKn']
-        self.fields[FIRST][EIGHTH] = cMatch.PIECES['wRk']
+        self.fields[FIRST][FIRST] = self.PIECES['wRk']
+        self.fields[FIRST][SECOND] = self.PIECES['wKn']
+        self.fields[FIRST][THIRD] = self.PIECES['wBp']
+        self.fields[FIRST][FOURTH] = self.PIECES['wQu']
+        self.fields[FIRST][FIFTH] = self.PIECES['wKg']
+        self.fields[FIRST][SIXTH] = self.PIECES['wBp']
+        self.fields[FIRST][SEVENTH] = self.PIECES['wKn']
+        self.fields[FIRST][EIGHTH] = self.PIECES['wRk']
 
         for y in range (SECOND, (SECOND + 1), 1):
             for x in range (FIRST, (EIGHTH + 1), 1):
-                self.fields[y][x] = cMatch.PIECES['wPw']
+                self.fields[y][x] = self.PIECES['wPw']
 
         for y in range (THIRD, (SIXTH + 1), 1):
             for x in range (FIRST, (EIGHTH + 1), 1):
-                self.fields[y][x] = cMatch.PIECES['blk']
+                self.fields[y][x] = self.PIECES['blk']
 
         for y in range (SEVENTH, (SEVENTH + 1), 1):
             for x in range (FIRST, (EIGHTH + 1), 1):
-                self.fields[y][x] = cMatch.PIECES['bPw']
+                self.fields[y][x] = self.PIECES['bPw']
 
-        self.fields[EIGHTH][FIRST] = cMatch.PIECES['bRk']
-        self.fields[EIGHTH][SECOND] = cMatch.PIECES['bKn']
-        self.fields[EIGHTH][THIRD] = cMatch.PIECES['bBp']
-        self.fields[EIGHTH][FOURTH] = cMatch.PIECES['bQu']
-        self.fields[EIGHTH][FIFTH] = cMatch.PIECES['bKg']
-        self.fields[EIGHTH][SIXTH] = cMatch.PIECES['bBp']
-        self.fields[EIGHTH][SEVENTH] = cMatch.PIECES['bKn']
-        self.fields[EIGHTH][EIGHTH] = cMatch.PIECES['bRk']
+        self.fields[EIGHTH][FIRST] = self.PIECES['bRk']
+        self.fields[EIGHTH][SECOND] = self.PIECES['bKn']
+        self.fields[EIGHTH][THIRD] = self.PIECES['bBp']
+        self.fields[EIGHTH][FOURTH] = self.PIECES['bQu']
+        self.fields[EIGHTH][FIFTH] = self.PIECES['bKg']
+        self.fields[EIGHTH][SIXTH] = self.PIECES['bBp']
+        self.fields[EIGHTH][SEVENTH] = self.PIECES['bKn']
+        self.fields[EIGHTH][EIGHTH] = self.PIECES['bRk']
 
     def writefield(self, x, y, value):
         self.fields[y][x] = value
@@ -68,7 +68,7 @@ class cBoard:
         y = srcy + stepy
         while(x >= self.FIRST and x <= self.EIGHTH and y >= self.FIRST and y <= self.EIGHTH):
             field = self.readfield(x, y)
-            if(field != cMatch.PIECES['blk']):
+            if(field != self.PIECES['blk']):
                 return x, y
             x += stepx
             y += stepy
