@@ -42,35 +42,35 @@ class cBoard:
                         [self.PIECES['bRk'], PIECES['bKn'], self.PIECES['bBp'], self.PIECES['bQu'], self.PIECES['bKg'], self.PIECES['bBp'], self.PIECES['bKn'], self.PIECES['bRk']] ]
 
     def set_to_base(self):
-        self.fields[FIRST][FIRST] = self.PIECES['wRk']
-        self.fields[FIRST][SECOND] = self.PIECES['wKn']
-        self.fields[FIRST][THIRD] = self.PIECES['wBp']
-        self.fields[FIRST][FOURTH] = self.PIECES['wQu']
-        self.fields[FIRST][FIFTH] = self.PIECES['wKg']
-        self.fields[FIRST][SIXTH] = self.PIECES['wBp']
-        self.fields[FIRST][SEVENTH] = self.PIECES['wKn']
-        self.fields[FIRST][EIGHTH] = self.PIECES['wRk']
+        self.fields[self.FIRST][self.FIRST] = self.PIECES['wRk']
+        self.fields[self.FIRST][self.SECOND] = self.PIECES['wKn']
+        self.fields[self.FIRST][self.THIRD] = self.PIECES['wBp']
+        self.fields[self.FIRST][self.FOURTH] = self.PIECES['wQu']
+        self.fields[self.FIRST][self.FIFTH] = self.PIECES['wKg']
+        self.fields[self.FIRST][self.SIXTH] = self.PIECES['wBp']
+        self.fields[self.FIRST][self.SEVENTH] = self.PIECES['wKn']
+        self.fields[self.FIRST][self.EIGHTH] = self.PIECES['wRk']
 
-        for y in range (SECOND, (SECOND + 1), 1):
-            for x in range (FIRST, (EIGHTH + 1), 1):
+        for y in range (self.SECOND, (self.SECOND + 1), 1):
+            for x in range (self.FIRST, (self.EIGHTH + 1), 1):
                 self.fields[y][x] = self.PIECES['wPw']
 
-        for y in range (THIRD, (SIXTH + 1), 1):
-            for x in range (FIRST, (EIGHTH + 1), 1):
+        for y in range (self.THIRD, (self.SIXTH + 1), 1):
+            for x in range (self.FIRST, (self.EIGHTH + 1), 1):
                 self.fields[y][x] = self.PIECES['blk']
 
-        for y in range (SEVENTH, (SEVENTH + 1), 1):
-            for x in range (FIRST, (EIGHTH + 1), 1):
+        for y in range (self.SEVENTH, (self.SEVENTH + 1), 1):
+            for x in range (self.FIRST, (self.EIGHTH + 1), 1):
                 self.fields[y][x] = self.PIECES['bPw']
 
-        self.fields[EIGHTH][FIRST] = self.PIECES['bRk']
-        self.fields[EIGHTH][SECOND] = self.PIECES['bKn']
-        self.fields[EIGHTH][THIRD] = self.PIECES['bBp']
-        self.fields[EIGHTH][FOURTH] = self.PIECES['bQu']
-        self.fields[EIGHTH][FIFTH] = self.PIECES['bKg']
-        self.fields[EIGHTH][SIXTH] = self.PIECES['bBp']
-        self.fields[EIGHTH][SEVENTH] = self.PIECES['bKn']
-        self.fields[EIGHTH][EIGHTH] = self.PIECES['bRk']
+        self.fields[self.EIGHTH][self.FIRST] = self.PIECES['bRk']
+        self.fields[self.EIGHTH][self.SECOND] = self.PIECES['bKn']
+        self.fields[self.EIGHTH][self.THIRD] = self.PIECES['bBp']
+        self.fields[self.EIGHTH][self.FOURTH] = self.PIECES['bQu']
+        self.fields[self.EIGHTH][self.FIFTH] = self.PIECES['bKg']
+        self.fields[self.EIGHTH][self.SIXTH] = self.PIECES['bBp']
+        self.fields[self.EIGHTH][self.SEVENTH] = self.PIECES['bKn']
+        self.fields[self.EIGHTH][self.EIGHTH] = self.PIECES['bRk']
 
     def writefield(self, x, y, value):
         self.fields[y][x] = value
