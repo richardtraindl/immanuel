@@ -70,7 +70,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return len(priomoves)
 
     if(depth <= slimits.dpth_stage1):
-        if(match.level = match.LEVELS['blitz']):
+        if(match.level == match.LEVELS['blitz']):
             return slimits.count
         else:
             return max(slimits.count, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
