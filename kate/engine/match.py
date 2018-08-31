@@ -1,4 +1,5 @@
 from datetime import datetime
+from .board import cBoard
 from .pieces.pawn import cPawn
 from .pieces.knight import cKnight
 from .pieces.bishop import cBishop
@@ -196,14 +197,7 @@ class cMatch:
         self.black_player_name = ""
         self.black_player_is_human = True
         self.black_elapsed_seconds = 0
-        self.board = [ [self.PIECES['wRk'], self.PIECES['wKn'], self.PIECES['wBp'], self.PIECES['wQu'], self.PIECES['wKg'], self.PIECES['wBp'], self.PIECES['wKn'], self.PIECES['wRk']],
-                       [self.PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw']],
-                       [self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk']],
-                       [self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk']],
-                       [self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk']],
-                       [self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk']],
-                       [self.PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw']],
-                       [self.PIECES['bRk'], self.PIECES['bKn'], self.PIECES['bBp'], self.PIECES['bQu'], self.PIECES['bKg'], self.PIECES['bBp'], self.PIECES['bKn'], self.PIECES['bRk']] ]
+        self.board = cBoard(self.PIECES)
         self.fifty_moves_count = 0
         self.white_movecnt_short_castling_lost = 0
         self.white_movecnt_long_castling_lost = 0
@@ -285,21 +279,13 @@ class cMatch:
                     self.bOfficer_cnt += 1
 
     def writefield(self, x, y, value):
-        self.board[y][x] = value
+        self.board.writefield(x, y, value)
 
     def readfield(self, x, y):
-        return self.board[y][x]
+        return self.board.readfield(x, y)
 
     def search(self, srcx, srcy, stepx, stepy):
-        x = srcx + stepx
-        y = srcy + stepy
-        while(x >= self.A1_X and x <= self.H1_X and y >= self.A1_Y and y <= self.A8_Y):
-            field = self.readfield(x, y)
-            if(field != self.PIECES['blk']):
-                return x, y
-            x += stepx
-            y += stepy
-        return self.UNDEF_X, self.UNDEF_Y
+        return self.board.search(srcx, srcy, stepx, stepy)
 
     def is_next_color_human(self):
         if(self.movecnt % 2 == 0 ):
@@ -353,18 +339,11 @@ class cMatch:
 
     @classmethod
     def is_inbounds(cls, x, y):
-        if(x < cls.A1_X or x > cls.H1_X or y < cls.A1_Y or y > cls.A8_Y):
-            return False
-        else:
-            return True
+        return self.board.is_inbounds(x, y)
 
     @classmethod
     def is_move_inbounds(cls, srcx, srcy, dstx, dsty):
-        if(srcx < cls.A1_X or srcx > cls.H1_X or srcy < cls.A1_Y or srcy > cls.A8_Y or
-           dstx < cls.A1_X or dstx > cls.H1_X or dsty < cls.A1_Y or dsty > cls.A8_Y):
-            return False
-        else:
-            return True
+        return self.board.is_move_inbounds(srcx, srcy, dstx, dsty)
 
     def is_move_valid(self, srcx, srcy, dstx, dsty, prom_piece):
         if(not self.is_move_inbounds(srcx, srcy, dstx, dsty)):
