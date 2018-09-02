@@ -31,12 +31,12 @@ def list_match_attributes(match):
     attributes.append(ClassAttr(match.seconds_per_move, "seconds_per_move"))
     attributes.append(ClassAttr(match.begin, "begin"))
     attributes.append(ClassAttr(match.time_start, "time_start"))
-    attributes.append(ClassAttr(match.white_player_name, "white_player_name"))
-    attributes.append(ClassAttr(match.white_player_is_human, "white_player_is_human"))
-    attributes.append(ClassAttr(match.white_elapsed_seconds, "white_elapsed_seconds"))
-    attributes.append(ClassAttr(match.black_player_name, "black_player_name"))
-    attributes.append(ClassAttr(match.black_player_is_human, "black_player_is_human"))
-    attributes.append(ClassAttr(match.black_elapsed_seconds, "black_elapsed_seconds"))
+    attributes.append(ClassAttr(match.white_player.name, "white_player_name"))
+    attributes.append(ClassAttr(match.white_player.is_human, "white_player_is_human"))
+    attributes.append(ClassAttr(match.white_player.elapsed_seconds, "white_elapsed_seconds"))
+    attributes.append(ClassAttr(match.black_player.name, "black_player_name"))
+    attributes.append(ClassAttr(match.black_player.is_human, "black_player_is_human"))
+    attributes.append(ClassAttr(match.black_player.elapsed_seconds, "black_elapsed_seconds"))
     attributes.append(ClassAttr(match.fifty_moves_count, "fifty_moves_count"))
     attributes.append(ClassAttr(match.white_movecnt_short_castling_lost, "white_movecnt_short_castling_lost"))
     attributes.append(ClassAttr(match.white_movecnt_long_castling_lost, "white_movecnt_long_castling_lost"))
@@ -174,4 +174,5 @@ def list_move_attributes(move):
     attributes.append(ClassAttr(move.fifty_moves_count, "fifty_moves_count"))
 
     return attributes
+
 

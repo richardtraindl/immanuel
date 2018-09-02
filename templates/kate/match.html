@@ -10,7 +10,7 @@
     <div style="display: table; width: 100%">
         <div style="display: table-row;">
             <div style="display: table-cell; width: 60%">
-                <h2>{{ match.white_player_name }} : {{ match.black_player_name }}</h2>
+                <h2>{{ match.white_player.name }} : {{ match.black_player.name }}</h2>
             </div>
             <div style="display: table-cell">
                 <p style="font-size: 12px; text-align: right;">Created on: {{ match.begin|fmtdate }}</p>
@@ -40,14 +40,14 @@
 
 
 {% block content %}
-    {% if match.white_player_is_human and match.black_player_is_human %}
+    {% if match.white_player.is_human and match.black_player.is_human %}
         <div id="chat">
-            {% include "kate/_chat.html" with match=match %}
+            {% include "kate/_chat.html" with match=match switch=switch %}
         </div>
     {% endif %}
 
     <div id="board-wrapper">
-        {% include "kate/_board.html" %}
+        {% include "kate/_board.html" with match=match %}
     </div>
 
     <div id="minutes">

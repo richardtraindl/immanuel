@@ -129,7 +129,11 @@ class cGenerator:
                         dsty = y + stepy
                         flag, errmsg = self.match.is_move_valid(x, y, dstx, dsty, prom_piece)
                         if(flag):
-                            gmove = GenMove(x, y, dstx, dsty, prom_piece)
+                            if(self.match.readfield(dstx, dsty) != self.match.PIECES['blk']):
+                                captures = True
+                            else:
+                                captures = False
+                            gmove = GenMove(x, y, dstx, dsty, prom_piece, captures)
                             priomove = PrioMove(gmove)
                             priomoves.append(priomove)
                         elif(errmsg != cValidator.RETURN_CODES['king-error']):

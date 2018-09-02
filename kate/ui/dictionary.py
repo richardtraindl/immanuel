@@ -93,19 +93,19 @@ def new_match(lstparam):
 
     match = cMatch()
 
-    match.white_player_name = lstparam[0]
+    match.white_player.name = lstparam[0]
 
     if(lstparam[1] == "h" or lstparam[1] == "0"):
-        match.white_player_is_human = True
+        match.white_player.is_human = True
     else:
-        match.white_player_is_human = False
+        match.white_player.is_human = False
 
-    match.black_player_name = lstparam[2]
+    match.black_player.name = lstparam[2]
 
     if(lstparam[3] == "h" or lstparam[3] == "0"):
-        match.black_player_is_human = True
+        match.black_player.is_human = True
     else:
-        match.black_player_is_human = False
+        match.black_player.is_human = False
 
     return match
 
@@ -160,21 +160,21 @@ def word_set(session, params):
         except KeyError:
             print("??? value")
     elif(tokens[0] == "white-player"):
-        session.match.white_player_name = tokens[1]
+        session.match.white_player.name = tokens[1]
     elif(tokens[0] == "black-player"):
-        session.match.black_player_name = tokens[1]
+        session.match.black_player.name = tokens[1]
     elif(tokens[0] == "white-human"):
         if(tokens[1] == "J" or tokens[1] == "j"):
-            session.match.white_player_is_human = True
+            session.match.white_player.is_human = True
         else:
-            session.match.white_player_is_human = False
-            session.match.black_player_is_human = True
+            session.match.white_player.is_human = False
+            session.match.black_player.is_human = True
     elif(tokens[0] == "black-human"):
         if(tokens[1] == "J" or tokens[1] == "j"):
-            session.match.black_player_is_human = True
+            session.match.black_player.is_human = True
         else:
-            session.match.black_player_is_human = False
-            session.match.white_player_is_human = True
+            session.match.black_player.is_human = False
+            session.match.white_player.is_human = True
     else:
         print("??? params...")
 

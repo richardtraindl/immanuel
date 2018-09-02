@@ -4,16 +4,16 @@
         <div class="tiny-gap" style="display: grid; grid-template-columns: 2fr 6fr 16fr; grid-gap: 4px;">
             <p>&nbsp;</p>
             
-            {% if match.white_player_is_human == False %}
-                <p class="fbold">{{ match.white_player_name }}</p>
+            {% if match.white_player.is_human == False %}
+                <p class="fbold">{{ match.white_player.name }}</p>
             {% else %}
-                <p>{{ match.white_player_name }}</p>
+                <p>{{ match.white_player.name }}</p>
             {% endif %}
 
-            {% if match.black_player_is_human == False %}
-                <p class="fbold"> {{ match.black_player_name }}</p>
+            {% if match.black_player.is_human == False %}
+                <p class="fbold"> {{ match.black_player.name }}</p>
             {% else %}
-                <p>{{ match.black_player_name }}</p>
+                <p>{{ match.black_player.name }}</p>
             {% endif %}
         </div>
 

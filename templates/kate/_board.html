@@ -31,9 +31,9 @@
 
         <div class="tiny-gap" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-gap: 4px;">
             <p>Time White:</p>
-            <p id="white-time">{{ match.white_elapsed_seconds|fmttime }}</p>
+            <p id="white-time">{{ match.white_player.elapsed_seconds|fmttime }}</p>
             <p>Time Black:</p>
-            <p id="black-time">{{ match.black_elapsed_seconds|fmttime }}</p>
+            <p id="black-time">{{ match.black_player.elapsed_seconds|fmttime }}</p>
         </div>
 
         <table id="board" matchid="{{ match.id }}" movecnt="{{ match.movecnt }}">

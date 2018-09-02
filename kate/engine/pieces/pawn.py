@@ -156,7 +156,10 @@ class cPawn(cPiece):
                     return self.is_black_ep_move_ok(dstx, dsty)
 
             # check promotion
-            if(dsty == 0 and prom_piece != self.match.PIECES['bQu'] and prom_piece != self.match.PIECES['bRk'] and prom_piece != self.match.PIECES['bBp'] and prom_piece != self.match.PIECES['bKn']):
+            if(dsty == 0 and prom_piece != self.match.PIECES['bQu'] and 
+               prom_piece != self.match.PIECES['bRk'] and 
+               prom_piece != self.match.PIECES['bBp'] and 
+               prom_piece != self.match.PIECES['bKn']):
                 return False
             elif(dsty > 0 and prom_piece != self.match.PIECES['blk']):
                 return False
@@ -164,65 +167,58 @@ class cPawn(cPiece):
         return True
 
     def do_move(self, dstx, dsty, prom_piece):
-        move = cMove(self.match, 
-                    self.match.movecnt + 1, 
-                    cMove.TYPES['standard'],
-                    self.xpos, 
-                    self.ypos, 
-                    dstx, 
-                    dsty, 
-                    None,
-                    None,
-                    self.match.PIECES['blk'], 
-                    prom_piece, 
-                    self.match.fifty_moves_count)
+        dstpiece = self.match.readfield(dstx, dsty)
 
-        srcpiece = self.match.readfield(move.srcx, move.srcy)
-        dstpiece = self.match.readfield(move.dstx, move.dsty)
+        if(dstpiece == self.match.PIECES['wQu']):
+            self.match.wQu_cnt -= 1
+        elif(dstpiece == self.match.PIECES['bQu']):
+            self.match.bQu_cnt -= 1
+        elif(dstpiece == self.match.PIECES['wKn'] or dstpiece == self.match.PIECES['wBp'] or dstpiece == self.match.PIECES['wRk']):
+            self.match.wOfficer_cnt -= 1
+        elif(dstpiece == self.match.PIECES['bKn'] or dstpiece == self.match.PIECES['bBp'] or dstpiece == self.match.PIECES['bRk']):
+            self.match.bOfficer_cnt -= 1
 
         if(prom_piece != self.match.PIECES['blk']):
-            move.move_type = move.TYPES['promotion']
-            move.captured_piece = dstpiece
-
+            move_type = cMove.TYPES['promotion']
+            e_p_fieldx = None
+            e_p_fieldy = None
+            captured_piece = dstpiece
             self.match.movecnt += 1 
-            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
-            self.match.writefield(move.dstx, move.dsty, move.prom_piece)
+            self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+            self.match.writefield(dstx, dsty, prom_piece)
             self.match.fifty_moves_count = 0
-            self.match.score -= (self.match.SCORES[move.prom_piece] - self.match.SCORES[srcpiece])
+            self.match.score -= (self.match.SCORES[prom_piece] - self.match.SCORES[self.piece])
             self.match.score += self.match.SCORES[dstpiece]
-            self.match.move_list.append(move)
-            return move
-        elif(dstpiece == self.match.PIECES['blk'] and move.srcx != move.dstx):
-            move.move_type = cMove.TYPES['en_passant']
-            move.e_p_fieldx = move.dstx
-            move.e_p_fieldy = move.srcy
-            enemy = self.match.readfield(move.e_p_fieldx, move.e_p_fieldy)
-            move.captured_piece = enemy
-
+        elif(dstpiece == self.match.PIECES['blk'] and self.xpos != dstx):
+            move_type = cMove.TYPES['en_passant']
+            e_p_fieldx = dstx
+            e_p_fieldy = self.ypos
+            captured_piece = self.match.readfield(e_p_fieldx, e_p_fieldy)
             self.match.movecnt += 1 
-            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
-            self.match.writefield(move.dstx, move.dsty, srcpiece)
+            self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+            self.match.writefield(dstx, dsty, self.piece)
             self.match.fifty_moves_count = 0
-            self.match.writefield(move.e_p_fieldx, move.e_p_fieldy, self.match.PIECES['blk'])
-            self.match.score += self.match.SCORES[enemy]
-            self.match.move_list.append(move)
-            return move
+            self.match.writefield(e_p_fieldx, e_p_fieldy, self.match.PIECES['blk'])
+            self.match.score += self.match.SCORES[captured_piece]
         else:
-            move.captured_piece = dstpiece
-
+            move_type = cMove.TYPES['standard']
+            e_p_fieldx = None
+            e_p_fieldy = None
+            captured_piece = dstpiece
             self.match.movecnt += 1
-            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
-            self.match.writefield(move.dstx, move.dsty, srcpiece)
+            self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+            self.match.writefield(dstx, dsty, self.piece)
             if(dstpiece != self.match.PIECES['blk']):
                 self.match.fifty_moves_count = 0
-                move.fifty_moves_count = self.match.fifty_moves_count
             else:
                 self.match.fifty_moves_count += 1
-                move.fifty_moves_count = self.match.fifty_moves_count
-
             self.match.score += self.match.SCORES[dstpiece]
-            self.match.move_list.append(move)
-            return move
+
+        move = cMove(self.match, self.match.movecnt, move_type,
+                     self.xpos, self.ypos, dstx, dsty, e_p_fieldx, e_p_fieldy,
+                     captured_piece, prom_piece, self.match.fifty_moves_count)
+        self.match.move_list.append(move)
+        return move
 
     def undo_move(self, move):
         if(move.captured_piece == self.match.PIECES['wQu']):
@@ -238,24 +234,22 @@ class cPawn(cPiece):
         self.match.fifty_moves_count = move.fifty_moves_count
 
         if(move.move_type == move.TYPES['standard']):
-            piece = self.match.readfield(move.dstx, move.dsty)
-            self.match.writefield(move.srcx, move.srcy, piece)
+            self.match.writefield(move.srcx, move.srcy, self.piece)
             self.match.writefield(move.dstx, move.dsty, move.captured_piece)
             self.match.score -= self.match.SCORES[move.captured_piece]
             return move
         elif(move.move_type == move.TYPES['promotion']):
-            if(move.dsty == 7):
-                piece = self.match.PIECES['wPw']
+            if(self.match.color_of_piece(self.piece) == self.match.COLORS['white']):
+                origin = self.match.PIECES['wPw']
             else:
-                piece = self.match.PIECES['bPw']
-            self.match.writefield(move.srcx, move.srcy, piece)
+                origin = self.match.PIECES['bPw']
+            self.match.writefield(move.srcx, move.srcy, origin)
             self.match.writefield(move.dstx, move.dsty, move.captured_piece)
-            self.match.score += (self.match.SCORES[move.prom_piece] - self.match.SCORES[piece])
+            self.match.score += (self.match.SCORES[move.prom_piece] - self.match.SCORES[origin])
             self.match.score -= self.match.SCORES[move.captured_piece]
             return move
         elif(move.move_type == move.TYPES['en_passant']):
-            piece = self.match.readfield(move.dstx, move.dsty)
-            self.match.writefield(move.srcx, move.srcy, piece)
+            self.match.writefield(move.srcx, move.srcy, self.piece)
             self.match.writefield(move.dstx, move.dsty, self.match.PIECES['blk'])
             self.match.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
             self.match.score -= self.match.SCORES[move.captured_piece]
@@ -265,32 +259,34 @@ class cPawn(cPiece):
         if(len(self.match.move_list) == 0):
             return False
         else:
-            move = self.match.move_list[-1]
+            lastmove = self.match.move_list[-1]
 
         dstpiece = self.match.readfield(dstx, dsty)
-        opp_piece = self.match.readfield(move.dstx, move.dsty)
-        if(dstpiece == self.match.PIECES['blk'] and opp_piece == self.match.PIECES['bPw'] and 
-           move.srcy - move.dsty == 2 and move.dsty == self.ypos and move.dstx == dstx and 
-           move.dsty - dsty == -1):
-            return True
-        else:
-            return False
+        enemy = self.match.readfield(lastmove.dstx, lastmove.dsty)
+        if(dstpiece == self.match.PIECES['blk'] and enemy == self.match.PIECES['bPw']):
+            if(lastmove.srcy - lastmove.dsty == 2 and 
+               lastmove.dsty == self.ypos and 
+               lastmove.dstx == dstx and 
+               lastmove.dsty - dsty == -1):
+                return True
+        return False
 
     def is_black_ep_move_ok(self, dstx, dsty):
         if(len(self.match.move_list) == 0):
             return False
         else:
-            move = self.match.move_list[-1]
+            lastmove = self.match.move_list[-1]
 
         dstpiece = self.match.readfield(dstx, dsty)
-        opp_piece = self.match.readfield(move.dstx, move.dsty)
-        if(dstpiece == self.match.PIECES['blk'] and opp_piece == self.match.PIECES['wPw'] and 
-           move.srcy - move.dsty == -2 and move.dsty == self.ypos and move.dstx == dstx and 
-           move.dsty - dsty == 1):
-            return True
-        else:
-            return False
-        
+        enemy = self.match.readfield(lastmove.dstx, lastmove.dsty)
+        if(dstpiece == self.match.PIECES['blk'] and enemy == self.match.PIECES['wPw']):
+            if(lastmove.srcy - lastmove.dsty == -2 and 
+               lastmove.dsty == self.ypos and 
+               lastmove.dstx == dstx and 
+               lastmove.dsty - dsty == 1):
+                return True
+        return False
+
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
         from .. analyze_helper import field_touches_beyond
 

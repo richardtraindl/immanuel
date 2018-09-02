@@ -44,5 +44,9 @@ def retrieve_move(match):
         candidate = candidates[idx]
         srcx, srcy = coord_to_index(candidate[:2])
         dstx, dsty = coord_to_index(candidate[3:])
-        return GenMove(srcx, srcy, dstx, dsty, match.PIECES['blk'])
+        if(match.readfield(dstx, dsty) != match.PIECES['blk']):
+            captures = True
+        else:
+            captures = False
+        return GenMove(srcx, srcy, dstx, dsty, match.PIECES['blk'], captures)
 

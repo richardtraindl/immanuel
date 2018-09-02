@@ -21,12 +21,20 @@ def map_matches(src, dst, map_dir):
     dst.level = src.level
     dst.begin = src.begin
     dst.time_start = src.time_start
-    dst.white_player_name = src.white_player_name
-    dst.white_player_is_human = src.white_player_is_human
-    dst.white_elapsed_seconds = src.white_elapsed_seconds
-    dst.black_player_name = src.black_player_name
-    dst.black_player_is_human = src.black_player_is_human
-    dst.black_elapsed_seconds = src.black_elapsed_seconds
+    if(map_dir == MAP_DIR['model-to-engine']):
+        dst.white_player.name = src.white_player_name
+        dst.white_player.is_human = src.white_player_is_human
+        dst.white_player.elapsed_seconds = src.white_elapsed_seconds
+        dst.black_player.name = src.black_player_name
+        dst.black_player.is_human = src.black_player_is_human
+        dst.black_player.elapsed_seconds = src.black_elapsed_seconds
+    else:
+        dst.white_player_name = src.white_player.name
+        dst.white_player_is_human = src.white_player.is_human
+        dst.white_elapsed_seconds = src.white_player.elapsed_seconds
+        dst.black_player_name = src.black_player.name
+        dst.black_player_is_human = src.black_player.is_human
+        dst.black_elapsed_seconds = src.black_player.elapsed_seconds
 
     for y in range(8):
         for x in range(8):
@@ -88,9 +96,9 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     if(match.time_start > 0):
         elapsed_time = time.time() - match.time_start
         if(match.next_color() == match.COLORS['white']):
-            match.white_elapsed_seconds += elapsed_time
+            match.white_player.elapsed_seconds += elapsed_time
         else:
-            match.black_elapsed_seconds += elapsed_time
+            match.black_player.elapsed_seconds += elapsed_time
 
     match.time_start = time.time()
     ###

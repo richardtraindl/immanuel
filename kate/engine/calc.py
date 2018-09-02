@@ -1,4 +1,4 @@
-import time
+import time, copy
 from operator import attrgetter
 from .match import *
 from .move import *
@@ -20,17 +20,17 @@ def prnt_before_calc(match, count, priomove):
 
 def prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescore):
     print("CURR SEARCH: " + str(score).rjust(8, " ") + \
-          " [" + gmove.format_genmove() + "] " + concat_fmt_gmoves(newcandidates))
-    print("CANDIDATES:  " + str(nodescore).rjust(8, " ") + concat_fmt_gmoves(nodecandidates))
+          " [" + gmove.format_genmove() + "] " + concat_fmt_gmoves(match, newcandidates))
+    print("CANDIDATES:  " + str(nodescore).rjust(8, " ") + concat_fmt_gmoves(match, nodecandidates))
 
-def concat_fmt_gmoves(gmoves):
+def concat_fmt_gmoves(match, gmoves):
     str_gmoves = ""
     for gmove in gmoves:
         if(gmove):
             str_gmoves += " [" + gmove.format_genmove() + "] "
     return str_gmoves
 
-def prnt_priomoves(priomoves):
+def prnt_priomoves(match, priomoves):
     for priomove in priomoves:
         print("\n" + priomove.gmove.format_genmove(), end=" ")
         priomove.prnt_tactics()
@@ -39,6 +39,33 @@ def prnt_fmttime(msg, seconds):
     minute, sec = divmod(seconds, 60)
     hour, minute = divmod(minute, 60)
     print( msg + "%02d:%02d:%02d" % (hour, minute, sec))
+
+
+class Msgs:
+    def __init__(self):
+        self.created_at = time.time()
+        self.terminate = False
+        self.currentsearch = []
+
+
+class SearchLimits:
+    def __init__(self, match):
+        if(match.level == match.LEVELS['blitz']):
+            self.count = 6
+            self.dpth_stage1 = 2
+            self.dpth_stage2 = 5
+        elif(match.level == match.LEVELS['low']):
+            self.count = 8
+            self.dpth_stage1 = 3
+            self.dpth_stage2 = 6
+        elif(match.level == match.LEVELS['medium']):
+            self.count = 12
+            self.dpth_stage1 = 4
+            self.dpth_stage2 = 7
+        else:
+            self.count = 16
+            self.dpth_stage1 = 5
+            self.dpth_stage1 = 8
 
 
 def append_newmove(gmove, nodecandidates, newcandidates):
@@ -70,10 +97,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return len(priomoves)
 
     if(depth <= slimits.dpth_stage1):
-        if(match.level == match.LEVELS['blitz']):
-            return slimits.count
-        else:
-            return max(slimits.count, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
+        return max(slimits.count, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
     elif(depth <= slimits.dpth_stage2): # and (last_pmove.is_tactic_stormy() or is_stormy(match))):
         count = 0
         silent_move_cnt = 0
@@ -150,7 +174,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
 
     if(depth == 1):
         print("************ maxcnt: " + str(maxcnt) + " ******************")
-        prnt_priomoves(priomoves)
+        prnt_priomoves(match, priomoves)
 
         if(len(priomoves) == 1):
             pmove = priomoves[0]
@@ -235,33 +259,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     return nodescore, nodecandidates
 
 
-class Msgs:
-    def __init__(self):
-        self.created_at = time.time()
-        self.terminate = False
-        self.currentsearch = []
-
-
-class SearchLimits:
-    def __init__(self, match):
-        if(match.level == match.LEVELS['blitz']):
-            self.count = 6
-            self.dpth_stage1 = 2
-            self.dpth_stage2 = 5
-        elif(match.level == match.LEVELS['low']):
-            self.count = 8
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 6
-        elif(match.level == match.LEVELS['medium']):
-            self.count = 12
-            self.dpth_stage1 = 4
-            self.dpth_stage2 = 7
-        else:
-            self.count = 16
-            self.dpth_stage1 = 5
-            self.dpth_stage1 = 8
-
-
 def calc_move(match, msgs):
     print("is opening: " + str(is_opening(match)) + " is endgame: " + str(is_endgame(match)))
 
@@ -284,15 +281,15 @@ def calc_move(match, msgs):
     ### time
     elapsed_time = time.time() - match.time_start
     if(match.next_color() == match.COLORS['white']):
-        match.white_elapsed_seconds += elapsed_time
+        match.white_player.elapsed_seconds += elapsed_time
     else:
-        match.black_elapsed_seconds += elapsed_time
+        match.black_player.elapsed_seconds += elapsed_time
 
     match.time_start = time.time()
     ###
 
     msg = "result: " + str(score) + " match: " + str(match.begin) + " "
-    print(msg + concat_fmt_gmoves(candidates))
+    print(msg + concat_fmt_gmoves(match, candidates))
     prnt_fmttime("\ncalc-time: ", elapsed_time)
     return candidates
 

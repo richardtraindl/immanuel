@@ -1,5 +1,6 @@
 from datetime import datetime
 from .board import cBoard
+from .player import cPlayer
 from .pieces.pawn import cPawn
 from .pieces.knight import cKnight
 from .pieces.bishop import cBishop
@@ -191,13 +192,9 @@ class cMatch:
         self.seconds_per_move = self.SECONDS_PER_MOVE[self.level]
         self.begin = datetime.now()
         self.time_start = 0
-        self.white_player_name = ""
-        self.white_player_is_human = True
-        self.white_elapsed_seconds= 0
-        self.black_player_name = ""
-        self.black_player_is_human = True
-        self.black_elapsed_seconds = 0
-        self.board = cBoard()
+        self.white_player = cPlayer(self.COLORS['white'], "", True, 0)
+        self.black_player = cPlayer(self.COLORS['black'], "", True, 0)
+        self.board = cBoard(self.PIECES)
         self.fifty_moves_count = 0
         self.white_movecnt_short_castling_lost = 0
         self.white_movecnt_long_castling_lost = 0
@@ -289,9 +286,9 @@ class cMatch:
 
     def is_next_color_human(self):
         if(self.movecnt % 2 == 0 ):
-            return self.white_player_is_human
+            return self.white_player.is_human
         else:
-            return self.black_player_is_human
+            return self.black_player.is_human
 
     def next_color(self):
         if(self.movecnt % 2 == 0 ):
@@ -337,12 +334,10 @@ class cMatch:
         color = cls.PIECES_COLOR[piece]
         return cls.REVERSED_COLORS[color]
 
-    @classmethod
-    def is_inbounds(cls, x, y):
+    def is_inbounds(self, x, y):
         return self.board.is_inbounds(x, y)
 
-    @classmethod
-    def is_move_inbounds(cls, srcx, srcy, dstx, dsty):
+    def is_move_inbounds(self, srcx, srcy, dstx, dsty):
         return self.board.is_move_inbounds(srcx, srcy, dstx, dsty)
 
     def is_move_valid(self, srcx, srcy, dstx, dsty, prom_piece):
@@ -427,7 +422,7 @@ class cMatch:
 
         piece = self.readfield(move.dstx, move.dsty)
 
-        if(piece == self.PIECES['wPw'] or piece == self.PIECES['bPw']):
+        if(move.move_type == move.TYPES['promotion'] or piece == self.PIECES['wPw'] or piece == self.PIECES['bPw']):
             cpawn = cPawn(self, move.dstx, move.dsty)
             return cpawn.undo_move(move)
         elif(piece == self.PIECES['wRk'] or piece == self.PIECES['bRk']):
@@ -450,7 +445,7 @@ class cMatch:
         piece = self.readfield(srcx, srcy)
 
         pawnenmy = None
-        if(piece == self.PIECES['wPw']):
+        """if(piece == self.PIECES['wPw']):
             cpawn = cPawn(self, srcx, srcy)
             if(cpawn.is_white_ep_move_ok(dstx, dsty)):
                 pawnenmy = self.readfield(dstx, srcy)
@@ -459,7 +454,7 @@ class cMatch:
             cpawn = cPawn(self, srcx, srcy)
             if(cpawn.is_black_ep_move_ok(dstx, dsty)):
                 pawnenmy = self.readfield(dstx, srcy)
-                self.writefield(dstx, srcy, self.PIECES['blk'])
+                self.writefield(dstx, srcy, self.PIECES['blk'])"""
 
         self.writefield(srcx, srcy, self.PIECES['blk'])
         dstpiece = self.readfield(dstx, dsty)

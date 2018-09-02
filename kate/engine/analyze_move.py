@@ -316,13 +316,12 @@ def blocks(match, gmove):
 
     oppenents = search_opposed_pieces(match, color, gmove.dstx, gmove.dsty, gmove.srcx, gmove.srcy)
 
-    count = 0
     for oppenent in oppenents:
-        if(match.PIECES_RANK[oppenent[0].piece] > match.PIECES_RANK[oppenent[1].piece] or
-           match.PIECES_RANK[oppenent[0].piece] >= match.PIECES_RANK[piece]):
-            count += 1
+        if(match.PIECES_RANK[oppenent[0].piece] > match.PIECES_RANK[oppenent[1].piece] and 
+           match.PIECES_RANK[oppenent[0].piece] > match.PIECES_RANK[piece]):
+            return True
 
-    return count > 0
+    return False
 
 
 def running_pawn_in_endgame(match, gmove):

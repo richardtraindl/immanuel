@@ -20,7 +20,6 @@ from .engine.debug import list_match_attributes
 def index(request):
     context = RequestContext(request)
     modelmatches = ModelMatch.objects.order_by("begin").reverse()[:10]
-
     return render(request, 'kate/index.html', { 'matches': modelmatches } )
 
 
@@ -203,7 +202,7 @@ def settings(request, matchid=None):
             modelmatch.black_player_is_human = form.black_player_is_human
             modelmatch.level = form.level
             modelmatch.save()
-            
+
             if(create):
                 interface.calc_move_for_immanuel(modelmatch)
 
@@ -227,9 +226,7 @@ def settings(request, matchid=None):
 
 def delete(request, matchid=None):
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-    
     ModelMatch.objects.filter(id=modelmatch.id).delete()
-
     return HttpResponseRedirect('/kate/')
 
 
@@ -240,12 +237,14 @@ def fetch_match(request):
     if(matchid):
         matchid = int(matchid)
     else:
+        print("from fetch_match: no changes")
         return
 
     movecnt = request.GET.get('movecnt', None)
     if(movecnt):
         movecnt = int(movecnt)
     else:
+        print("from fetch_match: no changes")
         return
 
     modelmatch = ModelMatch.objects.get(id=matchid)
@@ -257,17 +256,18 @@ def fetch_match(request):
         elapsed_time = 0
 
     if(match.next_color() == match.COLORS['white']):
-        match.white_elapsed_seconds += elapsed_time
+        match.white_player.elapsed_seconds += elapsed_time
     else:
-        match.black_elapsed_seconds += elapsed_time
+        match.black_player.elapsed_seconds += elapsed_time
 
     lastmove = ModelMove.objects.filter(match_id=modelmatch.id).order_by("count").last()
 
     if(modelmatch and lastmove and lastmove.count > movecnt):
-        data = "1" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds)
+        data = "1" + "|" + fmttime(match.white_player.elapsed_seconds) + "|" + fmttime(match.black_player.elapsed_seconds)
     else:
-        data = "0" + "|" + fmttime(match.white_elapsed_seconds) + "|" + fmttime(match.black_elapsed_seconds)
+        data = "0" + "|" + fmttime(match.white_player.elapsed_seconds) + "|" + fmttime(match.black_player.elapsed_seconds)
 
+    print("response from fetch_match: " + data)
     return HttpResponse(data)
 
 
@@ -346,28 +346,28 @@ def import_match(request):
             modelmatch.begin = datetime.strptime(strdatetime, '%Y-%m-%d-%H:%M:%S')
 
             result = re.search(r"white_player_name:\s*(?P<white_player_name>\w+)", form.match_data)
-            modelmatch.white_player_name = result.group("white_player_name")
+            modelmatch.white_player.name = result.group("white_player_name")
             
             result = re.search(r"white_player_is_human:\s*(?P<white_player_is_human>\w+)", form.match_data)
             if(result.group("white_player_is_human") == "True"):
-                modelmatch.white_player_is_human = True
+                modelmatch.white_player.is_human = True
             else:
-                modelmatch.white_player_is_human = False
+                modelmatch.white_player.is_human = False
 
             result = re.search(r"white_elapsed_seconds:\s*(?P<white_elapsed_seconds>\w+)", form.match_data)
-            modelmatch.white_elapsed_seconds = int(result.group("white_elapsed_seconds"))
+            modelmatch.white_player.elapsed.seconds = int(result.group("white_elapsed_seconds"))
 
             result = re.search(r"black_player_name:\s*(?P<black_player_name>\w+)", form.match_data)
-            modelmatch.black_player_name = result.group("black_player_name")
+            modelmatch.black_player.name = result.group("black_player_name")
             
             result = re.search(r"black_player_is_human:\s*(?P<black_player_is_human>\w+)", form.match_data)
             if(result.group("black_player_is_human") == "True"):
-                modelmatch.black_player_is_human = True
+                modelmatch.black_player.is_human = True
             else:
-                modelmatch.black_player_is_human = False
+                modelmatch.black_player.is_human = False
 
             result = re.search(r"black_elapsed_seconds:\s*(?P<black_elapsed_seconds>\w+)", form.match_data)
-            modelmatch.black_elapsed_seconds = int(result.group("black_elapsed_seconds"))
+            modelmatch.black_player.elapsed_seconds = int(result.group("black_elapsed_seconds"))
 
             modelmatch.save()
 

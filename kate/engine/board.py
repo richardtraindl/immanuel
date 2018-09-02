@@ -10,36 +10,22 @@ class cBoard:
     SEVENTH = 6
     EIGHTH = 7
     UNDEF = 8
+
     MIN_X = 0
     MIN_Y = 0
     MAX_X = 7
     MAX_Y = 7
 
-    PIECES = {
-            'blk' : 0,
-            'wKg' : 1,
-            'wPw' : 2,
-            'wRk' : 3,
-            'wKn' : 4,
-            'wBp' : 5,
-            'wQu' : 6,
-            'bKg' : 9,
-            'bPw' : 10,
-            'bRk' : 11,
-            'bKn' : 12,
-            'bBp' : 13,
-            'bQu' : 14 
-        }
-
-    def __init__(self):
-        self.fields = [ [self.PIECES['wRk'], PIECES['wKn'], self.PIECES['wBp'], self.PIECES['wQu'], self.PIECES['wKg'], self.PIECES['wBp'], self.PIECES['wKn'], self.PIECES['wRk']],
-                        [self.PIECES['wPw'], PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw'], self.PIECES['wPw']],
-                        [self.PIECES['blk'], PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk']],
-                        [self.PIECES['blk'], PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk']],
-                        [self.PIECES['blk'], PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk']],
-                        [self.PIECES['blk'], PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk'], self.PIECES['blk']],
-                        [self.PIECES['bPw'], PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw'], self.PIECES['bPw']],
-                        [self.PIECES['bRk'], PIECES['bKn'], self.PIECES['bBp'], self.PIECES['bQu'], self.PIECES['bKg'], self.PIECES['bBp'], self.PIECES['bKn'], self.PIECES['bRk']] ]
+    def __init__(self, PIECES):
+        self.PIECES = PIECES
+        self.fields = [ [PIECES['wRk'], PIECES['wKn'], PIECES['wBp'], PIECES['wQu'], PIECES['wKg'], PIECES['wBp'], PIECES['wKn'], PIECES['wRk']],
+                        [PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw'], PIECES['wPw']],
+                        [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                        [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                        [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                        [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
+                        [PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw']],
+                        [PIECES['bRk'], PIECES['bKn'], PIECES['bBp'], PIECES['bQu'], PIECES['bKg'], PIECES['bBp'], PIECES['bKn'], PIECES['bRk']] ]
 
     def set_to_base(self):
         self.fields[self.FIRST][self.FIRST] = self.PIECES['wRk']
