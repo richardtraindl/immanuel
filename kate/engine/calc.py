@@ -53,19 +53,19 @@ class SearchLimits:
         if(match.level == match.LEVELS['blitz']):
             self.count = 6
             self.dpth_stage1 = 2
-            self.dpth_stage2 = 5
+            self.dpth_stage2 = 4
         elif(match.level == match.LEVELS['low']):
             self.count = 8
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 6
+            self.dpth_stage1 = 2
+            self.dpth_stage2 = 5
         elif(match.level == match.LEVELS['medium']):
             self.count = 12
-            self.dpth_stage1 = 4
-            self.dpth_stage2 = 7
+            self.dpth_stage1 = 3
+            self.dpth_stage2 = 6
         else:
             self.count = 16
-            self.dpth_stage1 = 5
-            self.dpth_stage1 = 8
+            self.dpth_stage1 = 4
+            self.dpth_stage1 = 7
 
 
 def append_newmove(gmove, nodecandidates, newcandidates):
