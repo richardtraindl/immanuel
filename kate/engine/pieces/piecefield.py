@@ -37,7 +37,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1 != self.match.UNDEF_X):
+            if(x1):
                 piece = self.match.readfield(x1, y1)
                 flag = False
                 if(color == self.match.COLORS['white']):
@@ -72,7 +72,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1 != self.match.UNDEF_X):
+            if(x1):
                 piece = self.match.readfield(x1, y1)
                 wflag = False
                 for face in self.white_faces:
@@ -99,7 +99,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1 != self.match.UNDEF_X):
+            if(x1):
                 piece = self.match.readfield(x1, y1)
                 cpiece = self.obj_for_piece(piece, x1, y1)
                 if(cpiece.is_move_stuck(self.fieldx, self.fieldy)):
@@ -126,7 +126,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1 != self.match.UNDEF_X):
+            if(x1):
                 piece = self.match.readfield(x1, y1)
 
                 cpiece = self.obj_for_piece(piece, self.fieldx, self.fieldy)

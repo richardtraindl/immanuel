@@ -101,6 +101,11 @@ class GenMove(object):
 
 # class end
 
+class cTactic:
+    def __init__(self, tactic=None, subtactic=None):
+        self.tactic = tactic
+        self.subtactic = subtactic
+# class end
 
 class PrioMove:
     PRIO = {
@@ -116,70 +121,124 @@ class PrioMove:
         'prio10' : 9 }
 
     TACTICS = {
-        'defend-check' : 0,
-        'defend-king-attack-urgent' : 1,
-        'defend-king-attack' : 2,
-        'promotion' : 3,
-        'tactical-draw' : 4,
-        'capture-good-deal' : 5,
-        'running-pawn-in-endgame' : 6, 
-        'attack-king-good-deal' : 7,
-        'does-unpin' : 8, 
-        'attack-stormy' : 9,
-        'flee-urgent' : 10,
-        'support-good-deal' : 11,
-        'block' : 12,
-        'discl-support-good-deal' : 13,
-        'defend-fork' : 14,
-        'attack-good-deal' : 15,
-        'discl-attack-good-deal' : 16,
-        'controles-file-good-deal' : 17,
-        'castling' : 18,
-        'capture-bad-deal' : 19,
-        'attack-king-bad-deal' : 20,
-        'defend-fork-downgraded' : 21,
-        'flee-downgraded' : 22,
-        'support-downgraded' : 23,
-        'attack-downgraded' : 24,
-        'support-unattacked' : 25,
-        'progress' : 26, 
-        'flee' : 27,
-        'attack-bad-deal' : 28,
-        'support-bad-deal' : 29,
-        'undefined' : 30 }
+        'defend-check' :        10,
+        'capture' :             20,  # 'good-deal' | 'bad-deal'
+        'attack-king' :         30,  # 'good-deal' | 'bad-deal'
+        'attack' :              40,  # 'stormy' | 'good-deal' | 'bad-deal'
+        'discl-attack' :        50,  # 'good-deal' | 'bad-deal' | 'downgraded'
+        'support' :             60,  # 'good-deal' | 'bad-deal'
+        'discl-support' :       70,  # 'good-deal' | 'bad-deal' | 'downgraded'
+        'support-unattacked' :  80,  # 'good-deal' | 'bad-deal'
+        'flee' :                90,  # 'urgent' | 'downgraded'
+        'defend-fork' :         100, # 'downgraded'
+        'does-unpin' :          110,
+        'block' :               120,
+        'promotion' :           130, 
+        'tactical-draw' :       140,
+        'running-pawn' :        150, 
+        'controle-file' :       160,
+        'castling' :            170,
+        'progress' :            180,
+        'undefined' :           200 }
+
+    SUB_TACTICS = {
+        'stormy' : 1,
+        'urgent' : 2,
+        'good-deal' : 3,
+        'bad-deal' : 4,
+        'downgraded' : 5,
+        'undefined' : 6 }
 
     TACTICS_TO_PRIO = {
-          TACTICS['defend-check'] : PRIO['prio1'],
-          TACTICS['defend-king-attack-urgent'] : PRIO['prio2'],
-          TACTICS['defend-king-attack'] : PRIO['prio2'],
-          TACTICS['promotion'] : PRIO['prio2'],
-          TACTICS['tactical-draw'] : PRIO['prio2'],
-          TACTICS['capture-good-deal'] : PRIO['prio2'],
-          TACTICS['running-pawn-in-endgame'] : PRIO['prio2'], 
-          TACTICS['attack-king-good-deal'] : PRIO['prio2'],
-          TACTICS['does-unpin'] : PRIO['prio2'], 
-          TACTICS['attack-stormy'] : PRIO['prio3'],
-          TACTICS['flee-urgent'] : PRIO['prio3'], 
-          TACTICS['support-good-deal'] : PRIO['prio4'], 
-          TACTICS['block'] : PRIO['prio4'], 
-          TACTICS['discl-support-good-deal'] : PRIO['prio4'], 
-          TACTICS['defend-fork'] : PRIO['prio4'], 
-          TACTICS['attack-good-deal'] : PRIO['prio4'], 
-          TACTICS['discl-attack-good-deal'] : PRIO['prio4'], 
-          TACTICS['controles-file-good-deal'] : PRIO['prio5'], 
-          TACTICS['castling'] : PRIO['prio5'],
-          TACTICS['capture-bad-deal'] : PRIO['prio6'], 
-          TACTICS['attack-king-bad-deal'] : PRIO['prio6'], 
-          TACTICS['defend-fork-downgraded'] : PRIO['prio7'], 
-          TACTICS['flee-downgraded'] : PRIO['prio7'], 
-          TACTICS['support-downgraded'] : PRIO['prio7'], 
-          TACTICS['attack-downgraded'] : PRIO['prio7'],
-          TACTICS['support-unattacked'] : PRIO['prio8'], 
-          TACTICS['progress'] : PRIO['prio8'], 
-          TACTICS['flee'] : PRIO['prio8'],
-          TACTICS['attack-bad-deal'] : PRIO['prio9'], 
-          TACTICS['support-bad-deal'] : PRIO['prio9'],
-          TACTICS['undefined'] : PRIO['prio10'] }
+        TACTICS['defend-check'] : PRIO['prio2'],
+        TACTICS['capture'] : PRIO['prio4'],
+        TACTICS['attack-king'] : PRIO['prio4'],
+        TACTICS['attack'] : PRIO['prio6'],
+        TACTICS['discl-attack'] : PRIO['prio6'],
+        TACTICS['support'] : PRIO['prio6'],
+        TACTICS['discl-support'] : PRIO['prio6'], 
+        TACTICS['support-unattacked'] : PRIO['prio8'],
+        TACTICS['flee'] : PRIO['prio6'],
+        TACTICS['defend-fork'] : PRIO['prio4'], 
+        TACTICS['does-unpin'] : PRIO['prio4'], 
+        TACTICS['block'] : PRIO['prio6'], 
+        TACTICS['promotion'] : PRIO['prio4'],
+        TACTICS['tactical-draw'] : PRIO['prio4'],
+        TACTICS['running-pawn'] : PRIO['prio4'], 
+        TACTICS['controle-file'] : PRIO['prio7'], 
+        TACTICS['castling'] : PRIO['prio6'],
+        TACTICS['progress'] : PRIO['prio8'], 
+        TACTICS['undefined'] : PRIO['prio10'] }
+
+    SUB_TACTICS_TO_ADJUST = {
+        SUB_TACTICS['stormy'] : -2,
+        SUB_TACTICS['urgent'] : -2,
+        SUB_TACTICS['good-deal'] : -1,
+        SUB_TACTICS['bad-deal'] : 1,
+        SUB_TACTICS['downgraded'] : 1,
+        SUB_TACTICS['undefined'] : 0 }
+
+    """TACTICS = {
+        'tactical-draw' : 0,
+        'defend-check' : 10,
+        'capture-good-deal' : 20,
+        'capture-bad-deal' : 21,
+        'attack-king-good-deal' : 31,
+        'attack-king-bad-deal' : 32,
+        'attack-stormy' : 33,
+        'attack-good-deal' : 34,
+        'discl-attack-good-deal' : 35,
+        'attack-downgraded' : 37,
+        'attack-bad-deal' : 36,
+        'support-good-deal' : 40,
+        'discl-support-good-deal' : 41,
+        'support-downgraded' : 42,
+        'support-unattacked' : 43,
+        'support-bad-deal' : 44,
+        'flee-urgent' : 50,
+        'flee' : 51,
+        'flee-downgraded' : 52,
+        'defend-fork' : 60,
+        'defend-fork-downgraded' : 61,
+        'castling' : 70,
+        'promotion' : 71,
+        'running-pawn-in-endgame' : 72, 
+        'does-unpin' : 73, 
+        'block' : 74,
+        'controle-file-good-deal' : 75,
+        'progress' : 76, 
+        'undefined' : 90 }
+
+    TACTICS_TO_PRIO = {
+        TACTICS['tactical-draw'] : PRIO['prio2'],
+        TACTICS['defend-check'] : PRIO['prio1'],
+        TACTICS['capture-good-deal'] : PRIO['prio2'],
+        TACTICS['capture-bad-deal'] : PRIO['prio6'], 
+        TACTICS['attack-king-good-deal'] : PRIO['prio2'],
+        TACTICS['attack-king-bad-deal'] : PRIO['prio5'], 
+        TACTICS['attack-stormy'] : PRIO['prio3'],          
+        TACTICS['attack-good-deal'] : PRIO['prio4'],
+        TACTICS['discl-attack-good-deal'] : PRIO['prio4'],  
+        TACTICS['attack-downgraded'] : PRIO['prio6'],
+        TACTICS['attack-bad-deal'] : PRIO['prio9'], 
+        TACTICS['support-good-deal'] : PRIO['prio4'], 
+        TACTICS['discl-support-good-deal'] : PRIO['prio4'], 
+        TACTICS['support-downgraded'] : PRIO['prio6'], 
+        TACTICS['support-unattacked'] : PRIO['prio8'], 
+        TACTICS['support-bad-deal'] : PRIO['prio9'],
+        TACTICS['flee-urgent'] : PRIO['prio3'], 
+        TACTICS['flee-downgraded'] : PRIO['prio6'], 
+        TACTICS['flee'] : PRIO['prio6'],
+        TACTICS['defend-fork'] : PRIO['prio4'], 
+        TACTICS['defend-fork-downgraded'] : PRIO['prio6'], 
+        TACTICS['castling'] : PRIO['prio5'],
+        TACTICS['promotion'] : PRIO['prio2'],
+        TACTICS['running-pawn-in-endgame'] : PRIO['prio2'], 
+        TACTICS['does-unpin'] : PRIO['prio2'], 
+        TACTICS['block'] : PRIO['prio4'], 
+        TACTICS['controle-file-good-deal'] : PRIO['prio5'], 
+        TACTICS['progress'] : PRIO['prio8'], 
+        TACTICS['undefined'] : PRIO['prio10'] }"""
 
     def __init__(self, gmove=None):
         self.gmove = gmove
@@ -187,53 +246,67 @@ class PrioMove:
         self.prio = self.PRIO['prio10']
         self.prio_sec = self.PRIO['prio10']
 
-    def downgrade(self, old_tactic, new_tactic):
-        self.prio = self.TACTICS_TO_PRIO[new_tactic]
-        for idx in range(len(self.tactics)):
-            if(self.tactics[idx] == old_tactic):
-                self.tactics[idx] = new_tactic
+    def evaluate_prio(self):
+        prio = self.PRIO['prio10']
+        for tactitem in self.tactics:
+            prio_new = max(self.PRIO['prio1'], 
+                              self.TACTICS_TO_PRIO[tactitem.tactic] + \
+                              self.SUB_TACTICS_TO_ADJUST[tactitem.subtactic])
+            prio = min(prio, prio_new)
+        return prio
+
+    def downgrade(self, tactic):
+        for tactitem in self.tactics:
+            if(tactitem.tactic == tactic.tactic):
+                tactitem.subtactic = self.SUB_TACTICS['downgraded']
                 return
 
     def fetch_tactics(self, idx):
         if(len(self.tactics) > idx):
-            return self.tactics[idx]
+            return self.tactics[idx].tactic
         else:
             return self.TACTICS['undefined']
     
-    def find_tactic(self, tactic):
-        for tactic_item in self.tactics:
-            if(tactic_item == tactic):
+    def has_tactic(self, tactic):
+        for tactitem in self.tactics:
+            if(tactitem.tactic == tactic.tactic):
+                return True
+        return False
+
+    def has_tactic_ext(self, tactic):
+        for tactitem in self.tactics:
+            if(tactitem.tactic == tactic.tactic and tactitem.subtactic == tactic.subtactic):
                 return True
         return False
 
     def is_tactic_stormy(self):
-        for tactic in self.tactics:
-            if(tactic == self.TACTICS['defend-check'] or
-               tactic == self.TACTICS['defend-king-attack-urgent'] or
-               tactic == self.TACTICS['defend-king-attack'] or
-               tactic == self.TACTICS['promotion'] or
-               tactic == self.TACTICS['capture-good-deal'] or
-               tactic == self.TACTICS['attack-king-good-deal'] or 
-               tactic == self.TACTICS['capture-bad-deal'] or 
-               tactic == self.TACTICS['attack-king-bad-deal'] or
-               tactic == self.TACTICS['attack-stormy']):
+        for tactitem in self.tactics:
+            if(tactitem.tactic == self.TACTICS['defend-check'] or
+               tactitem.tactic == self.TACTICS['promotion'] or
+               tactitem.tactic == self.TACTICS['capture'] or
+               tactitem.tactic == self.TACTICS['attack-king'] or 
+               (tactitem.tactic == self.TACTICS['attack'] and 
+                tactitem.subtactic == self.SUB_TACTICS['good-deal'])):
                 return True
         return False
 
     def is_tactic_urgent(self):
-        for tactic in self.tactics:
-            if(tactic == self.TACTICS['promotion'] or
-               tactic == self.TACTICS['capture-good-deal'] or 
-               tactic == self.TACTICS['capture-bad-deal']): # tactic == self.TACTICS['defend-check'] or 
+        for tactitem in self.tactics:
+            if(tactitem.tactic == self.TACTICS['promotion'] or
+               tactitem.tactic == self.TACTICS['capture']):
                 return True
         return False
 
     def is_tactic_silent(self):
-        for tactic in self.tactics:
-            if(tactic == self.TACTICS['capture-bad-deal'] or
-               tactic == self.TACTICS['attack-king-bad-deal'] or
-               tactic == self.TACTICS['attack-bad-deal'] or
-               tactic == self.TACTICS[ 'support-bad-deal']):
+        for tactitem in self.tactics:
+            if((tactitem.tactic == self.TACTICS['capture'] and
+                tactitem.subtactic == self.SUB_TACTICS['bad-deal']) or
+               (tactitem.tactic == self.TACTICS['attack-king'] and
+                tactitem.subtactic == self.SUB_TACTICS['bad-deal']) or               
+               (tactitem.tactic == self.TACTICS['attack'] and
+                tactitem.subtactic == self.SUB_TACTICS['bad-deal']) or
+               (tactitem.tactic == self.TACTICS[ 'support'] and 
+                tactitem.subtactic == self.SUB_TACTICS[ 'bad-deal'])):
                 return False
         return True
 
@@ -241,9 +314,10 @@ class PrioMove:
         str_tactics = ""
         length = len(self.tactics)
         i = 1
-        for tactic in self.tactics:
-            str_tactics += reverse_lookup(self.TACTICS, tactic)
-
+        for tactitem in self.tactics:
+            str_tactics += reverse_lookup(self.TACTICS, tactitem.tactic)
+            if(tactitem.subtactic != self.SUB_TACTICS['undefined']):
+                str_tactics += " * " + reverse_lookup(self.SUB_TACTICS, tactitem.subtactic)
             if(i < length):
                 str_tactics += delimiter
             i += 1
@@ -252,11 +326,16 @@ class PrioMove:
     def prnt_tactics(self):
         length = len(self.tactics)
         i = 1
-        for tactic in self.tactics:
+        for tactitem in self.tactics:
             if(i < length):
-                print(reverse_lookup(self.TACTICS, tactic), end=" | ")
+                str_end = " | "
             else:
-                print(reverse_lookup(self.TACTICS, tactic), end="")
+                str_end = ""
+            if(tactitem.subtactic != self.SUB_TACTICS['undefined']):
+                subtactic_str = " * " + reverse_lookup(self.SUB_TACTICS, tactitem.subtactic)
+            else:
+                subtactic_str = ""
+            print(reverse_lookup(self.TACTICS, tactitem.tactic) + subtactic_str, end=str_end)
             i += 1
 
 # class end

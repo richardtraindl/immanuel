@@ -24,7 +24,7 @@ def search_dir(match, fieldx, fieldy, direction, exclx, excly):
 
     for i in range(7):
         x1, y1 = match.search(srcx, srcy, stepx, stepy)
-        if(x1 != match.UNDEF_X and x1 != exclx and y1 != excly):
+        if(x1 and x1 != exclx and y1 != excly):
             piece = match.readfield(x1, y1)
             dirtouches.append(cDirTouch(piece, direction, x1, y1))
             srcx = x1
@@ -82,10 +82,10 @@ def search_opposed_pieces(match, color, fieldx, fieldy, excl_fieldx, excl_fieldy
             stepy = cQueen.STEPS[i+k][1]
 
             x1, y1 = match.search(fieldx, fieldy, stepx, stepy)
-            if(x1 == excl_fieldx and y1 == excl_fieldy):
+            if(x1 and x1 == excl_fieldx and y1 == excl_fieldy):
                 break
 
-            if(x1 != match.UNDEF_X):
+            if(x1):
                 piece = match.readfield(x1, y1)
 
                 if(match.color_of_piece(piece) == color):

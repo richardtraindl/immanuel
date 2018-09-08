@@ -187,7 +187,7 @@ class cKnight(cPiece):
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.xpos, self.ypos, stepx , stepy)
-            if(x1 != self.match.UNDEF_X):
+            if(x1):
                 if(x1 == self.xpos and y1 == self.ypos):
                     continue
 

@@ -365,12 +365,14 @@ class cPawn(cPiece):
         for i in range(3):
             x1 = self.xpos + STARTX[i]
             y1 = self.ypos
-            while(x1 != self.match.UNDEF_X and self.match.is_inbounds(x1, y1) ):
+            while(self.match.is_inbounds(x1, y1) ):
                 x1, y1 = self.match.search(x1, y1, stepx, stepy)
-                if(x1 != self.match.UNDEF_X):
+                if(x1):
                     piece = self.match.readfield(x1, y1)
                     if(piece == opp_pawn):
                         return False
+                else:
+                    break
         return True
 
     def score_attacks(self):

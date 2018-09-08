@@ -542,14 +542,14 @@ class cMatch:
             if(direction != self.DIRS['undefined']):
                 stepx, stepy = cpieces[idx].step_for_dir(direction)
                 dstx, dsty = self.search(srcx, srcy, stepx, stepy)
-                if(dstx != self.UNDEF_X):
+                if(dstx):
                     piece = self.readfield(dstx, dsty)
                     if( (color == self.COLORS['white'] and piece == self.PIECES['wKg']) or
                         (color == self.COLORS['black'] and piece == self.PIECES['bKg']) ):
                         reverse_dir = self.REVERSE_DIRS[direction]
                         stepx, stepy = cpieces[idx].step_for_dir(reverse_dir)
                         dstx, dsty = self.search(srcx, srcy, stepx, stepy)
-                        if(dstx != self.UNDEF_X):
+                        if(dstx):
                             piece = self.readfield(dstx, dsty)
                             if(color == self.COLORS['white']):
                                 if(piece == self.PIECES['bQu'] or piece == black_faces[idx]):
@@ -578,7 +578,7 @@ class cMatch:
             enemy_dir = cRook.dir_for_move(srcx, srcy, enemy.fieldx, enemy.fieldy)
             stepx, stepy = cRook.step_for_dir(self.REVERSE_DIRS[enemy_dir])
             x1, y1 = self.search(srcx, srcy, stepx, stepy)
-            if(x1 != self.UNDEF_X):
+            if(x1):
                 friend = self.readfield(x1, y1)
                 if(self.color_of_piece(friend) == color and 
                    self.PIECES_RANK[friend] > self.PIECES_RANK[piece] and 
@@ -592,7 +592,7 @@ class cMatch:
             enemy_dir = cBishop.dir_for_move(srcx, srcy, enemy.fieldx, enemy.fieldy)
             stepx, stepy = cBishop.step_for_dir(self.REVERSE_DIRS[enemy_dir])
             x1, y1 = self.search(srcx, srcy, stepx, stepy)
-            if(x1 != self.UNDEF_X):
+            if(x1):
                 friend = self.readfield(x1, y1)
                 if(self.color_of_piece(friend) == color and 
                    self.PIECES_RANK[friend] > self.PIECES_RANK[piece] and 

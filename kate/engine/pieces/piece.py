@@ -184,7 +184,7 @@ class cPiece:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(dstx, dsty, stepx , stepy)
-            if(x1 !=  self.match.UNDEF_X):
+            if(x1):
                 if(x1 == self.xpos and y1 == self.ypos):
                     continue
 
@@ -286,7 +286,7 @@ class cPiece:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.xpos, self.ypos, stepx, stepy)
-            if(x1 != self.match.UNDEF_X):
+            if(x1):
                 if(self.is_move_stuck(x1, y1)):
                     continue
 
@@ -327,7 +327,7 @@ class cPiece:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.xpos, self.ypos, stepx , stepy)
-            if(x1 != self.match.UNDEF_X):
+            if(x1):
                 if(x1 == self.xpos and y1 == self.ypos):
                     continue
 
