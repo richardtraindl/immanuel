@@ -120,9 +120,9 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         priomoves.sort(key=attrgetter('prio'))
         return count
     elif(depth <= slimits.dpth_stage1):
-        return min(slimits.move_count, len(priomoves)) # max count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
+        return max(slimits.move_count, count_up_to_prio(priomoves, PrioMove.PRIO['prio5']))
     elif(depth <= slimits.dpth_stage2):
-        return min(slimits.move_count, len(priomoves)) # max count_up_to_prio(priomoves, PrioMove.PRIO['prio4']))
+        return max(slimits.move_count, count_up_to_prio(priomoves, PrioMove.PRIO['prio4']))
     elif(depth <= slimits.dpth_max and last_pmove.is_tactic_urgent()):
         count = 0
         silent_move_cnt = 0
