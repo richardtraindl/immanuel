@@ -7,7 +7,7 @@ from .pieces.bishop import cBishop
 from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
-from .pieces import pawnfield, knightfield, rookfield, bishopfield, queenfield, kingfield
+from .pieces import pawnfield, knightfield, rookfield, bishopfield, kingfield
 from .validator import cValidator
 
 
@@ -473,9 +473,6 @@ class cMatch:
         return flag
 
     def is_field_touched(self, color, srcx, srcy, mode):
-        #cqueenfield = queenfield.cQueenField(self, srcx, srcy)
-        #if(cqueenfield.is_field_touched(color, mode)):
-        #    return True
         crookfield = rookfield.cRookField(self, srcx, srcy)
         if(crookfield.is_field_touched(color, mode)):
             return True
