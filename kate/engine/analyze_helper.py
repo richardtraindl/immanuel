@@ -5,7 +5,7 @@ from .pieces.bishop import cBishop
 from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
-from .pieces import pawnfield, knightfield, rookfield, bishopfield, queenfield, kingfield
+from .pieces import pawnfield, knightfield, rookfield, bishopfield, kingfield
 from .pieces.piece import cTouch
 
 
@@ -354,11 +354,6 @@ def is_fork_field(match, color, forkx, forky):
     frdlytouches, enmytouches = list_all_field_touches(match, color, forkx, forky)
     if(len(frdlytouches) >= len(enmytouches)):
         return False
-
-    #cqueenfield = queenfield.cQueenField(match, forkx, forky)
-    #if(cqueenfield.is_field_touched(opp_color, 2)):
-        #if(cqueenfield.count_touches(color) > 1):
-            #return True
 
     crookfield = rookfield.cRookField(match, forkx, forky)
     if(crookfield.is_field_touched(opp_color, 2)):
