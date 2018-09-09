@@ -4,8 +4,7 @@ from .piece import cTouch
 
 class cKingField(cPieceField):
     def __init__(self, match, fieldx, fieldy):
-        super().__init__(match, fieldx, fieldy, [match.PIECES['wKg']], [match.PIECES['bKg']])
-        self.STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
+        super().__init__(match, fieldx, fieldy, [match.PIECES['wKg']], [match.PIECES['bKg']], [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]])
 
     def is_field_touched(self, color):
         for step in self.STEPS:

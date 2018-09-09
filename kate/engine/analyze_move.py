@@ -181,7 +181,7 @@ def find_disclosures(match, srcx, srcy, dstx, dsty, discl_attacked, discl_suppor
         if(direction == excluded_dir or direction == match.REVERSE_DIRS[excluded_dir]):
             break
         x1, y1 = match.search(srcx, srcy, stepx, stepy)
-        if(x1):
+        if(x1 is not None):
             piece = match.readfield(x1, y1)
             if(first.piece == match.PIECES['blk']):
                 first.piece = piece
@@ -321,33 +321,26 @@ def is_tactical_draw(match, gmove):
     #if(newmatch.fifty_moves_count >= 49):
         #return True
 
-    if(len(newmatch.move_list) < 5):
+    if(len(newmatch.move_list) < 9):
         return False
 
     boards = []
-    for idx in range(min(len(newmatch.move_list), 10)):
-        board = ""
+    for i in range(9):
+        str_board = ""
         for y in range(8):
             for x in range(8):
                 piece = newmatch.readfield(x, y)
-                board += reverse_lookup(match.PIECES, piece)
-        boards.append(board)
-
+                str_board += reverse_lookup(newmatch.PIECES, piece)
+        boards.append(str_board)
         newmatch.undo_move()
 
-    idx = 0
     count = 0
-    lastboard = boards[-1]
-    for board in boards:
-        idx += 1
-        if(idx > 1 and idx % 2 == 1):
-            if(board == lastboard):
-                count += 1
+    str_board = boards[0]
+    for i in range(1, 9):
+        if(boards[i] == str_board):
+            count += 1
 
-    if(count >= 3):
-        return True
-    else:
-        return False
+    return count >= 2
 
 
 def fetch_first_tactics(priomove):

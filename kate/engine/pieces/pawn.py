@@ -367,7 +367,7 @@ class cPawn(cPiece):
             y1 = self.ypos
             while(self.match.is_inbounds(x1, y1) ):
                 x1, y1 = self.match.search(x1, y1, stepx, stepy)
-                if(x1):
+                if(x1 is not None):
                     piece = self.match.readfield(x1, y1)
                     if(piece == opp_pawn):
                         return False

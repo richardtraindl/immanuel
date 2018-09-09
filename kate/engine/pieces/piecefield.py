@@ -8,13 +8,13 @@ from .piece import cTouch
 
 
 class cPieceField:
-    def __init__(self, match, fieldx, fieldy, white_faces, black_faces):
+    def __init__(self, match, fieldx, fieldy, white_faces, black_faces, STEPS):
         self.match = match
         self.fieldx = fieldx
         self.fieldy = fieldy
         self.white_faces = white_faces
         self.black_faces = black_faces
-        self.STEPS = []
+        self.STEPS = STEPS
 
     def obj_for_piece(self, piece, x1, y1):
         if(piece == self.match.PIECES['wBp'] or piece == self.match.PIECES['bBp']):
@@ -37,7 +37,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1):
+            if(x1 is not None):
                 piece = self.match.readfield(x1, y1)
                 flag = False
                 if(color == self.match.COLORS['white']):
@@ -72,7 +72,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1):
+            if(x1 is not None):
                 piece = self.match.readfield(x1, y1)
                 wflag = False
                 for face in self.white_faces:
@@ -99,7 +99,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1):
+            if(x1 is not None):
                 piece = self.match.readfield(x1, y1)
                 cpiece = self.obj_for_piece(piece, x1, y1)
                 if(cpiece.is_move_stuck(self.fieldx, self.fieldy)):
@@ -126,7 +126,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1):
+            if(x1 is not None):
                 piece = self.match.readfield(x1, y1)
 
                 cpiece = self.obj_for_piece(piece, self.fieldx, self.fieldy)

@@ -5,7 +5,7 @@ from .pawn import cPawn
 
 class cPawnField(cPieceField):
     def __init__(self, match, fieldx, fieldy):
-        super().__init__(match, fieldx, fieldy, [match.PIECES['wPw']], [match.PIECES['bPw']])
+        super().__init__(match, fieldx, fieldy, [match.PIECES['wPw']], [match.PIECES['bPw']], None)
         self.WHITE_BACK_STEPS = [ [1, -1], [-1, -1] ]
         self.BLACK_BACK_STEPS = [ [1, 1], [-1, 1] ]
 

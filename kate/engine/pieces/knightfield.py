@@ -5,8 +5,7 @@ from .knight import cKnight
 
 class cKnightField(cPieceField):
     def __init__(self, match, fieldx, fieldy):
-        super().__init__(match, fieldx, fieldy, [match.PIECES['wKn']], [match.PIECES['bKn']])
-        self.STEPS = [ [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2] ]
+        super().__init__(match, fieldx, fieldy, [match.PIECES['wKn']], [match.PIECES['bKn']], [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]])
 
     def is_field_touched(self, color, mode):
         for step in self.STEPS:

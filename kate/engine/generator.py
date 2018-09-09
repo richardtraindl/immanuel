@@ -1,6 +1,36 @@
 from .match import *
 from .validator import *
-from .move import GenMove, PrioMove
+from .move import PrioMove
+from .helper import reverse_lookup, index_to_coord
+
+
+class GenMove(object):
+    def __init__(self, srcx=None, srcy=None, dstx=None, dsty=None, prom_piece=None, captures= None):
+        self.srcx = srcx
+        self.srcy = srcy
+        self.dstx = dstx
+        self.dsty = dsty
+        self.prom_piece = prom_piece
+        self.captures = captures
+
+    def format_genmove(self):
+        if(self.captures):
+            hyphen = "x"
+        else:
+            hyphen = "-"
+
+        if(self.prom_piece and self.prom_piece != cMatch.PIECES['blk']):
+            trailing = ", " + reverse_lookup(cMatch.PIECES, self.prom_piece)
+        else:
+            trailing = ""
+
+        fmtmove = index_to_coord(self.srcx, self.srcy) + \
+                  hyphen + \
+                  index_to_coord(self.dstx, self.dsty) + \
+                  trailing
+        return fmtmove
+
+# class end
 
 
 class cGenerator:

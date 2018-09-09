@@ -432,24 +432,22 @@ def score_endgame(match):
     value = 0
 
     whiterate = match.ATTACKED_SCORES[match.PIECES['bPw']]
-    white_step_rate = whiterate // 2
-
     blackrate = match.ATTACKED_SCORES[match.PIECES['wPw']]
-    black_step_rate = blackrate // 2
+    step_rates = [ 1, 1, 2, 4, 7, 11, 16, 22]
 
-    for y in range(0, 8, 1):
-        for x in range(0, 8, 1):
+    for y in range(8):
+        for x in range(8):
             piece = match.readfield(x, y)
             if(piece == match.PIECES['wPw']):
                 cpawn = cPawn(match, x, y)
                 if(cpawn.is_running()):
                     value += whiterate
-                    value += white_step_rate * y
+                    value += whiterate * step_rates[y]
             elif(piece == match.PIECES['bPw']):
                 cpawn = cPawn(match, x, y)
                 if(cpawn.is_running()):
                     value += blackrate
-                    value += black_step_rate * (7 - y)
+                    value += blackrate * step_rates[(7 - y)]
 
     if(is_king_centered(match, match.COLORS['white'])):
         value += whiterate

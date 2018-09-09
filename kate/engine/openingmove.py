@@ -2,7 +2,7 @@ import random
 from .match import *
 from .move import *
 from .openings import *
-from .move import GenMove
+from .generator import GenMove
 from .helper import coord_to_index, index_to_coord
 
 

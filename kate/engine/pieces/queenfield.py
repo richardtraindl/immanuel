@@ -5,13 +5,12 @@ from .bishopfield import cBishopField
 
 class cQueenField(cPieceField):
     def __init__(self, match, fieldx, fieldy):
-        super().__init__(match, fieldx, fieldy, [match.PIECES['wQu'], match.PIECES['wRk'], match.PIECES['wBp']], [match.PIECES['bQu'], match.PIECES['bRk'], match.PIECES['bBp']])
-        self.STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
+        super().__init__(match, fieldx, fieldy, [match.PIECES['wQu'], match.PIECES['wRk'], match.PIECES['wBp']], [match.PIECES['bQu'], match.PIECES['bRk'], match.PIECES['bBp']], [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1]])
 
-    def is_field_touched(self, color, mode):
+    """"def is_field_touched(self, color, mode):
         crookfield = cRookField(self.match, self.fieldx, self.fieldy)
         cbishopfield = cBishopField(self.match, self.fieldx, self.fieldy)
-        return crookfield.is_field_touched(color, mode) or cbishopfield.is_field_touched(color, mode)
+        return crookfield.is_field_touched(color, mode) or cbishopfield.is_field_touched(color, mode)"""
 
     def list_all_field_touches(self, color, frdlytouches, enmytouches):
         crookfield = cRookField(self.match, self.fieldx, self.fieldy)

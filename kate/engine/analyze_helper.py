@@ -24,7 +24,7 @@ def search_dir(match, fieldx, fieldy, direction, exclx, excly):
 
     for i in range(7):
         x1, y1 = match.search(srcx, srcy, stepx, stepy)
-        if(x1 and x1 != exclx and y1 != excly):
+        if(x1 is not None and x1 != exclx and y1 != excly):
             piece = match.readfield(x1, y1)
             dirtouches.append(cDirTouch(piece, direction, x1, y1))
             srcx = x1
@@ -82,7 +82,7 @@ def search_opposed_pieces(match, color, fieldx, fieldy, excl_fieldx, excl_fieldy
             stepy = cQueen.STEPS[i+k][1]
 
             x1, y1 = match.search(fieldx, fieldy, stepx, stepy)
-            if(x1 and x1 == excl_fieldx and y1 == excl_fieldy):
+            if(x1 is not None and x1 == excl_fieldx and y1 == excl_fieldy):
                 break
 
             if(x1):
@@ -355,10 +355,10 @@ def is_fork_field(match, color, forkx, forky):
     if(len(frdlytouches) >= len(enmytouches)):
         return False
 
-    cqueenfield = queenfield.cQueenField(match, forkx, forky)
-    if(cqueenfield.is_field_touched(opp_color, 2)):
-        if(cqueenfield.count_touches(color) > 1):
-            return True
+    #cqueenfield = queenfield.cQueenField(match, forkx, forky)
+    #if(cqueenfield.is_field_touched(opp_color, 2)):
+        #if(cqueenfield.count_touches(color) > 1):
+            #return True
 
     crookfield = rookfield.cRookField(match, forkx, forky)
     if(crookfield.is_field_touched(opp_color, 2)):

@@ -52,22 +52,22 @@ class SearchLimits:
         if(match.level == match.LEVELS['blitz']):
             self.move_count = 6
             self.dpth_stage1 = 2
-            self.dpth_stage2 = 5
+            self.dpth_stage2 = 4
             self.dpth_max = 10
         elif(match.level == match.LEVELS['low']):
             self.move_count = 8
             self.dpth_stage1 = 2
-            self.dpth_stage2 = 6
+            self.dpth_stage2 = 5
             self.dpth_max = 10
         elif(match.level == match.LEVELS['medium']):
             self.move_count = 12
             self.dpth_stage1 = 3
-            self.dpth_stage2 = 7
+            self.dpth_stage2 = 6
             self.dpth_max = 12
         else:
             self.move_count = 16
             self.dpth_stage1 = 3
-            self.dpth_stage1 = 8
+            self.dpth_stage1 = 7
             self.dpth_max = 12
 # class end
 
@@ -161,9 +161,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     starttime = time.time()
 
     if(maximizing):
-        nodescore = alpha
+        maxscore = alpha
     else:
-        nodescore = beta
+        minscore = beta
 
     cgenerator = cGenerator(match)
     priomoves = cgenerator.generate_moves()
@@ -205,63 +205,71 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             if(maximizing):
-                score, newcandidates = alphabeta(match, depth + 1, slimits, nodescore, beta, False, priomove, msgs)
+                score, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, msgs)
             else:
-                score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, nodescore, True, priomove, msgs)
+                score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, msgs)
 
             match.undo_move()
 
         if(maximizing):
-            if(score > nodescore):
-                nodescore = score
+            if(depth == 1):
+                prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, maxscore)
+
+            if(score > maxscore):
+                maxscore = score
                 append_newmove(gmove, nodecandidates, newcandidates)
+
+                #alpha = max(alpha, nodescore)
+                if(maxscore >= beta): # if(beta <= alpha):
+                    if(depth == 1):
+                        print("beta cut-off")
+                    break # beta cut-off
 
             if(depth == 1):
                 msgs.currentsearch.clear()
                 for candidate in nodecandidates:
                     msgs.currentsearch.append(candidate)
 
-                prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescore)
-
-            #alpha = max(alpha, nodescore)
-            if(nodescore >= beta): # if(beta <= alpha):
-                return score, nodecandidates
-                #break # beta cut-off
         else:
-            if(score < nodescore):
-                nodescore = score
+            if(depth == 1):
+                prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, minscore)
+
+            if(score < minscore):
+                minscore = score
                 append_newmove(gmove, nodecandidates, newcandidates)
+
+                #beta = min(beta, nodescore)
+                if(minscore <= alpha): #if(beta <= alpha):
+                    if(depth == 1):
+                        print("alpha cut-off")
+                    break # alpha cut-off
 
             if(depth == 1):
                 msgs.currentsearch.clear()
                 for candidate in nodecandidates:
                     msgs.currentsearch.append(candidate)
 
-                prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescore)
+        #if(depth == 1):
+        #    diff = match.score + nodescore
+        #    diff_limit = abs(match.SCORES[match.PIECES['wPw']]) * 2
+        #    huge_diff = diff > diff_limit
+        #    elapsed_time = time.time() - starttime
+        #    exceeded = elapsed_time > match.seconds_per_move
+        #else:
+        #    huge_diff = False
+        #    exceeded = False
 
-            #beta = min(beta, nodescore)
-            if(nodescore <= alpha): #if(beta <= alpha):
-                return score, nodecandidates
-                #break # alpha cut-off
-
-        """if(depth == 1):
-            diff = match.score + nodescore
-            diff_limit = abs(match.SCORES[match.PIECES['wPw']]) * 2
-            huge_diff = diff > diff_limit
-            elapsed_time = time.time() - starttime
-            exceeded = elapsed_time > match.seconds_per_move
-        else:
-            huge_diff = False
-            exceeded = False
-
-        if(msgs.terminate):
-            break"""
+        #if(msgs.terminate):
+        #    break
         #elif(huge_diff and exceeded == False and count <= 24):
             #continue
         if(count >= maxcnt): #elif(count >= maxcnt):
             break
 
-    return nodescore, nodecandidates
+    if(maximizing):
+        return maxscore, nodecandidates
+    else:
+        return minscore, nodecandidates
 
 """def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     color = match.next_color()
