@@ -16,12 +16,9 @@ def prnt_before_calc(match, count, priomove):
     print("count: " + str(count))
     print("calculate: " + priomove.gmove.format_genmove())
     print("tactics: " + priomove.concat_tactics(" | "))
-    print("priorities: " + reverse_lookup(priomove.PRIO, priomove.prio) + " | " + reverse_lookup(priomove.PRIO, priomove.prio_sec))
-
-def prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescore):
-    print("CURR SEARCH: " + str(score).rjust(8, " ") + \
-          " [" + gmove.format_genmove() + "] " + concat_fmt_gmoves(match, newcandidates))
-    print("CANDIDATES:  " + str(nodescore).rjust(8, " ") + concat_fmt_gmoves(match, nodecandidates))
+    print("priorities: " + reverse_lookup(priomove.PRIO, priomove.prio) + \
+          " | " + reverse_lookup(priomove.PRIO, priomove.prio_sec))
+    print("\n***********************************************")
 
 def prnt_search(match, label, score, gmove, candidates):
     if(gmove):
@@ -78,13 +75,13 @@ class SearchLimits:
             self.dpth_max = 12
 # class end
 
-def append_newmove(gmove, nodecandidates, newcandidates):
-    nodecandidates.clear()
-    nodecandidates.append(gmove)
+def append_newmove(gmove, candidates, newcandidates):
+    candidates.clear()
+    candidates.append(gmove)
 
     for newcandidate in newcandidates:
         if(newcandidate):
-            nodecandidates.append(newcandidate)
+            candidates.append(newcandidate)
         else:
             break
 
@@ -222,15 +219,11 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             if(depth == 1):
                 prnt_search(match, "CURRENT SEARCH:   ", newscore, gmove, newcandidates)
                 prnt_search(match, "SEARCH CANDIDATE: ", maxscore, None, candidates)
-                #prnt_after_calc(match, gmove, newscore, newcandidates, candidates, maxscore)
 
             if(newscore > maxscore):
                 maxscore = newscore
                 append_newmove(gmove, candidates, newcandidates)
-
                 if(maxscore >= beta):
-                    if(depth == 1):
-                        print("beta cut-off")
                     break # beta cut-off
 
             if(depth == 1):
@@ -242,15 +235,11 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             if(depth == 1):
                 prnt_search(match, "CURRENT SEARCH:   ", newscore, gmove, newcandidates)
                 prnt_search(match, "SEARCH CANDIDATE: ", minscore, None, candidates)
-                #prnt_after_calc(match, gmove, newscore, newcandidates, candidates, minscore)
 
             if(newscore < minscore):
                 minscore = newscore
                 append_newmove(gmove, candidates, newcandidates)
-
                 if(minscore <= alpha):
-                    if(depth == 1):
-                        print("alpha cut-off")
                     break # alpha cut-off
 
             if(depth == 1):
@@ -279,115 +268,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         return maxscore, candidates
     else:
         return minscore, candidates
-
-"""def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
-    color = match.next_color()
-    nodecandidates = []
-    newcandidates = []
-    count = 0
-    starttime = time.time()
-
-    if(maximizing):
-        nodescore = match.SCORES[match.PIECES['wKg']] * 2
-    else:
-        nodescore = match.SCORES[match.PIECES['bKg']] * 2
-
-    cgenerator = cGenerator(match)
-    priomoves = cgenerator.generate_moves()
-
-    rank_gmoves(match, priomoves)    
-    
-    if(depth <= 12):
-        maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
-    else:
-        nodecandidates.append(None)
-        return analyze_position.score_position(match, len(priomoves)), nodecandidates
-
-    if(depth == 1):
-        print("************ maxcnt: " + str(maxcnt) + " ******************")
-        prnt_priomoves(match, priomoves)
-
-        if(len(priomoves) == 1):
-            pmove = priomoves[0]
-            nodecandidates.append(pmove.gmove)
-            nodecandidates.append(None)
-            if(pmove.has_tactic(cTactic(PrioMove.TACTICS['tactical-draw'], PrioMove.SUB_TACTICS['undefined']))):
-                return 0, nodecandidates
-            else:
-                return analyze_position.score_position(match, len(priomoves)), nodecandidates
-
-    if(len(priomoves) == 0 or maxcnt == 0):
-        nodecandidates.append(None)
-        return analyze_position.score_position(match, len(priomoves)), nodecandidates
-
-    for priomove in priomoves:
-        gmove = priomove.gmove
-
-        count += 1
-
-        if(depth == 1):
-            prnt_before_calc(match, count, priomove)
-
-        if(priomove.has_tactic(cTactic(PrioMove.TACTICS['tactical-draw'], PrioMove.SUB_TACTICS['undefined']))):
-            newcandidates.clear()
-            newcandidates.append(None)
-            score = 0
-        else:
-            match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-
-            score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, beta, not maximizing, priomove, msgs)
-
-            match.undo_move()
-
-        if(maximizing):
-            if(score > nodescore):
-                nodescore = score
-                append_newmove(gmove, nodecandidates, newcandidates)
-
-            if(depth == 1):
-                msgs.currentsearch.clear()
-                for candidate in nodecandidates:
-                    msgs.currentsearch.append(candidate)
-
-                prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescore)
-
-            alpha = max(alpha, nodescore)
-            if(beta <= alpha):
-                break # beta cut-off
-        else:
-            if(score < nodescore):
-                nodescore = score
-                append_newmove(gmove, nodecandidates, newcandidates)
-
-            if(depth == 1):
-                msgs.currentsearch.clear()
-                for candidate in nodecandidates:
-                    msgs.currentsearch.append(candidate)
-
-                prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescore)
-
-            beta = min(beta, nodescore)
-            if(beta <= alpha):
-                break # alpha cut-off
-
-        if(depth == 1):
-            diff = match.score + nodescore
-            diff_limit = abs(match.SCORES[match.PIECES['wPw']]) * 2
-            huge_diff = diff > diff_limit
-            elapsed_time = time.time() - starttime
-            exceeded = elapsed_time > match.seconds_per_move
-        else:
-            huge_diff = False
-            exceeded = False
-
-        if(msgs.terminate):
-            break
-        #elif(huge_diff and exceeded == False and count <= 24):
-            #continue
-        elif(count >= maxcnt):
-            break
-
-    return nodescore, nodecandidates"""
 
 def calc_move(match, msgs):
     print("is opening: " + str(analyze_position.is_opening(match)) + \
