@@ -23,6 +23,13 @@ def prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, nodescor
           " [" + gmove.format_genmove() + "] " + concat_fmt_gmoves(match, newcandidates))
     print("CANDIDATES:  " + str(nodescore).rjust(8, " ") + concat_fmt_gmoves(match, nodecandidates))
 
+def prnt_search(match, label, score, gmove, candidates):
+    if(gmove):
+        str_gmove = " [" + gmove.format_genmove() + "] "
+    else:
+        str_gmove = ""
+    print(label + str(score).rjust(8, " ") + str_gmove + concat_fmt_gmoves(match, candidates))
+
 def concat_fmt_gmoves(match, gmoves):
     str_gmoves = ""
     for gmove in gmoves:
@@ -155,7 +162,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
 
 def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     color = match.next_color()
-    nodecandidates = []
+    candidates = []
     newcandidates = []
     count = 0
     starttime = time.time()
@@ -178,16 +185,16 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
 
         if(len(priomoves) == 1):
             pmove = priomoves[0]
-            nodecandidates.append(pmove.gmove)
-            nodecandidates.append(None)
+            candidates.append(pmove.gmove)
+            candidates.append(None)
             if(pmove.has_tactic(cTactic(PrioMove.TACTICS['tactical-draw'], PrioMove.SUB_TACTICS['undefined']))):
-                return 0, nodecandidates
+                return 0, candidates
             else:
-                return analyze_position.score_position(match, len(priomoves)), nodecandidates
+                return analyze_position.score_position(match, len(priomoves)), candidates
 
     if(len(priomoves) == 0 or maxcnt == 0):
-        nodecandidates.append(None)
-        return analyze_position.score_position(match, len(priomoves)), nodecandidates
+        candidates.append(None)
+        return analyze_position.score_position(match, len(priomoves)), candidates
 
     for priomove in priomoves:
         gmove = priomove.gmove
@@ -200,57 +207,59 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         if(priomove.has_tactic(cTactic(PrioMove.TACTICS['tactical-draw'], PrioMove.SUB_TACTICS['undefined']))):
             newcandidates.clear()
             newcandidates.append(None)
-            score = 0
+            newscore = 0
         else:
             match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             if(maximizing):
-                score, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, msgs)
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, msgs)
             else:
-                score, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, msgs)
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, msgs)
 
             match.undo_move()
 
         if(maximizing):
             if(depth == 1):
-                prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, maxscore)
+                prnt_search(match, "CURRENT SEARCH:   ", newscore, gmove, newcandidates)
+                prnt_search(match, "SEARCH CANDIDATE: ", maxscore, None, candidates)
+                #prnt_after_calc(match, gmove, newscore, newcandidates, candidates, maxscore)
 
-            if(score > maxscore):
-                maxscore = score
-                append_newmove(gmove, nodecandidates, newcandidates)
+            if(newscore > maxscore):
+                maxscore = newscore
+                append_newmove(gmove, candidates, newcandidates)
 
-                #alpha = max(alpha, nodescore)
-                if(maxscore >= beta): # if(beta <= alpha):
+                if(maxscore >= beta):
                     if(depth == 1):
                         print("beta cut-off")
                     break # beta cut-off
 
             if(depth == 1):
                 msgs.currentsearch.clear()
-                for candidate in nodecandidates:
+                for candidate in candidates:
                     msgs.currentsearch.append(candidate)
 
         else:
             if(depth == 1):
-                prnt_after_calc(match, gmove, score, newcandidates, nodecandidates, minscore)
+                prnt_search(match, "CURRENT SEARCH:   ", newscore, gmove, newcandidates)
+                prnt_search(match, "SEARCH CANDIDATE: ", minscore, None, candidates)
+                #prnt_after_calc(match, gmove, newscore, newcandidates, candidates, minscore)
 
-            if(score < minscore):
-                minscore = score
-                append_newmove(gmove, nodecandidates, newcandidates)
+            if(newscore < minscore):
+                minscore = newscore
+                append_newmove(gmove, candidates, newcandidates)
 
-                #beta = min(beta, nodescore)
-                if(minscore <= alpha): #if(beta <= alpha):
+                if(minscore <= alpha):
                     if(depth == 1):
                         print("alpha cut-off")
                     break # alpha cut-off
 
             if(depth == 1):
                 msgs.currentsearch.clear()
-                for candidate in nodecandidates:
+                for candidate in candidates:
                     msgs.currentsearch.append(candidate)
 
         #if(depth == 1):
-        #    diff = match.score + nodescore
+        #    diff = match.score + newscore
         #    diff_limit = abs(match.SCORES[match.PIECES['wPw']]) * 2
         #    huge_diff = diff > diff_limit
         #    elapsed_time = time.time() - starttime
@@ -259,17 +268,17 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         #    huge_diff = False
         #    exceeded = False
 
-        #if(msgs.terminate):
-        #    break
-        #elif(huge_diff and exceeded == False and count <= 24):
+        #if(huge_diff and exceeded == False and count <= 24):
             #continue
-        if(count >= maxcnt): #elif(count >= maxcnt):
+        if(count >= maxcnt):
+            break
+        elif(msgs.terminate):
             break
 
     if(maximizing):
-        return maxscore, nodecandidates
+        return maxscore, candidates
     else:
-        return minscore, nodecandidates
+        return minscore, candidates
 
 """def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     color = match.next_color()
