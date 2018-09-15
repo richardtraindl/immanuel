@@ -2,7 +2,6 @@ from operator import attrgetter
 import copy
 from .match import *
 from .move import *
-from . import analyze_position
 from .helper import reverse_lookup
 from .analyze_helper import *
 from .pieces.pawn import cPawn
@@ -283,7 +282,7 @@ def blocks(match, gmove):
 def running_pawn_in_endgame(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
-    if(analyze_position.is_endgame(match)):
+    if(match.is_endgame()):
         if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
             cpawn = cPawn(match, gmove.srcx, gmove.srcy)
             return cpawn.is_running()

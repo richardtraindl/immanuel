@@ -111,6 +111,15 @@ class cKing(cPiece):
         srcpiece = self.match.readfield(move.srcx, move.srcy)
         dstpiece = self.match.readfield(move.dstx, move.dsty)
 
+        if(dstpiece == self.match.PIECES['wQu']):
+            self.match.wQu_cnt -= 1
+        elif(dstpiece == self.match.PIECES['bQu']):
+            self.match.bQu_cnt -= 1
+        elif(dstpiece == self.match.PIECES['wKn'] or dstpiece == self.match.PIECES['wBp'] or dstpiece == self.match.PIECES['wRk']):
+            self.match.wOfficer_cnt -= 1
+        elif(dstpiece == self.match.PIECES['bKn'] or dstpiece == self.match.PIECES['bBp'] or dstpiece == self.match.PIECES['bRk']):
+            self.match.bOfficer_cnt -= 1
+
         if(srcpiece == self.match.PIECES['wKg']):
             self.match.wKg_x = move.dstx
             self.match.wKg_y = move.dsty

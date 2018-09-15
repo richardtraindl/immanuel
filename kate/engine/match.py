@@ -296,6 +296,13 @@ class cMatch:
         else:
             return self.COLORS['black']
 
+    def is_opening(self):
+        return self.movecnt <= 30
+
+    def is_endgame(self):
+        count = self.wQu_cnt + self.wOfficer_cnt + self.bQu_cnt + self.bOfficer_cnt
+        return count <= 6
+
     def is_last_move_capture(self):
         if(len(self.move_list) > 0):
             move = self.move_list[-1]

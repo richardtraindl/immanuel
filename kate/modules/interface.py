@@ -11,9 +11,12 @@ MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
 
 def map_matches(src, dst, map_dir):
     if(map_dir == MAP_DIR['model-to-engine']):
-        moves = ModelMove.objects.filter(match_id=src.id).order_by("count")
-        if(len(moves) > 0):
-            for move in moves:
+        modelmoves = ModelMove.objects.filter(match_id=src.id).order_by("count")
+        if(len(modelmoves) > 0):
+            for modelmove in modelmoves:
+                move = cMove()
+                move.match = dst
+                map_moves(modelmove, move, MAP_DIR['model-to-engine'])
                 dst.move_list.append(move)
 
     dst.id = src.id
@@ -48,7 +51,7 @@ def map_matches(src, dst, map_dir):
 def map_moves(src, dst, map_dir):
     if(map_dir == MAP_DIR['model-to-engine']):
         dst.id = src.id
-        dst.match = src.match
+        #dst.match = src.match
 
     dst.count = src.count
     dst.move_type = src.move_type

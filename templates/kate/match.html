@@ -10,7 +10,19 @@
     <div style="display: table; width: 100%">
         <div style="display: table-row;">
             <div style="display: table-cell; width: 60%">
-                <h2>{{ match.white_player.name }} : {{ match.black_player.name }}</h2>
+                <h2>
+                {% if match.white_player.is_human %}
+                  {{ match.white_player.name }}
+                {% else %}
+                  <span style="color: DarkBlue">{{ match.white_player.name }}</span>
+                {% endif %}
+                &nbsp; : &nbsp;
+                {% if match.black_player.is_human %}
+                  {{ match.black_player.name }}
+                {% else %}
+                  <span style="color: DarkBlue">{{ match.black_player.name }}</span>
+                {% endif %}
+                </h2>
             </div>
             <div style="display: table-cell">
                 <p style="font-size: 12px; text-align: right;">Created on: {{ match.begin|fmtdate }}</p>

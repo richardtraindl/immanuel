@@ -42,15 +42,15 @@ p {
     padding: 0px;
 }
 
-h1, h1 a  {
+h1, h1 *  {
     font-size: 20px; /* 26px */
 }
 
-h2, h2 a  {
+h2, h2 *  {
     font-size: 18px; /* 24px */
 }
 
-h3, h3 a  {
+h3, h3 *  {
     font-size: 16px; /* 22px */
 }
 

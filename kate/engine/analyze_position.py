@@ -154,30 +154,20 @@ def score_controled_vertical_files(match):
     return score
 
 
-def is_opening(match):
-    return match.movecnt <= 30
-
-
-def is_endgame(match):
-    white_cnt = match.wQu_cnt + match.wOfficer_cnt
-    black_cnt = match.bQu_cnt + match.bOfficer_cnt
-    return (white_cnt <= 3 and black_cnt <= 3)
-
-
 def is_king_guarded(match, color):
     if(color == match.COLORS['white']):
         Kg_x = match.wKg_x
         Kg_y = match.wKg_y
         pawn = match.PIECES['wPw']
 
-        if(is_endgame(match) == False and Kg_y > 0):
+        if(match.is_endgame() == False and Kg_y > 0):
             return False
     else:
         Kg_x = match.bKg_x
         Kg_y = match.bKg_y
         pawn = match.PIECES['bPw']
 
-        if(is_endgame(match) == False and Kg_y < 7):
+        if(match.is_endgame() == False and Kg_y < 7):
             return False
 
     count = 0
@@ -293,38 +283,6 @@ def is_rook_locked(match, color):
 
     return score"""
 
-def piece_movecnt(match):
-    count = 0
-    last_srcx = None
-    last_srcy = None
-
-    for move in reversed(match.move_list):
-        if(last_srcx == move.dstx and last_srcy == move.dsty):
-            count += 1
-            last_srcx = move.srcx
-            last_srcy = move.srcy
-        elif(last_srcx is None):
-            count += 1
-            last_srcx = move.srcx
-            last_srcy = move.srcy
-
-    return count
-
-def multiple_pieces_movecnt(match, color):
-    count = 0
-
-    if(color == match.next_color()):
-        idx = 1
-    else:
-        idx = 0
-
-    for move in reversed(match.move_list):
-        if(idx % 2 == 0):
-            if(piece_movecnt(match) > 2):
-                count += 1
-        idx += 1
-
-    return count
 
 def score_opening(match):
     value = 0
@@ -342,11 +300,6 @@ def score_opening(match):
             cnt += 1
     if(cnt > 1):
         value += cnt * blackrate
-    ###
-
-    # multiple moves 
-    cnt = multiple_pieces_movecnt(match, match.COLORS['white'])
-    value += cnt * blackrate * 4
     ###
 
     # white king
@@ -373,11 +326,6 @@ def score_opening(match):
             cnt += 1
     if(cnt > 1):
         value += cnt * whiterate
-    ###
-
-    # multiple moves 
-    cnt = multiple_pieces_movecnt(match, match.COLORS['black'])
-    value += cnt * whiterate * 4
     ###
 
     # black king
@@ -432,9 +380,9 @@ def score_endgame(match):
     value = 0
 
     whiterate = match.ATTACKED_SCORES[match.PIECES['bPw']]
-    white_step_rates = [ 0, 0, 0, 1, 3, 6, 10, 15]
+    white_step_rates = [ 0, 0, 0, 2, 3, 5, 8, 12]
     blackrate = match.ATTACKED_SCORES[match.PIECES['wPw']]
-    black_step_rates = [15, 10, 6, 3, 1, 0, 0, 0 ]
+    black_step_rates = [12, 8, 5, 3, 2, 0, 0, 0 ]
 
     for y in range(8):
         for x in range(8):
@@ -448,25 +396,15 @@ def score_endgame(match):
                 cpawn = cPawn(match, x, y)
                 if(cpawn.is_running()):
                     value += blackrate
-                    value += blackrate * black_step_rates[(y)]
+                    value += blackrate * black_step_rates[y]
 
-    if(is_king_centered(match, match.COLORS['white'])):
+    """if(is_king_centered(match, match.COLORS['white'])):
         value += whiterate
 
     if(is_king_centered(match, match.COLORS['black'])):
-          value += blackrate
+          value += blackrate"""
 
     return value
-
-
-def score_mupltiple_piece_moves_in_opening(match, color):
-    if(is_opening(match)):
-        if(match.piece_movecnt() == 3):
-            if(color == match.COLORS['white']):
-                return match.ATTACKED_SCORES[match.PIECES['wPw']]
-            else:
-                return match.ATTACKED_SCORES[match.PIECES['bPw']]
-    return 0
 
 
 def score_stucks(match):
@@ -501,24 +439,24 @@ def score_position(match, movecnt):
             return match.SCORES[match.PIECES['blk']]
     else:
         score = match.score
-        
+
         color = match.next_color()
 
-        score += score_stucks(match)
+        #score += score_stucks(match)
 
         #----------------------------------------
-        score += score_attacks(match, color)
+        #score += score_attacks(match, color)
 
-        score += score_supports(match, match.REVERSED_COLORS[color])
+        #score += score_supports(match, match.REVERSED_COLORS[color])
 
-        score += score_controled_horizontal_files(match)
+        #score += score_controled_horizontal_files(match)
 
-        score += score_controled_vertical_files(match)
+        #score += score_controled_vertical_files(match)
         #----------------------------------------
 
-        if(is_opening(match)):
+        if(match.is_opening()):
             score += score_opening(match)
-        elif(is_endgame(match)):
+        elif(match.is_endgame()):
             score += score_endgame(match)
         else:
             score += score_game(match)

@@ -42,8 +42,8 @@ class Match(models.Model):
         return cMatch.PIECES[str_value]
 
 
-    def is_immanuel(self):
-        return (self.white_player_is_human == False or self.black_player_is_human == False)
+    #def is_immanuel(self):
+        #return (self.white_player_is_human == False or self.black_player_is_human == False)
 
 
 class Move(models.Model):

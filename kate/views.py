@@ -62,6 +62,7 @@ def match(request, matchid=None):
         qmoves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")[:limit]
         for qmove in reversed(qmoves):
             move = cMove()
+            move.match = match
             interface.map_moves(qmove, move, interface.MAP_DIR['model-to-engine'])
             moves.append(move)
 
@@ -108,6 +109,11 @@ def do_move(request, matchid=None):
 
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+        match = cMatch()
+        interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
+        if(match.is_next_color_human() == False):
+            msgcode= cValidator.RETURN_CODES['wrong-color']
+            return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
         form = DoMoveForm(request.POST)
         if(form.is_valid()):
             srcx,srcy = coord_to_index(form.move_src)

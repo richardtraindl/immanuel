@@ -4,7 +4,7 @@ from .match import *
 from .move import *
 from .openingmove import retrieve_move
 from .analyze_move import *
-from . import analyze_position
+from .analyze_position import score_position
 from .helper import *
 from .validator import *
 from .generator import cGenerator
@@ -187,11 +187,11 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             if(pmove.has_tactic(cTactic(PrioMove.TACTICS['tactical-draw'], PrioMove.SUB_TACTICS['undefined']))):
                 return 0, candidates
             else:
-                return analyze_position.score_position(match, len(priomoves)), candidates
+                return score_position(match, len(priomoves)), candidates
 
     if(len(priomoves) == 0 or maxcnt == 0):
         candidates.append(None)
-        return analyze_position.score_position(match, len(priomoves)), candidates
+        return score_position(match, len(priomoves)), candidates
 
     for priomove in priomoves:
         gmove = priomove.gmove
@@ -216,33 +216,35 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             match.undo_move()
 
         if(maximizing):
-            if(depth == 1):
-                prnt_search(match, "CURRENT SEARCH:   ", newscore, gmove, newcandidates)
-                prnt_search(match, "SEARCH CANDIDATE: ", maxscore, None, candidates)
-
             if(newscore > maxscore):
                 maxscore = newscore
                 append_newmove(gmove, candidates, newcandidates)
                 if(maxscore >= beta):
+                    if(depth == 1):
+                        prnt_search(match, "CURRENT SEARCH CUTOFF: ", -999, gmove, newcandidates)
+                        prnt_search(match, "SEARCH CANDIDATE:      ", maxscore, None, candidates)
                     break # beta cut-off
 
             if(depth == 1):
+                prnt_search(match, "CURRENT SEARCH:   ", newscore, gmove, newcandidates)
+                prnt_search(match, "SEARCH CANDIDATE: ", maxscore, None, candidates)
                 msgs.currentsearch.clear()
                 for candidate in candidates:
                     msgs.currentsearch.append(candidate)
 
         else:
-            if(depth == 1):
-                prnt_search(match, "CURRENT SEARCH:   ", newscore, gmove, newcandidates)
-                prnt_search(match, "SEARCH CANDIDATE: ", minscore, None, candidates)
-
             if(newscore < minscore):
                 minscore = newscore
                 append_newmove(gmove, candidates, newcandidates)
                 if(minscore <= alpha):
+                    if(depth == 1):
+                        prnt_search(match, "CURRENT SEARCH CUTOFF: ", 999, gmove, newcandidates)
+                        prnt_search(match, "SEARCH CANDIDATE:      ", minscore, None, candidates)
                     break # alpha cut-off
 
             if(depth == 1):
+                prnt_search(match, "CURRENT SEARCH:   ", newscore, gmove, newcandidates)
+                prnt_search(match, "SEARCH CANDIDATE: ", minscore, None, candidates)
                 msgs.currentsearch.clear()
                 for candidate in candidates:
                     msgs.currentsearch.append(candidate)
@@ -270,8 +272,8 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         return minscore, candidates
 
 def calc_move(match, msgs):
-    print("is opening: " + str(analyze_position.is_opening(match)) + \
-          " is endgame: " + str(analyze_position.is_endgame(match)))
+    print("is opening: " + str(match.is_opening()) + \
+          " is endgame: " + str(match.is_endgame()))
 
     candidates = []
     
