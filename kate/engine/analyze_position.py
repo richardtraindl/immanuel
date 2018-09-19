@@ -213,8 +213,17 @@ def is_king_exposed(match, color):
     else:
         return False
 
+def add_new_list_items(all_moves_list, move_list):
+    for move in move_list:
+        exists = False
+        for all_move in all_moves_list:
+            if(move[0] == all_move[0] and move[1] == all_move[1]):
+                exists = True
+                break
+        if(exists == False):
+            all_moves_list.append(move)
 
-def is_rook_locked(match, color):
+def is_rook_on_baseline_trapped(match, color):
     if(color == match.COLORS['white']):
         y = 0
         rook = match.PIECES['wRk']
@@ -224,39 +233,21 @@ def is_rook_locked(match, color):
         rook = match.PIECES['bRk']
         king = match.PIECES['bKg']
 
-    for i in range(2):
-        if(i == 0):
-            start = 0
-            end = 3
-            step = 1
-        else:
-            start = 7
-            end = 4
-            step = -1
-
-        first = None
-        second = None
-        for x in range(start, end, step):
-            piece = match.readfield(x, y)
-
-            if(piece == match.PIECES['blk']):
-                continue
-            elif(piece == rook):
-                if(first is None):
-                    first = rook
-                elif(second is None):
-                    second = rook
-            elif(piece == king):
-                if(first is None):
-                    first = king
-                elif(second is None):
-                    second = king
-                else:
-                    return True
-
-        if(first == rook and second == king):
-            return True
-
+    for x in range(8):
+        piece1 = match.readfield(x, y)
+        if(piece1 == rook):
+            crook1 = cRook(match, x, y)
+            move_list1 = crook1.list_moves()
+            all_moves_list = move_list1.copy()
+            for move in move_list1:
+                piece2 = match.readfield(move[0], move[1])
+                match.writefield(move[0], move[1], rook)
+                crook2 = cRook(match, move[0], move[1])
+                move_list2 = crook2.list_moves()
+                match.writefield(move[0], move[1], piece2)
+                add_new_list_items(all_moves_list, move_list2)
+            if(len(all_moves_list) <= 3):
+                return True
     return False
 
 
@@ -313,7 +304,7 @@ def score_opening(match):
     ###
 
     # white rook
-    if(is_rook_locked(match, match.COLORS['white'])):
+    if(is_rook_on_baseline_trapped(match, match.COLORS['white'])):
         value += blackrate
     ###
 
@@ -339,7 +330,7 @@ def score_opening(match):
     ###
 
     # black rook
-    if(is_rook_locked(match, match.COLORS['black'])):
+    if(is_rook_on_baseline_trapped(match, match.COLORS['black'])):
         value += whiterate
     ###
 
@@ -360,7 +351,7 @@ def score_game(match):
     if(is_king_exposed(match, match.COLORS['white'])):
         value += blackrate
 
-    if(is_rook_locked(match, match.COLORS['white'])):
+    if(is_rook_on_baseline_trapped(match, match.COLORS['white'])):
         value += blackrate
 
     # black
@@ -370,7 +361,7 @@ def score_game(match):
     if(is_king_exposed(match, match.COLORS['black'])):
         value += whiterate
 
-    if(is_rook_locked(match, match.COLORS['black'])):
+    if(is_rook_on_baseline_trapped(match, match.COLORS['black'])):
         value += whiterate
 
     return value
@@ -397,12 +388,6 @@ def score_endgame(match):
                 if(cpawn.is_running()):
                     value += blackrate
                     value += blackrate * black_step_rates[y]
-
-    """if(is_king_centered(match, match.COLORS['white'])):
-        value += whiterate
-
-    if(is_king_centered(match, match.COLORS['black'])):
-          value += blackrate"""
 
     return value
 

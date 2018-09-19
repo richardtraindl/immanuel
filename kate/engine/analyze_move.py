@@ -288,6 +288,23 @@ def running_pawn_in_endgame(match, gmove):
             return cpawn.is_running()
     return False
 
+def defends_invasion(match, gmove):
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+    color = match.color_of_piece(piece)
+    board =  [[0] * 8 for i in range(8)]
+
+    for y in range(8):
+        for x in range(8):
+            piece = match.readfield(x, y)
+            if(match.color_of_piece(piece) == match.COLORS['white']):
+                board[y][x] += 1
+            elif(match.color_of_piece(piece) == match.COLORS['black']):
+                board[y][x] -= 1
+
+
+
+   
+    return False
 
 def controles_file(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)

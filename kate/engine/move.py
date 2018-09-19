@@ -73,13 +73,48 @@ class cMove:
 # class end
 
 
+class cGenMove(object):
+    def __init__(self, match=None, srcx=None, srcy=None, dstx=None, dsty=None, prom_piece=None):
+        self.match = match
+        self.srcx = srcx
+        self.srcy = srcy
+        self.dstx = dstx
+        self.dsty = dsty
+        self.prom_piece = prom_piece
+
+    def format_genmove(self):
+        piece = self.match.readfield(self.srcx, self.srcy)
+        dstpiece = self.match.readfield(self.dstx, self.dsty)
+
+        if(dstpiece != self.match.PIECES['blk']):
+            hyphen = "x"
+        elif( (piece == self.match.PIECES['wPw'] or piece == self.match.PIECES['bPw']) and 
+               self.srcx != self.dstx ):
+            hyphen = "x"
+        else:
+            hyphen = "-"
+
+        if(self.prom_piece and self.prom_piece != cMatch.PIECES['blk']):
+            trailing = ", " + reverse_lookup(cMatch.PIECES, self.prom_piece)
+        else:
+            trailing = ""
+
+        fmtmove = index_to_coord(self.srcx, self.srcy) + \
+                  hyphen + \
+                  index_to_coord(self.dstx, self.dsty) + \
+                  trailing
+        return fmtmove
+
+# class end
+
+
 class cTactic:
     def __init__(self, tactic=None, subtactic=None):
         self.tactic = tactic
         self.subtactic = subtactic
 # class end
 
-class PrioMove:
+class cPrioMove:
     PRIO = {
         'prio1' : 0,
         'prio2' : 1,
@@ -138,7 +173,7 @@ class PrioMove:
         TACTICS['tactical-draw'] : PRIO['prio4'],
         TACTICS['running-pawn'] : PRIO['prio4'], 
         TACTICS['controle-file'] : PRIO['prio7'], 
-        TACTICS['castling'] : PRIO['prio6'],
+        TACTICS['castling'] : PRIO['prio5'],
         TACTICS['progress'] : PRIO['prio8'], 
         TACTICS['undefined'] : PRIO['prio10'] }
 
@@ -149,68 +184,6 @@ class PrioMove:
         SUB_TACTICS['bad-deal'] : 1,
         SUB_TACTICS['downgraded'] : 1,
         SUB_TACTICS['undefined'] : 0 }
-
-    """TACTICS = {
-        'tactical-draw' : 0,
-        'defend-check' : 10,
-        'capture-good-deal' : 20,
-        'capture-bad-deal' : 21,
-        'attack-king-good-deal' : 31,
-        'attack-king-bad-deal' : 32,
-        'attack-stormy' : 33,
-        'attack-good-deal' : 34,
-        'discl-attack-good-deal' : 35,
-        'attack-downgraded' : 37,
-        'attack-bad-deal' : 36,
-        'support-good-deal' : 40,
-        'discl-support-good-deal' : 41,
-        'support-downgraded' : 42,
-        'support-unattacked' : 43,
-        'support-bad-deal' : 44,
-        'flee-urgent' : 50,
-        'flee' : 51,
-        'flee-downgraded' : 52,
-        'defend-fork' : 60,
-        'defend-fork-downgraded' : 61,
-        'castling' : 70,
-        'promotion' : 71,
-        'running-pawn-in-endgame' : 72, 
-        'does-unpin' : 73, 
-        'block' : 74,
-        'controle-file-good-deal' : 75,
-        'progress' : 76, 
-        'undefined' : 90 }
-
-    TACTICS_TO_PRIO = {
-        TACTICS['tactical-draw'] : PRIO['prio2'],
-        TACTICS['defend-check'] : PRIO['prio1'],
-        TACTICS['capture-good-deal'] : PRIO['prio2'],
-        TACTICS['capture-bad-deal'] : PRIO['prio6'], 
-        TACTICS['attack-king-good-deal'] : PRIO['prio2'],
-        TACTICS['attack-king-bad-deal'] : PRIO['prio5'], 
-        TACTICS['attack-stormy'] : PRIO['prio3'],          
-        TACTICS['attack-good-deal'] : PRIO['prio4'],
-        TACTICS['discl-attack-good-deal'] : PRIO['prio4'],  
-        TACTICS['attack-downgraded'] : PRIO['prio6'],
-        TACTICS['attack-bad-deal'] : PRIO['prio9'], 
-        TACTICS['support-good-deal'] : PRIO['prio4'], 
-        TACTICS['discl-support-good-deal'] : PRIO['prio4'], 
-        TACTICS['support-downgraded'] : PRIO['prio6'], 
-        TACTICS['support-unattacked'] : PRIO['prio8'], 
-        TACTICS['support-bad-deal'] : PRIO['prio9'],
-        TACTICS['flee-urgent'] : PRIO['prio3'], 
-        TACTICS['flee-downgraded'] : PRIO['prio6'], 
-        TACTICS['flee'] : PRIO['prio6'],
-        TACTICS['defend-fork'] : PRIO['prio4'], 
-        TACTICS['defend-fork-downgraded'] : PRIO['prio6'], 
-        TACTICS['castling'] : PRIO['prio5'],
-        TACTICS['promotion'] : PRIO['prio2'],
-        TACTICS['running-pawn-in-endgame'] : PRIO['prio2'], 
-        TACTICS['does-unpin'] : PRIO['prio2'], 
-        TACTICS['block'] : PRIO['prio4'], 
-        TACTICS['controle-file-good-deal'] : PRIO['prio5'], 
-        TACTICS['progress'] : PRIO['prio8'], 
-        TACTICS['undefined'] : PRIO['prio10'] }"""
 
     def __init__(self, gmove=None):
         self.gmove = gmove

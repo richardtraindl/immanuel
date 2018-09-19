@@ -26,6 +26,18 @@ class cKing(cPiece):
     STEP_LG_CASTLING_X = -2
     STEP_LG_CASTLING_Y = 0
 
+    blk = 0
+    GEN_STEPS = [ [[0, 1, blk]],
+                  [[1, 1, blk]],
+                  [[1, 0, blk]], 
+                  [[1, -1, blk]],
+                  [[0, -1, blk]], 
+                  [[-1, -1, blk]],
+                  [[-1, 0, blk]],
+                  [[-1, 1, blk]],
+                  [[2, 0, blk]],
+                  [[-2, 0, blk]] ]
+
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
 

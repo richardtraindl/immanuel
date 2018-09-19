@@ -165,9 +165,9 @@ def calc_move_for_immanuel(modelmatch):
     if(status != match.STATUS['open']):
         return False, status
     elif(match.is_next_color_human()):
-        return False, cValidator.RETURN_CODES['wrong-color']
+        return False, match.RETURN_CODES['wrong-color']
     else:
         thread = ImmanuelsThread("immanuel-" + str(random.randint(0, 100000)), match)
         thread.start()
-        return True, cValidator.RETURN_CODES['ok']
+        return True, match.RETURN_CODES['ok']
 

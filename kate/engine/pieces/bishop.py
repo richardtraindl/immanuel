@@ -27,6 +27,12 @@ class cBishop(cPiece):
     STEP_SEAST_X = 1
     STEP_SEAST_Y = -1
 
+    blk = 0
+    GEN_STEPS = [ [[1, 1, blk],   [2, 2, blk],   [3, 3, blk],   [4, 4, blk],   [5, 5, blk],   [6, 6, blk],   [7, 7, blk]],
+                  [[-1, -1, blk], [-2, -2, blk], [-3, -3, blk], [-4, -4, blk], [-5, -5, blk], [-6, -6, blk], [-7, -7, blk]],
+                  [[1, -1, blk],  [2, -2, blk],  [3, -3, blk],  [4, -4, blk],  [5, -5, blk],  [6, -6, blk],  [7, -7, blk]],
+                  [[-1, 1, blk],  [-2, 2, blk],  [-3, 3, blk],  [-4, 4, blk],  [-5, 5, blk],  [-6, 6, blk],  [-7, 7, blk]] ]
+
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
 

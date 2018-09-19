@@ -12,8 +12,6 @@ from .modules import interface
 from .engine.match import *
 from .engine.move import *
 from .engine.helper import index_to_coord, coord_to_index
-from .engine.validator import cValidator
-#from .engine.analyze_position import score_position, is_stormy
 from .engine.debug import list_match_attributes
 
 
@@ -84,12 +82,12 @@ def match(request, matchid=None):
         else:
             urgent = False
             msg = "" """
-    elif(msgcode == cValidator.RETURN_CODES['ok']):
+    elif(msgcode == match.RETURN_CODES['ok']):
         #urgent = False
-        msg = cValidator.RETURN_MSGS[msgcode]
+        msg = match.RETURN_MSGS[msgcode]
     else:
         urgent = True
-        msg = cValidator.RETURN_MSGS[msgcode]
+        msg = match.RETURN_MSGS[msgcode]
 
     status = match.evaluate_status()
     if(status == match.STATUS['winner_white'] or status == match.STATUS['winner_black'] or status == match.STATUS['draw']):
@@ -112,7 +110,7 @@ def do_move(request, matchid=None):
         match = cMatch()
         interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
         if(match.is_next_color_human() == False):
-            msgcode= cValidator.RETURN_CODES['wrong-color']
+            msgcode= match.RETURN_CODES['wrong-color']
             return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
         form = DoMoveForm(request.POST)
         if(form.is_valid()):
@@ -125,7 +123,7 @@ def do_move(request, matchid=None):
 
                 interface.calc_move_for_immanuel(modelmatch)
         else:
-            msgcode= cValidator.RETURN_CODES['format-error']
+            msgcode= match.RETURN_CODES['format-error']
 
         return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
     else:

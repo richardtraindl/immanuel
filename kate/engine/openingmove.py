@@ -2,7 +2,6 @@ import random
 from .match import *
 from .move import *
 from .openings import *
-from .generator import GenMove
 from .helper import coord_to_index, index_to_coord
 
 
@@ -44,9 +43,5 @@ def retrieve_move(match):
         candidate = candidates[idx]
         srcx, srcy = coord_to_index(candidate[:2])
         dstx, dsty = coord_to_index(candidate[3:])
-        if(match.readfield(dstx, dsty) != match.PIECES['blk']):
-            captures = True
-        else:
-            captures = False
-        return GenMove(srcx, srcy, dstx, dsty, match.PIECES['blk'], captures)
+        return cGenMove(match, srcx, srcy, dstx, dsty, match.PIECES['blk'])
 

@@ -27,6 +27,12 @@ class cRook(cPiece):
     STEP_WEST_X = -1
     STEP_WEST_Y = 0
 
+    blk = 0
+    GEN_STEPS = [ [[0, 1, blk],  [0, 2, blk],  [0, 3, blk],  [0, 4, blk],  [0, 5, blk],  [0, 6, blk],  [0, 7, blk]],
+                  [[0, -1, blk], [0, -2, blk], [0, -3, blk], [0, -4, blk], [0, -5, blk], [0, -6, blk], [0, -7, blk]],
+                  [[1, 0, blk],  [2, 0, blk],  [3, 0, blk],  [4, 0, blk],  [5, 0, blk],  [6, 0, blk],  [7, 0, blk]],
+                  [[-1, 0, blk], [-2, 0, blk], [-3, 0, blk], [-4, 0, blk], [-5, 0, blk], [-6, 0, blk], [-7, 0, blk]] ]
+
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
 

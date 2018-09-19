@@ -44,14 +44,36 @@ class cPawn(cPiece):
     A2_Y = 1
     A7_Y = 6
 
+    blk = 0
+    wRk = 3
+    wKn = 4
+    wBp = 5
+    wQu = 6
+    bRk = 11
+    bKn = 12
+    bBp = 13
+    bQu = 14 
+
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
         if(self.color == self.match.COLORS['white']):
             self.STEPS = [ [1, 1], [-1, 1] ]
             self.BACK_STEPS = [ [1, -1], [-1, -1] ]
+            if(self.ypos < 6):
+                self.GEN_STEPS = [ [[0, 1, self.blk]], [[0, 2, self.blk]], [[1, 1, self.blk]], [[-1, 1, self.blk]] ]
+            else:
+                self.GEN_STEPS = [ [[0, 1, self.wQu],  [0, 1, self.wRk],  [0, 1, self.wBp],  [0, 1, self.wKn]],
+                                   [[1, 1, self.wQu],  [1, 1, self.wRk],  [1, 1, self.wBp],  [1, 1, self.wKn]],
+                                   [[-1, 1, self.wQu], [-1, 1, self.wRk], [-1, 1, self.wBp], [-1, 1, self.wKn]] ]
         else:
             self.STEPS = [ [1, -1], [-1, -1] ]
             self.BACK_STEPS = [ [1, 1], [-1, 1] ]
+            if(self.ypos > 1):
+                self.GEN_STEPS = [ [[0, -1, self.blk]], [[0, -2, self.blk]], [[-1, -1, self.blk]], [[1, -1, self.blk]] ]
+            else:
+                self.GEN_STEPS = [ [[0, -1, self.bQu],  [0, -1, self.bRk],  [0, -1, self.bBp],  [0, -1, self.bKn]],
+                                   [[1, -1, self.bQu],  [1, -1, self.bRk],  [1, -1, self.bBp],  [1, -1, self.bKn]],
+                                   [[-1, -1, self.bQu], [-1, -1, self.bRk], [-1, -1, self.bBp], [-1, -1, self.bKn]] ]
 
     @classmethod
     def dir_for_move(cls, srcx, srcy, dstx, dsty):

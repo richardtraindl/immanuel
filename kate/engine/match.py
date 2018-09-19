@@ -7,8 +7,11 @@ from .pieces.bishop import cBishop
 from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
-from .pieces import pawnfield, knightfield, rookfield, bishopfield, kingfield
-from .validator import cValidator
+from .pieces.pawnfield import cPawnField
+from .pieces.knightfield import cKnightField
+from .pieces.rookfield import cRookField
+from .pieces.bishopfield import cBishopField
+from .pieces.kingfield import cKingField
 
 
 class cMatch:
@@ -165,6 +168,42 @@ class cMatch:
             PIECES['bKn'] : 8,
             PIECES['bBp'] : 8,
             PIECES['bQu'] : 16 }
+
+    RETURN_CODES = {
+        'ok' : 10,
+        'draw' : 11,
+        'winner_white' : 12,
+        'winner_black' : 13,
+        'match-cancelled' : 14,
+        'wrong-color' : 15,
+        'pawn-error' : 20,
+        'rook-error' : 21,
+        'knight-error' : 22,
+        'bishop-error' : 23,
+        'queen-error' : 24,
+        'king-error' : 25,
+        'format-error' : 30,
+        'out-of-bounds' : 31,
+        'general-error' : 40,
+    }
+
+    RETURN_MSGS = {
+        RETURN_CODES['ok'] : "move okay",
+        RETURN_CODES['draw'] : "draw",
+        RETURN_CODES['winner_white'] : "winner white",
+        RETURN_CODES['winner_black'] : "winner black",
+        RETURN_CODES['match-cancelled'] : " match is cancelled",
+        RETURN_CODES['wrong-color'] : "wrong color",
+        RETURN_CODES['pawn-error'] : "pawn error",
+        RETURN_CODES['rook-error'] : "rook error",
+        RETURN_CODES['knight-error'] : "knight error",
+        RETURN_CODES['bishop-error'] : "bishop error",
+        RETURN_CODES['queen-error'] : "queen error",
+        RETURN_CODES['king-error'] : "king error",
+        RETURN_CODES['format-error'] : "format wrror",
+        RETURN_CODES['out-of-bounds'] : "wrong square",
+        RETURN_CODES['general-error'] : "general error",
+    }
 
     E1_X = 4
     E1_Y = 0
@@ -349,55 +388,55 @@ class cMatch:
 
     def is_move_valid(self, srcx, srcy, dstx, dsty, prom_piece):
         if(not self.is_move_inbounds(srcx, srcy, dstx, dsty)):
-            return False, cValidator.RETURN_CODES['out-of-bounds']
+            return False, self.RETURN_CODES['out-of-bounds']
 
         piece = self.readfield(srcx, srcy)
 
         if(self.next_color() != self.color_of_piece(piece)):
-            return False, cValidator.RETURN_CODES['wrong-color']
+            return False, self.RETURN_CODES['wrong-color']
 
         if(piece != self.PIECES['wKg'] and piece != self.PIECES['bKg']):
             if(self.is_king_after_move_attacked(srcx, srcy, dstx, dsty)):
-                return False, cValidator.RETURN_CODES['king-error']
+                return False, self.RETURN_CODES['king-error']
 
         if(piece == self.PIECES['wPw'] or piece == self.PIECES['bPw']):
             cpawn = cPawn(self, srcx, srcy)
             if(cpawn.is_move_valid(dstx, dsty, prom_piece)):
-                return True, cValidator.RETURN_CODES['ok']
+                return True, self.RETURN_CODES['ok']
             else:
-                return False, cValidator.RETURN_CODES['pawn-error']
+                return False, self.RETURN_CODES['pawn-error']
         elif(piece == self.PIECES['wRk'] or piece == self.PIECES['bRk']):
-            crook =  cRook(self, srcx, srcy)
+            crook = cRook(self, srcx, srcy)
             if(crook.is_move_valid(dstx, dsty)):
-                return True, cValidator.RETURN_CODES['ok']
+                return True, self.RETURN_CODES['ok']
             else:
-                return False, cValidator.RETURN_CODES['rook-error']
+                return False, self.RETURN_CODES['rook-error']
         elif(piece == self.PIECES['wKn'] or piece == self.PIECES['bKn']):
             cknight = cKnight(self, srcx, srcy)
             if(cknight.is_move_valid(dstx, dsty)):
-                return True, cValidator.RETURN_CODES['ok']
+                return True, self.RETURN_CODES['ok']
             else:
-                return False, cValidator.RETURN_CODES['knight-error']
+                return False, self.RETURN_CODES['knight-error']
         elif(piece == self.PIECES['wBp'] or piece == self.PIECES['bBp']):
             cbishop = cBishop(self, srcx, srcy)
             if(cbishop.is_move_valid(dstx, dsty)):
-                return True, cValidator.RETURN_CODES['ok']
+                return True, self.RETURN_CODES['ok']
             else:
-                return False, cValidator.RETURN_CODES['bishop-error']
+                return False, self.RETURN_CODES['bishop-error']
         elif(piece == self.PIECES['wQu'] or piece == self.PIECES['bQu']):
             cqueen = cQueen(self, srcx, srcy)
             if(cqueen.is_move_valid(dstx, dsty)):
-                return True, cValidator.RETURN_CODES['ok']
+                return True, self.RETURN_CODES['ok']
             else:
-                return False, cValidator.RETURN_CODES['queen-error']
+                return False, self.RETURN_CODES['queen-error']
         elif(piece == self.PIECES['wKg'] or piece == self.PIECES['bKg']):
             cking = cKing(self, srcx, srcy)
             if(cking.is_move_valid(dstx, dsty)):
-                return True, cValidator.RETURN_CODES['ok']
+                return True, self.RETURN_CODES['ok']
             else:
-                return False, cValidator.RETURN_CODES['king-error']
+                return False, self.RETURN_CODES['king-error']
         else:
-            return False, cValidator.RETURN_CODES['general-error']
+            return False, self.RETURN_CODES['general-error']
 
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
         piece = self.readfield(srcx, srcy)
@@ -480,19 +519,19 @@ class cMatch:
         return flag
 
     def is_field_touched(self, color, srcx, srcy, mode):
-        crookfield = rookfield.cRookField(self, srcx, srcy)
+        crookfield = cRookField(self, srcx, srcy)
         if(crookfield.is_field_touched(color, mode)):
             return True
-        cbishopfield = bishopfield.cBishopField(self, srcx, srcy)
+        cbishopfield = cBishopField(self, srcx, srcy)
         if(cbishopfield.is_field_touched(color, mode)):
             return True
-        cknightfield = knightfield.cKnightField(self, srcx, srcy)
+        cknightfield = cKnightField(self, srcx, srcy)
         if(cknightfield.is_field_touched(color, mode)):
             return True
-        ckingfield = kingfield.cKingField(self, srcx, srcy)
+        ckingfield = cKingField(self, srcx, srcy)
         if(ckingfield.is_field_touched(color)):
             return True
-        cpawnfield = pawnfield.cPawnField(self, srcx, srcy)
+        cpawnfield = cPawnField(self, srcx, srcy)
         if(cpawnfield.is_field_touched(color, mode)):
             return True
         return False
@@ -576,7 +615,7 @@ class cMatch:
         piece = self.readfield(srcx, srcy)
         color = self.color_of_piece(piece)
         opp_color = self.oppcolor_of_piece(piece)
-        crookfield = rookfield.cRookField(self, srcx, srcy)
+        crookfield = cRookField(self, srcx, srcy)
         enemies = crookfield.list_field_touches(opp_color)        
         for enemy in enemies:
             enemy_dir = cRook.dir_for_move(srcx, srcy, enemy.fieldx, enemy.fieldy)
@@ -590,7 +629,7 @@ class cMatch:
                     return True
 
         enemies.clear()
-        cbishopfield = bishopfield.cBishopField(self, srcx, srcy)
+        cbishopfield = cBishopField(self, srcx, srcy)
         enemies = cbishopfield.list_field_touches(opp_color) 
         for enemy in enemies:
             enemy_dir = cBishop.dir_for_move(srcx, srcy, enemy.fieldx, enemy.fieldy)

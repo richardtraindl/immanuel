@@ -21,6 +21,16 @@ class cKnight(cPiece):
     STEP_2N1W_X = -1
     STEP_2N1W_Y = 2
 
+    blk = 0
+    GEN_STEPS = [ [[1, 2, blk]],
+                  [[2, 1, blk]],
+                  [[2, -1, blk]], 
+                  [[1, -2, blk]],
+                  [[-1, -2, blk]],
+                  [[-2, -1, blk]],
+                  [[-2, 1, blk]],
+                  [[-1, 2, blk]] ]
+
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
 

@@ -1,4 +1,4 @@
-from .. move import cMove
+from .. move import *
 
 
 class cPiece:
@@ -8,6 +8,8 @@ class cPiece:
     STEPS = []
     UNDEF_X = 8
     UNDEF_Y = 8
+
+    GEN_STEPS = None
 
     def __init__(self, match, xpos, ypos):
         self.match = match
@@ -341,6 +343,35 @@ class cPiece:
                         score += self.match.SUPPORTED_SCORES[supported]
         return score
 
+
+    def list_moves(self):
+        movelist = []
+        for step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                piece = self.match.readfield(x1, y1)
+                if(self.match.color_of_piece(piece) != self.color):
+                    movelist.append([x1, y1])
+        return movelist
+
+
+    def generate_moves(self, mode):
+        genmoves = []
+        for direction in self.GEN_STEPS:
+            for step in direction:
+                dstx = self.xpos + step[0]
+                dsty = self.ypos + step[1]
+                flag, errcode = self.match.is_move_valid(self.xpos, self.ypos, dstx, dsty, step[2])
+                if(flag):
+                    if(mode == 0):
+                        genmoves.append(GenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2]))
+                    else:
+                        gmove = cGenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2])
+                        genmoves.append(cPrioMove(gmove))
+                elif(errcode == 31): #cValidator.RETURN_CODES['out-of-bounds']
+                    break
+        return genmoves
 # class end
 
 
