@@ -208,6 +208,7 @@ class cMatch(cBoard):
     UNDEF_Y = 8
 
     def __init__(self):
+        super().__init__()
         self.status = self.STATUS['open']
         self.movecnt = 0
         self.score = 0
