@@ -28,19 +28,19 @@ class cBoard:
             'bQu' : 14 
         }
 
-        BLK = self.PIECES['blk']
-        wRK = self.PIECES['wRk']
-        wKN = self.PIECES['wKn']
-        wBP = self.PIECES['wBp']
-        wQU = self.PIECES['wQu']
-        wKG = self.PIECES['wKg']
-        wPW = self.PIECES['wPw']
-        bRK = self.PIECES['bRk']
-        bKN = self.PIECES['bKn']
-        bBP = self.PIECES['bBp']
-        bQU = self.PIECES['bQu']
-        bKG = self.PIECES['bKg']
-        bPW = self.PIECES['bPw']
+    BLK = PIECES['blk']
+    wRK = PIECES['wRk']
+    wKN = PIECES['wKn']
+    wBP = PIECES['wBp']
+    wQU = PIECES['wQu']
+    wKG = PIECES['wKg']
+    wPW = PIECES['wPw']
+    bRK = PIECES['bRk']
+    bKN = PIECES['bKn']
+    bBP = PIECES['bBp']
+    bQU = PIECES['bQu']
+    bKG = PIECES['bKg']
+    bPW = PIECES['bPw']
 
     def __init__(self):
 
