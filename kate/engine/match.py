@@ -14,7 +14,7 @@ from .pieces.bishopfield import cBishopField
 from .pieces.kingfield import cKingField
 
 
-class cMatch(cBoard):
+class cMatch:
     STATUS = {
             'open' : 10,
             'draw' : 11,
@@ -34,6 +34,22 @@ class cMatch(cBoard):
             LEVELS['medium'] : 90,
             LEVELS['high'] : 120 }
 
+    PIECES = {
+            'blk' : 0,
+            'wKg' : 1,
+            'wPw' : 2,
+            'wRk' : 3,
+            'wKn' : 4,
+            'wBp' : 5,
+            'wQu' : 6,
+            'bKg' : 9,
+            'bPw' : 10,
+            'bRk' : 11,
+            'bKn' : 12,
+            'bBp' : 13,
+            'bQu' : 14 
+        }
+
     COLORS = {
             'undefined' : 0,
             'white' : 1,
@@ -45,34 +61,34 @@ class cMatch(cBoard):
                         COLORS['black'] : COLORS['white'] }
 
     PIECES_COLOR = {
-            cBoard.PIECES['blk'] : COLORS['undefined'],
-            cBoard.PIECES['wKg'] : COLORS['white'],
-            cBoard.PIECES['wPw'] : COLORS['white'],
-            cBoard.PIECES['wRk'] : COLORS['white'],
-            cBoard.PIECES['wKn'] : COLORS['white'],
-            cBoard.PIECES['wBp'] : COLORS['white'],
-            cBoard.PIECES['wQu'] : COLORS['white'],
-            cBoard.PIECES['bKg'] : COLORS['black'],
-            cBoard.PIECES['bPw'] : COLORS['black'],
-            cBoard.PIECES['bRk'] : COLORS['black'],
-            cBoard.PIECES['bKn'] : COLORS['black'],
-            cBoard.PIECES['bBp'] : COLORS['black'],
-            cBoard.PIECES['bQu'] : COLORS['black'] }
+            PIECES['blk'] : COLORS['undefined'],
+            PIECES['wKg'] : COLORS['white'],
+            PIECES['wPw'] : COLORS['white'],
+            PIECES['wRk'] : COLORS['white'],
+            PIECES['wKn'] : COLORS['white'],
+            PIECES['wBp'] : COLORS['white'],
+            PIECES['wQu'] : COLORS['white'],
+            PIECES['bKg'] : COLORS['black'],
+            PIECES['bPw'] : COLORS['black'],
+            PIECES['bRk'] : COLORS['black'],
+            PIECES['bKn'] : COLORS['black'],
+            PIECES['bBp'] : COLORS['black'],
+            PIECES['bQu'] : COLORS['black'] }
 
     PIECES_RANK = {
-            cBoard.PIECES['blk'] : 0,
-            cBoard.PIECES['wPw'] : 2,
-            cBoard.PIECES['bPw'] : 2,
-            cBoard.PIECES['wKn'] : 4,
-            cBoard.PIECES['bKn'] : 4,
-            cBoard.PIECES['wBp'] : 4,
-            cBoard.PIECES['bBp'] : 4,
-            cBoard.PIECES['wRk'] : 5,
-            cBoard.PIECES['bRk'] : 5,
-            cBoard.PIECES['wQu'] : 7,
-            cBoard.PIECES['bQu'] : 7,
-            cBoard.PIECES['wKg'] : 9,
-            cBoard.PIECES['bKg'] : 9 }
+            PIECES['blk'] : 0,
+            PIECES['wPw'] : 2,
+            PIECES['bPw'] : 2,
+            PIECES['wKn'] : 4,
+            PIECES['bKn'] : 4,
+            PIECES['wBp'] : 4,
+            PIECES['bBp'] : 4,
+            PIECES['wRk'] : 5,
+            PIECES['bRk'] : 5,
+            PIECES['wQu'] : 7,
+            PIECES['bQu'] : 7,
+            PIECES['wKg'] : 9,
+            PIECES['bKg'] : 9 }
 
     DIRS = {
         'north' : 1,
@@ -109,49 +125,49 @@ class cMatch(cBoard):
     }
 
     SCORES = { 
-            cBoard.PIECES['blk'] : 0,
-            cBoard.PIECES['wKg'] : -20000,
-            cBoard.PIECES['wPw'] : -100,
-            cBoard.PIECES['wRk'] : -500,
-            cBoard.PIECES['wKn'] : -336,
-            cBoard.PIECES['wBp'] : -340,
-            cBoard.PIECES['wQu'] : -950,
-            cBoard.PIECES['bKg'] : 20000,
-            cBoard.PIECES['bPw'] : 100,
-            cBoard.PIECES['bRk'] : 500,
-            cBoard.PIECES['bKn'] : 336,
-            cBoard.PIECES['bBp'] : 340,
-            cBoard.PIECES['bQu'] : 950 }
+            PIECES['blk'] : 0,
+            PIECES['wKg'] : -20000,
+            PIECES['wPw'] : -100,
+            PIECES['wRk'] : -500,
+            PIECES['wKn'] : -336,
+            PIECES['wBp'] : -340,
+            PIECES['wQu'] : -950,
+            PIECES['bKg'] : 20000,
+            PIECES['bPw'] : 100,
+            PIECES['bRk'] : 500,
+            PIECES['bKn'] : 336,
+            PIECES['bBp'] : 340,
+            PIECES['bQu'] : 950 }
 
     SUPPORTED_SCORES = {
-            cBoard.PIECES['blk'] : 0,
-            cBoard.PIECES['wKg'] : 0,
-            cBoard.PIECES['wPw'] : 4,
-            cBoard.PIECES['wRk'] : 10,
-            cBoard.PIECES['wKn'] : 8,
-            cBoard.PIECES['wBp'] : 8,
-            cBoard.PIECES['wQu'] : 16,
-            cBoard.PIECES['bKg'] : 0,
-            cBoard.PIECES['bPw'] : -4,
-            cBoard.PIECES['bRk'] : -10,
-            cBoard.PIECES['bKn'] : -8,
-            cBoard.PIECES['bBp'] : -8,
-            cBoard.PIECES['bQu'] : -16 }
+            PIECES['blk'] : 0,
+            PIECES['wKg'] : 0,
+            PIECES['wPw'] : 4,
+            PIECES['wRk'] : 10,
+            PIECES['wKn'] : 8,
+            PIECES['wBp'] : 8,
+            PIECES['wQu'] : 16,
+            PIECES['bKg'] : 0,
+            PIECES['bPw'] : -4,
+            PIECES['bRk'] : -10,
+            PIECES['bKn'] : -8,
+            PIECES['bBp'] : -8,
+            PIECES['bQu'] : -16 }
 
     ATTACKED_SCORES = {
-            cBoard.PIECES['blk'] : 0,
-            cBoard.PIECES['wKg'] : 0,
-            cBoard.PIECES['wPw'] : -4,
-            cBoard.PIECES['wRk'] : -10,
-            cBoard.PIECES['wKn'] : -8,
-            cBoard.PIECES['wBp'] : -8,
-            cBoard.PIECES['wQu'] : -16,
-            cBoard.PIECES['bKg'] : 0,
-            cBoard.PIECES['bPw'] : 4,
-            cBoard.PIECES['bRk'] : 10,
-            cBoard.PIECES['bKn'] : 8,
-            cBoard.PIECES['bBp'] : 8,
-            cBoard.PIECES['bQu'] : 16 }
+            PIECES['blk'] : 0,
+            PIECES['wKg'] : 0,
+            PIECES['wPw'] : -4,
+            PIECES['wRk'] : -10,
+            PIECES['wKn'] : -8,
+            PIECES['wBp'] : -8,
+            PIECES['wQu'] : -16,
+            PIECES['bKg'] : 0,
+            PIECES['bPw'] : 4,
+            PIECES['bRk'] : 10,
+            PIECES['bKn'] : 8,
+            PIECES['bBp'] : 8,
+            PIECES['bQu'] : 16 }
 
     RETURN_CODES = {
         'ok' : 10,
@@ -208,7 +224,6 @@ class cMatch(cBoard):
     UNDEF_Y = 8
 
     def __init__(self):
-        super().__init__()
         self.status = self.STATUS['open']
         self.movecnt = 0
         self.score = 0
@@ -218,6 +233,7 @@ class cMatch(cBoard):
         self.time_start = 0
         self.white_player = cPlayer(self.COLORS['white'], "", True, 0)
         self.black_player = cPlayer(self.COLORS['black'], "", True, 0)
+        self.board = cBoard(self.PIECES)
         self.fifty_moves_count = 0
         self.white_movecnt_short_castling_lost = 0
         self.white_movecnt_long_castling_lost = 0
@@ -298,6 +314,15 @@ class cMatch(cBoard):
                 elif(piece == self.PIECES['bRk'] or piece == self.PIECES['bBp'] or piece == self.PIECES['bKn']):
                     self.bOfficer_cnt += 1
 
+    def writefield(self, x, y, value):
+        self.board.writefield(x, y, value)
+
+    def readfield(self, x, y):
+        return self.board.readfield(x, y)
+
+    def search(self, srcx, srcy, stepx, stepy):
+        return self.board.search(srcx, srcy, stepx, stepy)
+
     def is_next_color_human(self):
         if(self.movecnt % 2 == 0 ):
             return self.white_player.is_human
@@ -354,6 +379,12 @@ class cMatch(cBoard):
     def oppcolor_of_piece(cls, piece):
         color = cls.PIECES_COLOR[piece]
         return cls.REVERSED_COLORS[color]
+
+    def is_inbounds(self, x, y):
+        return self.board.is_inbounds(x, y)
+
+    def is_move_inbounds(self, srcx, srcy, dstx, dsty):
+        return self.board.is_move_inbounds(srcx, srcy, dstx, dsty)
 
     def is_move_valid(self, srcx, srcy, dstx, dsty, prom_piece):
         if(not self.is_move_inbounds(srcx, srcy, dstx, dsty)):

@@ -6,6 +6,7 @@ from .openingmove import retrieve_move
 from .analyze_move import *
 from .analyze_position import score_position
 from .helper import *
+from .validator import *
 from .generator import cGenerator
 
 
@@ -102,7 +103,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
 
     #is_position_stormy = analyze_position.is_stormy(match)
 
-    if(depth <= slimits.dpth_stage2 and last_pmove and last_pmove.is_tactic_stormy()):
+    """if(depth <= slimits.dpth_stage2 and last_pmove and last_pmove.is_tactic_stormy()):
         count = 0
         silent_move_cnt = 0
 
@@ -121,38 +122,48 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                     count += 1
 
         priomoves.sort(key=attrgetter('prio'))
-        return count
-    elif(depth <= slimits.dpth_stage1):
+        return count"""
+    if(depth <= slimits.dpth_stage1):
         return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio5']))
     elif(depth <= slimits.dpth_stage2):
         return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio4']))
     elif(depth <= slimits.dpth_max and last_pmove.is_tactic_urgent()):
-        count = 0
-        silent_move_cnt = 0
+        promotion = []
+        good_captures = []
+        bad_captures = []
+        silent = None
+
         bad_capture = last_pmove.has_tactic_ext(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['bad-deal']))
 
         for priomove in priomoves:
-            if(bad_capture):
-                if(priomove.has_tactic(cTactic(cPrioMove.TACTICS['promotion'], cPrioMove.SUB_TACTICS['undefined'])) or
-                   priomove.has_tactic(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['undefined']))):
-                    count += 1
-                    priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio2'])
-                elif(silent_move_cnt < 1 and priomove.is_tactic_silent()):
-                    count += 1
-                    silent_move_cnt += 1
-                    priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio1'])
-                else:
-                    priomove.prio = cPrioMove.PRIO['prio10']
+            if(priomove.has_tactic(cTactic(cPrioMove.TACTICS['promotion'], cPrioMove.SUB_TACTICS['undefined']))):
+                priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio2'])
+                promotion.append(priomove)
+            elif(priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['good-deal']))):
+                priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio2'])
+                good_captures.append(priomove)
+            elif(priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['bad-deal']))):
+                priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio3'])
+                bad_captures.append(priomove)
             else:
-                if(priomove.has_tactic(cTactic(cPrioMove.TACTICS['promotion'], cPrioMove.SUB_TACTICS['undefined'])) or
-                   priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['good-deal']))):
-                    count += 1
-                    priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio2'])
-                else:
-                    priomove.prio = cPrioMove.PRIO['prio10']
+                priomove.prio = cPrioMove.PRIO['prio5']
+                if(silent is None):
+                    silent = priomove
 
-        priomoves.sort(key=attrgetter('prio'))
-        return count
+        if((len(promotion) + len(good_captures)) > 0):
+            priomoves.sort(key=attrgetter('prio'))
+            return (len(promotion) + len(good_captures))
+        else:
+            if(bad_capture and len(bad_captures) > 0):
+                if(silent):
+                    silent.prio = cPrioMove.PRIO['prio1']
+                    priomoves.sort(key=attrgetter('prio'))
+                    return (len(bad_captures) + 1)
+                else:
+                    priomoves.sort(key=attrgetter('prio'))
+                    return (len(bad_captures))
+            else:
+                return 0
     else:
         return 0
 
