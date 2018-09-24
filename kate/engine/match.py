@@ -14,7 +14,7 @@ from .pieces.bishopfield import cBishopField
 from .pieces.kingfield import cKingField
 
 
-class cMatch:
+class cMatch(cBoard):
     STATUS = {
             'open' : 10,
             'draw' : 11,
@@ -33,22 +33,6 @@ class cMatch:
             LEVELS['low'] : 60,
             LEVELS['medium'] : 90,
             LEVELS['high'] : 120 }
-
-    PIECES = {
-            'blk' : 0,
-            'wKg' : 1,
-            'wPw' : 2,
-            'wRk' : 3,
-            'wKn' : 4,
-            'wBp' : 5,
-            'wQu' : 6,
-            'bKg' : 9,
-            'bPw' : 10,
-            'bRk' : 11,
-            'bKn' : 12,
-            'bBp' : 13,
-            'bQu' : 14 
-        }
 
     COLORS = {
             'undefined' : 0,
@@ -233,7 +217,6 @@ class cMatch:
         self.time_start = 0
         self.white_player = cPlayer(self.COLORS['white'], "", True, 0)
         self.black_player = cPlayer(self.COLORS['black'], "", True, 0)
-        self.board = cBoard(self.PIECES)
         self.fifty_moves_count = 0
         self.white_movecnt_short_castling_lost = 0
         self.white_movecnt_long_castling_lost = 0
@@ -314,15 +297,6 @@ class cMatch:
                 elif(piece == self.PIECES['bRk'] or piece == self.PIECES['bBp'] or piece == self.PIECES['bKn']):
                     self.bOfficer_cnt += 1
 
-    def writefield(self, x, y, value):
-        self.board.writefield(x, y, value)
-
-    def readfield(self, x, y):
-        return self.board.readfield(x, y)
-
-    def search(self, srcx, srcy, stepx, stepy):
-        return self.board.search(srcx, srcy, stepx, stepy)
-
     def is_next_color_human(self):
         if(self.movecnt % 2 == 0 ):
             return self.white_player.is_human
@@ -379,12 +353,6 @@ class cMatch:
     def oppcolor_of_piece(cls, piece):
         color = cls.PIECES_COLOR[piece]
         return cls.REVERSED_COLORS[color]
-
-    def is_inbounds(self, x, y):
-        return self.board.is_inbounds(x, y)
-
-    def is_move_inbounds(self, srcx, srcy, dstx, dsty):
-        return self.board.is_move_inbounds(srcx, srcy, dstx, dsty)
 
     def is_move_valid(self, srcx, srcy, dstx, dsty, prom_piece):
         if(not self.is_move_inbounds(srcx, srcy, dstx, dsty)):
