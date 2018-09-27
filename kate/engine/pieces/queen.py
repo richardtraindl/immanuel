@@ -1,3 +1,4 @@
+from .. values import *
 from .piece import *
 
 
@@ -43,15 +44,14 @@ class cQueen(cPiece):
     STEP_SEAST_X = 1
     STEP_SEAST_Y = -1
 
-    blk = 0
-    GEN_STEPS = [ [[0, 1, blk],   [0, 2, blk],   [0, 3, blk],   [0, 4, blk],   [0, 5, blk],   [0, 6, blk],   [0, 7, blk]],
-                  [[0, -1, blk],  [0, -2, blk],  [0, -3, blk],  [0, -4, blk],  [0, -5, blk],  [0, -6, blk],  [0, -7, blk]],
-                  [[1, 0, blk],   [2, 0, blk],   [3, 0, blk],   [4, 0, blk],   [5, 0, blk],   [6, 0, blk],   [7, 0, blk]],
-                  [[-1, 0, blk],  [-2, 0, blk],  [-3, 0, blk],  [-4, 0, blk],  [-5, 0, blk],  [-6, 0, blk],  [-7, 0, blk]],
-                  [[1, 1, blk],   [2, 2, blk],   [3, 3, blk],   [4, 4, blk],   [5, 5, blk],   [6, 6, blk],   [7, 7, blk]],
-                  [[-1, -1, blk], [-2, -2, blk], [-3, -3, blk], [-4, -4, blk], [-5, -5, blk], [-6, -6, blk], [-7, -7, blk]],
-                  [[1, -1, blk],  [2, -2, blk],  [3, -3, blk],  [4, -4, blk],  [5, -5, blk],  [6, -6, blk],  [7, -7, blk]],
-                  [[-1, 1, blk],  [-2, 2, blk],  [-3, 3, blk],  [-4, 4, blk],  [-5, 5, blk],  [-6, 6, blk],  [-7, 7, blk]] ]
+    GEN_STEPS = [ [[0, 1, PIECES['blk']],   [0, 2, PIECES['blk']],   [0, 3, PIECES['blk']],   [0, 4, PIECES['blk']],   [0, 5, PIECES['blk']],   [0, 6, PIECES['blk']],   [0, 7, PIECES['blk']]],
+                  [[0, -1, PIECES['blk']],  [0, -2, PIECES['blk']],  [0, -3, PIECES['blk']],  [0, -4, bPIECES['blk']lk],  [0, -5, PIECES['blk']],  [0, -6, PIECES['blk']],  [0, -7, PIECES['blk']]],
+                  [[1, 0, PIECES['blk']],   [2, 0, PIECES['blk']],   [3, 0, PIECES['blk']],   [4, 0, PIECES['blk']],   [5, 0, PIECES['blk']],   [6, 0, PIECES['blk']],   [7, 0, PIECES['blk']]],
+                  [[-1, 0, PIECES['blk']],  [-2, 0, PIECES['blk']],  [-3, 0, PIECES['blk']],  [-4, 0, PIECES['blk']],  [-5, 0, PIECES['blk']],  [-6, 0, PIECES['blk']],  [-7, 0, PIECES['blk']]],
+                  [[1, 1, PIECES['blk']],   [2, 2, PIECES['blk']],   [3, 3, PIECES['blk']],   [4, 4, PIECES['blk']],   [5, 5, PIECES['blk']],   [6, 6, PIECES['blk']],   [7, 7, PIECES['blk']]],
+                  [[-1, -1, PIECES['blk']], [-2, -2, PIECES['blk']], [-3, -3, PIECES['blk']], [-4, -4, PIECES['blk']], [-5, -5, PIECES['blk']], [-6, -6, PIECES['blk']], [-7, -7, PIECES['blk']]],
+                  [[1, -1, PIECES['blk']],  [2, -2, PIECES['blk']],  [3, -3, PIECES['blk']],  [4, -4, PIECES['blk']],  [5, -5, PIECES['blk']],  [6, -6, PIECES['blk']],  [7, -7, PIECES['blk']]],
+                  [[-1, 1, PIECES['blk']],  [-2, 2, PIECES['blk']],  [-3, 3, PIECES['blk']],  [-4, 4, PIECES['blk']],  [-5, 5, PIECES['blk']],  [-6, 6, PIECES['blk']],  [-7, 7, PIECES['blk']]] ]
 
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
