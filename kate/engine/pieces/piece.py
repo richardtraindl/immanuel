@@ -33,7 +33,7 @@ class cPiece:
             y1 = self.ypos + step[1]
             if(self.match.is_inbounds(x1, y1)):
                 dstpiece = self.match.readfield(x1, y1)
-                if(dstpiece == self.match.PIECES['blk']):
+                if(dstpiece == PIECES['blk']):
                     return False
                 elif(self.match.color_of_piece(dstpiece) == self.color):
                     continue
@@ -133,7 +133,7 @@ class cPiece:
                 self.match.white_movecnt_long_castling_lost = self.match.movecnt
             elif(move.srcx == 7 and move.srcy == 0 and self.match.white_movecnt_short_castling_lost == 0):
                 self.match.white_movecnt_short_castling_lost = self.match.movecnt
-        elif(srcpiece == self.match.PIECES['bRk']):
+        elif(srcpiece == PIECES['bRk']):
             if(move.srcx == 0 and move.srcy == 7 and self.match.black_movecnt_long_castling_lost == 0):
                 self.match.black_movecnt_long_castling_lost == self.match.movecnt
             elif(move.srcx == 7 and move.srcy == 7 and self.match.black_movecnt_short_castling_lost == 0):
@@ -169,7 +169,7 @@ class cPiece:
                 self.match.white_movecnt_short_castling_lost = 0
             if(self.match.white_movecnt_long_castling_lost == self.match.movecnt + 1):
                 self.match.white_movecnt_long_castling_lost = 0
-        elif(piece == self.match.PIECES['bRk']):
+        elif(piece == PIECES['bRk']):
             if(self.match.black_movecnt_short_castling_lost == self.match.movecnt + 1):
                 self.match.black_movecnt_short_castling_lost = 0
             if(self.match.black_movecnt_long_castling_lost == self.match.movecnt + 1):
