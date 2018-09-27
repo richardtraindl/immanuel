@@ -168,7 +168,7 @@ class cPawn(cPiece):
                 return False
             
             # check fields
-            if(move_dir == self.DIRS['south'] and dstpiece != self.match.PIECES['blk']):
+            if(move_dir == self.DIRS['south'] and dstpiece != PIECES['blk']):
                 return False
             elif(move_dir == self.DIRS['2south']):
                 midpiece = self.match.readfield(dstx, self.ypos + self.STEP_1S_Y)
