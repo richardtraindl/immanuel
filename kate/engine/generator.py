@@ -1,3 +1,4 @@
+from .values import *
 from .pieces.pawn import cPawn
 from .pieces.knight import cKnight
 from .pieces.bishop import cBishop
@@ -17,22 +18,22 @@ class cGenerator:
         for y in range(0, 8, 1):
             for x in range(0, 8, 1):
                 piece = self.match.readfield(x, y)
-                if(piece == self.match.PIECES['blk'] or color != self.match.color_of_piece(piece)):
+                if(piece == PIECES['blk'] or color != self.match.color_of_piece(piece)):
                     continue
                 else:
-                    if(piece == self.match.PIECES['wPw'] or piece == self.match.PIECES['bPw']):
+                    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                         cpawn = cPawn(self.match, x, y)
                         genmoves.extend(cpawn.generate_moves(mode))
-                    elif(piece == self.match.PIECES['wRk'] or piece == self.match.PIECES['bRk']):
+                    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
                         crook = cRook(self.match, x, y)
                         genmoves.extend(crook.generate_moves(mode))
-                    elif(piece == self.match.PIECES['wBp'] or piece == self.match.PIECES['bBp']):
+                    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
                         cbishop = cBishop(self.match, x, y)
                         genmoves.extend(cbishop.generate_moves(mode))
-                    elif(piece == self.match.PIECES['wKn'] or piece == self.match.PIECES['bKn']):
+                    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
                         cknight = cKnight(self.match, x, y)
                         genmoves.extend(cknight.generate_moves(mode))
-                    elif(piece == self.match.PIECES['wQu'] or piece == self.match.PIECES['bQu']):
+                    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                         cqueen = cQueen(self.match, x, y)
                         genmoves.extend(cqueen.generate_moves(mode))
                     else:
