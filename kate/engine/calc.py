@@ -1,5 +1,6 @@
 import time, copy
 from operator import attrgetter
+from .values import *
 from .match import *
 from .move import *
 from .openingmove import retrieve_move
@@ -261,7 +262,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
 
         #if(depth == 1):
         #    diff = match.score + newscore
-        #    diff_limit = abs(match.SCORES[match.PIECES['wPw']]) * 2
+        #    diff_limit = abs(match.SCORES[PIECES['wPw']]) * 2
         #    huge_diff = diff > diff_limit
         #    elapsed_time = time.time() - starttime
         #    exceeded = elapsed_time > match.seconds_per_move
@@ -297,13 +298,13 @@ def calc_move(match, msgs):
         score = match.score
     else:
         maximizing = match.next_color() == match.COLORS['white']
-        alpha = match.SCORES[match.PIECES['wKg']] * 10
-        beta = match.SCORES[match.PIECES['bKg']] * 10 
+        alpha = match.SCORES[PIECES['wKg']] * 10
+        beta = match.SCORES[PIECES['bKg']] * 10 
         score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, msgs)
 
     ### time
     elapsed_time = time.time() - match.time_start
-    if(match.next_color() == match.COLORS['white']):
+    if(match.next_color() == COLORS['white']):
         match.white_player.elapsed_seconds += elapsed_time
     else:
         match.black_player.elapsed_seconds += elapsed_time
