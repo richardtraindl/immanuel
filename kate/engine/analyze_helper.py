@@ -234,7 +234,7 @@ def piece_is_lower_equal_than_enemy_on_srcfield(match, gmove):
 def srcfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
     
-    match.writefield(gmove.srcx, gmove.srcy, match.PIECES['blk'])
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
 
     frdlytouches, enmytouches = list_all_field_touches(match, match.color_of_piece(piece), gmove.srcx, gmove.srcy)
     
@@ -246,7 +246,7 @@ def srcfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match,
 def piece_is_lower_equal_than_enemy_on_dstfield(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
-    match.writefield(gmove.srcx, gmove.srcy, match.PIECES['blk'])
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
 
     enemies = list_field_touches(match, match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
 
@@ -264,7 +264,7 @@ def piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, gmove):
 
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
-    match.writefield(gmove.srcx, gmove.srcy, match.PIECES['blk'])
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
 
     enemies = list_field_touches(match, match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
     for enemy in enemies:
