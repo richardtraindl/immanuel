@@ -1,4 +1,4 @@
-from .. move import *
+from .. values import *
 from .pawn import cPawn
 from .knight import cKnight
 from .rook import cRook
