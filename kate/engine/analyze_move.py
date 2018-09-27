@@ -499,7 +499,7 @@ def rank_gmoves(match, priomoves):
             priomove.prio = priomove.evaluate_prio()
             prio_sec = priomove.PRIO['prio10']
         else:
-            priomove.tactics.append(cTactic(priomove.TACTICS['undefined'], priomove.SUB_TACTICS['undefined']))
+            priomove.tactics.append(cTactic(priomove.TACTICS['undefined'], priomove.SUB_TACTICS['downgraded']))
             priomove.prio = priomove.PRIO['prio10']
             priomove.prio_sec = priomove.PRIO['prio10']
 
@@ -508,7 +508,7 @@ def rank_gmoves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-             pmove.downgrade(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['undefined']))
+             pmove.downgrade(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['downgraded']))
              pmove.prio = pmove.evaluate_prio()
 
     excludes.clear()
@@ -517,7 +517,7 @@ def rank_gmoves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            pmove.downgrade(cTactic(priomove.TACTICS['discl-attack'], priomove.SUB_TACTICS['undefined']))
+            pmove.downgrade(cTactic(priomove.TACTICS['discl-attack'], priomove.SUB_TACTICS['downgraded']))
             pmove.prio = pmove.evaluate_prio()
 
     excludes.clear()
@@ -526,7 +526,7 @@ def rank_gmoves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            pmove.downgrade(cTactic(priomove.TACTICS['support'], priomove.SUB_TACTICS['undefined']))
+            pmove.downgrade(cTactic(priomove.TACTICS['support'], priomove.SUB_TACTICS['downgraded']))
             pmove.prio = pmove.evaluate_prio()
 
     excludes.clear()
@@ -535,7 +535,7 @@ def rank_gmoves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            pmove.downgrade(cTactic(priomove.TACTICS['discl-support'], priomove.SUB_TACTICS['undefined']))
+            pmove.downgrade(cTactic(priomove.TACTICS['discl-support'], priomove.SUB_TACTICS['downgraded']))
             pmove.prio = pmove.evaluate_prio()
 
     excludes.clear()
@@ -544,7 +544,7 @@ def rank_gmoves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            pmove.downgrade(cTactic(priomove.TACTICS['defend-fork'], priomove.SUB_TACTICS['undefined']))
+            pmove.downgrade(cTactic(priomove.TACTICS['defend-fork'], priomove.SUB_TACTICS['downgraded']))
             pmove.prio = pmove.evaluate_prio()
 
     excludes.clear()
@@ -553,7 +553,7 @@ def rank_gmoves(match, priomoves):
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
-            pmove.downgrade(cTactic(priomove.TACTICS['flee'], priomove.SUB_TACTICS['undefined']))
+            pmove.downgrade(cTactic(priomove.TACTICS['flee'], priomove.SUB_TACTICS['downgraded']))
             pmove.prio = pmove.evaluate_prio()
 
     priomoves.sort(key=attrgetter('prio', 'prio_sec'))

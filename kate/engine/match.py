@@ -459,11 +459,11 @@ class cMatch:
         if(self.is_move_available()):
             return self.STATUS['open']
         else:
-            if(self.next_color() == self.COLORS['white']):
+            if(self.next_color() == COLORS['white']):
                 if(self.is_field_touched(COLORS['black'], self.wKg_x, self.wKg_y, 0)):
                     return self.STATUS['winner_black']
             else:
-                if(self.is_field_touched(self.COLORS['white'], self.bKg_x, self.bKg_y, 0)):
+                if(self.is_field_touched(COLORS['white'], self.bKg_x, self.bKg_y, 0)):
                     return self.STATUS['winner_white']
         return self.STATUS['draw']
 

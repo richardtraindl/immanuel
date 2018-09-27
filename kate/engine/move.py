@@ -153,38 +153,38 @@ class cPrioMove:
         'stormy' : 1,
         'urgent' : 2,
         'good-deal' : 3,
-        'bad-deal' : 4,
-        'downgraded' : 5,
+        'downgraded' : 4,
+        'bad-deal' : 5,
         'undefined' : 6 }
 
     TACTICS_TO_PRIO = {
         TACTICS['defend-check'] : PRIO['prio2'],
         TACTICS['capture'] : PRIO['prio4'],
         TACTICS['attack-king'] : PRIO['prio4'],
-        TACTICS['attack'] : PRIO['prio6'],
-        TACTICS['discl-attack'] : PRIO['prio6'],
-        TACTICS['support'] : PRIO['prio6'],
-        TACTICS['discl-support'] : PRIO['prio6'], 
-        TACTICS['support-unattacked'] : PRIO['prio8'],
-        TACTICS['flee'] : PRIO['prio6'],
+        TACTICS['attack'] : PRIO['prio5'],
+        TACTICS['discl-attack'] : PRIO['prio5'],
+        TACTICS['support'] : PRIO['prio5'],
+        TACTICS['discl-support'] : PRIO['prio5'], 
+        TACTICS['support-unattacked'] : PRIO['prio7'],
+        TACTICS['flee'] : PRIO['prio5'],
         TACTICS['defend-fork'] : PRIO['prio4'], 
         TACTICS['does-unpin'] : PRIO['prio4'], 
-        TACTICS['block'] : PRIO['prio6'], 
+        TACTICS['block'] : PRIO['prio5'], 
         TACTICS['promotion'] : PRIO['prio4'],
         TACTICS['tactical-draw'] : PRIO['prio4'],
         TACTICS['running-pawn'] : PRIO['prio4'], 
-        TACTICS['controle-file'] : PRIO['prio7'], 
+        TACTICS['controle-file'] : PRIO['prio6'], 
         TACTICS['castling'] : PRIO['prio5'],
-        TACTICS['progress'] : PRIO['prio8'], 
+        TACTICS['progress'] : PRIO['prio7'], 
         TACTICS['undefined'] : PRIO['prio10'] }
 
     SUB_TACTICS_TO_ADJUST = {
         SUB_TACTICS['stormy'] : -2,
         SUB_TACTICS['urgent'] : -2,
         SUB_TACTICS['good-deal'] : -1,
+        SUB_TACTICS['downgraded'] : 0,
         SUB_TACTICS['bad-deal'] : 1,
-        SUB_TACTICS['downgraded'] : 1,
-        SUB_TACTICS['undefined'] : 0 }
+        SUB_TACTICS['undefined'] : 2 }
 
     def __init__(self, gmove=None):
         self.gmove = gmove
