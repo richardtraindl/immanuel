@@ -163,8 +163,8 @@ def find_disclosures(match, srcx, srcy, dstx, dsty, discl_attacked, discl_suppor
     idx = 0
     for step in cQueen.STEPS:
         if(idx % 2 == 0):
-            first = cTouchBeyond(None, None, None, None, match.PIECES['blk'], 0, 0)
-            second = cTouchBeyond(None, None, None, None, match.PIECES['blk'], 0, 0)
+            first = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
+            second = cTouchBeyond(None, None, None, None, PIECES['blk'], 0, 0)
         if(idx < 4):
             cpiece = cRook
             excluded_dir = cRook.dir_for_move(srcx, srcy, dstx, dsty)
@@ -347,7 +347,7 @@ def is_tactical_draw(match, gmove):
         for y in range(8):
             for x in range(8):
                 piece = newmatch.readfield(x, y)
-                str_board += reverse_lookup(newmatch.PIECES, piece)
+                str_board += reverse_lookup(PIECES, piece)
         boards.append(str_board)
         newmatch.undo_move()
 
@@ -424,7 +424,7 @@ def rank_gmoves(match, priomoves):
                     priomove.tactics.append(cTactic(priomove.TACTICS['flee'], priomove.SUB_TACTICS['undefined']))
 
         if(len(attacked) > 0):
-            if(is_piece_attacked(attacked, match.PIECES['wKg'], match.PIECES['bKg'])):
+            if(is_piece_attacked(attacked, PIECES['wKg'], PIECES['bKg'])):
                 if(dstflield_is_attacked == False or 
                    (dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att and 
                     piece_is_lower_fequal_than_enmy_on_dstflield)):
