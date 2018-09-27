@@ -321,7 +321,7 @@ def score_opening(match):
     ###
 
     # black king
-    if(is_king_guarded(match, match.COLORS['black'])):
+    if(is_king_guarded(match, COLORS['black'])):
         value += blackrate
 
     if(match.black_movecnt_short_castling_lost > 0 and
