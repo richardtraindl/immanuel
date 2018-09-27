@@ -1,3 +1,4 @@
+from .. values import *
 from . piece import *
 
 
@@ -26,17 +27,16 @@ class cKing(cPiece):
     STEP_LG_CASTLING_X = -2
     STEP_LG_CASTLING_Y = 0
 
-    blk = 0
-    GEN_STEPS = [ [[0, 1, blk]],
-                  [[1, 1, blk]],
-                  [[1, 0, blk]], 
-                  [[1, -1, blk]],
-                  [[0, -1, blk]], 
-                  [[-1, -1, blk]],
-                  [[-1, 0, blk]],
-                  [[-1, 1, blk]],
-                  [[2, 0, blk]],
-                  [[-2, 0, blk]] ]
+    GEN_STEPS = [ [[0, 1, PIECES['blk']]],
+                  [[1, 1, PIECES['blk']]],
+                  [[1, 0, PIECES['blk']]], 
+                  [[1, -1, PIECES['blk']]],
+                  [[0, -1, PIECES['blk']]], 
+                  [[-1, -1, PIECES['blk']]],
+                  [[-1, 0, PIECES['blk']]],
+                  [[-1, 1, PIECES['blk']]],
+                  [[2, 0, PIECES['blk']]],
+                  [[-2, 0, PIECES['blk']]] ]
 
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
@@ -92,7 +92,7 @@ class cKing(cPiece):
             return False
 
         captured = self.match.readfield(dstx, dsty)
-        self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+        self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
         self.match.writefield(dstx, dsty, self.piece)
         attacked = self.match.is_field_touched(opp_color, dstx, dsty, 0)
         self.match.writefield(self.xpos, self.ypos, self.piece)
@@ -116,20 +116,20 @@ class cKing(cPiece):
                     dsty, 
                     None,
                     None,
-                    self.match.PIECES['blk'], 
+                    PIECES['blk'], 
                     prom_piece, 
                     self.match.fifty_moves_count)
 
         srcpiece = self.match.readfield(move.srcx, move.srcy)
         dstpiece = self.match.readfield(move.dstx, move.dsty)
 
-        if(dstpiece == self.match.PIECES['wQu']):
+        if(dstpiece == PIECES['wQu']):
             self.match.wQu_cnt -= 1
-        elif(dstpiece == self.match.PIECES['bQu']):
+        elif(dstpiece == PIECES['bQu']):
             self.match.bQu_cnt -= 1
-        elif(dstpiece == self.match.PIECES['wKn'] or dstpiece == self.match.PIECES['wBp'] or dstpiece == self.match.PIECES['wRk']):
+        elif(dstpiece == PIECES['wKn'] or dstpiece == PIECES['wBp'] or dstpiece == PIECES['wRk']):
             self.match.wOfficer_cnt -= 1
-        elif(dstpiece == self.match.PIECES['bKn'] or dstpiece == self.match.PIECES['bBp'] or dstpiece == self.match.PIECES['bRk']):
+        elif(dstpiece == PIECES['bKn'] or dstpiece == PIECES['bBp'] or dstpiece == PIECES['bRk']):
             self.match.bOfficer_cnt -= 1
 
         if(srcpiece == self.match.PIECES['wKg']):
@@ -156,10 +156,10 @@ class cKing(cPiece):
             move.captured_piece = dstpiece
             self.match.movecnt += 1   
 
-            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.srcx, move.srcy, PIECES['blk'])
             self.match.writefield(move.dstx, move.dsty, srcpiece)
             rook = self.match.readfield(move.srcx + 3, move.srcy)
-            self.match.writefield(move.srcx + 3, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.srcx + 3, move.srcy, PIECES['blk'])
             self.match.writefield(move.dstx - 1, move.dsty, rook)
             self.match.fifty_moves_count += 1
 
@@ -170,10 +170,10 @@ class cKing(cPiece):
             move.captured_piece = dstpiece
             self.match.movecnt += 1   
 
-            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.srcx, move.srcy, PIECES['blk'])
             self.match.writefield(move.dstx, move.dsty, srcpiece)
             rook = self.match.readfield(move.srcx - 4, move.srcy)
-            self.match.writefield(move.srcx - 4, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.srcx - 4, move.srcy, PIECES['blk'])
             self.match.writefield(move.dstx + 1, move.dsty, rook)
             self.match.fifty_moves_count += 1
 
@@ -183,7 +183,7 @@ class cKing(cPiece):
             move.captured_piece = dstpiece
 
             self.match.movecnt += 1
-            self.match.writefield(move.srcx, move.srcy, self.match.PIECES['blk'])
+            self.match.writefield(move.srcx, move.srcy, PIECES['blk'])
             self.match.writefield(move.dstx, move.dsty, srcpiece)
             if(dstpiece != self.match.PIECES['blk']):
                 self.match.fifty_moves_count = 0
@@ -197,13 +197,13 @@ class cKing(cPiece):
             return move
 
     def undo_move(self, move):
-        if(move.captured_piece == self.match.PIECES['wQu']):
+        if(move.captured_piece == PIECES['wQu']):
             self.match.wQu_cnt += 1
-        elif(move.captured_piece == self.match.PIECES['bQu']):
+        elif(move.captured_piece == PIECES['bQu']):
             self.match.bQu_cnt += 1
-        elif(move.captured_piece == self.match.PIECES['wKn'] or move.captured_piece == self.match.PIECES['wBp'] or move.captured_piece == self.match.PIECES['wRk']):
+        elif(move.captured_piece == PIECES['wKn'] or move.captured_piece == PIECES['wBp'] or move.captured_piece == PIECES['wRk']):
             self.match.wOfficer_cnt += 1
-        elif(move.captured_piece == self.match.PIECES['bKn'] or move.captured_piece == self.match.PIECES['bBp'] or move.captured_piece == self.match.PIECES['bRk']):
+        elif(move.captured_piece == PIECES['bKn'] or move.captured_piece == PIECES['bBp'] or move.captured_piece == PIECES['bRk']):
             self.match.bOfficer_cnt += 1
 
         self.match.movecnt -= 1
@@ -217,10 +217,10 @@ class cKing(cPiece):
 
         if(move.move_type == move.TYPES['short_castling']):
             rook = self.match.readfield(move.dstx - 1, move.dsty)
-            self.match.writefield(move.dstx - 1, move.dsty, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx - 1, move.dsty, PIECES['blk'])
             self.match.writefield(move.dstx + 1, move.dsty, rook)
 
-            if(piece == self.match.PIECES['wKg']):
+            if(piece == PIECES['wKg']):
                 self.match.wKg_x = move.srcx
                 self.match.wKg_y = move.srcy
 
@@ -236,10 +236,10 @@ class cKing(cPiece):
                     self.match.black_movecnt_long_castling_lost = 0
         elif(move.move_type == move.TYPES['long_castling']):
             rook = self.match.readfield(move.dstx + 1, move.dsty)
-            self.match.writefield(move.dstx + 1, move.dsty, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx + 1, move.dsty, PIECES['blk'])
             self.match.writefield(move.dstx - 2, move.dsty, rook)
         
-            if(piece == self.match.PIECES['wKg']):
+            if(piece == PIECES['wKg']):
                 self.match.wKg_x = move.srcx
                 self.match.wKg_y = move.srcy
 
@@ -254,7 +254,7 @@ class cKing(cPiece):
                 if(self.match.black_movecnt_short_castling_lost == self.match.movecnt + 1):
                     self.match.black_movecnt_short_castling_lost = 0
         else:
-            if(piece == self.match.PIECES['wKg']):
+            if(piece == PIECES['wKg']):
                 self.match.wKg_x = move.srcx
                 self.match.wKg_y = move.srcy
                 if(self.match.white_movecnt_short_castling_lost == self.match.movecnt + 1):
@@ -277,7 +277,7 @@ class cKing(cPiece):
         for i in range(1, 3, 1):
             fieldx = self.xpos + i
             field = self.match.readfield(fieldx, self.ypos)
-            if(field != self.match.PIECES['blk']):
+            if(field != PIECES['blk']):
                 return False
 
         if( self.match.is_inbounds(dstx + 1, dsty)):
@@ -286,13 +286,13 @@ class cKing(cPiece):
             return False
 
         if(self.color == self.match.COLORS['white']):
-            if(self.match.white_movecnt_short_castling_lost > 0 or rook != self.match.PIECES['wRk']):
+            if(self.match.white_movecnt_short_castling_lost > 0 or rook != PIECES['wRk']):
                 return False
         else:
-            if(self.match.black_movecnt_short_castling_lost > 0 or rook != self.match.PIECES['bRk']):
+            if(self.match.black_movecnt_short_castling_lost > 0 or rook != PIECES['bRk']):
                 return False            
 
-        self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+        self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
         for i in range(3):
             castlingx = self.xpos + i
             attacked = self.match.is_field_touched(opp_color, castlingx, self.ypos, 0)
@@ -309,7 +309,7 @@ class cKing(cPiece):
         for i in range(1, 4, 1):
             fieldx = self.xpos - i
             field = self.match.readfield(fieldx, self.ypos)
-            if(field != self.match.PIECES['blk']):
+            if(field != PIECES['blk']):
                 return False
 
         if(self.match.is_inbounds(dstx - 2, dsty)):
@@ -318,13 +318,13 @@ class cKing(cPiece):
             return False
 
         if(self.color == self.match.COLORS['white']):
-            if(self.match.white_movecnt_long_castling_lost > 0 or rook != self.match.PIECES['wRk']):
+            if(self.match.white_movecnt_long_castling_lost > 0 or rook != PIECES['wRk']):
                 return False
         else:
-            if(self.match.black_movecnt_long_castling_lost > 0 or rook != self.match.PIECES['bRk']):
+            if(self.match.black_movecnt_long_castling_lost > 0 or rook != PIECES['bRk']):
                 return False
 
-        self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+        self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
         for i in range(0, -3, -1):
             castlingx = self.xpos + i
             attacked = self.match.is_field_touched(opp_color, castlingx, self.ypos, 0)
@@ -347,14 +347,14 @@ class cKing(cPiece):
                     continue
     
                 piece = self.match.readfield(x1, y1)
-                if(piece == self.match.PIECES['blk']):
+                if(piece == PIECES['blk']):
                     continue
 
                 if(self.match.color_of_piece(piece) == opp_color):
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     attacked.append(ctouch_beyond)
                     ###
-                    self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+                    self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
                     field_touches_beyond(self.match, opp_color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
@@ -362,7 +362,7 @@ class cKing(cPiece):
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     supported.append(ctouch_beyond)
                     ###
-                    self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+                    self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
                     field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
@@ -386,7 +386,7 @@ class cKing(cPiece):
 
                 piece = self.match.readfield(x1, y1)
 
-                if(piece == self.match.PIECES['blk'] or self.match.color_of_piece(piece) == self.color):
+                if(piece == PIECES['blk'] or self.match.color_of_piece(piece) == self.color):
                     if(is_fork_field(self.match, self.color, x1, y1)):
                         #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
                         #analyses.lst_fork_defended.append(cfork)
@@ -411,15 +411,15 @@ class cKing(cPiece):
                 attacked = self.match.readfield(x1, y1)
 
                 if(self.match.color_of_piece(attacked) == opp_color):
-                    score += self.match.ATTACKED_SCORES[attacked]
+                    score += ATTACKED_SCORES[attacked]
 
                     # extra score if attacked is pinned
                     enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color, 
                     if(enmy_pin != self.DIRS['undefined']):
-                        score += self.match.ATTACKED_SCORES[attacked]
+                        score += ATTACKED_SCORES[attacked]
 
                     if(self.match.is_soft_pin(x1, y1)):
-                        score += self.match.ATTACKED_SCORES[attacked]
+                        score += ATTACKED_SCORES[attacked]
         return score
 
     def score_supports(self):
@@ -438,7 +438,7 @@ class cKing(cPiece):
 
                 if(self.match.color_of_piece(supported) == self.color):
                     if(self.match.is_field_touched(opp_color, x1, y1, 1)):
-                        score += self.match.SUPPORTED_SCORES[supported]
+                        score += SUPPORTED_SCORES[supported]
         return score 
 
     def is_king_safe(match, color):
