@@ -117,7 +117,7 @@ def do_move(request, matchid=None):
         if(form.is_valid()):
             srcx,srcy = coord_to_index(form.move_src)
             dstx,dsty = coord_to_index(form.move_dst)
-            prom_piece = cMatch.PIECES[form.prom_piece]
+            prom_piece = PIECES[form.prom_piece]
             valid, msgcode = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
             if(valid):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
