@@ -128,7 +128,7 @@ class cPiece:
             self.match.fifty_moves_count += 1
             move.fifty_moves_count = self.match.fifty_moves_count
 
-        if(srcpiece == self.match.PIECES['wRk']):
+        if(srcpiece == PIECES['wRk']):
             if(move.srcx == 0 and move.srcy == 0 and self.match.white_movecnt_long_castling_lost == 0):
                 self.match.white_movecnt_long_castling_lost = self.match.movecnt
             elif(move.srcx == 7 and move.srcy == 0 and self.match.white_movecnt_short_castling_lost == 0):
