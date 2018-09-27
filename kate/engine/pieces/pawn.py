@@ -135,14 +135,14 @@ class cPawn(cPiece):
                 return False
 
             # check fields
-            if(move_dir == self.DIRS['north'] and dstpiece != self.match.PIECES['blk']):
+            if(move_dir == self.DIRS['north'] and dstpiece != PIECES['blk']):
                 return False
             elif(move_dir == self.DIRS['2north']):
                 midpiece = self.match.readfield(dstx, self.ypos + self.STEP_1N_Y)
                 if(midpiece != PIECES['blk'] or dstpiece != PIECES['blk']):
                     return False
             elif(move_dir == self.DIRS['north-west'] or move_dir == self.DIRS['north-east']):
-                if(self.match.color_of_piece(dstpiece) != self.match.COLORS['black']):
+                if(self.match.color_of_piece(dstpiece) != COLORS['black']):
                     return self.is_white_ep_move_ok(dstx, dsty)
 
             # check promotion
