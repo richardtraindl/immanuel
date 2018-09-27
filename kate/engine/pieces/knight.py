@@ -22,15 +22,14 @@ class cKnight(cPiece):
     STEP_2N1W_X = -1
     STEP_2N1W_Y = 2
 
-    blk = 0
-    GEN_STEPS = [ [[1, 2, blk]],
-                  [[2, 1, blk]],
-                  [[2, -1, blk]], 
-                  [[1, -2, blk]],
-                  [[-1, -2, blk]],
-                  [[-2, -1, blk]],
-                  [[-2, 1, blk]],
-                  [[-1, 2, blk]] ]
+    GEN_STEPS = [ [[1, 2, PIECES['blk']]],
+                  [[2, 1, PIECES['blk']]],
+                  [[2, -1, PIECES['blk']]], 
+                  [[1, -2, PIECES['blk']]],
+                  [[-1, -2, PIECES['blk']]],
+                  [[-2, -1, PIECES['blk']]],
+                  [[-2, 1, PIECES['blk']]],
+                  [[-1, 2, PIECES['blk']]] ]
 
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
@@ -137,7 +136,7 @@ class cKnight(cPiece):
             if(self.match.is_inbounds(x1, y1)):
                 piece = self.match.readfield(x1, y1)
 
-                if(piece == self.match.PIECES['blk'] or self.match.color_of_piece(piece) == self.color):
+                if(piece == PIECES['blk'] or self.match.color_of_piece(piece) == self.color):
                     if(is_fork_field(self.match, self.color, x1, y1)):
                         #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
                         #analyses.lst_fork_defended.append(cfork)
@@ -174,16 +173,16 @@ class cKnight(cPiece):
 
                 if(self.match.color_of_piece(attacked) == opp_color):
                     if(len(enmytouches) == 0 or 
-                       self.match.PIECES_RANK[attacked] > self.match.PIECES_RANK[self.piece]):
-                        score += self.match.ATTACKED_SCORES[attacked]
+                       PIECES_RANK[attacked] > PIECES_RANK[self.piece]):
+                        score += ATTACKED_SCORES[attacked]
 
                     # extra score if attacked is pinned
                     enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color, 
                     if(enmy_pin != self.DIRS['undefined']):
-                        score += self.match.ATTACKED_SCORES[attacked]
+                        score += ATTACKED_SCORES[attacked]
 
                     if(self.match.is_soft_pin(x1, y1)):
-                        score += self.match.ATTACKED_SCORES[attacked]
+                        score += ATTACKED_SCORES[attacked]
         return score
 
     def score_supports(self):
@@ -204,12 +203,12 @@ class cKnight(cPiece):
 
                 supported = self.match.readfield(x1, y1)
 
-                if(supported == self.match.PIECES['blk']):
+                if(supported == PIECES['blk']):
                     continue
 
                 if(self.match.color_of_piece(supported) == self.color):
                     if(self.match.is_field_touched(opp_color, x1, y1, 1)):
-                        score += self.match.SUPPORTED_SCORES[supported]
+                        score += SUPPORTED_SCORES[supported]
         return score 
 
 # class end
