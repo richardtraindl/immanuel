@@ -132,7 +132,7 @@ class cKing(cPiece):
         elif(dstpiece == PIECES['bKn'] or dstpiece == PIECES['bBp'] or dstpiece == PIECES['bRk']):
             self.match.bOfficer_cnt -= 1
 
-        if(srcpiece == self.match.PIECES['wKg']):
+        if(srcpiece == PIECES['wKg']):
             self.match.wKg_x = move.dstx
             self.match.wKg_y = move.dsty
 
@@ -185,14 +185,14 @@ class cKing(cPiece):
             self.match.movecnt += 1
             self.match.writefield(move.srcx, move.srcy, PIECES['blk'])
             self.match.writefield(move.dstx, move.dsty, srcpiece)
-            if(dstpiece != self.match.PIECES['blk']):
+            if(dstpiece != PIECES['blk']):
                 self.match.fifty_moves_count = 0
                 move.fifty_moves_count = self.match.fifty_moves_count
             else:
                 self.match.fifty_moves_count += 1
                 move.fifty_moves_count = self.match.fifty_moves_count
 
-            self.match.score += self.match.SCORES[dstpiece]
+            self.match.score += SCORES[dstpiece]
             self.match.move_list.append(move)
             return move
 
@@ -213,7 +213,7 @@ class cKing(cPiece):
         self.match.writefield(move.srcx, move.srcy, piece)
         self.match.writefield(move.dstx, move.dsty, move.captured_piece)
 
-        self.match.score -= self.match.SCORES[move.captured_piece]
+        self.match.score -= SCORES[move.captured_piece]
 
         if(move.move_type == move.TYPES['short_castling']):
             rook = self.match.readfield(move.dstx - 1, move.dsty)
@@ -285,7 +285,7 @@ class cKing(cPiece):
         else:
             return False
 
-        if(self.color == self.match.COLORS['white']):
+        if(self.color == COLORS['white']):
             if(self.match.white_movecnt_short_castling_lost > 0 or rook != PIECES['wRk']):
                 return False
         else:
@@ -317,7 +317,7 @@ class cKing(cPiece):
         else:
             return False
 
-        if(self.color == self.match.COLORS['white']):
+        if(self.color == COLORS['white']):
             if(self.match.white_movecnt_long_castling_lost > 0 or rook != PIECES['wRk']):
                 return False
         else:
