@@ -113,14 +113,14 @@ def do_move(request, matchid=None):
         if(match.is_next_color_human() == False):
             msgcode= match.RETURN_CODES['wrong-color']
             return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
-        print("do_move: before form()")
         form = DoMoveForm(request.POST)
         if(form.is_valid()):
-            print("do_move: after form()")
             srcx,srcy = coord_to_index(form.move_src)
             dstx,dsty = coord_to_index(form.move_dst)
             prom_piece = PIECES[form.prom_piece]
+            print("do_move: before interface")
             valid, msgcode = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
+            print("do_move: after interface")
             if(valid):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
 
