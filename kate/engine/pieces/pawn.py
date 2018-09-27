@@ -63,18 +63,18 @@ class cPawn(cPiece):
             if(self.ypos < 6):
                 self.GEN_STEPS = [ [[0, 1, PIECES['blk']]], [[0, 2, PIECES['blk']]], [[1, 1, PIECES['blk']]], [[-1, 1, PIECES['blk']]] ]
             else:
-                self.GEN_STEPS = [ [[0, 1, PIECES['blk']self.wQu],  [0, 1, PIECES['blk']self.wRk],  [0, 1, PIECES['blk']self.wBp],  [0, 1, PIECES['blk']self.wKn]],
-                                   [[1, 1, PIECES['blk']self.wQu],  [1, 1, PIECES['blk']self.wRk],  [1, 1, PIECES['blk']self.wBp],  [1, 1, PIECES['blk']self.wKn]],
-                                   [[-1, 1, PIECES['blk']self.wQu], [-1, 1, PIECES['blk']self.wRk], [-1, 1, PIECES['blk']self.wBp], [-1, 1, PIECES['blk']self.wKn]] ]
+                self.GEN_STEPS = [ [[0, 1, PIECES['wQu']],  [0, 1, PIECES['wRk']],  [0, 1, PIECES['wBp']],  [0, 1, PIECES['wKn']]],
+                                   [[1, 1, PIECES['wQu']],  [1, 1, PIECES['wRk']],  [1, 1, PIECES['wBp']],  [1, 1, PIECES['wKn']]],
+                                   [[-1, 1, PIECES['wQu']], [-1, 1, PIECES['wRk']], [-1, 1, PIECES['wBp']], [-1, 1, PIECES['wKn']]] ]
         else:
             self.STEPS = [ [1, -1], [-1, -1] ]
             self.BACK_STEPS = [ [1, 1], [-1, 1] ]
             if(self.ypos > 1):
                 self.GEN_STEPS = [ [[0, -1, PIECES['blk']]], [[0, -2, PIECES['blk']]], [[-1, -1, PIECES['blk']]], [[1, -1, PIECES['blk']]] ]
             else:
-                self.GEN_STEPS = [ [[0, -1, PIECES['blk']self.bQu],  [0, -1, PIECES['blk']self.bRk],  [0, -1, PIECES['blk']self.bBp],  [0, -1, PIECES['blk']self.bKn]],
-                                   [[1, -1, PIECES['blk']self.bQu],  [1, -1, PIECES['blk']self.bRk],  [1, -1, PIECES['blk']self.bBp],  [1, -1, PIECES['blk']self.bKn]],
-                                   [[-1, -1, PIECES['blk']self.bQu], [-1, -1, PIECES['blk']self.bRk], [-1, -1, PIECES['blk']self.bBp], [-1, -1, PIECES['blk']self.bKn]] ]
+                self.GEN_STEPS = [ [[0, -1, PIECES['bQu']],  [0, -1, PIECES['bRk']],  [0, -1, PIECES['bBp']],  [0, -1, PIECES['bKn']]],
+                                   [[1, -1, PIECES['bQu']],  [1, -1, PIECES['bRk']],  [1, -1, PIECES['bBp']],  [1, -1, PIECES['bKn']]],
+                                   [[-1, -1, PIECES['bQu']], [-1, -1, PIECES['bRk']], [-1, -1, PIECES['bBp']], [-1, -1, PIECES['bKn']]] ]
 
     @classmethod
     def dir_for_move(cls, srcx, srcy, dstx, dsty):
