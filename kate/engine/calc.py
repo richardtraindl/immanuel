@@ -297,7 +297,7 @@ def calc_move(match, msgs):
         candidates.append(gmove)
         score = match.score
     else:
-        maximizing = match.next_color() == match.COLORS['white']
+        maximizing = match.next_color() == COLORS['white']
         alpha = match.SCORES[PIECES['wKg']] * 10
         beta = match.SCORES[PIECES['bKg']] * 10 
         score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, msgs)
