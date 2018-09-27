@@ -1,5 +1,6 @@
 from operator import attrgetter
 import copy
+from .values import *
 from .match import *
 from .move import *
 from .helper import reverse_lookup
@@ -16,13 +17,13 @@ from .pieces.piece import cTouchBeyond
 def castles(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
-    if(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
         if(gmove.srcx - gmove.dstx == 2 or gmove.srcx - gmove.dstx == -2):
             return True
 
 
 def promotes(match, gmove):
-    if(gmove.prom_piece != match.PIECES['blk']):
+    if(gmove.prom_piece != PIECES['blk']):
         return True
 
 
@@ -33,9 +34,9 @@ def captures(match, gmove):
 
     dstpiece = match.readfield(gmove.dstx, gmove.dsty)
 
-    if(dstpiece != match.PIECES['blk']):
+    if(dstpiece != PIECES['blk']):
         return True
-    elif( (piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']) and gmove.srcx != gmove.dstx ):
+    elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and gmove.srcx != gmove.dstx ):
         return True
     else:
         return False
@@ -59,7 +60,7 @@ def flees(match, gmove):
 
     enmycontacts = list_field_touches(match, opp_color, gmove.srcx, gmove.srcy)
     for enmy in enmycontacts:
-        if(match.PIECES_RANK[enmy.piece] < match.PIECES_RANK[piece]):
+        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
             old_lower_cnt += 1
         else:
             old_higher_cnt += 1
@@ -70,7 +71,7 @@ def flees(match, gmove):
 
     enmycontacts = list_field_touches(match, opp_color, gmove.dstx, gmove.dsty)
     for enmy in enmycontacts:
-        if(match.PIECES_RANK[enmy.piece] < match.PIECES_RANK[piece]):
+        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
             new_lower_cnt += 1
         else:
             new_higher_cnt += 1
@@ -92,22 +93,22 @@ def find_attacks_and_supports(match, gmove):
 
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
-    if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
+    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
         cpawn = cPawn(match, gmove.srcx, gmove.srcy)
         cpawn.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
-    elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
         cknight = cKnight(match, gmove.srcx, gmove.srcy)
         cknight.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
-    elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
         cbishop = cBishop(match, gmove.srcx, gmove.srcy)
         cbishop.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
-    elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
         crook = cRook(match, gmove.srcx, gmove.srcy)
         crook.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
-    elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
+    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         cqueen = cQueen(match, gmove.srcx, gmove.srcy)
         cqueen.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
-    elif(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+    elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
         cking = cKing(match, gmove.srcx, gmove.srcy)
         cking.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
         if(gmove.srcx - gmove.dstx == -2):
@@ -150,7 +151,7 @@ def does_unpin(match, gmove):
 
 def defends_check(match):
     # is king attaked
-    if(match.next_color() == match.COLORS['white']):
+    if(match.next_color() == COLORS['white']):
         return match.is_king_attacked(match.wKg_x, match.wKg_y)
     else:
         return match.is_king_attacked(match.bKg_x, match.bKg_y)
@@ -167,11 +168,11 @@ def find_disclosures(match, srcx, srcy, dstx, dsty, discl_attacked, discl_suppor
         if(idx < 4):
             cpiece = cRook
             excluded_dir = cRook.dir_for_move(srcx, srcy, dstx, dsty)
-            faces = [match.PIECES['wRk'], match.PIECES['bRk'], match.PIECES['wQu'], match.PIECES['bQu']]
+            faces = [PIECES['wRk'], PIECES['bRk'], PIECES['wQu'], PIECES['bQu']]
         else:
             cpiece = cBishop
             excluded_dir = cBishop.dir_for_move(srcx, srcy, dstx, dsty)
-            faces = [match.PIECES['wBp'], match.PIECES['bBp'], match.PIECES['wQu'], match.PIECES['bQu']]
+            faces = [PIECES['wBp'], PIECES['bBp'], PIECES['wQu'], PIECES['bQu']]
         idx += 1
 
         stepx = step[0]
@@ -182,17 +183,17 @@ def find_disclosures(match, srcx, srcy, dstx, dsty, discl_attacked, discl_suppor
         x1, y1 = match.search(srcx, srcy, stepx, stepy)
         if(x1 is not None):
             piece = match.readfield(x1, y1)
-            if(first.piece == match.PIECES['blk']):
+            if(first.piece == PIECES['blk']):
                 first.piece = piece
                 first.fieldx = x1
                 first.fieldy = y1
                 continue
-            elif(second.piece == match.PIECES['blk']):
+            elif(second.piece == PIECES['blk']):
                 second.piece = piece
                 second.fieldx = x1
                 second.fieldy = y1
 
-            if(first.piece == match.PIECES['blk'] or second.piece == match.PIECES['blk']):
+            if(first.piece == PIECES['blk'] or second.piece == PIECES['blk']):
                 continue
                 
             if(match.color_of_piece(first.piece) != match.color_of_piece(second.piece)):
@@ -228,7 +229,7 @@ def disclosures(match, gmove):
     find_disclosures(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, discl_attacked, discl_supported)
     match.undo_move()
     ###
-    match.writefield(gmove.srcx, gmove.srcy, match.PIECES['blk'])
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
 
     for ctouch_beyond in discl_attacked:
         field_touches_beyond(match, color, ctouch_beyond)
@@ -243,22 +244,22 @@ def disclosures(match, gmove):
 
 
 def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
-    if(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
+    if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         cqueen = cQueen(match, srcx, srcy)
         return cqueen.move_defends_forked_field(dstx, dsty)
-    elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
         crook = cRook(match, srcx, srcy)
         return crook.move_defends_forked_field(dstx, dsty)
-    elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
         cbishop = cBishop(match, srcx, srcy)
         return cbishop.move_defends_forked_field(dstx, dsty)
-    elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
         cknight = cKnight(match, srcx, srcy)
         return cknight.move_defends_forked_field(dstx, dsty)
-    elif(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
+    elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
         cking = cKing(match, srcx, srcy)
         return cking.move_defends_forked_field(dstx, dsty)
-    elif(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
+    elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
         cpawn = cPawn(match, srcx, srcy)
         return cpawn.move_defends_forked_field(dstx, dsty)
     else:
@@ -272,8 +273,8 @@ def blocks(match, gmove):
     oppenents = search_opposed_pieces(match, color, gmove.dstx, gmove.dsty, gmove.srcx, gmove.srcy)
 
     for oppenent in oppenents:
-        if(match.PIECES_RANK[oppenent[0].piece] > match.PIECES_RANK[oppenent[1].piece] and 
-           match.PIECES_RANK[oppenent[0].piece] > match.PIECES_RANK[piece]):
+        if(PIECES_RANK[oppenent[0].piece] > PIECES_RANK[oppenent[1].piece] and 
+           PIECES_RANK[oppenent[0].piece] > PIECES_RANK[piece]):
             return True
 
     return False
@@ -283,7 +284,7 @@ def running_pawn_in_endgame(match, gmove):
     piece = match.readfield(gmove.srcx, gmove.srcy)
 
     if(match.is_endgame()):
-        if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
+        if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
             cpawn = cPawn(match, gmove.srcx, gmove.srcy)
             return cpawn.is_running()
     return False
@@ -296,9 +297,9 @@ def defends_invasion(match, gmove):
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
-            if(match.color_of_piece(piece) == match.COLORS['white']):
+            if(match.color_of_piece(piece) == COLORS['white']):
                 board[y][x] += 1
-            elif(match.color_of_piece(piece) == match.COLORS['black']):
+            elif(match.color_of_piece(piece) == COLORS['black']):
                 board[y][x] -= 1
 
 
@@ -311,17 +312,17 @@ def controles_file(match, gmove):
 
     color = match.color_of_piece(piece)
 
-    if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
+    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
         return False
-    elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
+    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
         return False
-    elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
+    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
         if(bishop.controles_file(match, piece, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)):
             return True
-    elif(piece == match.PIECES['wRk'] or piece == PIECES['bRk']):
+    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
         if(rook.controles_file(match, piece, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)):
             return True
-    elif(piece == PIECES['wQu'] or piece == match.PIECES['bQu']):
+    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         if(rook.controles_file(match, piece, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)):
             return True
         if(bishop.controles_file(match, piece, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)):
