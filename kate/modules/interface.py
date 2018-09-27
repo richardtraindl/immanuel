@@ -1,6 +1,7 @@
 import random, threading, copy, time
 from django.conf import settings
 from .. models import Match as ModelMatch, Move as ModelMove
+from .. engine.match values *
 from .. engine.match import *
 from .. engine.move import *
 from .. engine import calc
@@ -98,7 +99,7 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     ### time
     if(match.time_start > 0):
         elapsed_time = time.time() - match.time_start
-        if(match.next_color() == match.COLORS['white']):
+        if(match.next_color() == COLORS['white']):
             match.white_player.elapsed_seconds += elapsed_time
         else:
             match.black_player.elapsed_seconds += elapsed_time
