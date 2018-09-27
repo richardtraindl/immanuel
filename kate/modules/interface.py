@@ -75,7 +75,9 @@ def status(modelmatch):
 
 def is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     match = cMatch()
+    print("before mapper")
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+    print("after before mapper")
     return match.is_move_valid(srcx, srcy, dstx, dsty, prom_piece)
 
 
