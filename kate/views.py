@@ -113,8 +113,10 @@ def do_move(request, matchid=None):
         if(match.is_next_color_human() == False):
             msgcode= match.RETURN_CODES['wrong-color']
             return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
+        print("do_move: before form()")
         form = DoMoveForm(request.POST)
         if(form.is_valid()):
+            print("do_move: after form()")
             srcx,srcy = coord_to_index(form.move_src)
             dstx,dsty = coord_to_index(form.move_dst)
             prom_piece = PIECES[form.prom_piece]
@@ -126,6 +128,7 @@ def do_move(request, matchid=None):
         else:
             msgcode= match.RETURN_CODES['format-error']
 
+        print("do_move: reverse match...")
         return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
     else:
         return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(matchid,)), switch))
