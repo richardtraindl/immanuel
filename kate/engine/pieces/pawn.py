@@ -57,7 +57,7 @@ class cPawn(cPiece):
 
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
-        if(self.color == self.match.COLORS['white']):
+        if(self.color == COLORS['white']):
             self.STEPS = [ [1, 1], [-1, 1] ]
             self.BACK_STEPS = [ [1, -1], [-1, -1] ]
             if(self.ypos < 6):
