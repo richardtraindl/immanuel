@@ -45,7 +45,7 @@ class cQueen(cPiece):
     STEP_SEAST_Y = -1
 
     GEN_STEPS = [ [[0, 1, PIECES['blk']],   [0, 2, PIECES['blk']],   [0, 3, PIECES['blk']],   [0, 4, PIECES['blk']],   [0, 5, PIECES['blk']],   [0, 6, PIECES['blk']],   [0, 7, PIECES['blk']]],
-                  [[0, -1, PIECES['blk']],  [0, -2, PIECES['blk']],  [0, -3, PIECES['blk']],  [0, -4, bPIECES['blk']],  [0, -5, PIECES['blk']],  [0, -6, PIECES['blk']],  [0, -7, PIECES['blk']]],
+                  [[0, -1, PIECES['blk']],  [0, -2, PIECES['blk']],  [0, -3, PIECES['blk']],  [0, -4, PIECES['blk']],  [0, -5, PIECES['blk']],  [0, -6, PIECES['blk']],  [0, -7, PIECES['blk']]],
                   [[1, 0, PIECES['blk']],   [2, 0, PIECES['blk']],   [3, 0, PIECES['blk']],   [4, 0, PIECES['blk']],   [5, 0, PIECES['blk']],   [6, 0, PIECES['blk']],   [7, 0, PIECES['blk']]],
                   [[-1, 0, PIECES['blk']],  [-2, 0, PIECES['blk']],  [-3, 0, PIECES['blk']],  [-4, 0, PIECES['blk']],  [-5, 0, PIECES['blk']],  [-6, 0, PIECES['blk']],  [-7, 0, PIECES['blk']]],
                   [[1, 1, PIECES['blk']],   [2, 2, PIECES['blk']],   [3, 3, PIECES['blk']],   [4, 4, PIECES['blk']],   [5, 5, PIECES['blk']],   [6, 6, PIECES['blk']],   [7, 7, PIECES['blk']]],
