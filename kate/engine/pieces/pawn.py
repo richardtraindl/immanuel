@@ -175,7 +175,7 @@ class cPawn(cPiece):
                 if(midpiece != PIECES['blk'] or dstpiece != PIECES['blk']):
                     return False
             elif(move_dir == self.DIRS['south-east'] or move_dir == self.DIRS['south-west']):
-                if(self.match.color_of_piece(dstpiece) != self.match.COLORS['white']):
+                if(self.match.color_of_piece(dstpiece) != COLORS['white']):
                     return self.is_black_ep_move_ok(dstx, dsty)
 
             # check promotion
