@@ -1,3 +1,4 @@
+from .. values import *
 from .piecefield import cPieceField
 from .piece import cTouch
 from .knight import cKnight
