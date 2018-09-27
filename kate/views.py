@@ -118,9 +118,7 @@ def do_move(request, matchid=None):
             srcx,srcy = coord_to_index(form.move_src)
             dstx,dsty = coord_to_index(form.move_dst)
             prom_piece = PIECES[form.prom_piece]
-            print("do_move: before interface")
             valid, msgcode = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-            print("do_move: after interface")
             if(valid):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
 
