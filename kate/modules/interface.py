@@ -1,7 +1,7 @@
 import random, threading, copy, time
 from django.conf import settings
 from .. models import Match as ModelMatch, Move as ModelMove
-from .. engine.match values *
+from .. engine.values import *
 from .. engine.match import *
 from .. engine.move import *
 from .. engine import calc
