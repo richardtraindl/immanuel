@@ -1,4 +1,5 @@
 from .helper import reverse_lookup, index_to_coord
+from .values import *
 
 
 class cMove:
@@ -54,7 +55,7 @@ class cMove:
                 hyphen = "x"
             fmtmove = index_to_coord(self.srcx, self.srcy) + hyphen + \
                       index_to_coord(self.dstx, self.dsty) + " " + \
-                      reverse_lookup(self.match.PIECES, self.prom_piece)
+                      reverse_lookup(PIECES, self.prom_piece)
             return fmtmove
         else:
             fmtmove = index_to_coord(self.srcx, self.srcy) + "x" + \
@@ -66,8 +67,8 @@ class cMove:
             index_to_coord(self.srcx, self.srcy) + "-" +
             index_to_coord(self.dstx, self.dsty), end="")
 
-        if(self.prom_piece != self.match.PIECES['blk']):
-            print(" " + reverse_lookup(self.match.PIECES, self.prom_piece), end="")
+        if(self.prom_piece != PIECES['blk']):
+            print(" " + reverse_lookup(PIECES, self.prom_piece), end="")
         print(tailmsg, end="")
 
 # class end
@@ -86,16 +87,16 @@ class cGenMove(object):
         piece = self.match.readfield(self.srcx, self.srcy)
         dstpiece = self.match.readfield(self.dstx, self.dsty)
 
-        if(dstpiece != self.match.PIECES['blk']):
+        if(dstpiece != PIECES['blk']):
             hyphen = "x"
-        elif( (piece == self.match.PIECES['wPw'] or piece == self.match.PIECES['bPw']) and 
+        elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and 
                self.srcx != self.dstx ):
             hyphen = "x"
         else:
             hyphen = "-"
 
-        if(self.prom_piece and self.prom_piece != cMatch.PIECES['blk']):
-            trailing = ", " + reverse_lookup(cMatch.PIECES, self.prom_piece)
+        if(self.prom_piece and self.prom_piece != PIECES['blk']):
+            trailing = ", " + reverse_lookup(PIECES, self.prom_piece)
         else:
             trailing = ""
 
