@@ -9,6 +9,7 @@ from .utils import *
 from .forms import *
 from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from .modules import interface
+from .engine.values import *
 from .engine.match import *
 from .engine.move import *
 from .engine.helper import index_to_coord, coord_to_index
@@ -259,7 +260,7 @@ def fetch_match(request):
     else:
         elapsed_time = 0
 
-    if(match.next_color() == match.COLORS['white']):
+    if(match.next_color() == COLORS['white']):
         match.white_player.elapsed_seconds += elapsed_time
     else:
         match.black_player.elapsed_seconds += elapsed_time
