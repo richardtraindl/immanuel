@@ -162,7 +162,7 @@ class cPiece:
         self.match.writefield(move.srcx, move.srcy, piece)
         self.match.writefield(move.dstx, move.dsty, move.captured_piece)
 
-        self.match.score -= self.match.SCORES[move.captured_piece]
+        self.match.score -= SCORES[move.captured_piece]
 
         if(piece == PIECES['wRk']):
             if(self.match.white_movecnt_short_castling_lost == self.match.movecnt + 1):
