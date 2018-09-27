@@ -105,17 +105,17 @@ class cKnight(cPiece):
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     attacked.append(ctouch_beyond)
                     ###
-                    self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+                    self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
                     field_touches_beyond(self.match, opp_color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
                 else:
-                    if(piece == self.match.PIECES['blk'] or piece == self.match.PIECES['wKg'] or piece == self.match.PIECES['bKg']):
+                    if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                         continue
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     supported.append(ctouch_beyond)
                     ###
-                    self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+                    self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
                     field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
