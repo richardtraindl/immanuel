@@ -61,20 +61,20 @@ class cPawn(cPiece):
             self.STEPS = [ [1, 1], [-1, 1] ]
             self.BACK_STEPS = [ [1, -1], [-1, -1] ]
             if(self.ypos < 6):
-                self.GEN_STEPS = [ [[0, 1, self.blk]], [[0, 2, self.blk]], [[1, 1, self.blk]], [[-1, 1, self.blk]] ]
+                self.GEN_STEPS = [ [[0, 1, PIECES['blk']]], [[0, 2, PIECES['blk']]], [[1, 1, PIECES['blk']]], [[-1, 1, PIECES['blk']]] ]
             else:
-                self.GEN_STEPS = [ [[0, 1, self.wQu],  [0, 1, self.wRk],  [0, 1, self.wBp],  [0, 1, self.wKn]],
-                                   [[1, 1, self.wQu],  [1, 1, self.wRk],  [1, 1, self.wBp],  [1, 1, self.wKn]],
-                                   [[-1, 1, self.wQu], [-1, 1, self.wRk], [-1, 1, self.wBp], [-1, 1, self.wKn]] ]
+                self.GEN_STEPS = [ [[0, 1, PIECES['blk']self.wQu],  [0, 1, PIECES['blk']self.wRk],  [0, 1, PIECES['blk']self.wBp],  [0, 1, PIECES['blk']self.wKn]],
+                                   [[1, 1, PIECES['blk']self.wQu],  [1, 1, PIECES['blk']self.wRk],  [1, 1, PIECES['blk']self.wBp],  [1, 1, PIECES['blk']self.wKn]],
+                                   [[-1, 1, PIECES['blk']self.wQu], [-1, 1, PIECES['blk']self.wRk], [-1, 1, PIECES['blk']self.wBp], [-1, 1, PIECES['blk']self.wKn]] ]
         else:
             self.STEPS = [ [1, -1], [-1, -1] ]
             self.BACK_STEPS = [ [1, 1], [-1, 1] ]
             if(self.ypos > 1):
-                self.GEN_STEPS = [ [[0, -1, self.blk]], [[0, -2, self.blk]], [[-1, -1, self.blk]], [[1, -1, self.blk]] ]
+                self.GEN_STEPS = [ [[0, -1, PIECES['blk']]], [[0, -2, PIECES['blk']]], [[-1, -1, PIECES['blk']]], [[1, -1, PIECES['blk']]] ]
             else:
-                self.GEN_STEPS = [ [[0, -1, self.bQu],  [0, -1, self.bRk],  [0, -1, self.bBp],  [0, -1, self.bKn]],
-                                   [[1, -1, self.bQu],  [1, -1, self.bRk],  [1, -1, self.bBp],  [1, -1, self.bKn]],
-                                   [[-1, -1, self.bQu], [-1, -1, self.bRk], [-1, -1, self.bBp], [-1, -1, self.bKn]] ]
+                self.GEN_STEPS = [ [[0, -1, PIECES['blk']self.bQu],  [0, -1, PIECES['blk']self.bRk],  [0, -1, PIECES['blk']self.bBp],  [0, -1, PIECES['blk']self.bKn]],
+                                   [[1, -1, PIECES['blk']self.bQu],  [1, -1, PIECES['blk']self.bRk],  [1, -1, PIECES['blk']self.bBp],  [1, -1, PIECES['blk']self.bKn]],
+                                   [[-1, -1, PIECES['blk']self.bQu], [-1, -1, PIECES['blk']self.bRk], [-1, -1, PIECES['blk']self.bBp], [-1, -1, PIECES['blk']self.bKn]] ]
 
     @classmethod
     def dir_for_move(cls, srcx, srcy, dstx, dsty):
@@ -120,7 +120,7 @@ class cPawn(cPiece):
 
         dstpiece = self.match.readfield(dstx, dsty)
 
-        if(self.color == self.match.COLORS['white']):
+        if(self.color == COLORS['white']):
             # check pins
             if(move_dir == self.DIRS['north'] or move_dir == self.DIRS['2north']):
                 if(pin_dir != self.DIRS['north'] and pin_dir != self.DIRS['south'] and pin_dir != self.DIRS['undefined']):
@@ -139,19 +139,19 @@ class cPawn(cPiece):
                 return False
             elif(move_dir == self.DIRS['2north']):
                 midpiece = self.match.readfield(dstx, self.ypos + self.STEP_1N_Y)
-                if(midpiece != self.match.PIECES['blk'] or dstpiece != self.match.PIECES['blk']):
+                if(midpiece != PIECES['blk'] or dstpiece != PIECES['blk']):
                     return False
             elif(move_dir == self.DIRS['north-west'] or move_dir == self.DIRS['north-east']):
                 if(self.match.color_of_piece(dstpiece) != self.match.COLORS['black']):
                     return self.is_white_ep_move_ok(dstx, dsty)
 
             # check promotion
-            if(dsty == 7 and prom_piece != self.match.PIECES['wQu'] and 
-               prom_piece != self.match.PIECES['wRk'] and 
-               prom_piece != self.match.PIECES['wBp'] and 
-               prom_piece != self.match.PIECES['wKn']):
+            if(dsty == 7 and prom_piece != PIECES['wQu'] and 
+               prom_piece != PIECES['wRk'] and 
+               prom_piece != PIECES['wBp'] and 
+               prom_piece != PIECES['wKn']):
                 return False
-            elif(dsty < 7 and prom_piece != self.match.PIECES['blk']):
+            elif(dsty < 7 and prom_piece != PIECES['blk']):
                 return False
         else:
             # check pins
@@ -172,19 +172,19 @@ class cPawn(cPiece):
                 return False
             elif(move_dir == self.DIRS['2south']):
                 midpiece = self.match.readfield(dstx, self.ypos + self.STEP_1S_Y)
-                if(midpiece != self.match.PIECES['blk'] or dstpiece != self.match.PIECES['blk']):
+                if(midpiece != PIECES['blk'] or dstpiece != PIECES['blk']):
                     return False
             elif(move_dir == self.DIRS['south-east'] or move_dir == self.DIRS['south-west']):
                 if(self.match.color_of_piece(dstpiece) != self.match.COLORS['white']):
                     return self.is_black_ep_move_ok(dstx, dsty)
 
             # check promotion
-            if(dsty == 0 and prom_piece != self.match.PIECES['bQu'] and 
-               prom_piece != self.match.PIECES['bRk'] and 
-               prom_piece != self.match.PIECES['bBp'] and 
-               prom_piece != self.match.PIECES['bKn']):
+            if(dsty == 0 and prom_piece != PIECES['bQu'] and 
+               prom_piece != PIECES['bRk'] and 
+               prom_piece != PIECES['bBp'] and 
+               prom_piece != PIECES['bKn']):
                 return False
-            elif(dsty > 0 and prom_piece != self.match.PIECES['blk']):
+            elif(dsty > 0 and prom_piece != PIECES['blk']):
                 return False
 
         return True
@@ -192,50 +192,50 @@ class cPawn(cPiece):
     def do_move(self, dstx, dsty, prom_piece):
         dstpiece = self.match.readfield(dstx, dsty)
 
-        if(dstpiece == self.match.PIECES['wQu']):
+        if(dstpiece == PIECES['wQu']):
             self.match.wQu_cnt -= 1
-        elif(dstpiece == self.match.PIECES['bQu']):
+        elif(dstpiece == PIECES['bQu']):
             self.match.bQu_cnt -= 1
-        elif(dstpiece == self.match.PIECES['wKn'] or dstpiece == self.match.PIECES['wBp'] or dstpiece == self.match.PIECES['wRk']):
+        elif(dstpiece == PIECES['wKn'] or dstpiece == PIECES['wBp'] or dstpiece == PIECES['wRk']):
             self.match.wOfficer_cnt -= 1
-        elif(dstpiece == self.match.PIECES['bKn'] or dstpiece == self.match.PIECES['bBp'] or dstpiece == self.match.PIECES['bRk']):
+        elif(dstpiece == PIECES['bKn'] or dstpiece == PIECES['bBp'] or dstpiece == PIECES['bRk']):
             self.match.bOfficer_cnt -= 1
 
-        if(prom_piece != self.match.PIECES['blk']):
+        if(prom_piece != PIECES['blk']):
             move_type = cMove.TYPES['promotion']
             e_p_fieldx = None
             e_p_fieldy = None
             captured_piece = dstpiece
             self.match.movecnt += 1 
-            self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+            self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
             self.match.writefield(dstx, dsty, prom_piece)
             self.match.fifty_moves_count = 0
-            self.match.score -= (self.match.SCORES[prom_piece] - self.match.SCORES[self.piece])
-            self.match.score += self.match.SCORES[dstpiece]
-        elif(dstpiece == self.match.PIECES['blk'] and self.xpos != dstx):
+            self.match.score -= (SCORES[prom_piece] - SCORES[self.piece])
+            self.match.score += SCORES[dstpiece]
+        elif(dstpiece == PIECES['blk'] and self.xpos != dstx):
             move_type = cMove.TYPES['en_passant']
             e_p_fieldx = dstx
             e_p_fieldy = self.ypos
             captured_piece = self.match.readfield(e_p_fieldx, e_p_fieldy)
             self.match.movecnt += 1 
-            self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+            self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
             self.match.writefield(dstx, dsty, self.piece)
             self.match.fifty_moves_count = 0
-            self.match.writefield(e_p_fieldx, e_p_fieldy, self.match.PIECES['blk'])
-            self.match.score += self.match.SCORES[captured_piece]
+            self.match.writefield(e_p_fieldx, e_p_fieldy, PIECES['blk'])
+            self.match.score += SCORES[captured_piece]
         else:
             move_type = cMove.TYPES['standard']
             e_p_fieldx = None
             e_p_fieldy = None
             captured_piece = dstpiece
             self.match.movecnt += 1
-            self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+            self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
             self.match.writefield(dstx, dsty, self.piece)
-            if(dstpiece != self.match.PIECES['blk']):
+            if(dstpiece != PIECES['blk']):
                 self.match.fifty_moves_count = 0
             else:
                 self.match.fifty_moves_count += 1
-            self.match.score += self.match.SCORES[dstpiece]
+            self.match.score += SCORES[dstpiece]
 
         move = cMove(self.match, self.match.movecnt, move_type,
                      self.xpos, self.ypos, dstx, dsty, e_p_fieldx, e_p_fieldy,
@@ -244,13 +244,13 @@ class cPawn(cPiece):
         return move
 
     def undo_move(self, move):
-        if(move.captured_piece == self.match.PIECES['wQu']):
+        if(move.captured_piece == PIECES['wQu']):
             self.match.wQu_cnt += 1
-        elif(move.captured_piece == self.match.PIECES['bQu']):
+        elif(move.captured_piece == PIECES['bQu']):
             self.match.bQu_cnt += 1
-        elif(move.captured_piece == self.match.PIECES['wKn'] or move.captured_piece == self.match.PIECES['wBp'] or move.captured_piece == self.match.PIECES['wRk']):
+        elif(move.captured_piece == PIECES['wKn'] or move.captured_piece == PIECES['wBp'] or move.captured_piece == PIECES['wRk']):
             self.match.wOfficer_cnt += 1
-        elif(move.captured_piece == self.match.PIECES['bKn'] or move.captured_piece == self.match.PIECES['bBp'] or move.captured_piece == self.match.PIECES['bRk']):
+        elif(move.captured_piece == PIECES['bKn'] or move.captured_piece == PIECES['bBp'] or move.captured_piece == PIECES['bRk']):
             self.match.bOfficer_cnt += 1
 
         self.match.movecnt -= 1
@@ -259,23 +259,23 @@ class cPawn(cPiece):
         if(move.move_type == move.TYPES['standard']):
             self.match.writefield(move.srcx, move.srcy, self.piece)
             self.match.writefield(move.dstx, move.dsty, move.captured_piece)
-            self.match.score -= self.match.SCORES[move.captured_piece]
+            self.match.score -= SCORES[move.captured_piece]
             return move
         elif(move.move_type == move.TYPES['promotion']):
-            if(self.match.color_of_piece(self.piece) == self.match.COLORS['white']):
-                origin = self.match.PIECES['wPw']
+            if(self.match.color_of_piece(self.piece) == COLORS['white']):
+                origin = PIECES['wPw']
             else:
-                origin = self.match.PIECES['bPw']
+                origin = PIECES['bPw']
             self.match.writefield(move.srcx, move.srcy, origin)
             self.match.writefield(move.dstx, move.dsty, move.captured_piece)
-            self.match.score += (self.match.SCORES[move.prom_piece] - self.match.SCORES[origin])
-            self.match.score -= self.match.SCORES[move.captured_piece]
+            self.match.score += (SCORES[move.prom_piece] - SCORES[origin])
+            self.match.score -= SCORES[move.captured_piece]
             return move
         elif(move.move_type == move.TYPES['en_passant']):
             self.match.writefield(move.srcx, move.srcy, self.piece)
-            self.match.writefield(move.dstx, move.dsty, self.match.PIECES['blk'])
+            self.match.writefield(move.dstx, move.dsty, PIECES['blk'])
             self.match.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
-            self.match.score -= self.match.SCORES[move.captured_piece]
+            self.match.score -= SCORES[move.captured_piece]
             return move
 
     def is_white_ep_move_ok(self, dstx, dsty):
@@ -286,7 +286,7 @@ class cPawn(cPiece):
 
         dstpiece = self.match.readfield(dstx, dsty)
         enemy = self.match.readfield(lastmove.dstx, lastmove.dsty)
-        if(dstpiece == self.match.PIECES['blk'] and enemy == self.match.PIECES['bPw']):
+        if(dstpiece == PIECES['blk'] and enemy == PIECES['bPw']):
             if(lastmove.srcy - lastmove.dsty == 2 and 
                lastmove.dsty == self.ypos and 
                lastmove.dstx == dstx and 
@@ -302,7 +302,7 @@ class cPawn(cPiece):
 
         dstpiece = self.match.readfield(dstx, dsty)
         enemy = self.match.readfield(lastmove.dstx, lastmove.dsty)
-        if(dstpiece == self.match.PIECES['blk'] and enemy == self.match.PIECES['wPw']):
+        if(dstpiece == PIECES['blk'] and enemy == PIECES['wPw']):
             if(lastmove.srcy - lastmove.dsty == -2 and 
                lastmove.dsty == self.ypos and 
                lastmove.dstx == dstx and 
@@ -324,7 +324,7 @@ class cPawn(cPiece):
 
                 piece = self.match.readfield(x1, y1)
             
-                if(piece == self.match.PIECES['blk']):
+                if(piece == PIECES['blk']):
                     continue
 
                 cpawn = cPawn(self.match, dstx, dsty)
@@ -335,18 +335,18 @@ class cPawn(cPiece):
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     attacked.append(ctouch_beyond)
                     ###
-                    self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+                    self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
                     field_touches_beyond(self.match, opp_color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
                 else:
-                    if(piece == self.match.PIECES['blk'] or piece == self.match.PIECES['wKg'] or piece == self.match.PIECES['bKg']):
+                    if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
                         continue
 
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     supported.append(ctouch_beyond)
                     ###
-                    self.match.writefield(self.xpos, self.ypos, self.match.PIECES['blk'])
+                    self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
                     field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
@@ -364,7 +364,7 @@ class cPawn(cPiece):
             if(self.match.is_inbounds(x1, y1)):
                 piece = self.match.readfield(x1, y1)
 
-                if(piece == self.match.PIECES['blk'] or self.match.color_of_piece(piece) == self.color):
+                if(piece == PIECES['blk'] or self.match.color_of_piece(piece) == self.color):
                     if(is_fork_field(self.match, self.color, x1, y1)):
                         #cfork = cFork(srcx, srcy, dstx, dsty, x1, y1)
                         #analyses.lst_fork_defended.append(cfork)
@@ -375,14 +375,14 @@ class cPawn(cPiece):
         return False
 
     def is_running(self):
-        if(self.color == self.match.COLORS['white']):
+        if(self.color == COLORS['white']):
             stepx = 0
             stepy = 1
-            opp_pawn = self.match.PIECES['bPw']
+            opp_pawn = PIECES['bPw']
         else:
             stepx = 0
             stepy = -1
-            opp_pawn = self.match.PIECES['wPw']
+            opp_pawn = PIECES['wPw']
 
         STARTX = [0, 1, -1]
         for i in range(3):
@@ -423,15 +423,15 @@ class cPawn(cPiece):
                 piece = self.match.readfield(x1, y1)
 
                 if(self.match.color_of_piece(piece) == opp_color):
-                    score += self.match.ATTACKED_SCORES[piece]
+                    score += ATTACKED_SCORES[piece]
 
                     # extra score if attacked is pinned
                     enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color
                     if(enmy_pin != self.DIRS['undefined']):
-                        score += self.match.ATTACKED_SCORES[piece]
+                        score += ATTACKED_SCORES[piece]
 
                     if(self.match.is_soft_pin(x1, y1)):
-                        score += self.match.ATTACKED_SCORES[piece]
+                        score += ATTACKED_SCORES[piece]
         return score
 
     def score_supports(self):
@@ -450,7 +450,7 @@ class cPawn(cPiece):
 
                 if(self.match.color_of_piece(supported) == self.color):
                     if(self.match.is_field_touched(opp_color, x1, y1, 1)):
-                        score += self.match.SUPPORTED_SCORES[supported]
+                        score += SUPPORTED_SCORES[supported]
         return score
 
 # class end
