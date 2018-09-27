@@ -1,4 +1,5 @@
 import re, os, threading, copy
+from engine.values import *
 from engine.match import *
 from engine.move import *
 from engine.calc import calc_move, Msgs
@@ -111,9 +112,9 @@ def new_match(lstparam):
 
 
 def word_pause(session, params):
-    m = session.match
-    if(m.evaluate_status() == m.STATUS['open']):
-        m.status = m.STATUS['paused']
+    match = session.match
+    if(match.evaluate_status() == match.STATUS['open']):
+        match.status = match.STATUS['paused']
     return True
 
 
@@ -214,7 +215,7 @@ def word_move(session, params):
         else:
             matchobj = re.search(r"^\s*(?P<short>[0oO][-][0oO])\s*$", params)
             if(matchobj):
-                if(match.next_color() == match.COLORS['white']):
+                if(match.next_color() == COLORS['white']):
                     srcx = match.wKg_x
                     srcy = match.wKg_y
                 else:
@@ -225,7 +226,7 @@ def word_move(session, params):
             else:
                 matchobj = re.search(r"^\s*(?P<long>[0oO][-][0oO][-][0oO])\s*$", params)
                 if(matchobj):
-                    if(match.next_color() == match.COLORS['white']):
+                    if(match.next_color() == COLORS['white']):
                         srcx = match.wKg_x
                         srcy = match.wKg_y
                     else:
@@ -236,8 +237,8 @@ def word_move(session, params):
                 else:
                     return True
 
-    if(match.is_move_valid(srcx, srcy, dstx, dsty, match.PIECES[prom_piece])[0]):
-        match.do_move(srcx, srcy, dstx, dsty, match.PIECES[prom_piece])
+    if(match.is_move_valid(srcx, srcy, dstx, dsty, PIECES[prom_piece])[0]):
+        match.do_move(srcx, srcy, dstx, dsty, PIECES[prom_piece])
         prnt_board(match)
     else:
         print("invalid move!")
@@ -300,7 +301,7 @@ def word_save(session, params):
     strboard = "board:"
     for y in range(8):
         for x in range(8):
-            strboard += reverse_lookup(match.PIECES, match.readfield(x, y))
+            strboard += reverse_lookup(PIECES, match.readfield(x, y))
     fobject.write(strboard + ";")
 
     fobject.write("movelistcnt:" + str(len(match.move_list)) + ";")
@@ -366,7 +367,7 @@ def word_load(session, params):
         for x in range(8):
             idx = (y * 24) + (x * 3)
             strfield = strboard[idx:idx+3]
-            match.writefield(x, y, match.PIECES[strfield])
+            match.writefield(x, y, PIECES[strfield])
     # -----------------------
 
     # -----------------------
