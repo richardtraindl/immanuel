@@ -1,4 +1,5 @@
 from colorama import Fore, Back, Style
+from .values import *
 from .match import *
 from .move import *
 from .helper import *
@@ -11,7 +12,7 @@ def prnt_minutes(match):
         print(str(count) + ":" + 
               index_to_coord(move.srcx, move.srcy) + " " +
               index_to_coord(move.dstx, move.dsty) + " " +
-              reverse_lookup(match.PIECES, move.prom_piece))
+              reverse_lookup(PIECES, move.prom_piece))
         count += 1
     print("------------------------------------------------------")
 
@@ -104,22 +105,22 @@ def prnt_row(match, pieces):
             piece = pieces[k][0]
             backcolor = pieces[k][1]
 
-            if(match.color_of_piece(piece) == match.COLORS['white']):
+            if(match.color_of_piece(piece) == COLORS['white']):
                 forecolor = "white"
             else:
                 forecolor = "black"
 
-            if(piece == match.PIECES['blk']):
+            if(piece == PIECES['blk']):
                 piecemap = BLANK
-            elif(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
+            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                 piecemap = PAWN
-            elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
                 piecemap = KNIGHT
-            elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
+            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
                 piecemap = BISHOP
-            elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
                 piecemap = ROOK
-            elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
+            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                 piecemap = QUEEN
             else:
                 piecemap = KING
