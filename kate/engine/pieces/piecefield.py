@@ -1,3 +1,4 @@
+from .. move import *
 from .pawn import cPawn
 from .knight import cKnight
 from .rook import cRook
@@ -17,17 +18,17 @@ class cPieceField:
         self.STEPS = STEPS
 
     def obj_for_piece(self, piece, x1, y1):
-        if(piece == self.match.PIECES['wBp'] or piece == self.match.PIECES['bBp']):
+        if(piece == PIECES['wBp'] or piece == PIECES['bBp']):
             return cBishop(self.match, x1, y1)
-        elif(piece == self.match.PIECES['wRk'] or piece == self.match.PIECES['bRk']):
+        elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
             return cRook(self.match, x1, y1)
-        elif(piece == self.match.PIECES['wQu'] or piece == self.match.PIECES['bQu']):
+        elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
             return cQueen(self.match, x1, y1)
-        elif(piece == self.match.PIECES['wKg'] or piece == self.match.PIECES['bKg']):
+        elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
             return cKing(self.match, x1, y1)
-        elif(piece == self.match.PIECES['wKn'] or piece == self.match.PIECES['bKn']):
+        elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
             return cKnight(self.match, x1, y1)
-        elif(piece == self.match.PIECES['wPw'] or piece == self.match.PIECES['bPw']):
+        elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
             return cPawn(self.match, x1, y1)
         else:
             return None
@@ -40,7 +41,7 @@ class cPieceField:
             if(x1 is not None):
                 piece = self.match.readfield(x1, y1)
                 flag = False
-                if(color == self.match.COLORS['white']):
+                if(color == COLORS['white']):
                     for face in self.white_faces:
                         if(piece == face):
                             flag = True
@@ -105,7 +106,7 @@ class cPieceField:
                 if(cpiece.is_move_stuck(self.fieldx, self.fieldy)):
                     continue
                 flag = False
-                if(color == self.match.COLORS['white']):
+                if(color == COLORS['white']):
                     for face in self.white_faces:
                         if(piece == face):
                             flag = True
@@ -134,7 +135,7 @@ class cPieceField:
                     continue
 
                 if(self.match.color_of_piece(piece) == color):
-                    if(piece == self.match.PIECES['wKg'] or piece == self.match.PIECES['bKg'] or 
+                    if(piece == PIECES['wKg'] or piece == PIECES['bKg'] or 
                        self.match.is_field_touched(color, x1, y1, 1) == False):
                         count += 1
         return count
