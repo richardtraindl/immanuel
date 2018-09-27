@@ -489,7 +489,7 @@ class cMatch:
                     piece = self.readfield(dstx, dsty)
                     if( (color == COLORS['white'] and piece == PIECES['wKg']) or
                         (color == COLORS['black'] and piece == PIECES['bKg']) ):
-                        reverse_dir = REVERSE_DIRS[direction]
+                        reverse_dir = self.REVERSE_DIRS[direction]
                         stepx, stepy = cpieces[idx].step_for_dir(reverse_dir)
                         dstx, dsty = self.search(srcx, srcy, stepx, stepy)
                         if(dstx is not None):
