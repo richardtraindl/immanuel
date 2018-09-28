@@ -130,28 +130,16 @@ class cBoard:
         else:
             return False
 
-    def update_counter(self):
-        self.wQu_cnt = 0
-        self.bQu_cnt = 0
-        self.wOfficer_cnt = 0
-        self.bOfficer_cnt = 0
-        for y in range(8):
-            for x in range(8):
-                piece = self.readfield(x, y)
-                if(piece == PIECES['wKg']):
-                    self.wKg_x = x
-                    self.wKg_y = y
-                elif(piece == PIECES['bKg']):
-                    self.bKg_x = x
-                    self.bKg_y = y
-                elif(piece == PIECES['wQu']):
-                    self.wQu_cnt += 1
-                elif(piece == PIECES['bQu']):
-                    self.bQu_cnt += 1        
-                elif(piece == PIECES['wRk'] or piece == PIECES['wBp'] or piece == PIECES['wKn']):
-                    self.wOfficer_cnt += 1
-                elif(piece == PIECES['bRk'] or piece == PIECES['bBp'] or piece == PIECES['bKn']):
-                    self.bOfficer_cnt += 1
+    def update_counter(self, xpos, ypos, value):
+        piece = self.readfield(xpos, ypos)
+        if(piece == PIECES['wQu']):
+            self.wQu_cnt += value
+        elif(piece == PIECES['bQu']):
+            self.bQu_cnt += value
+        elif(piece == PIECES['wKn'] or piece == PIECES['wBp'] or piece == PIECES['wRk']):
+            self.wOfficer_cnt += value
+        elif(piece == PIECES['bKn'] or piece == PIECES['bBp'] or piece == PIECES['bRk']):
+            self.bOfficer_cnt += value
 
     def writefield(self, x, y, value):
         self.fields[y][x] = value
