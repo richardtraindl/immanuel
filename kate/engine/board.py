@@ -22,6 +22,19 @@ class cBoard:
                         [PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk'], PIECES['blk']],
                         [PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw'], PIECES['bPw']],
                         [PIECES['bRk'], PIECES['bKn'], PIECES['bBp'], PIECES['bQu'], PIECES['bKg'], PIECES['bBp'], PIECES['bKn'], PIECES['bRk']] ]
+        self.wKg_x = self.COORD['5']
+        self.wKg_y = self.COORD['1']
+        self.bKg_x = self.COORD['5']
+        self.bKg_y = self.COORD['8']
+        self.fifty_moves_count = 0
+        self.white_movecnt_short_castling_lost = 0
+        self.white_movecnt_long_castling_lost = 0
+        self.black_movecnt_short_castling_lost = 0
+        self.black_movecnt_long_castling_lost = 0
+        self.wQu_cnt = 1
+        self.bQu_cnt = 1
+        self.wOfficer_cnt = 6
+        self.bOfficer_cnt = 6
 
     def set_to_base(self):
         self.fields[self.COORD['1']][self.COORD['1']] = PIECES['wRk']
@@ -53,6 +66,92 @@ class cBoard:
         self.fields[self.COORD['8']][self.COORD['6']] = PIECES['bBp']
         self.fields[self.COORD['8']][self.COORD['7']] = PIECES['bKn']
         self.fields[self.COORD['8']][self.COORD['8']] = PIECES['bRk']
+        
+        self.wKg_x = self.COORD['5']
+        self.wKg_y = self.COORD['1']
+        self.bKg_x = self.COORD['5']
+        self.bKg_y = self.COORD['8']
+        self.fifty_moves_count = 0
+        self.white_movecnt_short_castling_lost = 0
+        self.white_movecnt_long_castling_lost = 0
+        self.black_movecnt_short_castling_lost = 0
+        self.black_movecnt_long_castling_lost = 0
+        self.wQu_cnt = 1
+        self.bQu_cnt = 1
+        self.wOfficer_cnt = 6
+        self.bOfficer_cnt = 6
+    # set_to_base() end
+
+    def update_white_movecnt_short_castling_lost(self, srcx, srcy, movecnt):
+        if(self.white_movecnt_short_castling_lost > 0):
+            return False
+        elif(srcx == self.COORD['5'] and srcy == self.COORD['1']): 
+            self.white_movecnt_short_castling_lost = movecnt
+            return True
+        elif(srcx == self.COORD['8'] and srcy == self.COORD['1']):
+            self.white_movecnt_short_castling_lost = movecnt
+            return True
+        else:
+            return False
+
+    def update_white_movecnt_long_castling_lost(self, srcx, srcy, movecnt):
+        if(self.white_movecnt_long_castling_lost > 0):
+            return False
+        elif(srcx == self.COORD['5'] and srcy == self.COORD['1']):
+            self.white_movecnt_long_castling_lost = movecnt
+            return True
+        elif(srcx == self.COORD['1'] and srcy == self.COORD['1']):
+            self.white_movecnt_long_castling_lost = movecnt
+            return True
+        else:
+            return False
+
+    def update_black_movecnt_short_castling_lost(self, srcx, srcy, movecnt):
+        if(self.black_movecnt_short_castling_lost > 0):
+            return False
+        elif(srcx == self.COORD['5'] and srcy == self.COORD['8']):
+            self.black_movecnt_short_castling_lost = movecnt
+            return True
+        elif(srcx == self.COORD['8'] and srcy == self.COORD['8']):
+            self.black_movecnt_short_castling_lost = movecnt
+            return True
+        else:
+            return False
+
+    def update_black_movecnt_long_castling_lost(self, srcx, srcy, movecnt):
+        if(self.black_movecnt_long_castling_lost > 0):
+            return False
+        elif(srcx == self.COORD['5'] and srcy == self.COORD['8']):
+            self.black_movecnt_long_castling_lost = movecnt
+            return True
+        elif(srcx == self.COORD['1'] and srcy == self.COORD['8']):
+            self.black_movecnt_long_castling_lost = movecnt
+            return True
+        else:
+            return False
+
+    def update_counter(self):
+        self.wQu_cnt = 0
+        self.bQu_cnt = 0
+        self.wOfficer_cnt = 0
+        self.bOfficer_cnt = 0
+        for y in range(8):
+            for x in range(8):
+                piece = self.readfield(x, y)
+                if(piece == PIECES['wKg']):
+                    self.wKg_x = x
+                    self.wKg_y = y
+                elif(piece == PIECES['bKg']):
+                    self.bKg_x = x
+                    self.bKg_y = y
+                elif(piece == PIECES['wQu']):
+                    self.wQu_cnt += 1
+                elif(piece == PIECES['bQu']):
+                    self.bQu_cnt += 1        
+                elif(piece == PIECES['wRk'] or piece == PIECES['wBp'] or piece == PIECES['wKn']):
+                    self.wOfficer_cnt += 1
+                elif(piece == PIECES['bRk'] or piece == PIECES['bBp'] or piece == PIECES['bKn']):
+                    self.bOfficer_cnt += 1
 
     def writefield(self, x, y, value):
         self.fields[y][x] = value
