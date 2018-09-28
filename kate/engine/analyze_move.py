@@ -301,9 +301,6 @@ def defends_invasion(match, gmove):
                 board[y][x] += 1
             elif(match.color_of_piece(piece) == COLORS['black']):
                 board[y][x] -= 1
-
-
-
    
     return False
 
@@ -335,7 +332,7 @@ def is_tactical_draw(match, gmove):
     newmatch = copy.deepcopy(match)
     newmatch.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
-    #if(newmatch.fifty_moves_count >= 49):
+    #if(newmatch.board.fifty_moves_count >= 49):
         #return True
 
     if(len(newmatch.move_list) < 9):
