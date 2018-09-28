@@ -138,8 +138,7 @@ class cMatch:
     def update_attributes(self):
         self.seconds_per_move = self.SECONDS_PER_MOVE[self.level]
 
-        self.movecnt = len(self.move_list)
-        if(self.movecnt > 0):
+        if(len(self.move_list) > 0):
             move = self.move_list[-1]
             self.board.fifty_moves_count = move.fifty_moves_count
 
@@ -151,13 +150,19 @@ class cMatch:
                     self.board.update_black_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
                     self.board.update_black_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
 
-        self.board.update_counter()
-
-        self.score = 0
         for y in range(8):
             for x in range(8):
                 piece = self.readfield(x, y)
-                self.score -= SCORES[piece]
+                self.score += SCORES[piece]
+                if(piece == PIECES['wKg']):
+                    self.board.wKg_x = x
+                    self.board.wKg_y = y
+                elif(piece == PIECES['bKg']):
+                    self.board.bKg_x = x
+                    self.board.bKg_y = y
+                else:
+                    self.board.update_counter(self, x, y, 1)
+    # update_attributes() end
 
     def writefield(self, x, y, value):
         self.board.writefield(x, y, value)
