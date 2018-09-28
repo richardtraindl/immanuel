@@ -125,7 +125,6 @@ class cMatch:
 
     def __init__(self):
         self.status = self.STATUS['open']
-        self.movecnt = 0
         self.score = 0
         self.level = self.LEVELS['blitz']
         self.seconds_per_move = self.SECONDS_PER_MOVE[self.level]
@@ -134,19 +133,6 @@ class cMatch:
         self.white_player = cPlayer(COLORS['white'], "", True, 0)
         self.black_player = cPlayer(COLORS['black'], "", True, 0)
         self.board = cBoard()
-        self.fifty_moves_count = 0
-        self.white_movecnt_short_castling_lost = 0
-        self.white_movecnt_long_castling_lost = 0
-        self.black_movecnt_short_castling_lost = 0
-        self.black_movecnt_long_castling_lost = 0
-        self.wKg_x = self.E1_X
-        self.wKg_y = self.E1_Y
-        self.bKg_x = self.E8_X
-        self.bKg_y = self.E8_Y
-        self.wQu_cnt = 1
-        self.bQu_cnt = 1
-        self.wOfficer_cnt = 6
-        self.bOfficer_cnt = 6
         self.move_list = []
 
     def update_attributes(self):
@@ -155,64 +141,23 @@ class cMatch:
         self.movecnt = len(self.move_list)
         if(self.movecnt > 0):
             move = self.move_list[-1]
-            self.fifty_moves_count = move.fifty_moves_count
+            self.board.fifty_moves_count = move.fifty_moves_count
 
             for move in self.move_list:
                 if(move.count % 2 == 1):
-                    if(self.white_movecnt_short_castling_lost == 0):
-                        if(move.srcx == self.E1_X and move.srcy == self.E1_Y):
-                            self.white_movecnt_short_castling_lost = move.count
-                        elif(move.srcx == self.H1_X and move.srcy == self.H1_Y):
-                            self.white_movecnt_short_castling_lost = move.count
-                            continue
-                    if(self.white_movecnt_long_castling_lost == 0):
-                        if(move.srcx == self.E1_X and move.srcy == self.E1_Y):
-                            self.white_movecnt_long_castling_lost = move.count
-                        elif(move.srcx == self.A1_X and move.srcy == self.A1_Y):
-                            self.white_movecnt_long_castling_lost = move.count
-                            continue
+                    self.board.update_white_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
+                    self.board.update_white_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
                 else:
-                    if(self.black_movecnt_short_castling_lost == 0):
-                        if(move.srcx == self.E8_X and move.srcy == self.E8_Y):
-                            self.black_movecnt_short_castling_lost = move.count
-                        elif(move.srcx == self.H8_X and move.srcy == self.H8_Y):
-                            self.black_movecnt_short_castling_lost = move.count
-                            continue
-                    if(self.black_movecnt_long_castling_lost == 0):
-                        if(move.srcx == self.E8_X and move.srcy == self.E8_Y):
-                            self.black_movecnt_long_castling_lost = move.count
-                        elif(move.srcx == self.A8_X and move.srcy == self.A8_Y):
-                            self.black_movecnt_long_castling_lost = move.count
-                            continue
+                    self.board.update_black_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
+                    self.board.update_black_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
+
+        self.board.update_counter()
 
         self.score = 0
-        self.wQu_cnt = 0
-        self.bQu_cnt = 0
-        self.wOfficer_cnt = 0
-        self.bOfficer_cnt = 0
         for y in range(8):
             for x in range(8):
                 piece = self.readfield(x, y)
-
-                if(piece == PIECES['blk']):
-                    continue
-                else:
-                    self.score -= SCORES[piece]
-
-                if(piece == PIECES['wKg']):
-                    self.wKg_x = x
-                    self.wKg_y = y
-                elif(piece == PIECES['bKg']):
-                    self.bKg_x = x
-                    self.bKg_y = y
-                elif(piece == PIECES['wQu']):
-                    self.wQu_cnt += 1
-                elif(piece == PIECES['bQu']):
-                    self.bQu_cnt += 1        
-                elif(piece == PIECES['wRk'] or piece == PIECES['wBp'] or piece == PIECES['wKn']):
-                    self.wOfficer_cnt += 1
-                elif(piece == PIECES['bRk'] or piece == PIECES['bBp'] or piece == PIECES['bKn']):
-                    self.bOfficer_cnt += 1
+                self.score -= SCORES[piece]
 
     def writefield(self, x, y, value):
         self.board.writefield(x, y, value)
@@ -223,20 +168,23 @@ class cMatch:
     def search(self, srcx, srcy, stepx, stepy):
         return self.board.search(srcx, srcy, stepx, stepy)
 
+    def movecnt(self):
+        return len(self.move_list)
+
     def is_next_color_human(self):
-        if(self.movecnt % 2 == 0 ):
+        if(len(self.move_list) % 2 == 0 ):
             return self.white_player.is_human
         else:
             return self.black_player.is_human
 
     def next_color(self):
-        if(self.movecnt % 2 == 0 ):
+        if(len(self.move_list) % 2 == 0 ):
             return COLORS['white']
         else:
             return COLORS['black']
 
     def is_opening(self):
-        return self.movecnt <= 30
+        return len(self.move_list) <= 30
 
     def is_endgame(self):
         count = self.wQu_cnt + self.wOfficer_cnt + self.bQu_cnt + self.bOfficer_cnt
@@ -407,9 +355,9 @@ class cMatch:
         self.writefield(dstx, dsty, piece)
 
         if(self.color_of_piece(piece) == COLORS['white']):
-            flag = self.is_field_touched(COLORS['black'], self.wKg_x, self.wKg_y, 0)
+            flag = self.is_field_touched(COLORS['black'], self.board.wKg_x, self.board.wKg_y, 0)
         else:
-            flag = self.is_field_touched(COLORS['white'], self.bKg_x, self.bKg_y, 0)
+            flag = self.is_field_touched(COLORS['white'], self.board.bKg_x, self.board.bKg_y, 0)
 
         self.writefield(dstx, dsty, dstpiece)
         self.writefield(srcx, srcy, piece)
@@ -476,11 +424,11 @@ class cMatch:
             piece = self.readfield(srcx, srcy)
             color = self.color_of_piece(piece)
             if(color == COLORS['white']):
-                kgx = self.wKg_x
-                kgy = self.wKg_y
+                kgx = self.board.wKg_x
+                kgy = self.board.wKg_y
             else:
-                kgx = self.bKg_x
-                kgy = self.bKg_y
+                kgx = self.board.bKg_x
+                kgy = self.board.bKg_y
             direction = cpieces[idx].dir_for_move(srcx, srcy, kgx, kgy)
             if(direction != self.DIRS['undefined']):
                 stepx, stepy = cpieces[idx].step_for_dir(direction)
