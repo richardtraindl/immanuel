@@ -1,4 +1,3 @@
-from colorama import Fore, Back, Style
 from .values import *
 from .match import *
 from .move import *
@@ -99,6 +98,13 @@ PAWN     = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020",
              u"\u0020\u0020\u2588\u2588\u2588\u0020\u0020",
              u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020" ]
 
+WHITE_TEXT = "\033[37m"
+BLACK_TEXT = "\033[30m"
+WHITE_BACK = "\033[47m"
+BLUE_BACK  = "\033[44m"
+BOLD_ON    = "\033[1m"
+RESET_ALL  = "\033[0m"
+
 def prnt_row(match, pieces):
     for i in range(4):
         for k in range(8):
@@ -135,14 +141,14 @@ def prnt_row(match, pieces):
 
             if(forecolor == "white"):
                 if(backcolor == "white"):
-                    print(Back.WHITE + Fore.WHITE + Style.DIM + piecemap[i] + Style.RESET_ALL, end=endstr)
+                    print(WHITE_BACK + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
                 else:
-                    print(Back.BLUE + Fore.WHITE + Style.DIM + piecemap[i] + Style.RESET_ALL, end=endstr)
+                    print(BLUE_BACK + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
             else:
                 if(backcolor == "white"):
-                    print(Back.WHITE + Fore.BLACK + piecemap[i] + Style.RESET_ALL, end=endstr)
+                    print(WHITE_BACK + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
                 else:
-                    print(Back.BLUE + Fore.BLACK + piecemap[i] + Style.RESET_ALL, end=endstr)
+                    print(BLUE_BACK + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
 
 
 def prnt_board(match):
