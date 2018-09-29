@@ -157,15 +157,15 @@ def score_controled_vertical_files(match):
 
 def is_king_guarded(match, color):
     if(color == COLORS['white']):
-        Kg_x = match.wKg_x
-        Kg_y = match.wKg_y
+        Kg_x = match.board.wKg_x
+        Kg_y = match.board.wKg_y
         pawn = PIECES['wPw']
 
         if(match.is_endgame() == False and Kg_y > 0):
             return False
     else:
-        Kg_x = match.bKg_x
-        Kg_y = match.bKg_y
+        Kg_x = match.board.bKg_x
+        Kg_y = match.board.bKg_y
         pawn = PIECES['bPw']
 
         if(match.is_endgame() == False and Kg_y < 7):
@@ -191,11 +191,11 @@ def is_king_guarded(match, color):
 
 def is_king_centered(match, color):
     if(color == COLORS['white']):
-        x = match.wKg_x
-        y = match.wKg_y
+        x = match.board.wKg_x
+        y = match.board.wKg_y
     else:
-        x = match.bKg_x
-        y = match.bKg_y
+        x = match.board.bKg_x
+        y = match.board.bKg_y
 
     if(x >= 2 and x <= 5 and y >= 2 and y <= 5):
         return True
@@ -205,9 +205,9 @@ def is_king_centered(match, color):
 
 def is_king_exposed(match, color):
     if(color == COLORS['white']):
-        x = match.wKg_x
+        x = match.board.wKg_x
     else:
-        x = match.bKg_x
+        x = match.board.bKg_x
 
     if(x == 3 or x == 4):
         return True

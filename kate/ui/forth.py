@@ -30,7 +30,7 @@ def interpret(session, inputstr):
 
 
 def forth():
-    lstparam = ['White', 'm', 'Black', "h"]
+    lstparam = ['White', 'h', 'Black', "m"]
     session = Session(new_match(lstparam), Msgs())
 
     thread = None

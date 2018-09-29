@@ -219,7 +219,7 @@ class cPawn(cPiece):
             move.captured_piece = self.match.readfield(move.e_p_fieldx, move.e_p_fieldy)
             self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
             self.match.writefield(dstx, dsty, self.piece)
-            self.match.writefield(e_p_fieldx, e_p_fieldy, PIECES['blk'])
+            self.match.writefield(move.e_p_fieldx, move.e_p_fieldy, PIECES['blk'])
             self.match.score += SCORES[move.captured_piece]
         else:
             move.captured_piece = dstpiece

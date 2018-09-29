@@ -144,13 +144,13 @@ class cKing(cPiece):
             self.match.writefield(move.dstx, move.dsty, self.piece)
 
         if(self.piece == PIECES['wKg']):
-            self.match.wKg_x = move.dstx
-            self.match.wKg_y = move.dsty
+            self.match.board.wKg_x = move.dstx
+            self.match.board.wKg_y = move.dsty
             self.match.board.domove_white_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
             self.match.board.domove_white_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
         else:
-            self.match.bKg_x = move.dstx
-            self.match.bKg_y = move.dsty
+            self.match.board.bKg_x = move.dstx
+            self.match.board.bKg_y = move.dsty
             self.match.board.domove_black_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
             self.match.board.domove_black_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
 

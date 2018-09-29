@@ -83,6 +83,7 @@ class CalcThread(threading.Thread):
 def calc_and_domove(session):
     match = session.match
     if(session.thread_is_busy == False and match.evaluate_status() == match.STATUS['open'] and match.is_next_color_human() == False):
+        session.msgs.terminate = False
         session.thread = CalcThread(session)
         session.thread.start()
 
@@ -96,14 +97,14 @@ def new_match(lstparam):
 
     match.white_player.name = lstparam[0]
 
-    if(lstparam[1] == "h" or lstparam[1] == "0"):
+    if(lstparam[1] == "human" or lstparam[1] == "h"):
         match.white_player.is_human = True
     else:
         match.white_player.is_human = False
 
     match.black_player.name = lstparam[2]
 
-    if(lstparam[3] == "h" or lstparam[3] == "0"):
+    if(lstparam[3] == "human" or lstparam[3] == "h"):
         match.black_player.is_human = True
     else:
         match.black_player.is_human = False
@@ -216,22 +217,22 @@ def word_move(session, params):
             matchobj = re.search(r"^\s*(?P<short>[0oO][-][0oO])\s*$", params)
             if(matchobj):
                 if(match.next_color() == COLORS['white']):
-                    srcx = match.wKg_x
-                    srcy = match.wKg_y
+                    srcx = match.board.wKg_x
+                    srcy = match.board.wKg_y
                 else:
-                    srcx = match.bKg_x
-                    srcy = match.bKg_y
+                    srcx = match.board.bKg_x
+                    srcy = match.board.bKg_y
                 dstx = srcx + 2
                 dsty = srcy
             else:
                 matchobj = re.search(r"^\s*(?P<long>[0oO][-][0oO][-][0oO])\s*$", params)
                 if(matchobj):
                     if(match.next_color() == COLORS['white']):
-                        srcx = match.wKg_x
-                        srcy = match.wKg_y
+                        srcx = match.board.wKg_x
+                        srcy = match.board.wKg_y
                     else:
-                        srcx = match.bKg_x
-                        srcy = match.bKg_y
+                        srcx = match.board.bKg_x
+                        srcy = match.board.bKg_y
                     dstx = srcx - 2
                     dsty = srcy
                 else:
@@ -354,7 +355,10 @@ def word_load(session, params):
                         except ValueError:
                             value = strvalue
 
-                setattr(match, classattr.label, value)
+                if(classattr.label[:6] == "board."):
+                    setattr(match.board, classattr.label, value)
+                else:
+                    setattr(match, classattr.label, value)
                 break
         index += 1
     # -----------------------

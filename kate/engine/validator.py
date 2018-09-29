@@ -121,9 +121,9 @@ class cValidator:
         match.writefield(dstx, dsty, piece)
 
         if(match.color_of_piece(piece) == match.COLORS['white']):
-            flag = cls.is_field_touched(match, match.COLORS['black'], match.wKg_x, match.wKg_y, 0)
+            flag = cls.is_field_touched(match, match.COLORS['black'], match.board.wKg_x, match.board.wKg_y, 0)
         else:
-            flag = cls.is_field_touched(match, match.COLORS['white'], match.bKg_x, match.bKg_y, 0)
+            flag = cls.is_field_touched(match, match.COLORS['white'], match.board.bKg_x, match.board.bKg_y, 0)
 
         match.writefield(dstx, dsty, dstpiece)
         match.writefield(srcx, srcy, piece)
@@ -181,11 +181,11 @@ class cValidator:
             piece = match.readfield(srcx, srcy)
             color = match.color_of_piece(piece)
             if(color == match.COLORS['white']):
-                kgx = match.wKg_x
-                kgy = match.wKg_y
+                kgx = match.board.wKg_x
+                kgy = match.board.wKg_y
             else:
-                kgx = match.bKg_x
-                kgy = match.bKg_y
+                kgx = match.board.bKg_x
+                kgy = match.board.bKg_y
             direction = cpieces[idx].dir_for_move(srcx, srcy, kgx, kgy)
             if(direction != match.DIRS['undefined']):
                 stepx, stepy = cpieces[idx].step_for_dir(direction)
