@@ -84,6 +84,12 @@ class cKnight(cPiece):
 
         return True
 
+    #do_move(self, dstx, dsty, prom_piece)
+        # works with inherited class
+
+    #undo_move(self, move)
+        # works with inherited class
+
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
         from .. analyze_helper import field_touches_beyond
 

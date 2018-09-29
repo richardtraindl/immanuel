@@ -7,7 +7,7 @@ from .helper import coord_to_index, index_to_coord
 
 
 def retrieve_move(match):
-    if(match.movecnt >= DEPTH):
+    if(match.movecnt() >= DEPTH):
         print("############ depth not supported ############")
         return None
         

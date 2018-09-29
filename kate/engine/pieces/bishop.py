@@ -74,6 +74,12 @@ class cBishop(cPiece):
     #is_move_valid(self, dstx, dsty)
         # works with inherited class
 
+    #do_move(self, dstx, dsty, prom_piece)
+        # works with inherited class
+
+    #undo_move(self, move)
+        # works with inherited class
+
     #find_attacks_and_supports(self, dstx, dsty, attacked, supported):
         # works with inherited class
 

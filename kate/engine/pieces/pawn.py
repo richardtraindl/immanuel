@@ -190,77 +190,61 @@ class cPawn(cPiece):
         return True
 
     def do_move(self, dstx, dsty, prom_piece):
-        dstpiece = self.match.readfield(dstx, dsty)
+        move = cMove(self.match, 
+                     self.match.movecnt() + 1, 
+                     cMove.TYPES['standard'],
+                     self.xpos, 
+                     self.ypos, 
+                     dstx, 
+                     dsty, 
+                     None, 
+                     None,
+                     PIECES['blk'], 
+                     prom_piece, 
+                     self.match.board.fifty_moves_count)
 
-        if(dstpiece == PIECES['wQu']):
-            self.match.wQu_cnt -= 1
-        elif(dstpiece == PIECES['bQu']):
-            self.match.bQu_cnt -= 1
-        elif(dstpiece == PIECES['wKn'] or dstpiece == PIECES['wBp'] or dstpiece == PIECES['wRk']):
-            self.match.wOfficer_cnt -= 1
-        elif(dstpiece == PIECES['bKn'] or dstpiece == PIECES['bBp'] or dstpiece == PIECES['bRk']):
-            self.match.bOfficer_cnt -= 1
-
+        dstpiece = self.match.readfield(move.dstx, move.dsty)
+        
         if(prom_piece != PIECES['blk']):
-            move_type = cMove.TYPES['promotion']
-            e_p_fieldx = None
-            e_p_fieldy = None
-            captured_piece = dstpiece
-            self.match.movecnt += 1 
+            move.move_type = cMove.TYPES['promotion']
+            move.captured_piece = dstpiece
             self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
             self.match.writefield(dstx, dsty, prom_piece)
-            self.match.fifty_moves_count = 0
             self.match.score -= (SCORES[prom_piece] - SCORES[self.piece])
             self.match.score += SCORES[dstpiece]
         elif(dstpiece == PIECES['blk'] and self.xpos != dstx):
-            move_type = cMove.TYPES['en_passant']
-            e_p_fieldx = dstx
-            e_p_fieldy = self.ypos
-            captured_piece = self.match.readfield(e_p_fieldx, e_p_fieldy)
-            self.match.movecnt += 1 
+            move.move_type = cMove.TYPES['en_passant']
+            move.e_p_fieldx = dstx
+            move.e_p_fieldy = self.ypos
+            move.captured_piece = self.match.readfield(move.e_p_fieldx, move.e_p_fieldy)
             self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
             self.match.writefield(dstx, dsty, self.piece)
-            self.match.fifty_moves_count = 0
             self.match.writefield(e_p_fieldx, e_p_fieldy, PIECES['blk'])
-            self.match.score += SCORES[captured_piece]
+            self.match.score += SCORES[move.captured_piece]
         else:
-            move_type = cMove.TYPES['standard']
-            e_p_fieldx = None
-            e_p_fieldy = None
-            captured_piece = dstpiece
-            self.match.movecnt += 1
+            move.captured_piece = dstpiece
             self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
             self.match.writefield(dstx, dsty, self.piece)
-            if(dstpiece != PIECES['blk']):
-                self.match.fifty_moves_count = 0
-            else:
-                self.match.fifty_moves_count += 1
             self.match.score += SCORES[dstpiece]
 
-        move = cMove(self.match, self.match.movecnt, move_type,
-                     self.xpos, self.ypos, dstx, dsty, e_p_fieldx, e_p_fieldy,
-                     captured_piece, prom_piece, self.match.fifty_moves_count)
+        if(self.match.color_of_piece(self.piece) == COLORS['white']):
+            self.match.board.domove_white_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
+            self.match.board.domove_white_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
+        else:
+            self.match.board.domove_black_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
+            self.match.board.domove_black_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
+
+        self.match.board.domove_counter(dstpiece)
+        self.match.board.domove_fifty_moves_count(self.piece, dstpiece)
+
         self.match.move_list.append(move)
         return move
 
     def undo_move(self, move):
-        if(move.captured_piece == PIECES['wQu']):
-            self.match.wQu_cnt += 1
-        elif(move.captured_piece == PIECES['bQu']):
-            self.match.bQu_cnt += 1
-        elif(move.captured_piece == PIECES['wKn'] or move.captured_piece == PIECES['wBp'] or move.captured_piece == PIECES['wRk']):
-            self.match.wOfficer_cnt += 1
-        elif(move.captured_piece == PIECES['bKn'] or move.captured_piece == PIECES['bBp'] or move.captured_piece == PIECES['bRk']):
-            self.match.bOfficer_cnt += 1
-
-        self.match.movecnt -= 1
-        self.match.fifty_moves_count = move.fifty_moves_count
-
         if(move.move_type == move.TYPES['standard']):
             self.match.writefield(move.srcx, move.srcy, self.piece)
             self.match.writefield(move.dstx, move.dsty, move.captured_piece)
             self.match.score -= SCORES[move.captured_piece]
-            return move
         elif(move.move_type == move.TYPES['promotion']):
             if(self.match.color_of_piece(self.piece) == COLORS['white']):
                 origin = PIECES['wPw']
@@ -270,13 +254,22 @@ class cPawn(cPiece):
             self.match.writefield(move.dstx, move.dsty, move.captured_piece)
             self.match.score += (SCORES[move.prom_piece] - SCORES[origin])
             self.match.score -= SCORES[move.captured_piece]
-            return move
         elif(move.move_type == move.TYPES['en_passant']):
             self.match.writefield(move.srcx, move.srcy, self.piece)
             self.match.writefield(move.dstx, move.dsty, PIECES['blk'])
             self.match.writefield(move.e_p_fieldx, move.e_p_fieldy, move.captured_piece)
             self.match.score -= SCORES[move.captured_piece]
-            return move
+
+        if(self.match.color_of_piece(self.piece) == COLORS['white']):
+            self.match.board.undomove_white_movecnt_short_castling_lost(move)
+            self.match.board.undomove_white_movecnt_long_castling_lost(move)
+        else:
+            self.match.board.undomove_black_movecnt_short_castling_lost(move)
+            self.match.board.undomove_black_movecnt_long_castling_lost(move)
+
+        self.match.board.undomove_counter(move)
+        self.match.board.undomove_fifty_moves_count(move)
+        return move
 
     def is_white_ep_move_ok(self, dstx, dsty):
         if(len(self.match.move_list) == 0):

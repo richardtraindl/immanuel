@@ -152,9 +152,9 @@ def does_unpin(match, gmove):
 def defends_check(match):
     # is king attaked
     if(match.next_color() == COLORS['white']):
-        return match.is_king_attacked(match.wKg_x, match.wKg_y)
+        return match.is_king_attacked(match.board.wKg_x, match.board.wKg_y)
     else:
-        return match.is_king_attacked(match.bKg_x, match.bKg_y)
+        return match.is_king_attacked(match.board.bKg_x, match.board.bKg_y)
 
 
 def find_disclosures(match, srcx, srcy, dstx, dsty, discl_attacked, discl_supported):

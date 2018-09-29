@@ -108,7 +108,7 @@ class cKing(cPiece):
 
     def do_move(self, dstx, dsty, prom_piece):
         move = cMove(self.match, 
-                    self.match.movecnt + 1, 
+                    self.match.movecnt() + 1, 
                     cMove.TYPES['standard'],
                     self.xpos, 
                     self.ypos, 
@@ -118,157 +118,76 @@ class cKing(cPiece):
                     None,
                     PIECES['blk'], 
                     prom_piece, 
-                    self.match.fifty_moves_count)
+                    self.match.board.fifty_moves_count)
 
-        srcpiece = self.match.readfield(move.srcx, move.srcy)
         dstpiece = self.match.readfield(move.dstx, move.dsty)
-
-        if(dstpiece == PIECES['wQu']):
-            self.match.wQu_cnt -= 1
-        elif(dstpiece == PIECES['bQu']):
-            self.match.bQu_cnt -= 1
-        elif(dstpiece == PIECES['wKn'] or dstpiece == PIECES['wBp'] or dstpiece == PIECES['wRk']):
-            self.match.wOfficer_cnt -= 1
-        elif(dstpiece == PIECES['bKn'] or dstpiece == PIECES['bBp'] or dstpiece == PIECES['bRk']):
-            self.match.bOfficer_cnt -= 1
-
-        if(srcpiece == PIECES['wKg']):
-            self.match.wKg_x = move.dstx
-            self.match.wKg_y = move.dsty
-
-            if(self.match.white_movecnt_short_castling_lost == 0):
-                self.match.white_movecnt_short_castling_lost = self.match.movecnt + 1
-
-            if(self.match.white_movecnt_long_castling_lost == 0):
-                self.match.white_movecnt_long_castling_lost = self.match.movecnt + 1
-        else:
-            self.match.bKg_x = move.dstx
-            self.match.bKg_y = move.dsty
-
-            if(self.match.black_movecnt_short_castling_lost == 0):
-                self.match.black_movecnt_short_castling_lost = self.match.movecnt + 1
-
-            if(self.match.black_movecnt_long_castling_lost == 0):
-                self.match.black_movecnt_long_castling_lost = self.match.movecnt + 1
 
         if(move.dstx - move.srcx == 2):
             move.move_type = cMove.TYPES['short_castling']
             move.captured_piece = dstpiece
-            self.match.movecnt += 1   
-
             self.match.writefield(move.srcx, move.srcy, PIECES['blk'])
-            self.match.writefield(move.dstx, move.dsty, srcpiece)
+            self.match.writefield(move.dstx, move.dsty, self.piece)
             rook = self.match.readfield(move.srcx + 3, move.srcy)
             self.match.writefield(move.srcx + 3, move.srcy, PIECES['blk'])
             self.match.writefield(move.dstx - 1, move.dsty, rook)
-            self.match.fifty_moves_count += 1
-
-            self.match.move_list.append(move)
-            return move
         elif(move.dstx - move.srcx == -2):
             move.move_type = cMove.TYPES['long_castling']
             move.captured_piece = dstpiece
-            self.match.movecnt += 1   
-
             self.match.writefield(move.srcx, move.srcy, PIECES['blk'])
-            self.match.writefield(move.dstx, move.dsty, srcpiece)
+            self.match.writefield(move.dstx, move.dsty, self.piece)
             rook = self.match.readfield(move.srcx - 4, move.srcy)
             self.match.writefield(move.srcx - 4, move.srcy, PIECES['blk'])
             self.match.writefield(move.dstx + 1, move.dsty, rook)
-            self.match.fifty_moves_count += 1
-
-            self.match.move_list.append(move)
-            return move
         else:
             move.captured_piece = dstpiece
-
-            self.match.movecnt += 1
             self.match.writefield(move.srcx, move.srcy, PIECES['blk'])
-            self.match.writefield(move.dstx, move.dsty, srcpiece)
-            if(dstpiece != PIECES['blk']):
-                self.match.fifty_moves_count = 0
-                move.fifty_moves_count = self.match.fifty_moves_count
-            else:
-                self.match.fifty_moves_count += 1
-                move.fifty_moves_count = self.match.fifty_moves_count
+            self.match.writefield(move.dstx, move.dsty, self.piece)
 
-            self.match.score += SCORES[dstpiece]
-            self.match.move_list.append(move)
-            return move
+        if(self.piece == PIECES['wKg']):
+            self.match.wKg_x = move.dstx
+            self.match.wKg_y = move.dsty
+            self.match.board.domove_white_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
+            self.match.board.domove_white_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
+        else:
+            self.match.bKg_x = move.dstx
+            self.match.bKg_y = move.dsty
+            self.match.board.domove_black_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
+            self.match.board.domove_black_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
+
+        self.match.board.domove_counter(dstpiece)
+        self.match.board.domove_fifty_moves_count(self.piece, dstpiece)
+
+        self.match.score += SCORES[dstpiece]
+        self.match.move_list.append(move)
+        return move
 
     def undo_move(self, move):
-        if(move.captured_piece == PIECES['wQu']):
-            self.match.wQu_cnt += 1
-        elif(move.captured_piece == PIECES['bQu']):
-            self.match.bQu_cnt += 1
-        elif(move.captured_piece == PIECES['wKn'] or move.captured_piece == PIECES['wBp'] or move.captured_piece == PIECES['wRk']):
-            self.match.wOfficer_cnt += 1
-        elif(move.captured_piece == PIECES['bKn'] or move.captured_piece == PIECES['bBp'] or move.captured_piece == PIECES['bRk']):
-            self.match.bOfficer_cnt += 1
-
-        self.match.movecnt -= 1
-        self.match.fifty_moves_count = move.fifty_moves_count
-
-        piece = self.match.readfield(move.dstx, move.dsty)
-        self.match.writefield(move.srcx, move.srcy, piece)
+        self.match.writefield(move.srcx, move.srcy, self.piece)
         self.match.writefield(move.dstx, move.dsty, move.captured_piece)
-
         self.match.score -= SCORES[move.captured_piece]
 
         if(move.move_type == move.TYPES['short_castling']):
             rook = self.match.readfield(move.dstx - 1, move.dsty)
             self.match.writefield(move.dstx - 1, move.dsty, PIECES['blk'])
             self.match.writefield(move.dstx + 1, move.dsty, rook)
-
-            if(piece == PIECES['wKg']):
-                self.match.wKg_x = move.srcx
-                self.match.wKg_y = move.srcy
-
-                self.match.white_movecnt_short_castling_lost = 0
-                if(self.match.white_movecnt_long_castling_lost == self.match.movecnt + 1):
-                    self.match.white_movecnt_long_castling_lost = 0
-            else:
-                self.match.bKg_x = move.srcx
-                self.match.bKg_y = move.srcy
-
-                self.match.black_movecnt_short_castling_lost = 0
-                if(self.match.black_movecnt_long_castling_lost == self.match.movecnt + 1):
-                    self.match.black_movecnt_long_castling_lost = 0
         elif(move.move_type == move.TYPES['long_castling']):
             rook = self.match.readfield(move.dstx + 1, move.dsty)
             self.match.writefield(move.dstx + 1, move.dsty, PIECES['blk'])
             self.match.writefield(move.dstx - 2, move.dsty, rook)
-        
-            if(piece == PIECES['wKg']):
-                self.match.wKg_x = move.srcx
-                self.match.wKg_y = move.srcy
 
-                self.match.white_movecnt_long_castling_lost = 0
-                if(self.match.white_movecnt_short_castling_lost == self.match.movecnt + 1):
-                    self.match.white_movecnt_short_castling_lost = 0
-            else:
-                self.match.bKg_x = move.srcx
-                self.match.bKg_y = move.srcy
-
-                self.match.black_movecnt_long_castling_lost = 0
-                if(self.match.black_movecnt_short_castling_lost == self.match.movecnt + 1):
-                    self.match.black_movecnt_short_castling_lost = 0
+        if(self.piece == PIECES['wKg']):
+            self.match.board.wKg_x = move.srcx
+            self.match.board.wKg_y = move.srcy
+            self.match.board.undomove_white_movecnt_short_castling_lost(move)
+            self.match.board.undomove_white_movecnt_long_castling_lost(move)    
         else:
-            if(piece == PIECES['wKg']):
-                self.match.wKg_x = move.srcx
-                self.match.wKg_y = move.srcy
-                if(self.match.white_movecnt_short_castling_lost == self.match.movecnt + 1):
-                    self.match.white_movecnt_short_castling_lost = 0
-                if(self.match.white_movecnt_long_castling_lost == self.match.movecnt + 1):
-                    self.match.white_movecnt_long_castling_lost = 0
-            else:
-                self.match.bKg_x = move.srcx
-                self.match.bKg_y = move.srcy
-                if(self.match.black_movecnt_short_castling_lost == self.match.movecnt + 1):
-                    self.match.black_movecnt_short_castling_lost = 0
-                if(self.match.black_movecnt_long_castling_lost == self.match.movecnt + 1):
-                    self.match.black_movecnt_long_castling_lost = 0
+            self.match.board.bKg_x = move.srcx
+            self.match.board.bKg_y = move.srcy
+            self.match.board.undomove_black_movecnt_short_castling_lost(move)
+            self.match.board.undomove_black_movecnt_long_castling_lost(move)                
 
+        self.match.board.undomove_counter(move)
+        self.match.board.undomove_fifty_moves_count(move)
         return move
 
     def is_sh_castling_ok(self, dstx, dsty):
@@ -286,10 +205,10 @@ class cKing(cPiece):
             return False
 
         if(self.color == COLORS['white']):
-            if(self.match.white_movecnt_short_castling_lost > 0 or rook != PIECES['wRk']):
+            if(self.match.board.white_movecnt_short_castling_lost > 0 or rook != PIECES['wRk']):
                 return False
         else:
-            if(self.match.black_movecnt_short_castling_lost > 0 or rook != PIECES['bRk']):
+            if(self.match.board.black_movecnt_short_castling_lost > 0 or rook != PIECES['bRk']):
                 return False            
 
         self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
@@ -318,10 +237,10 @@ class cKing(cPiece):
             return False
 
         if(self.color == COLORS['white']):
-            if(self.match.white_movecnt_long_castling_lost > 0 or rook != PIECES['wRk']):
+            if(self.match.board.white_movecnt_long_castling_lost > 0 or rook != PIECES['wRk']):
                 return False
         else:
-            if(self.match.black_movecnt_long_castling_lost > 0 or rook != PIECES['bRk']):
+            if(self.match.board.black_movecnt_long_castling_lost > 0 or rook != PIECES['bRk']):
                 return False
 
         self.match.writefield(self.xpos, self.ypos, PIECES['blk'])

@@ -82,56 +82,57 @@ class cBoard:
         self.bOfficer_cnt = 6
     # set_to_base() end
 
-    def update_white_movecnt_short_castling_lost(self, srcx, srcy, movecnt):
-        if(self.white_movecnt_short_castling_lost > 0):
-            return False
-        elif(srcx == self.COORD['5'] and srcy == self.COORD['1']): 
-            self.white_movecnt_short_castling_lost = movecnt
-            return True
-        elif(srcx == self.COORD['8'] and srcy == self.COORD['1']):
-            self.white_movecnt_short_castling_lost = movecnt
-            return True
-        else:
-            return False
+    def domove_white_movecnt_short_castling_lost(self, srcx, srcy, movecnt):
+        if(self.white_movecnt_short_castling_lost == 0):
+            if(srcx == self.COORD['5'] and srcy == self.COORD['1']): 
+                self.white_movecnt_short_castling_lost = movecnt
+            elif(srcx == self.COORD['8'] and srcy == self.COORD['1']):
+                self.white_movecnt_short_castling_lost = movecnt
 
-    def update_white_movecnt_long_castling_lost(self, srcx, srcy, movecnt):
-        if(self.white_movecnt_long_castling_lost > 0):
-            return False
-        elif(srcx == self.COORD['5'] and srcy == self.COORD['1']):
-            self.white_movecnt_long_castling_lost = movecnt
-            return True
-        elif(srcx == self.COORD['1'] and srcy == self.COORD['1']):
-            self.white_movecnt_long_castling_lost = movecnt
-            return True
-        else:
-            return False
+    def undomove_white_movecnt_short_castling_lost(self, move):
+        if(self.white_movecnt_short_castling_lost == move.count):
+            self.white_movecnt_short_castling_lost = 0
 
-    def update_black_movecnt_short_castling_lost(self, srcx, srcy, movecnt):
-        if(self.black_movecnt_short_castling_lost > 0):
-            return False
-        elif(srcx == self.COORD['5'] and srcy == self.COORD['8']):
-            self.black_movecnt_short_castling_lost = movecnt
-            return True
-        elif(srcx == self.COORD['8'] and srcy == self.COORD['8']):
-            self.black_movecnt_short_castling_lost = movecnt
-            return True
-        else:
-            return False
+    def domove_white_movecnt_long_castling_lost(self, srcx, srcy, movecnt):
+        if(self.white_movecnt_long_castling_lost == 0):
+            if(srcx == self.COORD['5'] and srcy == self.COORD['1']):
+                self.white_movecnt_long_castling_lost = movecnt
+            elif(srcx == self.COORD['1'] and srcy == self.COORD['1']):
+                self.white_movecnt_long_castling_lost = movecnt
 
-    def update_black_movecnt_long_castling_lost(self, srcx, srcy, movecnt):
-        if(self.black_movecnt_long_castling_lost > 0):
-            return False
-        elif(srcx == self.COORD['5'] and srcy == self.COORD['8']):
-            self.black_movecnt_long_castling_lost = movecnt
-            return True
-        elif(srcx == self.COORD['1'] and srcy == self.COORD['8']):
-            self.black_movecnt_long_castling_lost = movecnt
-            return True
-        else:
-            return False
+    def undomove_white_movecnt_long_castling_lost(self, move):
+        if(self.white_movecnt_long_castling_lost == move.count):
+            self.white_movecnt_long_castling_lost = 0
 
-    def update_counter(self, xpos, ypos, value):
-        piece = self.readfield(xpos, ypos)
+    def domove_black_movecnt_short_castling_lost(self, srcx, srcy, movecnt):
+        if(self.black_movecnt_short_castling_lost == 0):
+            if(srcx == self.COORD['5'] and srcy == self.COORD['8']):
+                self.black_movecnt_short_castling_lost = movecnt
+            elif(srcx == self.COORD['8'] and srcy == self.COORD['8']):
+                self.black_movecnt_short_castling_lost = movecnt
+
+    def undomove_black_movecnt_short_castling_lost(self, move):
+        if(self.black_movecnt_short_castling_lost == move.count):
+            self.black_movecnt_short_castling_lost = 0
+
+    def domove_black_movecnt_long_castling_lost(self, srcx, srcy, movecnt):
+        if(self.black_movecnt_long_castling_lost == 0):
+            if(srcx == self.COORD['5'] and srcy == self.COORD['8']):
+                self.black_movecnt_long_castling_lost = movecnt
+            elif(srcx == self.COORD['1'] and srcy == self.COORD['8']):
+                self.black_movecnt_long_castling_lost = movecnt
+
+    def undomove_black_movecnt_long_castling_lost(self, move):
+        if(self.black_movecnt_long_castling_lost == move.count):
+            self.black_movecnt_long_castling_lost = 0
+
+    def domove_counter(self, dstpiece):
+        self.update_counter(dstpiece, -1)
+
+    def undomove_counter(self, move):
+        self.update_counter(move.captured_piece, 1)
+
+    def update_counter(self, piece, value):
         if(piece == PIECES['wQu']):
             self.wQu_cnt += value
         elif(piece == PIECES['bQu']):
@@ -140,6 +141,17 @@ class cBoard:
             self.wOfficer_cnt += value
         elif(piece == PIECES['bKn'] or piece == PIECES['bBp'] or piece == PIECES['bRk']):
             self.bOfficer_cnt += value
+
+    def domove_fifty_moves_count(self, srcpiece, dstpiece):
+        if(srcpiece == PIECES['wPw'] or srcpiece == PIECES['bPw']):
+            self.fifty_moves_count = 0
+        elif(dstpiece != PIECES['blk']):
+            self.fifty_moves_count = 0
+        else:
+            self.fifty_moves_count += 1
+
+    def undomove_fifty_moves_count(self, move):
+        self.fifty_moves_count = move.fifty_moves_count
 
     def writefield(self, x, y, value):
         self.fields[y][x] = value

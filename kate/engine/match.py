@@ -144,11 +144,11 @@ class cMatch:
 
             for move in self.move_list:
                 if(move.count % 2 == 1):
-                    self.board.update_white_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
-                    self.board.update_white_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
+                    self.board.domove_white_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
+                    self.board.domove_white_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
                 else:
-                    self.board.update_black_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
-                    self.board.update_black_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
+                    self.board.domove_black_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
+                    self.board.domove_black_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
 
         for y in range(8):
             for x in range(8):
@@ -161,7 +161,7 @@ class cMatch:
                     self.board.bKg_x = x
                     self.board.bKg_y = y
                 else:
-                    self.board.update_counter(self, x, y, 1)
+                    self.board.domove_counter(piece)
     # update_attributes() end
 
     def writefield(self, x, y, value):
@@ -192,7 +192,7 @@ class cMatch:
         return len(self.move_list) <= 30
 
     def is_endgame(self):
-        count = self.wQu_cnt + self.wOfficer_cnt + self.bQu_cnt + self.bOfficer_cnt
+        count = self.board.wQu_cnt + self.board.wOfficer_cnt + self.board.bQu_cnt + self.board.bOfficer_cnt
         return count <= 6
 
     def is_last_move_capture(self):

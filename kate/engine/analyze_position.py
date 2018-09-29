@@ -298,8 +298,8 @@ def score_opening(match):
     if(is_king_guarded(match, COLORS['white'])):
         value += whiterate
 
-    if(match.white_movecnt_short_castling_lost > 0 and 
-       match.white_movecnt_long_castling_lost > 0 and 
+    if(match.board.white_movecnt_short_castling_lost > 0 and 
+       match.board.white_movecnt_long_castling_lost > 0 and 
        is_king_exposed(match, COLORS['white'])):
         value += blackrate
     ###
@@ -324,8 +324,8 @@ def score_opening(match):
     if(is_king_guarded(match, COLORS['black'])):
         value += blackrate
 
-    if(match.black_movecnt_short_castling_lost > 0 and
-       match.black_movecnt_long_castling_lost > 0 and 
+    if(match.board.black_movecnt_short_castling_lost > 0 and
+       match.board.black_movecnt_long_castling_lost > 0 and 
        is_king_exposed(match, COLORS['black'])):
         value += whiterate
     ###
@@ -418,9 +418,9 @@ def score_position(match, movecnt):
 
     if(movecnt == 0 and status != match.STATUS['open']):
         if(status == match.STATUS['winner_black']):
-            return ( SCORES[PIECES['wKg']] + match.movecnt )
+            return ( SCORES[PIECES['wKg']] + match.movecnt() )
         elif(status == match.STATUS['winner_white']):
-            return ( SCORES[PIECES['bKg']] - match.movecnt )
+            return ( SCORES[PIECES['bKg']] - match.movecnt() )
         else: # draw
             return SCORES[PIECES['blk']]
     else:
