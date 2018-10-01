@@ -17,7 +17,7 @@ def map_matches(src, dst, map_dir):
             for modelmove in modelmoves:
                 move = cMove()
                 move.match = dst
-                map_moves(modelmove, move, MAP_DIR['model-to-engine'])
+                map_moves(modelmove, move)
                 dst.move_list.append(move)
 
     dst.id = src.id
@@ -49,11 +49,7 @@ def map_matches(src, dst, map_dir):
         dst.update_attributes()
 
 
-def map_moves(src, dst, map_dir):
-    if(map_dir == MAP_DIR['model-to-engine']):
-        dst.id = src.id
-        #dst.match = src.match
-
+def map_moves(src, dst):
     dst.count = src.count
     dst.move_type = src.move_type
     dst.srcx = src.srcx
@@ -67,7 +63,7 @@ def map_moves(src, dst, map_dir):
     dst.fifty_moves_count = src.fifty_moves_count
 
 
-def status(modelmatch):
+def evaluate_status(modelmatch):
     match = cMatch()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
     return match.evaluate_status()
@@ -75,9 +71,7 @@ def status(modelmatch):
 
 def is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
     match = cMatch()
-    print("before mapper")
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
-    print("after before mapper")
     return match.is_move_valid(srcx, srcy, dstx, dsty, prom_piece)
 
 
@@ -108,14 +102,14 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
 
     match.time_start = time.time()
     ###
-
     move = match.do_move(srcx, srcy, dstx, dsty, prom_piece)
-    match.status = match.evaluate_status() #STATUS['open']
+    match.status = match.evaluate_status()
     map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
     modelmatch.save()
 
-    modelmove = ModelMove()                
-    map_moves(move, modelmove, MAP_DIR['engine-to-model'])
+    modelmove = ModelMove()   
+    modelmove.match = modelmatch
+    map_moves(move, modelmove)
     modelmove.match = modelmatch
     modelmove.save()
 
@@ -123,6 +117,7 @@ def do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece):
 def undo_move(modelmatch):
     match = cMatch()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+
     move = match.undo_move()
     if(move):
         map_matches(match, modelmatch, MAP_DIR['engine-to-model'])
@@ -145,25 +140,23 @@ class ImmanuelsThread(threading.Thread):
         candidates = calc.calc_move(self.match, self.msgs) 
         if(len(candidates) > 0):
             gmove = candidates[0]
-
             move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-
             modelmatch = ModelMatch()
             map_matches(self.match, modelmatch, MAP_DIR['engine-to-model'])
             modelmatch.save()
-
-            modelmove = ModelMove()            
-            map_moves(move, modelmove, MAP_DIR['engine-to-model'])
+            modelmove = ModelMove()
+            modelmove.match = modelmatch
+            map_moves(move, modelmove)
             modelmove.match = modelmatch
             modelmove.save()
             print("move saved")
         else:
             print("no move found or thread outdated!")
 
-
 def calc_move_for_immanuel(modelmatch):
     match = cMatch()
     map_matches(modelmatch, match, MAP_DIR['model-to-engine'])
+
     status = match.evaluate_status()
     if(status != match.STATUS['open']):
         return False, status

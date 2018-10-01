@@ -24,9 +24,7 @@ def index(request):
 
 def match(request, matchid=None):
     context = RequestContext(request)
-
     switch = int(request.GET.get('switch', '0'))
-
     msgcode = request.GET.get('msgcode', None)
     if(msgcode):
         msgcode = int(msgcode)
@@ -34,11 +32,7 @@ def match(request, matchid=None):
     if(matchid is None):
         modelmatch = ModelMatch(white_player_name=None, black_player_name=None)
     else:
-        try:
-            modelmatch = ModelMatch.objects.get(id=matchid)
-        except ObjectDoesNotExist: #ModelMatch.DoesNotExist:
-            return HttpResponseRedirect('/kate/')
-
+        modelmatch = get_object_or_404(ModelMatch, pk=matchid)
     match = cMatch()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
     match.status = match.evaluate_status()
@@ -62,7 +56,7 @@ def match(request, matchid=None):
         for qmove in reversed(qmoves):
             move = cMove()
             move.match = match
-            interface.map_moves(qmove, move, interface.MAP_DIR['model-to-engine'])
+            interface.map_moves(qmove, move)
             moves.append(move)
 
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:5]
@@ -90,38 +84,34 @@ def match(request, matchid=None):
         urgent = True
         msg = match.RETURN_MSGS[msgcode]
 
-    status = match.evaluate_status()
-    if(status == match.STATUS['winner_white'] or status == match.STATUS['winner_black'] or status == match.STATUS['draw']):
+    if(match.status == match.STATUS['winner_white'] or 
+       match.status == match.STATUS['winner_black'] or 
+       match.status == match.STATUS['draw']):
         urgent = True
 
     domoveform = DoMoveForm()
-
     fmtboard = preformat_board(modelmatch.board, switch)
-
     return render(request, 'kate/match.html', { 'match': match, 'fmtboard': fmtboard, 'domoveform': domoveform, 'switch': switch, 'movesrc': movesrc, 'movedst': movedst, 'moves': moves, 'comments': comments, 'urgent': urgent, 'msg': msg } )
 
 
 def do_move(request, matchid=None):
     context = RequestContext(request)
-
     switch = int(request.GET.get('switch', '0'))
 
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-        match = cMatch()
-        interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
-        if(match.is_next_color_human() == False):
+        if(interface.is_next_color_human(modelmatch) == False):
             msgcode= match.RETURN_CODES['wrong-color']
             return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
+
         form = DoMoveForm(request.POST)
         if(form.is_valid()):
-            srcx,srcy = coord_to_index(form.move_src)
-            dstx,dsty = coord_to_index(form.move_dst)
+            srcx, srcy = coord_to_index(form.move_src)
+            dstx, dsty = coord_to_index(form.move_dst)
             prom_piece = PIECES[form.prom_piece]
             valid, msgcode = interface.is_move_valid(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
             if(valid):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
-
                 interface.calc_move_for_immanuel(modelmatch)
         else:
             msgcode= match.RETURN_CODES['format-error']
@@ -134,23 +124,17 @@ def do_move(request, matchid=None):
 
 def undo_move(request, matchid=None):
     context = RequestContext(request)
-
     switch = int(request.GET.get('switch', '0'))
-
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-
     interface.undo_move(modelmatch)
-
     return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
 
 def pause(request, matchid=None):
     context = RequestContext(request)
-
     switch = int(request.GET.get('switch', '0'))
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-
     if(modelmatch.status == cMatch.STATUS['open']):
         if(modelmatch.time_start > 0):
             elapsed_time = time.time() - modelmatch.time_start
@@ -171,7 +155,6 @@ def pause(request, matchid=None):
 
 def resume(request, matchid=None):
     context = RequestContext(request)
-
     switch = int(request.GET.get('switch', '0'))
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
@@ -189,7 +172,6 @@ def resume(request, matchid=None):
 
 def settings(request, matchid=None):
     context = RequestContext(request)
-
     switch = int(request.GET.get('switch', '0'))
 
     if(matchid is None):
@@ -279,7 +261,6 @@ def fetch_match(request):
 
 def add_comment(request, matchid):
     context = RequestContext(request)
-
     switch = int(request.GET.get('switch', '0'))
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
@@ -311,11 +292,9 @@ def fetch_comments(request):
 
 def dbginfo(request, matchid=None):
     context = RequestContext(request)
-
     switch = int(request.GET.get('switch', '0'))
 
     modelmatch = get_object_or_404(ModelMatch, pk=matchid)
-
     match = cMatch()
     interface.map_matches(modelmatch, match, interface.MAP_DIR['model-to-engine'])
     
@@ -325,7 +304,8 @@ def dbginfo(request, matchid=None):
     for modelmove in reversed(modelmoves):
         idx += 1
         move = cMove()
-        interface.map_moves(modelmove, move, interface.MAP_DIR['model-to-engine'])
+        move.match = match
+        interface.map_moves(modelmove, move)
         if(idx == 1):
             moves += move.format_move()
         else:

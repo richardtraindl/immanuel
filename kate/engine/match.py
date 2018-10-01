@@ -150,10 +150,15 @@ class cMatch:
                     self.board.domove_black_movecnt_short_castling_lost(move.srcx, move.srcy, move.count)
                     self.board.domove_black_movecnt_long_castling_lost(move.srcx, move.srcy, move.count)
 
+        self.score = 0
+        self.board.wQu_cnt = 0
+        self.board.bQu_cnt = 0
+        self.board.wOfficer_cnt = 0
+        self.board.bOfficer_cnt = 0
         for y in range(8):
             for x in range(8):
                 piece = self.readfield(x, y)
-                self.score += SCORES[piece]
+                self.score -= SCORES[piece]
                 if(piece == PIECES['wKg']):
                     self.board.wKg_x = x
                     self.board.wKg_y = y
@@ -161,7 +166,7 @@ class cMatch:
                     self.board.bKg_x = x
                     self.board.bKg_y = y
                 else:
-                    self.board.domove_counter(piece)
+                    self.board.update_counter(piece, 1)
     # update_attributes() end
 
     def writefield(self, x, y, value):
