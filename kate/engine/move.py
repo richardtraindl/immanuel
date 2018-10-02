@@ -262,7 +262,7 @@ class cPrioMove:
         i = 1
         for tactitem in self.tactics:
             str_tactics += reverse_lookup(self.TACTICS, tactitem.tactic)
-            if(tactitem.subtactic != self.SUB_TACTICS['undefined']):
+            if((tactitem.subtactic and tactitem.subtactic != self.SUB_TACTICS['undefined']):
                 str_tactics += " * " + reverse_lookup(self.SUB_TACTICS, tactitem.subtactic)
             if(i < length):
                 str_tactics += delimiter
