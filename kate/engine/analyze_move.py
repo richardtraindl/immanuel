@@ -493,12 +493,10 @@ def rank_gmoves(match, priomoves):
                 priomove.tactics.append(cTactic(priomove.TACTICS['controle-file'], priomove.SUB_TACTICS['good-deal']))"""
 
         if(len(priomove.tactics) > 0):
-            priomove.prio = priomove.evaluate_prio()
-            prio_sec = priomove.PRIO['prio10']
+            priomove.evaluate_priorities()
         else:
-            priomove.tactics.append(cTactic(priomove.TACTICS['undefined'], priomove.SUB_TACTICS['downgraded']))
-            priomove.prio = priomove.PRIO['prio10']
-            priomove.prio_sec = priomove.PRIO['prio10']
+            priomove.tactics.append(cTactic(priomove.TACTICS['undefined'], priomove.SUB_TACTICS['undefined']))
+            priomove.evaluate_priorities()
 
     all_attacking.sort(key = fetch_first_tactics)
     for pmove in all_attacking:
@@ -506,8 +504,7 @@ def rank_gmoves(match, priomoves):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['downgraded']))
-            pmove.prio = pmove.evaluate_prio()
-            pmove.prio_sec = max(1, (pmove.prio_sec - 2))
+            pmove.evaluate_priorities()
 
     excludes.clear()
     all_discl_attacking.sort(key = fetch_first_tactics)
@@ -516,8 +513,7 @@ def rank_gmoves(match, priomoves):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(cTactic(priomove.TACTICS['discl-attack'], priomove.SUB_TACTICS['downgraded']))
-            pmove.prio = pmove.evaluate_prio()
-            pmove.prio_sec = max(1, (pmove.prio_sec - 2))
+            pmove.evaluate_priorities()
 
     excludes.clear()
     all_supporting.sort(key = fetch_first_tactics)
@@ -526,8 +522,7 @@ def rank_gmoves(match, priomoves):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(cTactic(priomove.TACTICS['support'], priomove.SUB_TACTICS['downgraded']))
-            pmove.prio = pmove.evaluate_prio()
-            pmove.prio_sec = max(1, (pmove.prio_sec - 2))
+            pmove.evaluate_priorities()
 
     excludes.clear()
     all_discl_supporting.sort(key = fetch_first_tactics)
@@ -536,8 +531,7 @@ def rank_gmoves(match, priomoves):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(cTactic(priomove.TACTICS['discl-support'], priomove.SUB_TACTICS['downgraded']))
-            pmove.prio = pmove.evaluate_prio()
-            pmove.prio_sec = max(1, (pmove.prio_sec - 2))
+            pmove.evaluate_priorities()
 
     excludes.clear()
     all_fork_defending.sort(key = fetch_first_tactics)
@@ -546,8 +540,7 @@ def rank_gmoves(match, priomoves):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(cTactic(priomove.TACTICS['defend-fork'], priomove.SUB_TACTICS['downgraded']))
-            pmove.prio = pmove.evaluate_prio()
-            pmove.prio_sec = max(1, (pmove.prio_sec - 2))
+            pmove.evaluate_priorities()
 
     excludes.clear()
     all_fleeing.sort(key = fetch_first_tactics)
@@ -556,11 +549,7 @@ def rank_gmoves(match, priomoves):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(cTactic(priomove.TACTICS['flee'], priomove.SUB_TACTICS['downgraded']))
-            pmove.prio = pmove.evaluate_prio()
-            pmove.prio_sec = max(1, (pmove.prio_sec - 2))
-
-    for pmove in priomoves:
-        pmove.prio_sec = max(1, (pmove.prio_sec - len(pmove.tactics) + 1))
+            pmove.evaluate_priorities()
 
     priomoves.sort(key=attrgetter('prio', 'prio_sec'))
 

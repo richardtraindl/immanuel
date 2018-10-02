@@ -192,14 +192,14 @@ class cPrioMove:
         self.prio = self.PRIO['prio10']
         self.prio_sec = self.PRIO['prio10']
 
-    def evaluate_prio(self):
-        prio = self.PRIO['prio10']
+    def evaluate_priorities(self):
+        self.prio = self.PRIO['prio10']
+        self.prio_sec = max(self.PRIO['prio1'], self.PRIO['prio10'] - len(self.tactics))
         for tactitem in self.tactics:
             prio_new = max(self.PRIO['prio1'], 
                               self.TACTICS_TO_PRIO[tactitem.tactic] + \
                               self.SUB_TACTICS_TO_ADJUST[tactitem.subtactic])
-            prio = min(prio, prio_new)
-        return prio
+            self.prio = min(self.prio, prio_new)
 
     def downgrade(self, tactic):
         for tactitem in self.tactics:
@@ -262,7 +262,7 @@ class cPrioMove:
         i = 1
         for tactitem in self.tactics:
             str_tactics += reverse_lookup(self.TACTICS, tactitem.tactic)
-            if(tactitem.subtactic and tactitem.subtactic != self.SUB_TACTICS['undefined']):
+            if(tactitem.subtactic != self.SUB_TACTICS['undefined']):
                 str_tactics += " * " + reverse_lookup(self.SUB_TACTICS, tactitem.subtactic)
             if(i < length):
                 str_tactics += delimiter
@@ -277,7 +277,7 @@ class cPrioMove:
                 str_end = " | "
             else:
                 str_end = ""
-            if(tactitem.subtactic and tactitem.subtactic != self.SUB_TACTICS['undefined']):
+            if(tactitem.subtactic != self.SUB_TACTICS['undefined']):
                 subtactic_str = " * " + reverse_lookup(self.SUB_TACTICS, tactitem.subtactic)
             else:
                 subtactic_str = ""
