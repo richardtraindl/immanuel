@@ -277,7 +277,7 @@ class cPrioMove:
                 str_end = " | "
             else:
                 str_end = ""
-            if(tactitem.subtactic != self.SUB_TACTICS['undefined']):
+            if(tactitem.subtactic and tactitem.subtactic != self.SUB_TACTICS['undefined']):
                 subtactic_str = " * " + reverse_lookup(self.SUB_TACTICS, tactitem.subtactic)
             else:
                 subtactic_str = ""
