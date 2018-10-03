@@ -400,5 +400,11 @@ class cKing(cPiece):
                     break
         return True
 
+    # list_moves(self):
+       # works with inherited class
+
+    # generate_moves(self, mode):
+       # works with inherited class
+
 # class end
 
