@@ -99,6 +99,7 @@ def count_up_to_prio(priomoves, prio_limit):
             count += 1
             silent = False
             priomove.prio = min(priomove.prio, prio_limit)
+    priomoves.sort(key=attrgetter('prio'))
     return count
 
 def select_maxcount(match, priomoves, depth, slimits, last_pmove):
