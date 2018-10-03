@@ -225,6 +225,12 @@ class cPrioMove:
                 return True
         return False
 
+    def has_subtactic(self, subtactic):
+        for tactitem in self.tactics:
+            if(tactitem.subtactic == subtactic):
+                return True
+        return False
+
     def is_tactic_stormy(self):
         for tactitem in self.tactics:
             if(tactitem.tactic == self.TACTICS['defend-check'] or
