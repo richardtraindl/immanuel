@@ -217,5 +217,11 @@ class cKnight(cPiece):
                         score += SUPPORTED_SCORES[supported]
         return score 
 
+    # list_moves(self):
+       # works with inherited class
+
+    # generate_moves(self, mode):
+       # works with inherited class
+
 # class end
 
