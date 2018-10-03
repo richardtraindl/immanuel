@@ -330,7 +330,7 @@ class cPiece:
                 flag, errcode = self.match.is_move_valid(self.xpos, self.ypos, dstx, dsty, step[2])
                 if(flag):
                     if(mode == 0):
-                        genmoves.append(GenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2]))
+                        genmoves.append(cGenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2]))
                     else:
                         gmove = cGenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2])
                         genmoves.append(cPrioMove(gmove))
