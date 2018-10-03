@@ -12,6 +12,7 @@ from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
 from .pieces.piece import cTouchBeyond
+from .generator import cGenerator
 
 
 def castles(match, gmove):
@@ -357,6 +358,27 @@ def is_tactical_draw(match, gmove):
     return count >= 2
 
 
+def is_progress(match, gmove):
+    cgenerator = cGenerator(match)
+
+    genmoves_before = cgenerator.generate_moves(0)
+    ###
+    srcpiece = match.readfield(gmove.srcx, gmove.srcy)
+    dstpiece = match.readfield(gmove.dstx, gmove.dsty)
+    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
+    if((srcpiece == PIECES['wPw'] or srcpiece == PIECES['bPw']) and gmove.prom_piece != PIECES['blk']):
+        match.writefield(gmove.dstx, gmove.dsty, gmove.prom_piece)
+    else:
+        match.writefield(gmove.dstx, gmove.dsty, srcpiece)
+    ###
+    genmoves_after = cgenerator.generate_moves(0)
+    ###
+    match.writefield(gmove.srcx, gmove.srcy, srcpiece)
+    match.writefield(gmove.dstx, gmove.dsty, dstpiece)
+    ###
+    return len(genmoves_before) + 2 < len(genmoves_after)
+
+
 def fetch_first_tactics(priomove):
     return priomove.fetch_tactics(0)
 
@@ -491,6 +513,9 @@ def rank_gmoves(match, priomoves):
                (dstfield_is_supported(match, priomove.gmove) and 
                 piece_is_lower_fequal_than_enmy_on_dstflield)):
                 priomove.tactics.append(cTactic(priomove.TACTICS['controle-file'], priomove.SUB_TACTICS['good-deal']))"""
+
+        if(is_progress(match, priomove.gmove)):
+            priomove.tactics.append(cTactic(priomove.TACTICS['progress'], priomove.SUB_TACTICS['undefined']))
 
         if(len(priomove.tactics) > 0):
             priomove.evaluate_priorities()
