@@ -95,5 +95,11 @@ class cBishop(cPiece):
     #score_supports(self):
         # works with inherited class
 
+    # list_moves(self):
+       # works with inherited class
+
+    # generate_moves(self, mode):
+       # works with inherited class
+
 # class end
 
