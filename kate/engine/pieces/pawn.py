@@ -445,6 +445,12 @@ class cPawn(cPiece):
                     if(self.match.is_field_touched(opp_color, x1, y1, 1)):
                         score += SUPPORTED_SCORES[supported]
         return score
+ 
+    # list_moves(self):
+       # works with inherited class
+
+    # generate_moves(self, mode):
+       # works with inherited class
 
 # class end
 
