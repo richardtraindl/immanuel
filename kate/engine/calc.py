@@ -93,9 +93,9 @@ def count_up_to_prio(priomoves, prio_limit):
     for priomove in priomoves:
         if(priomove.prio <= prio_limit):
             count += 1
-            if(priomove.has_subtactic(self, cPrioMove.SUB_TACTICS['bad-deal']) == False):
+            if(priomove.has_subtactic(cPrioMove.SUB_TACTICS['bad-deal']) == False):
                 silent = False
-        if(silent and priomove.has_subtactic(self, cPrioMove.SUB_TACTICS['bad-deal']) == False):
+        if(silent and priomove.has_subtactic(cPrioMove.SUB_TACTICS['bad-deal']) == False):
             count += 1
             silent = False
             priomove.prio = min(priomove.prio, prio_limit)
