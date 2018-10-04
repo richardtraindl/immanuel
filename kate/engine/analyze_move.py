@@ -359,24 +359,27 @@ def is_tactical_draw(match, gmove):
 
 
 def is_progress(match, gmove):
-    cgenerator = cGenerator(match)
+    if(match.is_opening()):
+        cgenerator = cGenerator(match)
 
-    genmoves_before = cgenerator.generate_moves(0)
-    ###
-    srcpiece = match.readfield(gmove.srcx, gmove.srcy)
-    dstpiece = match.readfield(gmove.dstx, gmove.dsty)
-    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
-    if((srcpiece == PIECES['wPw'] or srcpiece == PIECES['bPw']) and gmove.prom_piece != PIECES['blk']):
-        match.writefield(gmove.dstx, gmove.dsty, gmove.prom_piece)
+        genmoves_before = cgenerator.generate_moves(0)
+        ###
+        srcpiece = match.readfield(gmove.srcx, gmove.srcy)
+        dstpiece = match.readfield(gmove.dstx, gmove.dsty)
+        match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
+        if((srcpiece == PIECES['wPw'] or srcpiece == PIECES['bPw']) and gmove.prom_piece != PIECES['blk']):
+            match.writefield(gmove.dstx, gmove.dsty, gmove.prom_piece)
+        else:
+            match.writefield(gmove.dstx, gmove.dsty, srcpiece)
+        ###
+        genmoves_after = cgenerator.generate_moves(0)
+        ###
+        match.writefield(gmove.srcx, gmove.srcy, srcpiece)
+        match.writefield(gmove.dstx, gmove.dsty, dstpiece)
+        ###
+        return len(genmoves_before) + 2 < len(genmoves_after)
     else:
-        match.writefield(gmove.dstx, gmove.dsty, srcpiece)
-    ###
-    genmoves_after = cgenerator.generate_moves(0)
-    ###
-    match.writefield(gmove.srcx, gmove.srcy, srcpiece)
-    match.writefield(gmove.dstx, gmove.dsty, dstpiece)
-    ###
-    return len(genmoves_before) + 2 < len(genmoves_after)
+        return False
 
 
 def fetch_first_tactics(priomove):
