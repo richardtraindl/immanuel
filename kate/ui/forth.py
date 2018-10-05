@@ -33,8 +33,6 @@ def forth():
     lstparam = ['White', 'h', 'Black', "m"]
     session = Session(new_match(lstparam), Msgs())
 
-    thread = None
-
     if(init_words() == False):
         return
 
