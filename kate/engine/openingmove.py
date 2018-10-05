@@ -10,22 +10,22 @@ def retrieve_move(match):
     if(match.movecnt() >= DEPTH):
         print("############ depth not supported ############")
         return None
-        
+
     lastmoves = ""
     for move in match.move_list:
         lastmoves += index_to_coord(move.srcx, move.srcy)
         lastmoves += "-"
         lastmoves += index_to_coord(move.dstx, move.dsty)
         lastmoves += ","
-    
+
     lastmoves = lastmoves[:-1]
     print("lastmoves: " + lastmoves)
 
-    if(match.movecnt == 0):
+    if(match.movecnt() == 0):
         omovelist = FIRST
-    elif(match.movecnt == 1):
+    elif(match.movecnt() == 1):
         omovelist = SECOND
-    elif(match.movecnt == 2):
+    elif(match.movecnt() == 2):
         omovelist = THIRD
     else:
         omovelist = FOURTH
