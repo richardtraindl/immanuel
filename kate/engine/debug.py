@@ -100,6 +100,7 @@ PAWN     = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020",
 WHITE_TEXT = "\033[37m"
 BLACK_TEXT = "\033[30m"
 WHITE_BACK = "\033[47m"
+BROWN_BACK = "\033[43m"
 BLUE_BACK  = "\033[44m"
 BOLD_ON    = "\033[1m"
 BOLD_OFF   = "\033[2m"
@@ -144,12 +145,12 @@ def prnt_row(match, pieces):
                 if(backcolor == "white"):
                     print(WHITE_BACK + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
                 else:
-                    print(BLUE_BACK + BOLD_OFF + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
+                    print(BROWN_BACK + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
             else:
                 if(backcolor == "white"):
                     print(WHITE_BACK + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
                 else:
-                    print(BLUE_BACK + BOLD_OFF + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
+                    print(BROWN_BACK + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
 
 
 def prnt_board(match):
