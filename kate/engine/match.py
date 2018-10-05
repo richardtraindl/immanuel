@@ -418,7 +418,7 @@ class cMatch:
             return self.STATUS['open']
         else:
             if(self.next_color() == COLORS['white']):
-                if(self.is_field_touched(COLORS['black'], match.board.wKg_x, self.board.wKg_y, 0)):
+                if(self.is_field_touched(COLORS['black'], self.board.wKg_x, self.board.wKg_y, 0)):
                     return self.STATUS['winner_black']
             else:
                 if(self.is_field_touched(COLORS['white'], self.board.bKg_x, self.board.bKg_y, 0)):
