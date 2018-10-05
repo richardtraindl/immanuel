@@ -67,41 +67,43 @@ def prnt_match_attributes(match, delimiter):
     
 BLANK  = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020" ] * 4
 
-KING   = [ u"\u0020\u0020\u0020\u254B\u0020\u0020\u0020", # 253C 2542
-           u"\u0020\u0020\u2599\u2584\u259F\u0020\u0020", 
-           u"\u0020\u0020\u2587\u2587\u2587\u0020\u0020",
-           u"\u0020\u0020\u2580\u2580\u2580\u0020\u0020" ]
+KING   = [ u"\u0020\u0020\u2584\u2588\u2584\u0020\u0020",
+		   u"\u0020\u2584\u0020\u2588\u0020\u2584\u0020",
+		   u"\u0020\u2588\u2588\u2588\u2588\u2588\u0020",
+		   u"\u0020\u2580\u2580\u2580\u2580\u2580\u0020"]
 
-QUEEN   = [ u"\u0020\u0020\u0020\u25D3\u0020\u0020\u0020", 
-            u"\u0020\u0020\u2599\u2584\u259F\u0020\u0020", 
-            u"\u0020\u0020\u2590\u2588\u258D\u0020\u0020",
-            u"\u0020\u0020\u259D\u2580\u2598\u0020\u0020" ]
+QUEEN   = [ u"\u2584\u0020\u2584\u0020\u2584\u0020\u2584",
+            u"\u0020\u2588\u0020\u2588\u0020\u2588\u0020",
+			u"\u0020\u0020\u2588\u2588\u2588\u0020\u0020",
+			u"\u0020\u0020\u2580\u2580\u2580\u0020\u0020"]
 
 ROOK   = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020", 
-           u"\u0020\u0020\u2596\u2584\u2597\u0020\u0020",
-           u"\u0020\u0020\u2590\u2588\u258D\u0020\u0020",
-           u"\u0020\u0020\u2580\u2580\u2580\u0020\u0020" ] 
+           u"\u0020\u2584\u0020\u2584\u0020\u2584\u0020",
+		   u"\u0020\u0020\u2588\u2588\u2588\u0020\u0020",
+		   u"\u0020\u2580\u2580\u2580\u2580\u2580\u0020"]
 
 BISHOP   = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020", 
-             u"\u0020\u0020\u0020\u2584\u0020\u0020\u0020",
-             u"\u0020\u0020\u2590\u2588\u258D\u0020\u0020",
-             u"\u0020\u0020\u2580\u2580\u2580\u0020\u0020" ]
+             u"\u0020\u0020\u0020\u2588\u0020\u0020\u0020",
+			 u"\u0020\u0020\u2588\u2588\u2588\u0020\u0020",
+			 u"\u0020\u2580\u2580\u2580\u2580\u2580\u0020"]
 
-KNIGHT   = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020", 
-             u"\u0020\u0020\u0020\u2584\u2584\u0020\u0020",
-             u"\u0020\u2584\u2580\u259C\u2588\u2599\u0020", 
-             u"\u0020\u0020\u0020\u2580\u2580\u2580\u2580" ]
+KNIGHT   = [ u"\u0020\u0020\u0020\u2584\u0020\u0020\u0020", 
+             u"\u0020\u0020\u2588\u2580\u2588\u0020\u0020",
+             u"\u0020\u2580\u0020\u0020\u2588\u2588\u0020",
+             u"\u0020\u0020\u0020\u2580\u2580\u2580\u2580"]	
 
 PAWN     = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020",
-             u"\u0020\u0020\u2597\u2584\u2596\u0020\u0020", 
-             u"\u0020\u0020\u2588\u2588\u2588\u0020\u0020",
-             u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020" ]
+			 u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020",
+			 u"\u0020\u0020\u2584\u2588\u2584\u0020\u0020",
+			 u"\u0020\u0020\u2580\u2580\u2580\u0020\u0020"]
 
 WHITE_TEXT = "\033[37m"
 BLACK_TEXT = "\033[30m"
 WHITE_BACK = "\033[47m"
 BLUE_BACK  = "\033[44m"
 BOLD_ON    = "\033[1m"
+BOLD_OFF   = "\033[2m"
+MAGIC      = "\033[3m"
 RESET_ALL  = "\033[0m"
 
 def prnt_row(match, pieces):
@@ -142,12 +144,12 @@ def prnt_row(match, pieces):
                 if(backcolor == "white"):
                     print(WHITE_BACK + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
                 else:
-                    print(BLUE_BACK + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
+                    print(BLUE_BACK + BOLD_OFF + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
             else:
                 if(backcolor == "white"):
                     print(WHITE_BACK + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
                 else:
-                    print(BLUE_BACK + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
+                    print(BLUE_BACK + BOLD_OFF + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
 
 
 def prnt_board(match):
