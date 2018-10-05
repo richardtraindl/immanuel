@@ -359,6 +359,7 @@ def is_tactical_draw(match, gmove):
 
 
 def is_progress(match, gmove):
+    return False
     if(match.is_opening()):
         cgenerator = cGenerator(match)
 

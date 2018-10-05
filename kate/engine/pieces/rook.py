@@ -101,5 +101,9 @@ class cRook(cPiece):
     # generate_moves(self, mode):
        # works with inherited class
 
+    def is_rook_trapped(self):
+        genmoves = self.generate_moves(0)
+        return len(genmoves) <= 3
+
 # class end
 

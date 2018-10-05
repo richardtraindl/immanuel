@@ -360,7 +360,13 @@ class cKing(cPiece):
                         score += SUPPORTED_SCORES[supported]
         return score 
 
-    def is_king_safe(match, color):
+    # list_moves(self):
+       # works with inherited class
+
+    # generate_moves(self, mode):
+       # works with inherited class
+
+    def is_king_safe(self):
         from .. analyze_helper import list_all_field_touches
 
         for step in self.STEPS:
@@ -400,11 +406,11 @@ class cKing(cPiece):
                     break
         return True
 
-    # list_moves(self):
-       # works with inherited class
-
-    # generate_moves(self, mode):
-       # works with inherited class
+    def is_king_centered(self):
+        if(self.xpos >= 2 and self.xpos <= 5 and self.ypos >= 2 and self.ypos <= 5):
+            return True
+        else:
+            return False
 
 # class end
 
