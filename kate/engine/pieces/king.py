@@ -379,7 +379,7 @@ class cKing(cPiece):
                     return False
                 if(len(enemies) > 0):
                     count += 1
-        if(count >= 3):
+        if(count > 2):
             return False
 
         friends.clear()
