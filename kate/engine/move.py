@@ -172,7 +172,7 @@ class cPrioMove:
         TACTICS['block'] : PRIO['prio5'], 
         TACTICS['promotion'] : PRIO['prio4'],
         TACTICS['tactical-draw'] : PRIO['prio4'],
-        TACTICS['running-pawn'] : PRIO['prio4'], 
+        TACTICS['running-pawn'] : PRIO['prio3'], 
         TACTICS['controle-file'] : PRIO['prio6'], 
         TACTICS['castling'] : PRIO['prio5'],
         TACTICS['progress'] : PRIO['prio5'], 

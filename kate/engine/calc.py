@@ -72,8 +72,13 @@ class SearchLimits:
         else:
             self.move_count = 16
             self.dpth_stage1 = 3
-            self.dpth_stage1 = 7
+            self.dpth_stage2 = 7
             self.dpth_max = 12
+
+        if(match.is_endgame()):
+            self.dpth_stage1 += 1
+            self.dpth_stage2 += 1
+
 # class end
 
 def append_newmove(gmove, candidates, newcandidates):
