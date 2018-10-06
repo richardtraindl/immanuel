@@ -90,7 +90,7 @@ BISHOP   = [ u"\u0020\u0020\u0020\u2584\u0020\u0020\u0020",
 KNIGHT   = [ u"\u0020\u0020\u0020\u2584\u0020\u0020\u0020", 
              u"\u0020\u0020\u2588\u2580\u2588\u0020\u0020",
              u"\u0020\u2580\u0020\u0020\u2588\u2588\u0020",
-             u"\u0020\u0020\u0020\u2580\u2580\u2580\u2580"]	
+             u"\u0020\u0020\u0020\u2580\u2580\u2580\u2580"] 
 
 PAWN     = [ u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020",
              u"\u0020\u0020\u0020\u0020\u0020\u0020\u0020",
@@ -143,14 +143,14 @@ def prnt_row(match, pieces):
 
             if(forecolor == "white"):
                 if(backcolor == "white"):
-                    print(WHITE_BACK + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
+                    print(WHITE_BACK + WHITE_TEXT + BOLD_OFF + piecemap[i] + RESET_ALL, end=endstr)
                 else:
-                    print(BROWN_BACK + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
+                    print(BLUE_BACK + WHITE_TEXT + BOLD_OFF + piecemap[i] + RESET_ALL, end=endstr)
             else:
                 if(backcolor == "white"):
                     print(WHITE_BACK + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
                 else:
-                    print(BROWN_BACK + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
+                    print(BLUE_BACK + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
 
 
 def prnt_board(match):

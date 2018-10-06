@@ -369,6 +369,7 @@ class cKing(cPiece):
     def is_king_safe(self):
         from .. analyze_helper import list_all_field_touches
 
+        count = 0
         for step in self.STEPS:
             x1 = self.xpos + step[0]
             y1 = self.ypos + step[1]
@@ -376,6 +377,10 @@ class cKing(cPiece):
                 friends, enemies = list_all_field_touches(self.match, self.color, x1, y1)
                 if(len(friends) < len(enemies)):
                     return False
+                if(len(enemies) > 0):
+                    count += 1
+        if(count >= 3):
+            return False
 
         friends.clear()
         enemies.clear()

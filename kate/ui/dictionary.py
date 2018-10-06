@@ -3,6 +3,7 @@ from engine.values import *
 from engine.match import *
 from engine.move import *
 from engine.calc import calc_move, Msgs
+from engine.pieces.king import cKing
 from engine.debug import prnt_match_attributes, prnt_board, list_match_attributes, list_move_attributes
 from engine.helper import coord_to_index, reverse_lookup
 
@@ -33,17 +34,23 @@ def init_words():
         return False
     if(new_word("?", word_help, "this help") == False):
         return False
-    if(new_word("bye",    word_bye, "exit") == False):
+    if(new_word("bye", word_bye, "exit") == False):
         return False
-    if(new_word("pause",  word_pause, "pauses match") == False):
+    if(new_word("pause", word_pause, "pauses match") == False):
         return False
     if(new_word("resume", word_resume, "resumes (paused) match") == False):
         return False
     if(new_word("force", word_force, "terminates calculation") == False):
         return False
-    if(new_word("show",   word_show, "prints debug info") == False):
+    if(new_word("show", word_show, "prints debug info") == False):
         return False
-    if(new_word("set",    word_set, "sets attributes, e.g. set level medium") == False):
+    if(new_word("set", word_set, "sets attributes, e.g. set level medium") == False):
+        return False
+    if(new_word("setboard", word_set_board, "set board") == False):
+        return False
+    if(new_word("completeboard", word_complete_board, "complete board") == False):
+        return False
+    if(new_word("setpiece", word_set_piece, "sets a piece on the board") == False):
         return False
     if(new_word("move", word_move, "moves piece(s), e.g. move e2-e4") == False):
         return False
@@ -56,6 +63,8 @@ def init_words():
     if(new_word("load", word_load, "loads match with id, e.g. load 3") == False):
         return False
     if(new_word("delete", word_delete, "deletes match with id, e.g. delete 3") == False):
+        return False
+    if(new_word("debug", word_debug, "debug a function") == False):
         return False
     return True
 
@@ -82,7 +91,9 @@ class CalcThread(threading.Thread):
 
 def calc_and_domove(session):
     match = session.match
-    if(session.thread_is_busy == False and match.evaluate_status() == match.STATUS['open'] and match.is_next_color_human() == False):
+    if(session.thread_is_busy == False and 
+       match.evaluate_status() == match.STATUS['open'] and 
+       match.is_next_color_human() == False):
         session.msgs.terminate = False
         session.thread = CalcThread(session)
         session.thread.start()
@@ -96,12 +107,10 @@ def new_match(lstparam):
     match = cMatch()
 
     match.white_player.name = lstparam[0]
-
     if(lstparam[1] == "human" or lstparam[1] == "h"):
         match.white_player.is_human = True
     else:
         match.white_player.is_human = False
-
     match.black_player.name = lstparam[2]
 
     if(lstparam[3] == "human" or lstparam[3] == "h"):
@@ -249,10 +258,8 @@ def word_move(session, params):
 
 def word_undo(session, params):
     match = session.match
-    
     match.undo_move()
     prnt_board(match)
-
     if(match.evaluate_status() == match.STATUS['open']):
         match.status = match.STATUS['paused']
     return True
@@ -267,7 +274,6 @@ def word_list(session, params):
         else:
             print(filenname.replace(".txt", " "), end="")
     print("]")
-
     return True
 
 
@@ -421,12 +427,80 @@ def word_load(session, params):
 
 def word_delete(session, params):
     delfile = immanuels_dir + "/" + params.strip() + ".txt"
-
     if os.path.isfile(delfile):
         os.remove(delfile)
     else:
         print("Error: %s file not found" % delfile)
+    return True
 
+
+def word_set_board(session, params):
+    match = session.match
+    status = match.evaluate_status()
+    if(status == match.STATUS['open'] or status == match.STATUS['paused']):
+        match.status = match.STATUS['set-board']
+        match.score = 0
+        match.board.clear()
+        match.move_list.clear()
+        prnt_match_attributes(match, ", ")
+        prnt_board(match)
+        print("set board started. - please set pieces.")
+    else:
+        print("wrong status")
+    return True
+
+
+def word_complete_board(session, params):
+    match = session.match
+    if(match.status == match.STATUS['set-board']):
+        match.update_attributes()
+        if(match.board.verify() == False):
+            print("invalid position")
+        else:
+            match.status = match.STATUS['open']
+            prnt_match_attributes(session.match, ", ")
+            prnt_board(match)
+            print("set board finished")
+    else:
+        print("wrong status")
+    return True
+
+
+def word_set_piece(session, params):
+    match = session.match
+
+    if(match.status == match.STATUS['set-board']):
+        tokens = params.split(" ")
+
+        if(len(tokens) != 2):
+            print("??? 2 params required.")
+            return True
+
+        try:
+            piece = PIECES[tokens[0]]
+        except KeyError:
+            print("??? 1. param error.")
+            return True
+
+        x, y = coord_to_index(tokens[1])
+        if(match.board.is_inbounds(x, y) == False):
+            print("??? 2. param error.")
+            return True
+        else:
+            match.board.writefield(x, y, piece)
+            prnt_board(match)
+    else:
+        print("wrong status")
+    return True
+
+
+def word_debug(session, params):
+    match = session.match
+
+    king = cKing(match, match.board.wKg_x, match.board.wKg_y)
+    print("wKg - is_king_safe: " + str(king.is_king_safe()))
+    king = cKing(match, match.board.bKg_x, match.board.bKg_y)
+    print("bKg - is_king_safe: " + str(king.is_king_safe()))
     return True
 
 
@@ -435,7 +509,6 @@ def word_help(session, params):
         if(dword.name == "?"):
             continue
         print(dword.name + " *** " + dword.info)
-
     return True
 
 
@@ -447,6 +520,5 @@ def word_bye(session, params):
         session.thread = None
         session.terminate = False
     print("bye")
-
     return False
 

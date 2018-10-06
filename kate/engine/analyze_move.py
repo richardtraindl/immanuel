@@ -359,9 +359,18 @@ def is_tactical_draw(match, gmove):
 
 
 def is_progress(match, gmove):
-    return False
     if(match.is_opening()):
-        cgenerator = cGenerator(match)
+        piece = match.readfield(gmove.srcx, gmove.srcy)
+        if(piece == PIECES['wPw'] and gmove.srcy == match.board.COORD['2'] and
+           (gmove.srcx >= match.board.COORD['2'] and gmove.srcx <= match.board.COORD['7'])):
+           return True
+        elif(piece == PIECES['bPw'] and gmove.srcy == match.board.COORD['7'] and
+           (gmove.srcx >= match.board.COORD['2'] and gmove.srcx <= match.board.COORD['7'])):
+           return True
+        else:
+            return False
+        
+        """cgenerator = cGenerator(match)
 
         genmoves_before = cgenerator.generate_moves(0)
         ###
@@ -378,7 +387,7 @@ def is_progress(match, gmove):
         match.writefield(gmove.srcx, gmove.srcy, srcpiece)
         match.writefield(gmove.dstx, gmove.dsty, dstpiece)
         ###
-        return len(genmoves_before) + 2 < len(genmoves_after)
+        return len(genmoves_before) + 2 < len(genmoves_after)"""
     else:
         return False
 

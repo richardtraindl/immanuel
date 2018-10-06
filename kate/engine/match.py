@@ -21,7 +21,8 @@ class cMatch:
             'draw' : 11,
             'winner_white' : 12,
             'winner_black' : 13,
-            'paused' : 14 }
+            'paused' : 14,
+            'set-board' : 15 }
 
     LEVELS = {
             'blitz' : 0,
@@ -414,6 +415,8 @@ class cMatch:
         return False
 
     def evaluate_status(self):
+        if(self.status == self.STATUS['set-board']):
+            return self.status
         if(self.is_move_available()):
             return self.STATUS['open']
         else:

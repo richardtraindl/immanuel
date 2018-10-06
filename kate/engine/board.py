@@ -37,35 +37,35 @@ class cBoard:
         self.bOfficer_cnt = 6
 
     def set_to_base(self):
-        self.fields[self.COORD['1']][self.COORD['1']] = PIECES['wRk']
-        self.fields[self.COORD['1']][self.COORD['2']] = PIECES['wKn']
-        self.fields[self.COORD['1']][self.COORD['3']] = PIECES['wBp']
-        self.fields[self.COORD['1']][self.COORD['4']] = PIECES['wQu']
-        self.fields[self.COORD['1']][self.COORD['5']] = PIECES['wKg']
-        self.fields[self.COORD['1']][self.COORD['6']] = PIECES['wBp']
-        self.fields[self.COORD['1']][self.COORD['7']] = PIECES['wKn']
-        self.fields[self.COORD['1']][self.COORD['8']] = PIECES['wRk']
+        self.writefield(self.COORD['1'], self.COORD['1'], PIECES['wRk'])
+        self.writefield(self.COORD['2'], self.COORD['1'], PIECES['wKn'])
+        self.writefield(self.COORD['3'], self.COORD['1'], PIECES['wBp'])
+        self.writefield(self.COORD['4'], self.COORD['1'], PIECES['wQu'])
+        self.writefield(self.COORD['5'], self.COORD['1'], PIECES['wKg'])
+        self.writefield(self.COORD['6'], self.COORD['1'], PIECES['wBp'])
+        self.writefield(self.COORD['7'], self.COORD['1'], PIECES['wKn'])
+        self.writefield(self.COORD['8'], self.COORD['1'], PIECES['wRk'])
 
         for y in range (self.COORD['2'], (self.COORD['2'] + 1), 1):
             for x in range (self.COORD['1'], (self.COORD['8'] + 1), 1):
-                self.fields[y][x] = PIECES['wPw']
+                self.writefield(x, y, PIECES['wPw'])
 
         for y in range (self.COORD['3'], (self.COORD['6'] + 1), 1):
             for x in range (self.COORD['1'], (self.COORD['8'] + 1), 1):
-                self.fields[y][x] = PIECES['blk']
+                self.writefield(x, y, PIECES['blk'])
 
         for y in range (self.COORD['7'], (self.COORD['7'] + 1), 1):
             for x in range (self.COORD['1'], (self.COORD['8'] + 1), 1):
-                self.fields[y][x] = PIECES['bPw']
+                self.writefield(x, y, PIECES['bPw'])
 
-        self.fields[self.COORD['8']][self.COORD['1']] = PIECES['bRk']
-        self.fields[self.COORD['8']][self.COORD['2']] = PIECES['bKn']
-        self.fields[self.COORD['8']][self.COORD['3']] = PIECES['bBp']
-        self.fields[self.COORD['8']][self.COORD['4']] = PIECES['bQu']
-        self.fields[self.COORD['8']][self.COORD['5']] = PIECES['bKg']
-        self.fields[self.COORD['8']][self.COORD['6']] = PIECES['bBp']
-        self.fields[self.COORD['8']][self.COORD['7']] = PIECES['bKn']
-        self.fields[self.COORD['8']][self.COORD['8']] = PIECES['bRk']
+        self.writefield(self.COORD['1'], self.COORD['8'], PIECES['bRk'])
+        self.writefield(self.COORD['2'], self.COORD['8'], PIECES['bKn'])
+        self.writefield(self.COORD['3'], self.COORD['8'], PIECES['bBp'])
+        self.writefield(self.COORD['4'], self.COORD['8'], PIECES['bQu'])
+        self.writefield(self.COORD['5'], self.COORD['8'], PIECES['bKg'])
+        self.writefield(self.COORD['6'], self.COORD['8'], PIECES['bBp'])
+        self.writefield(self.COORD['7'], self.COORD['8'], PIECES['bKn'])
+        self.writefield(self.COORD['8'], self.COORD['8'], PIECES['bRk'])
         
         self.wKg_x = self.COORD['5']
         self.wKg_y = self.COORD['1']
@@ -81,6 +81,73 @@ class cBoard:
         self.wOfficer_cnt = 6
         self.bOfficer_cnt = 6
     # set_to_base() end
+
+    def clear(self):
+        for y in range(8):
+            for x in range(8):
+                self.writefield(x, y, PIECES['blk'])
+
+        self.wKg_x = None
+        self.wKg_y = None
+        self.bKg_x = None
+        self.bKg_y = None
+        self.fifty_moves_count = 0
+        self.white_movecnt_short_castling_lost = 0
+        self.white_movecnt_long_castling_lost = 0
+        self.black_movecnt_short_castling_lost = 0
+        self.black_movecnt_long_castling_lost = 0
+        self.wQu_cnt = 0
+        self.bQu_cnt = 0
+        self.wOfficer_cnt = 0
+        self.bOfficer_cnt = 0
+    # clear() end
+
+    def verify(self):
+        wKg_cnt = 0
+        bKg_cnt = 0
+        wPw_cnt = 0
+        bPw_cnt = 0
+        wOfficer_cnt = 0
+        bOfficer_cnt = 0
+        for y in range(8):
+            for x in range(8):
+                piece = self.readfield(x, y)
+                if(piece == PIECES['wKg']):
+                    wKg_cnt += 1
+                elif(piece == PIECES['bKg']):
+                    bKg_cnt += 1
+                elif(piece == PIECES['wPw']):
+                    wPw_cnt += 1
+                elif(piece == PIECES['bPw']):
+                    bPw_cnt += 1
+                elif(piece == PIECES['wRk'] or piece == PIECES['wBp'] or 
+                     piece == PIECES['wKn'] or piece == PIECES['wQu']):
+                    wOfficer_cnt += 1
+                elif(piece == PIECES['bRk'] or piece == PIECES['bBp'] or 
+                     piece == PIECES['bKn'] or piece == PIECES['bQu']):
+                    bOfficer_cnt += 1
+                elif(piece == PIECES['blk']):
+                    continue
+                else:
+                    return False
+
+        if(wKg_cnt != 1 or bKg_cnt != 1):
+            return False
+        if(wPw_cnt > 8 or bPw_cnt > 8):
+            return False
+        if(wPw_cnt + wOfficer_cnt > 15):
+            return False
+        if(bPw_cnt + bOfficer_cnt > 15):
+            return False
+        if(self.wKg_x is None or self.wKg_y is None or self.bKg_x is None or self.bKg_y is None):
+            return False
+        if(self.readfield(self.wKg_x, self.wKg_y) != PIECES['wKg']):
+            return False
+        if(self.readfield(self.bKg_x, self.bKg_y) != PIECES['bKg']):
+            return False
+        if(abs(self.wKg_y - self.bKg_y) < 2 and abs(self.wKg_x - self.bKg_x) < 2):
+            return False
+        return True
 
     def domove_white_movecnt_short_castling_lost(self, srcx, srcy, movecnt):
         if(self.white_movecnt_short_castling_lost == 0):

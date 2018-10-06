@@ -4,6 +4,7 @@ def reverse_lookup(dic, value):
     for key in dic:
         if dic[key] == value:
             return key
+    return None
 
 def coord_to_index(coord):
     x = ord(coord[0]) - ord('a')

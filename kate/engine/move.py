@@ -175,7 +175,7 @@ class cPrioMove:
         TACTICS['running-pawn'] : PRIO['prio4'], 
         TACTICS['controle-file'] : PRIO['prio6'], 
         TACTICS['castling'] : PRIO['prio5'],
-        TACTICS['progress'] : PRIO['prio7'], 
+        TACTICS['progress'] : PRIO['prio5'], 
         TACTICS['undefined'] : PRIO['prio10'] }
 
     SUB_TACTICS_TO_ADJUST = {
