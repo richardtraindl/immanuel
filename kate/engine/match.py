@@ -106,24 +106,6 @@ class cMatch:
         RETURN_CODES['general-error'] : "general error",
     }
 
-    E1_X = 4
-    E1_Y = 0
-    A1_X = 0
-    A1_Y = 0
-    H1_X = 7
-    H1_Y = 0
-    E8_X = 4
-    E8_Y = 7
-    A8_X = 0
-    A8_Y = 7
-    H8_X = 7
-    H8_Y = 7
-    A2_Y = 1
-    A7_Y = 6
-
-    UNDEF_X = 8
-    UNDEF_Y = 8
-
     def __init__(self):
         self.status = self.STATUS['open']
         self.score = 0
@@ -401,9 +383,9 @@ class cMatch:
             for x1 in range(8):
                 piece = self.readfield(x1, y1)
                 if(color == self.color_of_piece(piece)):
-                    if(piece == PIECES['wPw'] and y1 == self.A7_Y):
+                    if(piece == PIECES['wPw'] and y1 == self.board.COORD['7']):
                         prom_piece = PIECES['wQu']
-                    elif(piece == PIECES['bPw'] and y1 == self.A2_Y):
+                    elif(piece == PIECES['bPw'] and y1 == self.board.COORD['2']):
                         prom_piece = PIECES['bQu']
                     else:
                         prom_piece = PIECES['blk']

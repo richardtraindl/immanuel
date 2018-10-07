@@ -1,5 +1,6 @@
 from .. values import *
 from .piece import *
+from .. board import *
 
 
 class cPawn(cPiece):
@@ -42,9 +43,6 @@ class cPawn(cPiece):
     STEP_1S1W_X = -1
     STEP_1S1W_Y = -1
     
-    A2_Y = 1
-    A7_Y = 6
-
     blk = 0
     wRk = 3
     wKn = 4
@@ -82,7 +80,8 @@ class cPawn(cPiece):
         step_y = dsty - srcy
         if(step_x == cls.STEP_1N_X and step_y == cls.STEP_1N_Y):
             return cls.DIRS['north']
-        elif(step_x == cls.STEP_2N_X and step_y == cls.STEP_2N_Y and srcy == cls.A2_Y):
+        elif(step_x == cls.STEP_2N_X and step_y == cls.STEP_2N_Y and 
+             srcy == cBoard.COORD['2']):
             return cls.DIRS['2north']
         elif(step_x == cls.STEP_1N1E_X and step_y == cls.STEP_1N1E_Y):
             return cls.DIRS['north-east']
@@ -90,7 +89,8 @@ class cPawn(cPiece):
             return cls.DIRS['north-west']
         elif(step_x == cls.STEP_1S_X and step_y == cls.STEP_1S_Y):
             return cls.DIRS['south']
-        elif(step_x == cls.STEP_2S_X and step_y == cls.STEP_2S_Y and srcy == cls.A7_Y):
+        elif(step_x == cls.STEP_2S_X and step_y == cls.STEP_2S_Y and 
+             srcy == cBoard.COORD['7']):
             return cls.DIRS['2south']
         elif(step_x == cls.STEP_1S1E_X and step_y == cls.STEP_1S1E_Y):
             return cls.DIRS['south-east']

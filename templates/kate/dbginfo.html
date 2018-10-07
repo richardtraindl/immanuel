@@ -38,9 +38,15 @@
 
 
 {% block content %}
-    <div id="debug">
+    <div id="debug" class="gap">
       {% for attribute in attributes %}
         <p>{{ attribute.label }} {{ attribute.attribute }}</p>
+      {% endfor %}
+    </div>
+    
+    <div id="dbgfunc" class="gap">
+      {% for dbgitem in dbgfunc %}
+        <p>{{ dbgitem }}</p>
       {% endfor %}
     </div>
 

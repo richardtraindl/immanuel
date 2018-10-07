@@ -173,10 +173,10 @@ def score_controled_vertical_files(match):
 
 def is_rook_on_baseline_trapped(match, color):
     if(color == COLORS['white']):
-        y = 0
+        y = match.board.COORD['1']
         rookpiece = PIECES['wRk']
     else:
-        y = 7
+        y = match.board.COORD['8']
         rookpiece = PIECES['bRk']
 
     for x in range(8):
@@ -187,80 +187,64 @@ def is_rook_on_baseline_trapped(match, color):
                 return True
     return False
 
-
-def score_opening(match):
+def score_trapped_rooks(match):
     value = 0
     whiterate = ATTACKED_SCORES[PIECES['bKn']]
     blackrate = ATTACKED_SCORES[PIECES['wKn']]
-    
-    # white position
-    y = 0
-    cnt = 0
-    for x in range(8):
-        piece = match.readfield(x, y)
-        if(piece == PIECES['wKn'] or piece == PIECES['wBp']):
-            cnt += 1
-    value += cnt * blackrate
-    ###
+    if(is_rook_on_baseline_trapped(match, COLORS['white'])):
+        value += blackrate
+    if(is_rook_on_baseline_trapped(match, COLORS['black'])):
+        value += whiterate
+    return value
 
-    # white king
+def score_kings_safety(match):
+    value = 0
+    whiterate = ATTACKED_SCORES[PIECES['bKn']]
+    blackrate = ATTACKED_SCORES[PIECES['wKn']]
     king = cKing(match, match.board.wKg_x, match.board.wKg_y)
     if(king.is_king_safe()):
         value += whiterate
-    ###
-
-    # white rook
-    if(is_rook_on_baseline_trapped(match, COLORS['white'])):
-        value += blackrate
-    ###
-
-    # black position
-    y = 7
-    cnt = 0
-    for x in range(8):
-        piece = match.readfield(x, y)
-        if(piece == PIECES['bKn'] or piece == PIECES['bBp']):
-            cnt += 1
-    value += cnt * whiterate
-    ###
-
-    # black king
     king = cKing(match, match.board.bKg_x, match.board.bKg_y)
     if(king.is_king_safe()):
         value += blackrate
-    ###
+    return value
 
-    # black rook
-    if(is_rook_on_baseline_trapped(match, COLORS['black'])):
-        value += whiterate
-    ###
+def score_stuck_pieces_on_baseline(match):
+    value = 0
+    whiterate = ATTACKED_SCORES[PIECES['bKn']]
+    blackrate = ATTACKED_SCORES[PIECES['wKn']]
+    for i in range(2):
+        if(i == 0):
+            y = match.board.COORD['1']
+            knight = PIECES['wKn']
+            bishop = PIECES['wBp']
+            rate = blackrate
+        else:
+            y = match.board.COORD['8']
+            knight = PIECES['bKn']
+            bishop = PIECES['bBp']
+            rate = whiterate
+        for x in range(8):
+            piece = match.readfield(x, y)
+            if(piece == knight or piece == bishop):
+                value += rate
+    return value
 
+
+def score_opening(match):
+    value = 0
+    value += score_stuck_pieces_on_baseline(match)
+    value += score_kings_safety(match)
+    value += score_trapped_rooks(match)
     return value
 
 
 def score_middlegame(match):
     value = 0
-    whiterate = ATTACKED_SCORES[PIECES['bKn']]
-    blackrate = ATTACKED_SCORES[PIECES['wKn']]
-
-    # white
-    king = cKing(match, match.board.wKg_x, match.board.wKg_y)
-    if(king.is_king_safe()):
-        value += whiterate
-
-    if(is_rook_on_baseline_trapped(match, COLORS['white'])):
-        value += blackrate
-
-    # black
-    king = cKing(match, match.board.bKg_x, match.board.bKg_y)
-    if(king.is_king_safe()):
-        value += blackrate
-
-    if(is_rook_on_baseline_trapped(match, COLORS['black'])):
-        value += whiterate
-
+    value += score_stuck_pieces_on_baseline(match)
+    value += score_kings_safety(match)
+    value += score_trapped_rooks(match)
     return value
-
 
 def score_endgame(match):
     value = 0
@@ -269,7 +253,6 @@ def score_endgame(match):
     white_step_rates = [ 0, 0, 0, 2, 3, 5, 8, 12]
     blackrate = ATTACKED_SCORES[PIECES['wPw']]
     black_step_rates = [12, 8, 5, 3, 2, 0, 0, 0 ]
-
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
@@ -284,6 +267,8 @@ def score_endgame(match):
                     value += blackrate
                     value += blackrate * black_step_rates[y]
 
+    value += score_stuck_pieces_on_baseline(match)
+    value += score_trapped_rooks(match)
     return value
 
 

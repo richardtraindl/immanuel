@@ -360,33 +360,31 @@ def is_tactical_draw(match, gmove):
 def is_progress(match, gmove):
     if(match.is_opening()):
         piece = match.readfield(gmove.srcx, gmove.srcy)
-        if(piece == PIECES['wPw'] and gmove.srcy == match.board.COORD['2'] and
-           (gmove.srcx >= match.board.COORD['2'] and gmove.srcx <= match.board.COORD['7'])):
-           return True
-        elif(piece == PIECES['bPw'] and gmove.srcy == match.board.COORD['7'] and
-           (gmove.srcx >= match.board.COORD['2'] and gmove.srcx <= match.board.COORD['7'])):
-           return True
-        else:
-            return False
-        
-        """cgenerator = cGenerator(match)
-
-        genmoves_before = cgenerator.generate_moves(0)
-        ###
-        srcpiece = match.readfield(gmove.srcx, gmove.srcy)
-        dstpiece = match.readfield(gmove.dstx, gmove.dsty)
-        match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
-        if((srcpiece == PIECES['wPw'] or srcpiece == PIECES['bPw']) and gmove.prom_piece != PIECES['blk']):
-            match.writefield(gmove.dstx, gmove.dsty, gmove.prom_piece)
-        else:
-            match.writefield(gmove.dstx, gmove.dsty, srcpiece)
-        ###
-        genmoves_after = cgenerator.generate_moves(0)
-        ###
-        match.writefield(gmove.srcx, gmove.srcy, srcpiece)
-        match.writefield(gmove.dstx, gmove.dsty, dstpiece)
-        ###
-        return len(genmoves_before) + 2 < len(genmoves_after)"""
+        if(piece == PIECES['wPw']):
+            if(gmove.srcy == match.board.COORD['2'] and 
+               gmove.srcx >= match.board.COORD['2'] and gmove.srcx <= match.board.COORD['7']):
+                return True
+        elif(piece == PIECES['bPw']):
+            if(gmove.srcy == match.board.COORD['7'] and 
+               gmove.srcx >= match.board.COORD['2'] and gmove.srcx <= match.board.COORD['7']):
+                return True
+        elif(piece == PIECES['wKn']):
+            if(gmove.srcy >= match.board.COORD['1'] and 
+               (gmove.srcx == match.board.COORD['2'] or gmove.srcx <= match.board.COORD['7'])):
+                return True
+        elif(piece == PIECES['bKn']):
+            if(gmove.srcy >= match.board.COORD['8'] and 
+               (gmove.srcx == match.board.COORD['2'] or gmove.srcx <= match.board.COORD['7'])):
+                return True
+        elif(piece == PIECES['wBp']):
+            if(gmove.srcy >= match.board.COORD['1'] and 
+               (gmove.srcx == match.board.COORD['3'] or gmove.srcx <= match.board.COORD['6'])):
+                return True
+        elif(piece == PIECES['bBp']):
+            if(gmove.srcy >= match.board.COORD['8'] and 
+               (gmove.srcx == match.board.COORD['3'] or gmove.srcx <= match.board.COORD['6'])):
+                return True
+        return False
     else:
         return False
 

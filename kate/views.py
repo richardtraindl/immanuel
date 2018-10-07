@@ -14,6 +14,8 @@ from .engine.match import *
 from .engine.move import *
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.debug import list_match_attributes
+from .engine.pieces.king import cKing
+from .engine.analyze_position import is_rook_on_baseline_trapped
 
 
 def index(request):
@@ -312,8 +314,16 @@ def dbginfo(request, matchid=None):
             moves += "|" + move.format_move()
 
     attributes = list_match_attributes(match)
+    
+    str_dbgfunc = []
+    king = cKing(match, match.board.wKg_x, match.board.wKg_y)
+    str_dbgfunc.append("wKg - is_king_safe: " + str(king.is_king_safe()))
+    king = cKing(match, match.board.bKg_x, match.board.bKg_y)
+    str_dbgfunc.append("bKg - is_king_safe: " + str(king.is_king_safe()))
+    str_dbgfunc.append("is_rook_on_baseline_trapped - white: " + str(is_rook_on_baseline_trapped(match, COLORS['white'])))
+    str_dbgfunc.append("is_rook_on_baseline_trapped - black: " + str(is_rook_on_baseline_trapped(match, COLORS['black'])))
 
-    return render(request, 'kate/dbginfo.html', { 'match': match, 'moves': moves, 'attributes': attributes, 'switch': switch } )
+    return render(request, 'kate/dbginfo.html', { 'match': match, 'moves': moves, 'attributes': attributes, 'dbgfunc': str_dbgfunc, 'switch': switch } )
 
 
 def import_match(request):

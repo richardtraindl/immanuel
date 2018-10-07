@@ -158,9 +158,9 @@ class cValidator:
             for x1 in range(8):
                 piece = match.readfield(x1, y1)
                 if(color == match.color_of_piece(piece)):
-                    if(piece == match.PIECES['wPw'] and y1 == match.A7_Y):
+                    if(piece == match.PIECES['wPw'] and y1 == match.board.COORD['7']):
                         prom_piece = match.PIECES['wQu']
-                    elif(piece == match.PIECES['bPw'] and y1 == match.A2_Y):
+                    elif(piece == match.PIECES['bPw'] and y1 == match.board.COORD['2']):
                         prom_piece = match.PIECES['bQu']
                     else:
                         prom_piece = match.PIECES['blk']
