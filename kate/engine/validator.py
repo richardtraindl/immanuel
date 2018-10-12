@@ -1,3 +1,4 @@
+from .values import *
 from .pieces.pawn import cPawn
 from .pieces.knight import cKnight
 from .pieces.bishop import cBishop
@@ -249,5 +250,24 @@ class cValidator:
                    match.PIECES_RANK[friend] > match.PIECES_RANK[enemy.piece]):
                     return True
         return False
+
+    @classmethod
+    def dir_for_move(cls, match, srcx, srcy, dstx, dsty):
+        piece = match.readfield(srcx, srcy)
+
+        if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+            return cPawn.dir_for_move(srcx, srcy, dstx, dsty)
+        elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+            return cRook.dir_for_move(srcx, srcy, dstx, dsty)
+        elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+            return cKnight.dir_for_move(srcx, srcy, dstx, dsty)
+        elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+            return cBishop.dir_for_move(srcx, srcy, dstx, dsty)
+        elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+            return cQueen.dir_for_move(srcx, srcy, dstx, dsty)
+        elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+            return cKing.dir_for_move(srcx, srcy, dstx, dsty)
+        else:
+            return cPiece.DIRS['undefined']
 
 # class end

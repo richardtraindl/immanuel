@@ -46,16 +46,16 @@ class cBoard:
         self.writefield(self.COORD['7'], self.COORD['1'], PIECES['wKn'])
         self.writefield(self.COORD['8'], self.COORD['1'], PIECES['wRk'])
 
-        for y in range (self.COORD['2'], (self.COORD['2'] + 1), 1):
-            for x in range (self.COORD['1'], (self.COORD['8'] + 1), 1):
+        for y in range(1, 2, 1):
+            for x in range(8):
                 self.writefield(x, y, PIECES['wPw'])
 
-        for y in range (self.COORD['3'], (self.COORD['6'] + 1), 1):
-            for x in range (self.COORD['1'], (self.COORD['8'] + 1), 1):
+        for y in range(2, 6, 1):
+            for x in range(8):
                 self.writefield(x, y, PIECES['blk'])
 
-        for y in range (self.COORD['7'], (self.COORD['7'] + 1), 1):
-            for x in range (self.COORD['1'], (self.COORD['8'] + 1), 1):
+        for y in range(6, 7, 1):
+            for x in range(8):
                 self.writefield(x, y, PIECES['bPw'])
 
         self.writefield(self.COORD['1'], self.COORD['8'], PIECES['bRk'])

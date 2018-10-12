@@ -14,6 +14,7 @@ class cGenerator:
     def generate_moves(self, mode):
         color = self.match.next_color()
         genmoves = []
+        piececnt = 0
 
         for y in range(0, 8, 1):
             for x in range(0, 8, 1):
@@ -23,23 +24,41 @@ class cGenerator:
                 else:
                     if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                         cpawn = cPawn(self.match, x, y)
-                        genmoves.extend(cpawn.generate_moves(mode))
+                        pawnmoves = cpawn.generate_moves(mode)
+                        if(len(pawnmoves) > 0):
+                            piececnt += 1
+                            genmoves.extend(pawnmoves)
                     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
                         crook = cRook(self.match, x, y)
-                        genmoves.extend(crook.generate_moves(mode))
+                        rookmoves = crook.generate_moves(mode)
+                        if(len(rookmoves) > 0):
+                            piececnt += 1
+                            genmoves.extend(rookmoves)
                     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
                         cbishop = cBishop(self.match, x, y)
-                        genmoves.extend(cbishop.generate_moves(mode))
+                        bishopmoves = cbishop.generate_moves(mode)
+                        if(len(bishopmoves) > 0):
+                            piececnt += 1
+                            genmoves.extend(bishopmoves)
                     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
                         cknight = cKnight(self.match, x, y)
-                        genmoves.extend(cknight.generate_moves(mode))
+                        knightmoves = cknight.generate_moves(mode)
+                        if(len(knightmoves) > 0):
+                            piececnt += 1
+                            genmoves.extend(knightmoves)
                     elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
                         cqueen = cQueen(self.match, x, y)
-                        genmoves.extend(cqueen.generate_moves(mode))
+                        queenmoves = cqueen.generate_moves(mode)
+                        if(len(queenmoves) > 0):
+                            piececnt += 1
+                            genmoves.extend(queenmoves)
                     else:
                         cking = cKing(self.match, x, y)
-                        genmoves.extend(cking.generate_moves(mode))
-        return genmoves
+                        kingmoves = cking.generate_moves(mode)
+                        if(len(kingmoves) > 0):
+                            piececnt += 1
+                            genmoves.extend(kingmoves)
+        return genmoves, piececnt
 
 # class end
 

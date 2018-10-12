@@ -8,6 +8,7 @@ from .pieces.king import cKing
 from .pieces.queen import cQueen
 from .pieces import pawnfield, knightfield, rookfield, bishopfield, kingfield
 from .pieces.piece import cTouch
+from .validator import *
 
 
 class cDirTouch:
@@ -349,6 +350,7 @@ def is_discl_supported_weak(discl_supported):
 
     return False
 
+
 def is_fork_field(match, color, forkx, forky):
     opp_color = REVERSED_COLORS[color]
 
@@ -384,8 +386,8 @@ def is_fork_field(match, color, forkx, forky):
     return False
 
 
-def is_piece_attacked(lst, piece1, piece2):
-    for ctouch_beyond in lst:
+def is_piece_attacked(attacked, piece1, piece2):
+    for ctouch_beyond in attacked:
         if(ctouch_beyond.piece == piece1 or ctouch_beyond.piece == piece2):
             return True
 
@@ -443,6 +445,24 @@ def is_attacked_higher_equal_than_piece(match, attacked):
             return True
 
     return False
+
+
+def is_attacked_before_move(priomove, attacked):
+    match = priomove.gmove.match
+    for tbeyond in attacked:
+        piece = match.readfield(tbeyond.agent_srcx, tbeyond.agent_srcy)
+        if(piece == PIECES['wPw'] or piece == PIECES['bPw'] or 
+           piece == PIECES['wKn'] or piece == PIECES['bKn'] or 
+           piece == PIECES['wKg'] or piece == PIECES['bKg']):
+            return False
+        else:
+            dir1 = cValidator.dir_for_move(match, tbeyond.agent_srcx, tbeyond.agent_srcy, tbeyond.agent_dstx, tbeyond.agent_dsty)
+            dir2 = cValidator.dir_for_move(match, tbeyond.agent_srcx, tbeyond.agent_srcy, tbeyond.fieldx, tbeyond.fieldy)
+            if(dir1 == dir2 or match.REVERSE_DIRS[dir1] == dir2):
+                continue
+            else:
+                return False
+    return True
 
 
 def is_supported_weak(match, supported):

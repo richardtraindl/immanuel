@@ -13,6 +13,7 @@ from .pieces.king import cKing
 from .pieces.queen import cQueen
 from .pieces.piece import cTouchBeyond
 from .generator import cGenerator
+from .validator import *
 
 
 def castles(match, gmove):
@@ -392,7 +393,7 @@ def is_progress(match, gmove):
 def fetch_first_tactics(priomove):
     return priomove.fetch_tactics(0)
 
-def rank_gmoves(match, priomoves):
+def rank_gmoves(match, priomoves, piecescnt):
     all_attacking = []
     all_supporting = []
     all_fork_defending = []
@@ -466,12 +467,18 @@ def rank_gmoves(match, priomoves):
                     piece_is_lower_fequal_than_enmy_on_dstflield)):
                     if(is_attacked_pinned(match, attacked) or 
                        is_attacked_soft_pinned(match, attacked)):
-                        priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['stormy']))
-                        all_attacking.append(priomove)
+                        if(piecescnt > 1 and is_attacked_before_move(priomove, attacked)):
+                            priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['downgraded']))
+                        else:
+                            priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['stormy']))
+                            all_attacking.append(priomove)
                     elif(is_attacked_supported(attacked) == False or 
                          is_attacked_higher_equal_than_piece(match, attacked)):
-                        priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['good-deal']))
-                        all_attacking.append(priomove)
+                        if(piecescnt > 1 and is_attacked_before_move(priomove, attacked)):
+                            priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['downgraded']))
+                        else:
+                            priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['good-deal']))
+                            all_attacking.append(priomove)
                     else:
                         priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['bad-deal']))
                 else:
