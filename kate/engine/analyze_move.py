@@ -370,20 +370,20 @@ def is_progress(match, gmove):
                gmove.srcx >= match.board.COORD['2'] and gmove.srcx <= match.board.COORD['7']):
                 return True
         elif(piece == PIECES['wKn']):
-            if(gmove.srcy >= match.board.COORD['1'] and 
-               (gmove.srcx == match.board.COORD['2'] or gmove.srcx <= match.board.COORD['7'])):
+            if(gmove.srcy == match.board.COORD['1'] and 
+               (gmove.srcx == match.board.COORD['2'] or gmove.srcx == match.board.COORD['7'])):
                 return True
         elif(piece == PIECES['bKn']):
-            if(gmove.srcy >= match.board.COORD['8'] and 
-               (gmove.srcx == match.board.COORD['2'] or gmove.srcx <= match.board.COORD['7'])):
+            if(gmove.srcy == match.board.COORD['8'] and 
+               (gmove.srcx == match.board.COORD['2'] or gmove.srcx == match.board.COORD['7'])):
                 return True
         elif(piece == PIECES['wBp']):
-            if(gmove.srcy >= match.board.COORD['1'] and 
-               (gmove.srcx == match.board.COORD['3'] or gmove.srcx <= match.board.COORD['6'])):
+            if(gmove.srcy == match.board.COORD['1'] and 
+               (gmove.srcx == match.board.COORD['3'] or gmove.srcx == match.board.COORD['6'])):
                 return True
         elif(piece == PIECES['bBp']):
-            if(gmove.srcy >= match.board.COORD['8'] and 
-               (gmove.srcx == match.board.COORD['3'] or gmove.srcx <= match.board.COORD['6'])):
+            if(gmove.srcy == match.board.COORD['8'] and 
+               (gmove.srcx == match.board.COORD['3'] or gmove.srcx == match.board.COORD['6'])):
                 return True
         return False
     else:
@@ -400,6 +400,7 @@ def rank_gmoves(match, priomoves, piecescnt):
     all_discl_attacking = []
     all_discl_supporting = []
     all_fleeing = []
+    all_running = []
     excludes = []
     
     for priomove in priomoves:
@@ -524,6 +525,7 @@ def rank_gmoves(match, priomoves, piecescnt):
 
         if(running_pawn(match, priomove.gmove)):
             priomove.tactics.append(cTactic(priomove.TACTICS['running-pawn'], priomove.SUB_TACTICS['undefined']))
+            all_running.append(priomove)
 
         """if(controles_file(match, priomove.gmove)):
             if(dstflield_is_attacked == False or 
@@ -540,7 +542,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             priomove.tactics.append(cTactic(priomove.TACTICS['undefined'], priomove.SUB_TACTICS['undefined']))
             priomove.evaluate_priorities()
 
-    all_attacking.sort(key=attrgetter('prio', 'prio_sec')) #sort(key = fetch_first_tactics)
+    all_attacking.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
     for pmove in all_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -549,7 +551,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_discl_attacking.sort(key=attrgetter('prio', 'prio_sec')) #sort(key = fetch_first_tactics)
+    all_discl_attacking.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
     for pmove in all_discl_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -558,7 +560,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_supporting.sort(key=attrgetter('prio', 'prio_sec')) #sort(key = fetch_first_tactics)
+    all_supporting.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
     for pmove in all_supporting:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -567,7 +569,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_discl_supporting.sort(key=attrgetter('prio', 'prio_sec')) #sort(key = fetch_first_tactics)
+    all_discl_supporting.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
     for pmove in all_discl_supporting:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -576,7 +578,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_fork_defending.sort(key=attrgetter('prio', 'prio_sec')) #sort(key = fetch_first_tactics)
+    all_fork_defending.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
     for pmove in all_fork_defending:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -585,7 +587,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_fleeing.sort(key=attrgetter('prio', 'prio_sec')) #sort(key = fetch_first_tactics)
+    all_fleeing.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
     for pmove in all_fleeing:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -593,5 +595,14 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.downgrade(cTactic(priomove.TACTICS['flee'], priomove.SUB_TACTICS['downgraded']))
             pmove.evaluate_priorities()
 
-    priomoves.sort(key=attrgetter('prio', 'prio_sec'))
+    excludes.clear()
+    all_running.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
+    for pmove in all_running:
+        if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
+            excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
+        else:
+            pmove.downgrade(cTactic(priomove.TACTICS['running-pawn'], priomove.SUB_TACTICS['downgraded']))
+            pmove.evaluate_priorities()
+
+    priomoves.sort(key=attrgetter('prio'))
 

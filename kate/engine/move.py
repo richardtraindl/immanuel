@@ -117,16 +117,12 @@ class cTactic:
 
 class cPrioMove:
     PRIO = {
-        'prio1' : 0,
-        'prio2' : 1,
-        'prio3' : 2,
-        'prio4' : 3,
-        'prio5' : 4,
-        'prio6' : 5,
-        'prio7' : 6,
-        'prio8' : 7,
-        'prio9' : 8,
-        'prio10' : 9 }
+        'prio0' : 0,
+        'prio1' : 10,
+        'prio2' : 20,
+        'prio3' : 30,
+        'prio4' : 40,
+        'prio5' : 50 }
 
     TACTICS = {
         'defend-check' :        10,
@@ -158,48 +154,48 @@ class cPrioMove:
         'undefined' : 6 }
 
     TACTICS_TO_PRIO = {
-        TACTICS['defend-check'] : PRIO['prio2'],
-        TACTICS['capture'] : PRIO['prio4'],
-        TACTICS['attack-king'] : PRIO['prio4'],
-        TACTICS['attack'] : PRIO['prio5'],
-        TACTICS['discl-attack'] : PRIO['prio5'],
-        TACTICS['support'] : PRIO['prio5'],
-        TACTICS['discl-support'] : PRIO['prio5'], 
-        TACTICS['support-unattacked'] : PRIO['prio7'],
-        TACTICS['flee'] : PRIO['prio5'],
-        TACTICS['defend-fork'] : PRIO['prio4'], 
-        TACTICS['does-unpin'] : PRIO['prio4'], 
-        TACTICS['block'] : PRIO['prio5'], 
-        TACTICS['promotion'] : PRIO['prio4'],
-        TACTICS['tactical-draw'] : PRIO['prio4'],
-        TACTICS['running-pawn'] : PRIO['prio3'], 
-        TACTICS['controle-file'] : PRIO['prio6'], 
-        TACTICS['castling'] : PRIO['prio5'],
-        TACTICS['progress'] : PRIO['prio5'], 
-        TACTICS['undefined'] : PRIO['prio10'] }
+        TACTICS['defend-check'] : PRIO['prio1'],
+        TACTICS['capture'] : PRIO['prio2'],
+        TACTICS['attack-king'] : PRIO['prio2'],
+        TACTICS['attack'] : PRIO['prio3'],
+        TACTICS['discl-attack'] : PRIO['prio3'],
+        TACTICS['support'] : PRIO['prio3'],
+        TACTICS['discl-support'] : PRIO['prio3'], 
+        TACTICS['support-unattacked'] : PRIO['prio4'],
+        TACTICS['flee'] : PRIO['prio3'],
+        TACTICS['defend-fork'] : PRIO['prio2'], 
+        TACTICS['does-unpin'] : PRIO['prio2'], 
+        TACTICS['block'] : PRIO['prio3'], 
+        TACTICS['promotion'] : PRIO['prio2'],
+        TACTICS['tactical-draw'] : PRIO['prio1'],
+        TACTICS['running-pawn'] : PRIO['prio2'], 
+        TACTICS['controle-file'] : PRIO['prio3'], 
+        TACTICS['castling'] : PRIO['prio3'],
+        TACTICS['progress'] : PRIO['prio3'], 
+        TACTICS['undefined'] : PRIO['prio5'] }
 
     SUB_TACTICS_TO_ADJUST = {
-        SUB_TACTICS['stormy'] : -2,
-        SUB_TACTICS['urgent'] : -2,
-        SUB_TACTICS['good-deal'] : -1,
-        SUB_TACTICS['downgraded'] : 0,
-        SUB_TACTICS['bad-deal'] : 1,
-        SUB_TACTICS['undefined'] : 2 }
+        SUB_TACTICS['stormy'] : -10,
+        SUB_TACTICS['urgent'] : -10,
+        SUB_TACTICS['good-deal'] : -5,
+        SUB_TACTICS['undefined'] : 0, 
+        SUB_TACTICS['downgraded'] : 10,
+        SUB_TACTICS['bad-deal'] : 15 }
 
-    def __init__(self, gmove=None):
+    def __init__(self, gmove=None, prio=PRIO['prio5']):
         self.gmove = gmove
         self.tactics = []
-        self.prio = self.PRIO['prio10']
-        self.prio_sec = self.PRIO['prio10']
+        self.prio = prio
 
     def evaluate_priorities(self):
-        self.prio = self.PRIO['prio10']
-        self.prio_sec = max(self.PRIO['prio1'], self.PRIO['prio10'] - len(self.tactics))
+        self.prio = self.PRIO['prio5']
         for tactitem in self.tactics:
             prio_new = max(self.PRIO['prio1'], 
                               self.TACTICS_TO_PRIO[tactitem.tactic] + \
                               self.SUB_TACTICS_TO_ADJUST[tactitem.subtactic])
             self.prio = min(self.prio, prio_new)
+        if(self.tactics):
+            self.prio = max(self.PRIO['prio0'], self.prio - len(self.tactics))
 
     def downgrade(self, tactic):
         for tactitem in self.tactics:
@@ -238,14 +234,20 @@ class cPrioMove:
                tactitem.tactic == self.TACTICS['capture'] or
                tactitem.tactic == self.TACTICS['attack-king'] or 
                (tactitem.tactic == self.TACTICS['attack'] and 
-                tactitem.subtactic == self.SUB_TACTICS['good-deal'])):
+                (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
+                 tactitem.subtactic == self.SUB_TACTICS['urgent'] or
+                 tactitem.subtactic == self.SUB_TACTICS['good-deal']))):
                 return True
         return False
 
     def is_tactic_urgent(self):
         for tactitem in self.tactics:
             if(tactitem.tactic == self.TACTICS['promotion'] or
-               tactitem.tactic == self.TACTICS['capture']):
+               tactitem.tactic == self.TACTICS['capture'] or
+               (tactitem.tactic == self.TACTICS['attack'] and 
+                (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
+                 tactitem.subtactic == self.SUB_TACTICS['urgent'] or
+                 tactitem.subtactic == self.SUB_TACTICS['good-deal']))):
                 return True
         return False
 

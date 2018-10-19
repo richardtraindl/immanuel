@@ -177,7 +177,8 @@ class cMatch:
             return COLORS['black']
 
     def is_opening(self):
-        return len(self.move_list) <= 30
+        count = self.board.wQu_cnt + self.board.wOfficer_cnt + self.board.bQu_cnt + self.board.bOfficer_cnt
+        return (len(self.move_list) <= 30 and count > 8)
 
     def is_endgame(self):
         count = self.board.wQu_cnt + self.board.wOfficer_cnt + self.board.bQu_cnt + self.board.bOfficer_cnt
