@@ -17,7 +17,7 @@ def prnt_before_calc(match, count, priomove):
     print("count: " + str(count))
     print("calculate: " + priomove.gmove.format_genmove())
     print("tactics: " + priomove.concat_tactics(" | "))
-    #print("priorities: " + reverse_lookup(priomove.PRIO, priomove.prio))
+    print("priorities: " + str(priomove.prio))
     print("\n***********************************************")
 
 def prnt_search(match, label, score, gmove, candidates):
@@ -54,29 +54,33 @@ class Msgs:
 class SearchLimits:
     def __init__(self, match):
         if(match.level == match.LEVELS['blitz']):
-            self.move_count = 16
-            self.dpth_stage1 = 2
+            self.mvcnt_stage1 = 16
+            self.dpth_stage1 = 1
+            self.mvcnt_stage2 = 12
             self.dpth_stage2 = 2
-            self.dpth_max = 10
+            self.dpth_max = 8
         elif(match.level == match.LEVELS['low']):
-            self.move_count = 16
-            self.dpth_stage1 = 3
+            self.mvcnt_stage1 = 20
+            self.dpth_stage1 = 1
+            self.mvcnt_stage2 = 12
             self.dpth_stage2 = 3
             self.dpth_max = 10
         elif(match.level == match.LEVELS['medium']):
-            self.move_count = 20
-            self.dpth_stage1 = 4
+            self.mvcnt_stage1 = 24
+            self.dpth_stage1 = 2
+            self.mvcnt_stage2 = 16
             self.dpth_stage2 = 4
             self.dpth_max = 12
         else:
-            self.move_count = 24
-            self.dpth_stage1 = 5
+            self.mvcnt_stage1 = 28
+            self.dpth_stage1 = 2
+            self.mvcnt_stage2 = 16
             self.dpth_stage2 = 5
-            self.dpth_max = 12
+            self.dpth_max = 14
 
         if(match.is_endgame()):
             self.dpth_stage1 += 1
-            self.dpth_stage2 += 1
+            self.dpth_stage2 += 2
 
 # class end
 
@@ -106,7 +110,7 @@ def count_up_to_prio(priomoves, prio_limit):
     priomoves.sort(key=attrgetter('prio'))
     return count
 
-def select_maxcount_new(match, priomoves, depth, slimits, last_pmove):
+def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     if(len(priomoves) == 0):
         return 0
     
@@ -114,13 +118,14 @@ def select_maxcount_new(match, priomoves, depth, slimits, last_pmove):
         return len(priomoves)
 
     if(depth <= slimits.dpth_stage1):
-        return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio5']))
+        return slimits.mvcnt_stage1
         """if(match.level == match.LEVELS['blitz']):
-            return min(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio5']))
+            return min(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio4']))
         else:
-            return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio5']))"""
+            return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio4']))"""
     elif(depth <= slimits.dpth_stage2):
-        return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio4']))
+        return slimits.mvcnt_stage2
+        #return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio3']))
     elif(depth <= slimits.dpth_max):
         promotion = []
         good_captures = []
@@ -167,7 +172,7 @@ def select_maxcount_new(match, priomoves, depth, slimits, last_pmove):
     else:
         return 0
 
-def select_maxcount(match, priomoves, depth, slimits, last_pmove):
+def select_maxcount_old(match, priomoves, depth, slimits, last_pmove):
     if(len(priomoves) == 0):
         return 0
     
@@ -176,11 +181,11 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
 
     if(depth <= slimits.dpth_stage1):
         if(match.level == match.LEVELS['blitz']):
-            return min(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio5']))
+            return min(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio3']))
         else:
-            return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio5']))
+            return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio3']))
     elif(depth <= slimits.dpth_stage2):
-        return min(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio4']))
+        return min(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio2']))
     elif(depth <= slimits.dpth_max and last_pmove.is_tactic_urgent()):
         promotion = []
         good_captures = []

@@ -12,6 +12,7 @@ from .modules import interface
 from .engine.values import *
 from .engine.match import *
 from .engine.move import *
+from .engine.validator import *
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.debug import list_match_attributes
 from .engine.pieces.king import cKing
@@ -79,7 +80,7 @@ def match(request, matchid=None):
         else:
             urgent = False
             msg = "" """
-    elif(msgcode == match.RETURN_CODES['ok']):
+    elif(msgcode == cValidator.RETURN_CODES['ok']):
         #urgent = False
         msg = match.RETURN_MSGS[msgcode]
     else:
@@ -103,7 +104,7 @@ def do_move(request, matchid=None):
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
         if(interface.is_next_color_human(modelmatch) == False):
-            msgcode= match.RETURN_CODES['wrong-color']
+            msgcode= cValidator.RETURN_CODES['wrong-color']
             return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
         form = DoMoveForm(request.POST)
@@ -116,9 +117,8 @@ def do_move(request, matchid=None):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
                 interface.calc_move_for_immanuel(modelmatch)
         else:
-            msgcode= match.RETURN_CODES['format-error']
+            msgcode= cValidator.RETURN_CODES['format-error']
 
-        print("do_move: reverse match...")
         return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
     else:
         return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(matchid,)), switch))
@@ -227,14 +227,12 @@ def fetch_match(request):
     if(matchid):
         matchid = int(matchid)
     else:
-        print("from fetch_match: no changes")
         return
 
     movecnt = request.GET.get('movecnt', None)
     if(movecnt):
         movecnt = int(movecnt)
     else:
-        print("from fetch_match: no changes")
         return
 
     modelmatch = ModelMatch.objects.get(id=matchid)
@@ -257,7 +255,6 @@ def fetch_match(request):
     else:
         data = "0" + "|" + fmttime(match.white_player.elapsed_seconds) + "|" + fmttime(match.black_player.elapsed_seconds)
 
-    print("response from fetch_match: " + data)
     return HttpResponse(data)
 
 
@@ -409,3 +406,18 @@ def import_match(request):
         form = ImportMatchForm()
         return render(request, 'kate/import.html', { 'form': form } )
 
+def clone(request, matchid=None):
+    context = RequestContext(request)
+
+    modelmatch = get_object_or_404(ModelMatch, pk=matchid)
+    modelmatch.id = None
+    modelmatch.begin = datetime.now()
+    modelmatch.save()
+    
+    modelmoves = ModelMove.objects.filter(match_id=matchid)
+    for modelmove in modelmoves:
+        modelmove.match_id = modelmatch.id
+        modelmove.id = None
+        modelmove.save()
+
+    return HttpResponseRedirect(reverse('kate:match', args=(modelmatch.id,)))

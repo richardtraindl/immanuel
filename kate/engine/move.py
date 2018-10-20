@@ -188,9 +188,8 @@ class cPrioMove:
         self.prio = prio
 
     def evaluate_priorities(self):
-        self.prio = self.PRIO['prio5']
         for tactitem in self.tactics:
-            prio_new = max(self.PRIO['prio1'], 
+            prio_new = max(self.PRIO['prio0'], 
                               self.TACTICS_TO_PRIO[tactitem.tactic] + \
                               self.SUB_TACTICS_TO_ADJUST[tactitem.subtactic])
             self.prio = min(self.prio, prio_new)

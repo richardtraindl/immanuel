@@ -109,7 +109,7 @@ class cMatch:
     def __init__(self):
         self.status = self.STATUS['open']
         self.score = 0
-        self.level = self.LEVELS['blitz']
+        self.level = self.LEVELS['low']
         self.seconds_per_move = self.SECONDS_PER_MOVE[self.level]
         self.begin = datetime.now()
         self.time_start = 0
