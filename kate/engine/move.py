@@ -125,25 +125,26 @@ class cPrioMove:
         'prio5' : 50 }
 
     TACTICS = {
-        'defend-check' :        10,
-        'capture' :             20,  # 'good-deal' | 'bad-deal'
-        'attack-king' :         30,  # 'good-deal' | 'bad-deal'
-        'attack' :              40,  # 'stormy' | 'good-deal' | 'bad-deal'
-        'discl-attack' :        50,  # 'good-deal' | 'bad-deal' | 'downgraded'
-        'support' :             60,  # 'good-deal' | 'bad-deal'
-        'discl-support' :       70,  # 'good-deal' | 'bad-deal' | 'downgraded'
-        'support-unattacked' :  80,  # 'good-deal' | 'bad-deal'
-        'flee' :                90,  # 'urgent' | 'downgraded'
-        'defend-fork' :         100, # 'downgraded'
-        'does-unpin' :          110,
-        'block' :               120,
-        'promotion' :           130, 
-        'tactical-draw' :       140,
-        'running-pawn' :        150, 
-        'controle-file' :       160,
-        'castling' :            170,
-        'progress' :            180,
-        'undefined' :           200 }
+        'defend-check' :         10,
+        'capture' :              20,  # 'good-deal' | 'bad-deal'
+        'attack-king' :          30,  # 'good-deal' | 'bad-deal'
+        'attack' :               40,  # 'stormy' | 'good-deal' | 'bad-deal'
+        'discl-attack' :         50,  # 'good-deal' | 'bad-deal' | 'downgraded'
+        'support' :              60,  # 'good-deal' | 'bad-deal'
+        'discl-support' :        70,  # 'good-deal' | 'bad-deal' | 'downgraded'
+        'support-running-pawn' : 80,  # 'good-deal' | 'bad-deal'
+        'support-unattacked' :   90,  # 'good-deal' | 'bad-deal'
+        'flee' :                 100, # 'urgent' | 'downgraded'
+        'defend-fork' :          110, # 'downgraded'
+        'does-unpin' :           120,
+        'block' :                130,
+        'promotion' :            140, 
+        'tactical-draw' :        150,
+        'running-pawn' :         160, 
+        'controle-file' :        170,
+        'castling' :             180,
+        'progress' :             190,
+        'undefined' :            200 }
 
     SUB_TACTICS = {
         'stormy' : 1,
@@ -161,6 +162,7 @@ class cPrioMove:
         TACTICS['discl-attack'] : PRIO['prio3'],
         TACTICS['support'] : PRIO['prio3'],
         TACTICS['discl-support'] : PRIO['prio3'], 
+        TACTICS['support-running-pawn'] : PRIO['prio3'], 
         TACTICS['support-unattacked'] : PRIO['prio4'],
         TACTICS['flee'] : PRIO['prio3'],
         TACTICS['defend-fork'] : PRIO['prio2'], 
@@ -188,13 +190,13 @@ class cPrioMove:
         self.prio = prio
 
     def evaluate_priorities(self):
-        for tactitem in self.tactics:
-            prio_new = max(self.PRIO['prio0'], 
-                              self.TACTICS_TO_PRIO[tactitem.tactic] + \
-                              self.SUB_TACTICS_TO_ADJUST[tactitem.subtactic])
-            self.prio = min(self.prio, prio_new)
+        self.prio = self.PRIO['prio5']
         if(self.tactics):
-            self.prio = max(self.PRIO['prio0'], self.prio - len(self.tactics))
+            for tactitem in self.tactics:
+                prio_new = self.TACTICS_TO_PRIO[tactitem.tactic] + \
+                           self.SUB_TACTICS_TO_ADJUST[tactitem.subtactic]
+                self.prio = min(self.prio, prio_new)
+            self.prio -= len(self.tactics)
 
     def downgrade(self, tactic):
         for tactitem in self.tactics:

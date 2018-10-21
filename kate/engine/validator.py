@@ -13,7 +13,7 @@ from .pieces.kingfield import cKingField
 
 
 class cValidator:
-    RETURN_CODES = {
+    VAL_CODES = {
         'ok' : 10,
         'draw' : 11,
         'winner_white' : 12,
@@ -31,76 +31,76 @@ class cValidator:
         'general-error' : 40,
     }
 
-    RETURN_MSGS = {
-        RETURN_CODES['ok'] : "move okay",
-        RETURN_CODES['draw'] : "draw",
-        RETURN_CODES['winner_white'] : "winner white",
-        RETURN_CODES['winner_black'] : "winner black",
-        RETURN_CODES['match-cancelled'] : " match is cancelled",
-        RETURN_CODES['wrong-color'] : "wrong color",
-        RETURN_CODES['pawn-error'] : "pawn error",
-        RETURN_CODES['rook-error'] : "rook error",
-        RETURN_CODES['knight-error'] : "knight error",
-        RETURN_CODES['bishop-error'] : "bishop error",
-        RETURN_CODES['queen-error'] : "queen error",
-        RETURN_CODES['king-error'] : "king error",
-        RETURN_CODES['format-error'] : "format wrror",
-        RETURN_CODES['out-of-bounds'] : "wrong square",
-        RETURN_CODES['general-error'] : "general error",
+    VAL_MSGS = {
+        VAL_CODES['ok'] : "move okay",
+        VAL_CODES['draw'] : "draw",
+        VAL_CODES['winner_white'] : "winner white",
+        VAL_CODES['winner_black'] : "winner black",
+        VAL_CODES['match-cancelled'] : " match is cancelled",
+        VAL_CODES['wrong-color'] : "wrong color",
+        VAL_CODES['pawn-error'] : "pawn error",
+        VAL_CODES['rook-error'] : "rook error",
+        VAL_CODES['knight-error'] : "knight error",
+        VAL_CODES['bishop-error'] : "bishop error",
+        VAL_CODES['queen-error'] : "queen error",
+        VAL_CODES['king-error'] : "king error",
+        VAL_CODES['format-error'] : "format wrror",
+        VAL_CODES['out-of-bounds'] : "wrong square",
+        VAL_CODES['general-error'] : "general error",
     }
 
     @classmethod
     def is_move_valid(cls, match, srcx, srcy, dstx, dsty, prom_piece):
         if(not match.is_move_inbounds(srcx, srcy, dstx, dsty)):
-            return False, cls.RETURN_CODES['out-of-bounds']
+            return False, cls.VAL_CODES['out-of-bounds']
 
         piece = match.readfield(srcx, srcy)
 
         if(match.next_color() != match.color_of_piece(piece)):
-            return False, cls.RETURN_CODES['wrong-color']
+            return False, cls.VAL_CODES['wrong-color']
 
         if(piece != match.PIECES['wKg'] and piece != match.PIECES['bKg']):
             if(cls.is_king_after_move_attacked(match, srcx, srcy, dstx, dsty)):
-                return False, cls.RETURN_CODES['king-error']
+                return False, cls.VAL_CODES['king-error']
 
         if(piece == match.PIECES['wPw'] or piece == match.PIECES['bPw']):
             cpawn = cPawn(match, srcx, srcy)
             if(cpawn.is_move_valid(dstx, dsty, prom_piece)):
-                return True, cls.RETURN_CODES['ok']
+                return True, cls.VAL_CODES['ok']
             else:
-                return False, cls.RETURN_CODES['pawn-error']
+                return False, cls.VAL_CODES['pawn-error']
         elif(piece == match.PIECES['wRk'] or piece == match.PIECES['bRk']):
             crook = cRook(match, srcx, srcy)
             if(crook.is_move_valid(dstx, dsty)):
-                return True, cls.RETURN_CODES['ok']
+                return True, cls.VAL_CODES['ok']
             else:
-                return False, cls.RETURN_CODES['rook-error']
+                return False, cls.VAL_CODES['rook-error']
         elif(piece == match.PIECES['wKn'] or piece == match.PIECES['bKn']):
             cknight = cKnight(match, srcx, srcy)
             if(cknight.is_move_valid(dstx, dsty)):
-                return True, cls.RETURN_CODES['ok']
+                return True, cls.VAL_CODES['ok']
             else:
-                return False, cls.RETURN_CODES['knight-error']
+                return False, cls.VAL_CODES['knight-error']
         elif(piece == match.PIECES['wBp'] or piece == match.PIECES['bBp']):
             cbishop = cBishop(match, srcx, srcy)
             if(cbishop.is_move_valid(dstx, dsty)):
-                return True, cls.RETURN_CODES['ok']
+                return True, cls.VAL_CODES['ok']
             else:
-                return False, cls.RETURN_CODES['bishop-error']
+                return False, cls.VAL_CODES['bishop-error']
         elif(piece == match.PIECES['wQu'] or piece == match.PIECES['bQu']):
             cqueen = cQueen(match, srcx, srcy)
             if(cqueen.is_move_valid(dstx, dsty)):
-                return True, cls.RETURN_CODES['ok']
+                return True, cls.VAL_CODES['ok']
             else:
-                return False, cls.RETURN_CODES['queen-error']
+                return False, cls.VAL_CODES['queen-error']
         elif(piece == match.PIECES['wKg'] or piece == match.PIECES['bKg']):
             cking = cKing(match, srcx, srcy)
             if(cking.is_move_valid(dstx, dsty)):
-                return True, cls.RETURN_CODES['ok']
+                return True, cls.VAL_CODES['ok']
             else:
-                return False, cls.RETURN_CODES['king-error']
+                return False, cls.VAL_CODES['king-error']
         else:
-            return False, cls.RETURN_CODES['general-error']    
+            return False, cls.VAL_CODES['general-error']    
 
     @classmethod
     def is_king_after_move_attacked(cls, match, srcx, srcy, dstx, dsty):

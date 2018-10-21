@@ -390,18 +390,22 @@ def is_piece_attacked(attacked, piece1, piece2):
     for ctouch_beyond in attacked:
         if(ctouch_beyond.piece == piece1 or ctouch_beyond.piece == piece2):
             return True
-
     return False
 
 
 def is_attacked_supported(attacked):
-    if(len(attacked) == 0):
-        return False
-
     for ctouch_beyond in attacked:
         if(len(ctouch_beyond.supporter_beyond) > 0):
             return True
+    return False
 
+
+def is_attacked_weak(match, attacked):
+    for ctouch_beyond in attacked:
+        if(len(ctouch_beyond.attacker_beyond) > len(ctouch_beyond.supporter_beyond)):
+            return True
+        elif(match.is_soft_pin(ctouch_beyond.fieldx, ctouch_beyond.fieldy)):
+            return True
     return False
 
 
@@ -466,26 +470,18 @@ def is_attacked_before_move(priomove, attacked):
 
 
 def is_supported_weak(match, supported):
-    if(len(supported) == 0):
-        return False
-
     for ctouch_beyond in supported:
         if(len(ctouch_beyond.attacker_beyond) > len(ctouch_beyond.supporter_beyond)):
             return True
         elif(match.is_soft_pin(ctouch_beyond.fieldx, ctouch_beyond.fieldy)):
             return True
-
     return False
 
 
 def is_supported_attacked(supported):
-    if(len(supported) == 0):
-        return False
-
     for ctouch_beyond in supported:
         if(len(ctouch_beyond.attacker_beyond) > 0):
             return True
-
     return False
 
 
@@ -499,4 +495,16 @@ def is_supported_lower_equal_than_attacker(match, supported):
                 return False
 
     return True
+
+
+def is_supported_running_pawn(match, supported):
+    if(match.is_endgame() == False or len(supported) == 0):
+        return False
+
+    for ctouch_beyond in supported:
+        if(ctouch_beyond.piece == PIECES['wPw'] or ctouch_beyond.piece == PIECES['bPw']):
+            cpawn = cPawn(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
+            if(cpawn.is_running()):
+                return True
+    return False
 

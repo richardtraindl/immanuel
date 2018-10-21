@@ -55,42 +55,26 @@ def match(request, matchid=None):
             limit = 22
         else:
             limit = 21
-        qmoves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")[:limit]
-        for qmove in reversed(qmoves):
+        modelmoves = ModelMove.objects.filter(match_id=modelmatch.id).order_by("-count")[:limit]
+        for modelmove in reversed(modelmoves):
             move = cMove()
             move.match = match
-            interface.map_moves(qmove, move)
+            interface.map_moves(modelmove, move)
             moves.append(move)
 
     comments = ModelComment.objects.filter(match_id=modelmatch.id).order_by("created_at").reverse()[:5]
 
-    urgent = False
-
     if(msgcode is None):
         msg = ""
-        """if(match.status == STATUS['winner_white']):
-            urgent = True
-            msg = RETURN_MSGS[RETURN_CODES['winner_white']]
-        elif(match.status == STATUS['winner_black']):
-            urgent = True
-            msg = RETURN_MSGS[RETURN_CODES['winner_black']]
-        elif(match.status == STATUS['draw']):
-            urgent = True
-            msg = RETURN_MSGS[RETURN_CODES['draw']]
-        else:
-            urgent = False
-            msg = "" """
-    elif(msgcode == cValidator.RETURN_CODES['ok']):
-        #urgent = False
-        msg = match.RETURN_MSGS[msgcode]
     else:
-        urgent = True
-        msg = match.RETURN_MSGS[msgcode]
+        msg = cValidator.VAL_MSGS[msgcode]
 
     if(match.status == match.STATUS['winner_white'] or 
        match.status == match.STATUS['winner_black'] or 
        match.status == match.STATUS['draw']):
         urgent = True
+    else:
+        urgent = False
 
     domoveform = DoMoveForm()
     fmtboard = preformat_board(modelmatch.board, switch)
@@ -104,7 +88,7 @@ def do_move(request, matchid=None):
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
         if(interface.is_next_color_human(modelmatch) == False):
-            msgcode= cValidator.RETURN_CODES['wrong-color']
+            msgcode= cValidator.VAL_CODES['wrong-color']
             return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
         form = DoMoveForm(request.POST)
@@ -117,7 +101,7 @@ def do_move(request, matchid=None):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
                 interface.calc_move_for_immanuel(modelmatch)
         else:
-            msgcode= cValidator.RETURN_CODES['format-error']
+            msgcode= cValidator.VAL_CODES['format-error']
 
         return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
     else:

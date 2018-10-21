@@ -5,7 +5,7 @@ from .match import *
 from .move import *
 from .openingmove import retrieve_move
 from .analyze_move import *
-from .analyze_position import score_position
+from . import analyze_position #score_position, is_stormy
 from .helper import *
 from .validator import *
 from .generator import cGenerator
@@ -36,7 +36,7 @@ def concat_fmt_gmoves(match, gmoves):
 
 def prnt_priomoves(match, priomoves):
     for priomove in priomoves:
-        print("\n" + priomove.gmove.format_genmove(), end=" ")
+        print("\n" + priomove.gmove.format_genmove() + " prio: " + str(priomove.prio), end=" ")
         priomove.prnt_tactics()
 
 def prnt_fmttime(msg, seconds):
@@ -54,33 +54,29 @@ class Msgs:
 class SearchLimits:
     def __init__(self, match):
         if(match.level == match.LEVELS['blitz']):
-            self.mvcnt_stage1 = 16
+            self.move_count = 8
             self.dpth_stage1 = 1
-            self.mvcnt_stage2 = 12
             self.dpth_stage2 = 2
             self.dpth_max = 8
         elif(match.level == match.LEVELS['low']):
-            self.mvcnt_stage1 = 20
-            self.dpth_stage1 = 1
-            self.mvcnt_stage2 = 12
+            self.move_count = 12
+            self.dpth_stage1 = 2
             self.dpth_stage2 = 3
             self.dpth_max = 10
         elif(match.level == match.LEVELS['medium']):
-            self.mvcnt_stage1 = 24
+            self.move_count = 16
             self.dpth_stage1 = 2
-            self.mvcnt_stage2 = 16
             self.dpth_stage2 = 4
             self.dpth_max = 12
         else:
-            self.mvcnt_stage1 = 28
-            self.dpth_stage1 = 2
-            self.mvcnt_stage2 = 16
+            self.move_count = 20
+            self.dpth_stage1 = 3
             self.dpth_stage2 = 5
             self.dpth_max = 14
 
         if(match.is_endgame()):
             self.dpth_stage1 += 1
-            self.dpth_stage2 += 2
+            self.dpth_stage2 += 1
 
 # class end
 
@@ -118,21 +114,17 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return len(priomoves)
 
     if(depth <= slimits.dpth_stage1):
-        return slimits.mvcnt_stage1
-        """if(match.level == match.LEVELS['blitz']):
-            return min(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio4']))
-        else:
-            return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio4']))"""
+        return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio3']))
     elif(depth <= slimits.dpth_stage2):
-        return slimits.mvcnt_stage2
-        #return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio3']))
+        return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio2']))
     elif(depth <= slimits.dpth_max):
         promotion = []
         good_captures = []
         bad_captures = []
+        #attackes = []
         silent = None
-        eval_movecnt = last_pmove.is_tactic_urgent()
-
+        #is_stormy = analyze_position.is_stormy(match)
+        eval_movecnt = last_pmove.is_tactic_stormy() #is_tactic_urgent()
         bad_capture = last_pmove.has_tactic_ext(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['bad-deal']))
 
         for priomove in priomoves:
@@ -148,6 +140,10 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
                 priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio3'])
                 bad_captures.append(priomove)
                 eval_movecnt = True
+            #elif(priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['attack'], cPrioMove.SUB_TACTICS['stormy']))): #is_stormy and 
+                #priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio3'])
+                #attackes.append(priomove)
+                #eval_movecnt = True
             else:
                 priomove.prio = cPrioMove.PRIO['prio5']
                 if(silent is None):
@@ -155,9 +151,9 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
 
         if(eval_movecnt == False):
             return 0
-        elif((len(promotion) + len(good_captures)) > 0):
+        elif(len(promotion) + len(good_captures) > 0): #  + len(attackes)
             priomoves.sort(key=attrgetter('prio'))
-            return (len(promotion) + len(good_captures))
+            return (len(promotion) + len(good_captures)) #  + len(attackes)
         else:
             if(bad_capture and len(bad_captures) > 0):
                 if(silent):
@@ -265,11 +261,11 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             if(pmove.has_tactic(cTactic(cPrioMove.TACTICS['tactical-draw'], cPrioMove.SUB_TACTICS['undefined']))):
                 return 0, candidates
             else:
-                return score_position(match, len(priomoves)), candidates
+                return analyze_position.score_position(match, len(priomoves)), candidates
 
     if(len(priomoves) == 0 or maxcnt == 0):
         candidates.append(None)
-        return score_position(match, len(priomoves)), candidates
+        return analyze_position.score_position(match, len(priomoves)), candidates
 
     for priomove in priomoves:
         gmove = priomove.gmove

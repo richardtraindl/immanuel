@@ -311,15 +311,14 @@ def is_stormy(match):
     color = match.next_color()
 
     ### is pawn on last row before promotion
-    if(color == COLORS['white']):
-        y = 6
-        pw = PIECES['wPw']
-    else:
-        y = 1
-        pw = PIECES['bPw']
     for x in range(8):
-        piece = match.readfield(x, y)
-        if(piece == pw):
+        piece = match.readfield(x, 6)
+        if(piece == PIECES['wPw']):
+            return True
+    
+    for x in range(8):
+        piece = match.readfield(x, 1)
+        if(piece == PIECES['bPw']):
             return True
     ###
 
@@ -334,14 +333,14 @@ def is_stormy(match):
 
             frdlytouches, enmytouches = list_all_field_touches(match, piece_color, x, y)
 
-            if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+            """if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                 if(len(enmytouches) > 0):
                     return True
                 else:
-                    continue
+                    continue"""
 
-            #if(len(enmytouches) > len(frdlytouches)):
-                #return True
+            """if(len(enmytouches) > len(frdlytouches)):
+                return True"""
 
             if(match.is_pinned(x, y) or match.is_soft_pin(x, y)):
                 return True
