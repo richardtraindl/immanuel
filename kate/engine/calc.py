@@ -168,69 +168,6 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     else:
         return 0
 
-def select_maxcount_old(match, priomoves, depth, slimits, last_pmove):
-    if(len(priomoves) == 0):
-        return 0
-    
-    if(priomoves[0].has_tactic(cTactic(cPrioMove.TACTICS['defend-check'], cPrioMove.SUB_TACTICS['undefined']))):
-        return len(priomoves)
-
-    if(depth <= slimits.dpth_stage1):
-        if(match.level == match.LEVELS['blitz']):
-            return min(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio3']))
-        else:
-            return max(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio3']))
-    elif(depth <= slimits.dpth_stage2):
-        return min(slimits.move_count, count_up_to_prio(priomoves, cPrioMove.PRIO['prio2']))
-    elif(depth <= slimits.dpth_max and last_pmove.is_tactic_urgent()):
-        promotion = []
-        good_captures = []
-        bad_captures = []
-        silent = None
-
-        bad_capture = last_pmove.has_tactic_ext(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['bad-deal']))
-
-        for priomove in priomoves:
-            if(priomove.has_tactic(cTactic(cPrioMove.TACTICS['promotion'], cPrioMove.SUB_TACTICS['undefined']))):
-                priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio2'])
-                promotion.append(priomove)
-            elif(priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['good-deal']))):
-                priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio2'])
-                good_captures.append(priomove)
-            elif(priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['bad-deal']))):
-                priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio3'])
-                bad_captures.append(priomove)
-            else:
-                priomove.prio = cPrioMove.PRIO['prio5']
-                if(silent is None):
-                    silent = priomove
-
-        if((len(promotion) + len(good_captures)) > 0):
-            priomoves.sort(key=attrgetter('prio'))
-            return (len(promotion) + len(good_captures))
-        else:
-            if(bad_capture and len(bad_captures) > 0):
-                if(silent):
-                    silent.prio = cPrioMove.PRIO['prio1']
-                    priomoves.sort(key=attrgetter('prio'))
-                    return (len(bad_captures) + 1)
-                else:
-                    priomoves.sort(key=attrgetter('prio'))
-                    return (len(bad_captures))
-            else:
-                return 0
-    elif(depth <= slimits.dpth_max):
-        count = 0
-        for priomove in priomoves:
-            if(priomove.is_tactic_urgent()): #_v2
-                priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio2'])
-            else:
-                priomove.prio = cPrioMove.PRIO['prio5']
-        return count
-    else:
-        return 0
-
-
 def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     color = match.next_color()
     candidates = []
@@ -244,9 +181,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         minscore = beta
 
     cgenerator = cGenerator(match)
-    priomoves, piecescnt = cgenerator.generate_moves(1)
+    priomoves, piececnt = cgenerator.generate_moves(1)
 
-    rank_gmoves(match, priomoves, piecescnt)    
+    rank_gmoves(match, priomoves, piececnt)    
     
     maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 

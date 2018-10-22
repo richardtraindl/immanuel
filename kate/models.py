@@ -4,7 +4,6 @@ from kate.engine.values import *
 from kate.engine.match import *
 from kate.engine.move import *
 from kate.engine import helper
-import threading
 
 
 class Match(models.Model):

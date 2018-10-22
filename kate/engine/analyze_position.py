@@ -289,9 +289,9 @@ def score_position(match, movecnt):
 
         #score += score_stucks(match)
 
-        #score += score_attacks(match, color)
+        score += score_attacks(match, color)
 
-        #score += score_supports(match, REVERSED_COLORS[color])
+        score += score_supports(match, REVERSED_COLORS[color])
 
         #score += score_controled_horizontal_files(match)
 
