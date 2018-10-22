@@ -143,9 +143,9 @@ def prnt_row(match, pieces):
 
             if(forecolor == "white"):
                 if(backcolor == "white"):
-                    print(WHITE_BACK + WHITE_TEXT + BOLD_OFF + piecemap[i] + RESET_ALL, end=endstr)
+                    print(WHITE_BACK + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
                 else:
-                    print(BLUE_BACK + WHITE_TEXT + BOLD_OFF + piecemap[i] + RESET_ALL, end=endstr)
+                    print(BLUE_BACK + WHITE_TEXT + BOLD_ON + piecemap[i] + RESET_ALL, end=endstr)
             else:
                 if(backcolor == "white"):
                     print(WHITE_BACK + BLACK_TEXT + piecemap[i] + RESET_ALL, end=endstr)
