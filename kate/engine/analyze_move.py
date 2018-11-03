@@ -16,26 +16,22 @@ from .generator import cGenerator
 from .validator import *
 
 
-def castles(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-
+def castles(gmove):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
     if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
         if(gmove.srcx - gmove.dstx == 2 or gmove.srcx - gmove.dstx == -2):
             return True
 
 
-def promotes(match, gmove):
+def promotes(gmove):
     if(gmove.prom_piece != PIECES['blk']):
         return True
 
 
-def captures(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-
-    color = match.color_of_piece(piece)
-
-    dstpiece = match.readfield(gmove.dstx, gmove.dsty)
-
+def captures(gmove):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    color = gmove.match.color_of_piece(piece)
+    dstpiece = gmove.match.readfield(gmove.dstx, gmove.dsty)
     if(dstpiece != PIECES['blk']):
         return True
     elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and gmove.srcx != gmove.dstx ):
@@ -44,22 +40,20 @@ def captures(match, gmove):
         return False
 
 
-def defends_fork(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-    return defends_fork_field(match, piece, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
+def defends_fork(gmove):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    return defends_fork_field(gmove.match, piece, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
 
 
-def flees(match, gmove):
+def flees(gmove):
+    match = gmove.match
     old_lower_cnt = 0
     old_higher_cnt = 0
     new_lower_cnt = 0
     new_higher_cnt = 0
-
     piece = match.readfield(gmove.srcx, gmove.srcy)
-
     color = match.color_of_piece(piece)
     opp_color = match.oppcolor_of_piece(piece)
-
     enmycontacts = list_field_touches(match, opp_color, gmove.srcx, gmove.srcy)
     for enmy in enmycontacts:
         if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
@@ -67,20 +61,16 @@ def flees(match, gmove):
         else:
             old_higher_cnt += 1
     enmycontacts.clear()
-
     ###
     match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-
     enmycontacts = list_field_touches(match, opp_color, gmove.dstx, gmove.dsty)
     for enmy in enmycontacts:
         if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
             new_lower_cnt += 1
         else:
             new_higher_cnt += 1
-
     match.undo_move()
     ###
-
     if((old_lower_cnt + old_higher_cnt) > 0 and 
        (new_lower_cnt < old_lower_cnt or 
         new_lower_cnt + new_higher_cnt < old_lower_cnt + old_higher_cnt)):
@@ -89,57 +79,78 @@ def flees(match, gmove):
         return False
 
 
-def find_attacks_and_supports(match, gmove):
+def find_attacks_and_supports(match, fieldx, fieldy):
     attacked = []
     supported = []
 
-    piece = match.readfield(gmove.srcx, gmove.srcy)
+    piece = match.readfield(fieldx, fieldy)
 
     if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        cpawn = cPawn(match, gmove.srcx, gmove.srcy)
-        cpawn.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
+        cpawn = cPawn(match, fieldx, fieldy)
+        cpawn.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        cknight = cKnight(match, gmove.srcx, gmove.srcy)
-        cknight.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
+        cknight = cKnight(match, fieldx, fieldy)
+        cknight.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        cbishop = cBishop(match, gmove.srcx, gmove.srcy)
-        cbishop.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
+        cbishop = cBishop(match, fieldx, fieldy)
+        cbishop.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        crook = cRook(match, gmove.srcx, gmove.srcy)
-        crook.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
+        crook = cRook(match, fieldx, fieldy)
+        crook.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
     elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        cqueen = cQueen(match, gmove.srcx, gmove.srcy)
-        cqueen.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
+        cqueen = cQueen(match, fieldx, fieldy)
+        cqueen.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
     elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        cking = cKing(match, gmove.srcx, gmove.srcy)
-        cking.find_attacks_and_supports(gmove.dstx, gmove.dsty, attacked, supported)
-        if(gmove.srcx - gmove.dstx == -2):
-            crook = cRook(match, gmove.dstx + 1, gmove.srcy)
-            crook.find_attacks_and_supports(gmove.dstx - 1, gmove.dsty, attacked, supported)
-        elif(gmove.srcx - gmove.dstx == 2):
-            crook = cRook(match, gmove.dstx - 2, gmove.srcy)
-            crook.find_attacks_and_supports(gmove.dstx + 1, gmove.dsty, attacked, supported)
-
+        cking = cKing(match, fieldx, fieldy)
+        cking.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
     return attacked, supported
 
 
-def does_unpin(match, gmove):
+def find_attacks_and_supports_from_srcfield(gmove):
+    return find_attacks_and_supports(gmove.match, gmove.srcx, gmove.srcy)
+
+    
+def find_attacks_and_supports_from_dstfield_after_move(gmove):
+    match = gmove.match
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+    match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    attacked, supported = find_attacks_and_supports(gmove.match, gmove.dstx, gmove.dsty)
+    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+        if(gmove.srcx - gmove.dstx == -2):
+            crook = cRook(match, gmove.dstx - 1, gmove.dsty)
+            crook.find_attacks_and_supports(gmove.dstx - 1, gmove.dsty, attacked, supported)
+        elif(gmove.srcx - gmove.dstx == 2):
+            crook = cRook(match, gmove.dstx + 1, gmove.dsty)
+            crook.find_attacks_and_supports(gmove.dstx + 1, gmove.dsty, attacked, supported)
+    match.undo_move()
+    return attacked, supported
+
+
+def find_attacks_on_and_supports_of_srcfield(gmove):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    return list_all_field_touches(gmove.match, gmove.match.color_of_piece(piece), gmove.srcx, gmove.srcy)
+
+
+def find_attacks_on_and_supports_of_dstfield_after_move(gmove):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    gmove.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    frdlytouches, enmytouches = list_all_field_touches(gmove.match, gmove.match.color_of_piece(piece), gmove.dstx, gmove.dsty)
+    gmove.match.undo_move()
+    return frdlytouches, enmytouches
+
+
+def does_unpin(gmove):
+    match = gmove.match
     piece = match.readfield(gmove.srcx, gmove.srcy)
     color = match.color_of_piece(piece)
-
     pinlines_before = search_lines_of_pin(match, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
-
     ###
     match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-    
     pinlines_after = search_lines_of_pin(match, color, gmove.dstx, gmove.dsty, None, None)
-
     match.undo_move()
     ###
-
     if(len(pinlines_after) < len(pinlines_before)):
         return True
-
     for pbefore in pinlines_before:
         identical = False
         for pafter in pinlines_after:
@@ -147,7 +158,6 @@ def does_unpin(match, gmove):
                 identical = True
         if(identical == False):
             return True
-
     return False
 
 
@@ -159,7 +169,7 @@ def defends_check(match):
         return match.is_king_attacked(match.board.bKg_x, match.board.bKg_y)
 
 
-def find_disclosures(match, srcx, srcy, dstx, dsty, discl_attacked, discl_supported):
+def find_disclosed_pieces(match, srcx, srcy, dstx, dsty, discl_attacked, discl_supported):
     piece = match.readfield(srcx, srcy)
     color = match.color_of_piece(piece)
     idx = 0
@@ -220,7 +230,7 @@ def find_disclosures(match, srcx, srcy, dstx, dsty, discl_attacked, discl_suppor
                             discl_supported.append(first)
                             break
 
-def disclosures(match, gmove):
+def find_disclosures(match, gmove):
     discl_attacked = []
     discl_supported = []
 
@@ -228,16 +238,16 @@ def disclosures(match, gmove):
     color = match.color_of_piece(piece)
 
     match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-    find_disclosures(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, discl_attacked, discl_supported)
+    find_disclosed_pieces(match, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, discl_attacked, discl_supported)
     match.undo_move()
     ###
     match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
 
     for ctouch_beyond in discl_attacked:
-        field_touches_beyond(match, color, ctouch_beyond)
+        list_field_touches_beyond(match, color, ctouch_beyond)
 
     for ctouch_beyond in discl_supported:
-        field_touches_beyond(match, color, ctouch_beyond)
+        list_field_touches_beyond(match, color, ctouch_beyond)
 
     match.writefield(gmove.srcx, gmove.srcy, piece)
     ###
@@ -268,25 +278,23 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
         return False
 
 
-def blocks(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-    color = match.color_of_piece(piece)
-
-    oppenents = search_opposed_pieces(match, color, gmove.dstx, gmove.dsty, gmove.srcx, gmove.srcy)
-
+def blocks(gmove):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    color = gmove.match.color_of_piece(piece)
+    oppenents = search_opposed_pieces(gmove.match, color, gmove.dstx, gmove.dsty, gmove.srcx, gmove.srcy)
     for oppenent in oppenents:
         if(PIECES_RANK[oppenent[0].piece] > PIECES_RANK[oppenent[1].piece] and 
            PIECES_RANK[oppenent[0].piece] > PIECES_RANK[piece]):
             return True
-
     return False
 
 
-def running_pawn(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        cpawn = cPawn(match, gmove.srcx, gmove.srcy)
-        return cpawn.is_running()
+def running_pawn_in_endgame(gmove):
+    if(gmove.match.is_endgame()):
+        piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+        if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+            cpawn = cPawn(gmove.match, gmove.srcx, gmove.srcy)
+            return cpawn.is_running()
     return False
 
 
@@ -305,9 +313,9 @@ def defends_invasion(match, gmove):
    
     return False
 
-def controles_file(match, gmove):
+def controles_file(gmove):
+    match = gmove.match
     piece = match.readfield(gmove.srcx, gmove.srcy)
-
     color = match.color_of_piece(piece)
 
     if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
@@ -329,8 +337,8 @@ def controles_file(match, gmove):
     return False
 
 
-def is_tactical_draw(match, gmove):
-    newmatch = copy.deepcopy(match)
+def is_tactical_draw(gmove):
+    newmatch = copy.deepcopy(gmove.match)
     newmatch.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
     #if(newmatch.board.fifty_moves_count >= 49):
@@ -358,7 +366,8 @@ def is_tactical_draw(match, gmove):
     return count >= 2
 
 
-def is_progress(match, gmove):
+def is_progress(gmove):
+    match = gmove.match
     if(match.is_opening()):
         piece = match.readfield(gmove.srcx, gmove.srcy)
         if(piece == PIECES['wPw']):
@@ -404,103 +413,106 @@ def rank_gmoves(match, priomoves, piecescnt):
     excludes = []
     
     for priomove in priomoves:
+        from_srcfield_attacked, from_srcfield_supported = find_attacks_and_supports_from_srcfield(priomove.gmove)
+        from_dstfield_attacked, from_dstfield_supported = find_attacks_and_supports_from_dstfield_after_move(priomove.gmove)
+        frdlytouches_on_srcfield, enmytouches_on_srcfield = find_attacks_on_and_supports_of_srcfield(priomove.gmove)
+        frdlytouches_on_dstfield, enmytouches_on_dstfield = find_attacks_on_and_supports_of_dstfield_after_move(priomove.gmove)
+        discl_attacked, discl_supported = find_disclosures(match, priomove.gmove)
+        is_piece_lfe_attacker_on_dstfield_flag = is_piece_lfe_attacker_on_dstfield(priomove.gmove, enmytouches_on_dstfield)
+
         if(defends_check(match)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['defend-check'], priomove.SUB_TACTICS['undefined']))
+            if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and
+               is_piece_lfe_attacker_on_dstfield_flag):
+                subtactic = priomove.SUB_TACTICS['good-deal']
+            else:
+                subtactic = priomove.SUB_TACTICS['bad-deal']
+            priomove.tactics.append(cTactic(priomove.TACTICS['defend-check'], subtactic))
 
-        attacked, supported = find_attacks_and_supports(match, priomove.gmove)
-        discl_attacked, discl_supported = disclosures(match, priomove.gmove)
-        dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att = dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove)
-        dstflield_is_attacked = dstfield_is_attacked(match, priomove.gmove)
-        piece_is_lower_fequal_than_enmy_on_dstflield = piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, priomove.gmove)
+        if(castles(priomove.gmove)):
+            match.do_move(priomove.gmove.srcx, priomove.gmove.srcy, priomove.gmove.dstx, priomove.gmove.dsty, priomove.gmove.prom_piece)
+            cking = cKing(match, priomove.gmove.dstx, priomove.gmove.dsty)
+            is_king_safe = cking.is_king_safe()
+            match.undo_move()
+            if(is_king_safe):
+                subtactic = priomove.SUB_TACTICS['good-deal']
+            else:
+                subtactic = priomove.SUB_TACTICS['bad-deal']
+            priomove.tactics.append(cTactic(priomove.TACTICS['castling'], subtactic))
 
-        if(castles(match, priomove.gmove)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['castling'], priomove.SUB_TACTICS['undefined']))
+        if(is_tactical_draw(priomove.gmove)):
+            priomove.tactics.append(cTactic(priomove.TACTICS['tactical-draw'], priomove.SUB_TACTICS['good-deal']))
 
-        if(is_tactical_draw(match, priomove.gmove)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['tactical-draw'], priomove.SUB_TACTICS['undefined']))
+        if(promotes(priomove.gmove)):
+            if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and 
+               is_piece_lfe_attacker_on_dstfield_flag):
+                subtactic = priomove.SUB_TACTICS['good-deal']
+            else:
+                subtactic = priomove.SUB_TACTICS['bad-deal']
+            priomove.tactics.append(cTactic(priomove.TACTICS['promotion'], subtactic))
 
-        if(promotes(match, priomove.gmove)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['promotion'], priomove.SUB_TACTICS['undefined']))
-
-        if(captures(match, priomove.gmove)):
-            if(piece_is_lower_equal_than_captured(match, priomove.gmove) or
-               dstflield_is_attacked == False or 
-               (dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att and 
-                piece_is_lower_fequal_than_enmy_on_dstflield)):
+        if(captures(priomove.gmove)):
+            if(is_piece_le_captured(priomove.gmove) or
+               (len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and 
+                is_piece_lfe_attacker_on_dstfield_flag) or
+                is_captured_pinned_or_soft_pinned(priomove.gmove)):
                 priomove.tactics.append(cTactic(priomove.TACTICS['capture'], priomove.SUB_TACTICS['good-deal']))
             else:
                 priomove.tactics.append(cTactic(priomove.TACTICS['capture'], priomove.SUB_TACTICS['bad-deal']))
 
-        if(does_unpin(match, priomove.gmove)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['does-unpin'], priomove.SUB_TACTICS['undefined']))
+        if(does_unpin(priomove.gmove)):
+            priomove.tactics.append(cTactic(priomove.TACTICS['does-unpin'], priomove.SUB_TACTICS['good-deal']))
 
-        if(defends_fork(match, priomove.gmove)):
-            if(dstflield_is_attacked == False or 
-               (dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att and 
-                piece_is_lower_fequal_than_enmy_on_dstflield)):
-                priomove.tactics.append(cTactic(priomove.TACTICS['defend-fork'], priomove.SUB_TACTICS['undefined']))
+        if(defends_fork(priomove.gmove)):
+            if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and 
+               is_piece_lfe_attacker_on_dstfield_flag):
+                priomove.tactics.append(cTactic(priomove.TACTICS['defend-fork'], priomove.SUB_TACTICS['good-deal']))
                 all_fork_defending.append(priomove)
             else:
                 priomove.tactics.append(cTactic(priomove.TACTICS['support'], priomove.SUB_TACTICS['bad-deal']))
 
-        if(flees(match, priomove.gmove)):
-            if(dstflield_is_attacked == False or
-                (dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att 
-                 and piece_is_lower_equal_than_enemy_on_dstfield(match, priomove.gmove))):
-                if(srcfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, priomove.gmove) == False or
-                   piece_is_lower_equal_than_enemy_on_srcfield(match, priomove.gmove) == False):
+        if(flees(priomove.gmove)):
+            if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and
+               is_piece_le_attacker_on_dstfield(priomove.gmove, enmytouches_on_dstfield)):
+                if(len(frdlytouches_on_srcfield) < len(enmytouches_on_srcfield) or
+                   is_piece_le_attacker_on_srcfield(priomove.gmove, enmytouches_on_srcfield) == False):
                     priomove.tactics.append(cTactic(priomove.TACTICS['flee'], priomove.SUB_TACTICS['urgent']))
                     all_fleeing.append(priomove)
-                elif(srcfield_is_supported(match, priomove.gmove) == False):
-                    priomove.tactics.append(cTactic(priomove.TACTICS['flee'], priomove.SUB_TACTICS['undefined']))
+                elif(len(frdlytouches_on_srcfield) == 0):
+                    priomove.tactics.append(cTactic(priomove.TACTICS['flee'], priomove.SUB_TACTICS['neutral']))
 
-        if(len(attacked) > 0):
-            if(is_attacked_weak(match, attacked) and 
-               (dstflield_is_attacked == False or 
-                (dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att and 
-                 piece_is_lower_fequal_than_enmy_on_dstflield))):
-                subtactic = priomove.SUB_TACTICS['good-deal']
-            else:
-                subtactic = priomove.SUB_TACTICS['bad-deal']
-
-            if(is_piece_attacked(attacked, PIECES['wKg'], PIECES['bKg'])):
-                priomove.tactics.append(cTactic(priomove.TACTICS['attack-king'], subtactic))
-            else:
-                if(subtactic == priomove.SUB_TACTICS['good-deal']):
-                    if(is_attacked_pinned(match, attacked) or 
-                       is_attacked_soft_pinned(match, attacked)):
-                        if(piecescnt > 1 and is_attacked_before_move(priomove, attacked)):
-                            priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['downgraded']))
-                        else:
-                            priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['stormy']))
-                            all_attacking.append(priomove)
-                    elif(is_attacked_supported(attacked) == False or 
-                         is_attacked_higher_equal_than_piece(match, attacked)):
-                        if(piecescnt > 1 and is_attacked_before_move(priomove, attacked)):
-                            priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['downgraded']))
-                        else:
-                            priomove.tactics.append(cTactic(priomove.TACTICS['attack'], subtactic))
-                            all_attacking.append(priomove)
-                    else:
-                        priomove.tactics.append(cTactic(priomove.TACTICS['attack'], subtactic))
+        if(len(from_dstfield_attacked) > 0):
+            if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and 
+               is_piece_lfe_attacker_on_dstfield_flag):
+                if(piecescnt > 1 and len(enmytouches_on_srcfield) > 0):
+                    subtactic = priomove.SUB_TACTICS['downgraded']
                 else:
-                    priomove.tactics.append(cTactic(priomove.TACTICS['attack'], subtactic))
+                    subtactic = priomove.SUB_TACTICS['good-deal']
+            else:
+                subtactic = priomove.SUB_TACTICS['bad-deal']
 
-        if(len(supported) > 0):
-            if(is_supported_lower_equal_than_attacker(match, supported) and 
-               (dstflield_is_attacked == False or 
-                (dstfld_cnt_of_supp_is_equ_or_high_than_cnt_of_att and 
-                 piece_is_lower_fequal_than_enmy_on_dstflield))):
+            if(is_attacked_piece_king(from_dstfield_attacked)):
+                priomove.tactics.append(cTactic(priomove.TACTICS['attack-king'], subtactic))
+            elif(subtactic == priomove.SUB_TACTICS['good-deal'] and
+                 is_attacked_soft_pinned(priomove.gmove, from_dstfield_attacked)):
+                priomove.tactics.append(cTactic(priomove.TACTICS['attack'], priomove.SUB_TACTICS['stormy']))
+                all_attacking.append(priomove)
+            else:
+                priomove.tactics.append(cTactic(priomove.TACTICS['attack'], subtactic))
+
+        if(len(from_dstfield_supported) > 0):
+            if(is_supported_le_attacker(from_dstfield_supported) and 
+               len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and 
+               is_piece_lfe_attacker_on_dstfield_flag):
                 subtactic = priomove.SUB_TACTICS['good-deal']
             else:
                 subtactic = priomove.SUB_TACTICS['bad-deal']
 
-            if(is_supported_weak(match, supported)):
+            if(is_supported_weak(priomove.gmove, from_dstfield_supported)):
                 priomove.tactics.append(cTactic(priomove.TACTICS['support'], subtactic))
             else:
                 priomove.tactics.append(cTactic(priomove.TACTICS['support-unattacked'], subtactic))
 
-            if(is_supported_running_pawn(match, supported)):
+            if(is_supported_running_pawn(match, from_dstfield_supported)):
                 priomove.tactics.append(cTactic(priomove.TACTICS['support-running-pawn'], subtactic))
 
         if(len(discl_attacked) > 0):
@@ -517,29 +529,29 @@ def rank_gmoves(match, priomoves, piecescnt):
             else:
                 priomove.tactics.append(cTactic(priomove.TACTICS['support'], priomove.SUB_TACTICS['bad-deal']))
 
-        if(blocks(match, priomove.gmove)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['block'], priomove.SUB_TACTICS['undefined']))
+        if(blocks(priomove.gmove)):
+            priomove.tactics.append(cTactic(priomove.TACTICS['block'], priomove.SUB_TACTICS['good-deal']))
 
-        if(running_pawn(match, priomove.gmove)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['running-pawn'], priomove.SUB_TACTICS['undefined']))
+        if(running_pawn_in_endgame(priomove.gmove)):
+            if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield)):
+                subtactic = priomove.SUB_TACTICS['good-deal']
+            else:
+                subtactic = priomove.SUB_TACTICS['bad-deal']
+            priomove.tactics.append(cTactic(priomove.TACTICS['running-pawn'], subtactic))
             all_running.append(priomove)
 
-        """if(controles_file(match, priomove.gmove)):
-            if(dstflield_is_attacked == False or 
-               (dstfield_is_supported(match, priomove.gmove) and 
-                piece_is_lower_fequal_than_enmy_on_dstflield)):
+        """if(controles_file(priomove.gmove)):
+            if(len(supports_of_dstfield) >= len(attacks_on_dstfield) and 
+               is_piece_lfe_attacker_on_dstfield_flag):
                 priomove.tactics.append(cTactic(priomove.TACTICS['controle-file'], priomove.SUB_TACTICS['good-deal']))"""
 
-        if(is_progress(match, priomove.gmove)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['progress'], priomove.SUB_TACTICS['undefined']))
+        if(is_progress(priomove.gmove)):
+            priomove.tactics.append(cTactic(priomove.TACTICS['progress'], priomove.SUB_TACTICS['neutral']))
 
         if(len(priomove.tactics) > 0):
             priomove.evaluate_priorities()
-        #else:
-            #priomove.tactics.append(cTactic(priomove.TACTICS['undefined'], priomove.SUB_TACTICS['undefined']))
-            #priomove.evaluate_priorities()
 
-    all_attacking.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
+    all_attacking.sort(key=attrgetter('prio'))
     for pmove in all_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -548,7 +560,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_discl_attacking.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
+    all_discl_attacking.sort(key=attrgetter('prio'))
     for pmove in all_discl_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -557,7 +569,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_supporting.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
+    all_supporting.sort(key=attrgetter('prio'))
     for pmove in all_supporting:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -566,7 +578,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_discl_supporting.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
+    all_discl_supporting.sort(key=attrgetter('prio'))
     for pmove in all_discl_supporting:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -575,7 +587,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_fork_defending.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
+    all_fork_defending.sort(key=attrgetter('prio'))
     for pmove in all_fork_defending:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -584,7 +596,7 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_fleeing.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
+    all_fleeing.sort(key=attrgetter('prio'))
     for pmove in all_fleeing:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
@@ -593,13 +605,10 @@ def rank_gmoves(match, priomoves, piecescnt):
             pmove.evaluate_priorities()
 
     excludes.clear()
-    all_running.sort(key=attrgetter('prio')) #sort(key = fetch_first_tactics)
+    all_running.sort(key=attrgetter('prio'))
     for pmove in all_running:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(cTactic(priomove.TACTICS['running-pawn'], priomove.SUB_TACTICS['downgraded']))
             pmove.evaluate_priorities()
-
-    priomoves.sort(key=attrgetter('prio'))
-

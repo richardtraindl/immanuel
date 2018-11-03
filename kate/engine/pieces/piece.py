@@ -45,7 +45,7 @@ class cPiece:
                         return False
         return True
 
-    def is_piece_stuck_new(self):
+    def is_piece_stuck(self):
         pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos)
         for piecedir in self.DIRS_ARY:
             if(pin_dir == piecedir):
@@ -144,7 +144,7 @@ class cPiece:
 
     # version for queen, rook and bishop - other pieces override function
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
-        from .. analyze_helper import field_touches_beyond
+        from .. analyze_helper import list_field_touches_beyond
 
         opp_color = self.match.oppcolor_of_piece(self.color)
         for step in self.STEPS:
@@ -153,7 +153,9 @@ class cPiece:
             x1, y1 = self.match.search(dstx, dsty, stepx , stepy)
             if(x1 is not None):
                 if(x1 == self.xpos and y1 == self.ypos):
-                    continue
+                    x1, y1 = self.match.search(x1, y1, stepx , stepy)
+                    if(x1 is None):
+                        continue
 
                 cpiece = cPiece(self.match, dstx, dsty)
                 if(cpiece.is_move_stuck(x1, y1)):
@@ -165,7 +167,7 @@ class cPiece:
                     attacked.append(ctouch_beyond)
                     ###
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    field_touches_beyond(self.match, opp_color, ctouch_beyond)
+                    list_field_touches_beyond(self.match, opp_color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
                 else:
@@ -175,7 +177,7 @@ class cPiece:
                     supported.append(ctouch_beyond)
                     ###
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    field_touches_beyond(self.match, self.color, ctouch_beyond)
+                    list_field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
 

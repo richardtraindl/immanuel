@@ -105,7 +105,7 @@ class cPawn(cPiece):
     def is_piece_trapped(self):
         return False # pawn cannot be trapped
 
-    #is_piece_stuck_new(self):
+    #is_piece_stuck(self):
         # works with inherited class
 
     #is_move_stuck(self, dstx, dsty)
@@ -304,7 +304,7 @@ class cPawn(cPiece):
         return False
 
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
-        from .. analyze_helper import field_touches_beyond
+        from .. analyze_helper import list_field_touches_beyond
 
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
@@ -329,18 +329,18 @@ class cPawn(cPiece):
                     attacked.append(ctouch_beyond)
                     ###
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    field_touches_beyond(self.match, opp_color, ctouch_beyond)
+                    list_field_touches_beyond(self.match, opp_color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
                 else:
-                    if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                         continue
 
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     supported.append(ctouch_beyond)
                     ###
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    field_touches_beyond(self.match, self.color, ctouch_beyond)
+                    list_field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
                     

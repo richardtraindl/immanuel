@@ -152,10 +152,10 @@ class cPrioMove:
         'good-deal' : 3,
         'downgraded' : 4,
         'bad-deal' : 5,
-        'undefined' : 6 }
+        'neutral' : 6 }
 
     TACTICS_TO_PRIO = {
-        TACTICS['defend-check'] : PRIO['prio1'],
+        TACTICS['defend-check'] : PRIO['prio5'],
         TACTICS['capture'] : PRIO['prio2'],
         TACTICS['attack-king'] : PRIO['prio2'],
         TACTICS['attack'] : PRIO['prio3'],
@@ -180,9 +180,9 @@ class cPrioMove:
         SUB_TACTICS['stormy'] : -10,
         SUB_TACTICS['urgent'] : -10,
         SUB_TACTICS['good-deal'] : -5,
-        SUB_TACTICS['undefined'] : 0, 
-        SUB_TACTICS['downgraded'] : 10,
-        SUB_TACTICS['bad-deal'] : 15 }
+        SUB_TACTICS['neutral'] : 0, 
+        SUB_TACTICS['downgraded'] : 5,
+        SUB_TACTICS['bad-deal'] : 10 }
 
     def __init__(self, gmove=None, prio=PRIO['prio5']):
         self.gmove = gmove
@@ -209,16 +209,17 @@ class cPrioMove:
             return self.tactics[idx].tactic
         else:
             return self.TACTICS['undefined']
-    
+
     def has_tactic(self, tactic):
         for tactitem in self.tactics:
-            if(tactitem.tactic == tactic.tactic):
+            if(tactitem.tactic == tactic.tactic and
+               tactitem.subtactic == tactic.subtactic):
                 return True
         return False
-
-    def has_tactic_ext(self, tactic):
+    
+    def has_domain_tactic(self, domain_tactic):
         for tactitem in self.tactics:
-            if(tactitem.tactic == tactic.tactic and tactitem.subtactic == tactic.subtactic):
+            if(tactitem.tactic == domain_tactic):
                 return True
         return False
 
@@ -228,7 +229,13 @@ class cPrioMove:
                 return True
         return False
 
-    def is_tactic_stormy(self):
+    def has_tactic_ext(self, tactic):
+        for tactitem in self.tactics:
+            if(tactitem.tactic == tactic.tactic and tactitem.subtactic == tactic.subtactic):
+                return True
+        return False
+
+    """def is_tactic_stormy(self):
         for tactitem in self.tactics:
             if(tactitem.tactic == self.TACTICS['defend-check'] or
                tactitem.tactic == self.TACTICS['promotion'] or
@@ -239,16 +246,62 @@ class cPrioMove:
                  tactitem.subtactic == self.SUB_TACTICS['urgent'] or
                  tactitem.subtactic == self.SUB_TACTICS['good-deal']))):
                 return True
+        return False"""
+
+    def is_tactic_selectiv(self):
+        for tactitem in self.tactics:
+            if((tactitem.tactic == self.TACTICS['promotion'] or
+                tactitem.tactic == self.TACTICS['capture'] or
+                tactitem.tactic == self.TACTICS['flee'] or
+                tactitem.tactic == self.TACTICS['block'] or
+                tactitem.tactic == self.TACTICS['support'] or
+                tactitem.tactic == self.TACTICS['discl-support'] or
+                tactitem.tactic == self.TACTICS['support-running-pawn'] or
+                tactitem.tactic == self.TACTICS['defend-fork'] or
+                tactitem.tactic == self.TACTICS['does-unpin']) and
+                (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
+                 tactitem.subtactic == self.SUB_TACTICS['urgent'] or
+                 tactitem.subtactic == self.SUB_TACTICS['good-deal'])):
+                return True
+        return False
+
+    def is_tactic_super_selectiv(self):
+        for tactitem in self.tactics:
+            if((tactitem.tactic == self.TACTICS['promotion'] or
+                  tactitem.tactic == self.TACTICS['capture'] or
+                  tactitem.tactic == self.TACTICS['flee'] or
+                  tactitem.tactic == self.TACTICS['block'] or
+                  tactitem.tactic == self.TACTICS['support'] or
+                  tactitem.tactic == self.TACTICS['discl-support'] or
+                  tactitem.tactic == self.TACTICS['support-running-pawn'] or
+                  tactitem.tactic == self.TACTICS['defend-fork'] or
+                  tactitem.tactic == self.TACTICS['does-unpin']) and
+                  (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
+                   tactitem.subtactic == self.SUB_TACTICS['urgent'] or
+                   tactitem.subtactic == self.SUB_TACTICS['good-deal'])):
+                return True
+        return False
+
+    def is_tactic_selectiv_old(self):
+        for tactitem in self.tactics:
+            if(tactitem.tactic == self.TACTICS['promotion'] or
+               (tactitem.tactic == self.TACTICS['capture'] and
+                 (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
+                  tactitem.subtactic == self.SUB_TACTICS['good-deal'])) or
+               (tactitem.tactic == self.TACTICS['attack'] and 
+                (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
+                 tactitem.subtactic == self.SUB_TACTICS['good-deal']))):
+                return True
         return False
 
     def is_tactic_urgent(self):
         for tactitem in self.tactics:
             if(tactitem.tactic == self.TACTICS['promotion'] or
-               tactitem.tactic == self.TACTICS['capture'] or
+               (tactitem.tactic == self.TACTICS['capture'] and
+                 (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
+                  tactitem.subtactic == self.SUB_TACTICS['good-deal'])) or
                (tactitem.tactic == self.TACTICS['attack'] and 
-                (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
-                 tactitem.subtactic == self.SUB_TACTICS['urgent'] or
-                 tactitem.subtactic == self.SUB_TACTICS['good-deal']))):
+                tactitem.subtactic == self.SUB_TACTICS['stormy'])):
                 return True
         return False
 
@@ -271,7 +324,7 @@ class cPrioMove:
         i = 1
         for tactitem in self.tactics:
             str_tactics += reverse_lookup(self.TACTICS, tactitem.tactic)
-            if(tactitem.subtactic != self.SUB_TACTICS['undefined']):
+            if(tactitem.subtactic != self.SUB_TACTICS['neutral']):
                 str_tactics += " * " + reverse_lookup(self.SUB_TACTICS, tactitem.subtactic)
             if(i < length):
                 str_tactics += delimiter
@@ -286,7 +339,7 @@ class cPrioMove:
                 str_end = " | "
             else:
                 str_end = ""
-            if(tactitem.subtactic != self.SUB_TACTICS['undefined']):
+            if(tactitem.subtactic != self.SUB_TACTICS['neutral']):
                 subtactic_str = " * " + reverse_lookup(self.SUB_TACTICS, tactitem.subtactic)
             else:
                 subtactic_str = ""

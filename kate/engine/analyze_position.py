@@ -6,7 +6,7 @@ from .pieces.bishop import cBishop
 from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
-from .analyze_helper import list_all_field_touches, is_piece_stuck_new
+from .analyze_helper import list_all_field_touches, is_piece_stuck
 
 
 def score_stucks(match):
@@ -20,7 +20,7 @@ def score_stucks(match):
             if(piece == PIECES['blk']):
                 continue
 
-            if(is_piece_stuck_new(match, x, y)):
+            if(is_piece_stuck(match, x, y)):
                 if(match.color_of_piece(piece) == COLORS['white']):
                     score += blackrate
                 else:

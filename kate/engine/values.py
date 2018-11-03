@@ -115,4 +115,9 @@ ATTACKED_SCORES = {
     PIECES['bQu'] : 40 
 }
 
+OPERATORS = {
+        'less'        : 0,
+        'equal'       : 1,
+        'fairy-equal' : 2,
+        'greater'     : 3 }
 

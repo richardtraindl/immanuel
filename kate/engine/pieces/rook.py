@@ -65,7 +65,7 @@ class cRook(cPiece):
     #is_piece_trapped(self)
         # works with inherited class
 
-    #is_piece_stuck_new(self):
+    #is_piece_stuck(self):
         # works with inherited class
 
     #is_move_stuck(self, dstx, dsty)

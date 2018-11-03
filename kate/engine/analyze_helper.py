@@ -18,6 +18,7 @@ class cDirTouch:
         self.fieldx = fieldx
         self.fieldy = fieldy
 
+
 def search_dir(match, fieldx, fieldy, direction, exclx, excly):
     srcx = fieldx
     srcy = fieldy
@@ -106,27 +107,27 @@ def search_opposed_pieces(match, color, fieldx, fieldy, excl_fieldx, excl_fieldy
     return oppenents
 
 
-def is_piece_stuck_new(match, srcx, srcy):
+def is_piece_stuck(match, srcx, srcy):
     piece = match.readfield(srcx, srcy)
 
     if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
         cpawn = cPawn(match, srcx, srcy)
-        return cpawn.is_piece_stuck_new()
+        return cpawn.is_piece_stuck()
     elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
         cknight = cKnight(match, srcx, srcy)
-        return cknight.is_piece_stuck_new()
+        return cknight.is_piece_stuck()
     elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
         cbishop = cBishop(match, srcx, srcy)
-        return cbishop.is_piece_stuck_new()
+        return cbishop.is_piece_stuck()
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
         crook = cRook(match, srcx, srcy)
-        return crook.is_piece_stuck_new()
+        return crook.is_piece_stuck()
     elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         cqueen = cQueen(match, srcx, srcy)
-        return cqueen.is_piece_stuck_new()
+        return cqueen.is_piece_stuck()
     else:
         cking = cKing(match, srcx, srcy)
-        return cking.is_piece_stuck_new()
+        return cking.is_piece_stuck()
 
 
 def list_all_field_touches(match, color, fieldx, fieldy):
@@ -151,7 +152,7 @@ def list_all_field_touches(match, color, fieldx, fieldy):
     return frdlytouches, enmytouches
 
 
-def field_touches_beyond(match, color, ctouch_beyond):
+def list_field_touches_beyond(match, color, ctouch_beyond):
     crookfield = rookfield.cRookField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
     crookfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
 
@@ -201,310 +202,151 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
 
-def piece_is_lower_equal_than_captured(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-    
-    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        return True
+def is_fork_field(match, color, forkx, forky):
+    opp_color = REVERSED_COLORS[color]
+    frdlytouches, enmytouches = list_all_field_touches(match, color, forkx, forky)
+    if(len(frdlytouches) >= len(enmytouches)):
+        return False
+    crookfield = rookfield.cRookField(match, forkx, forky)
+    if(crookfield.is_field_touched(opp_color, 2)):
+        if(crookfield.count_touches(color) > 1):
+            return True
+    cbishopfield = bishopfield.cBishopField(match, forkx, forky)
+    if(cbishopfield.is_field_touched(opp_color, 2)):
+        if(cbishopfield.count_touches(color) > 1):
+            return True
+    cknightfield = knightfield.cKnightField(match, forkx, forky)
+    if(cknightfield.is_field_touched(opp_color, 2)):
+        if(cknightfield.count_touches(color) > 1):
+            return True
+    cpawnfield = pawnfield.cPawnField(match, forkx, forky)
+    if(cpawnfield.is_field_touched(opp_color, 2)):
+        if(cpawnfield.count_touches(color) > 1):
+            return True
+    ckingfield = kingfield.cKingField(match, forkx, forky)
+    if(ckingfield.is_field_touched(opp_color)):
+        if(ckingfield.count_touches(color) > 1):
+            return True
+    return False
 
-    captured_piece = match.readfield(gmove.dstx, gmove.dsty)
-    if(PIECES_RANK[piece] <= PIECES_RANK[captured_piece]):
+
+def is_piece_le_attacker_on_srcfield(gmove, enmytouches_on_srcfield):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    for enmy in enmytouches_on_srcfield:
+        if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wKg']]):
+            continue
+        if(PIECES_RANK[piece] > PIECES_RANK[enmy.piece]):
+            return False
+    return True
+
+
+def is_piece_le_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    for enmy in enmytouches_on_dstfield:
+        if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wKg']]):
+            continue
+        if(PIECES_RANK[piece] > PIECES_RANK[enmy.piece]):
+            return False
+    return True
+
+
+def is_piece_lfe_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    for enmy in enmytouches_on_dstfield:
+        if(PIECES_RANK[piece] > PIECES_RANK[enmy.piece]):
+            if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wKg']]):
+                continue
+            if(PIECES_RANK[enmy.piece] == PIECES_RANK[PIECES['wPw']]):
+                return False
+            elif(PIECES_RANK[piece] == PIECES_RANK[PIECES['wQu']]):
+                return False
+    return True
+
+
+def is_supported_weak(gmove, from_dstfield_supported):
+    gmove.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    for supported in from_dstfield_supported:
+        if(len(supported.attacker_beyond) > len(supported.supporter_beyond)):
+            gmove.match.undo_move()
+            return True
+        elif(gmove.match.is_soft_pin(supported.fieldx, supported.fieldy)):
+            gmove.match.undo_move()
+            return True
+    gmove.match.undo_move()
+    return False
+
+
+def is_supported_le_attacker(from_dstfield_supported):
+    for supported in from_dstfield_supported:
+        for attacker_beyond in supported.attacker_beyond:
+            if(PIECES_RANK[supported.piece] > PIECES_RANK[attacker_beyond.piece]):
+                return False
+    return True
+
+
+def is_discl_supported_weak(discl_supported):
+    for ctouch_beyond in discl_supported:
+        if(len(ctouch_beyond.attacker_beyond) > len(ctouch_beyond.supporter_beyond)):
+            return True
+    return False
+
+
+def is_discl_attacked_supported(discl_attacked):
+    for ctouch_beyond in discl_attacked:
+        if(len(ctouch_beyond.supporter_beyond) > 0):
+            return True
+    return False
+
+
+def is_supported_running_pawn(match, from_dstfield_supported):
+    if(match.is_endgame() == False or len(from_dstfield_supported) == 0):
+        return False
+    for supported in from_dstfield_supported:
+        if(supported.piece == PIECES['wPw'] or supported.piece == PIECES['bPw']):
+            cpawn = cPawn(match, supported.fieldx, supported.fieldy)
+            if(cpawn.is_running()):
+                return True
+    return False
+
+
+def is_attacked_piece_king(from_dstfield_attacked):
+    for attacked in from_dstfield_attacked:
+        if(attacked.piece == PIECES['wKg'] or attacked.piece == PIECES['bKg']):
+            return True
+    return False
+
+
+def is_captured_pinned_or_soft_pinned(gmove):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    if(piece != PIECES['wKg'] and piece != PIECES['bKg']):
+        gmove.match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
+    is_soft_pin, pinning_piece = cValidator.is_soft_pin(gmove.match, gmove.dstx, gmove.dsty)
+    gmove.match.writefield(gmove.srcx, gmove.srcy, piece)
+    if(is_soft_pin and 
+       (pinning_piece.fieldx != gmove.srcx or pinning_piece.fieldy != gmove.srcy)):
         return True
     else:
         return False
 
 
-def srcfield_is_supported(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-
-    return match.is_field_touched(match.color_of_piece(piece), gmove.srcx, gmove.srcy, 0)
-
-
-def piece_is_lower_equal_than_enemy_on_srcfield(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-
-    enemies = list_field_touches(match, match.oppcolor_of_piece(piece), gmove.srcx, gmove.srcy)
-
-    for enemy in enemies:
-        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
-            return False
-
-    return True
+def is_attacked_soft_pinned(gmove, from_dstfield_attacked):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    if(piece != PIECES['wKg'] and piece != PIECES['bKg']):
+        gmove.match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
+    for attacked in from_dstfield_attacked:
+        if(gmove.match.is_soft_pin(attacked.fieldx, attacked.fieldy)):
+            gmove.match.writefield(gmove.srcx, gmove.srcy, piece)
+            return True
+    gmove.match.writefield(gmove.srcx, gmove.srcy, piece)
+    return False
     
 
-def srcfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-    
-    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
-
-    frdlytouches, enmytouches = list_all_field_touches(match, match.color_of_piece(piece), gmove.srcx, gmove.srcy)
-    
-    match.writefield(gmove.srcx, gmove.srcy, piece)
-
-    return len(frdlytouches) >= len(enmytouches)
-
-
-def piece_is_lower_equal_than_enemy_on_dstfield(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-
-    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
-
-    enemies = list_field_touches(match, match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
-
-    match.writefield(gmove.srcx, gmove.srcy, piece)
-
-    for enemy in enemies:
-        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
-            return False
-
-    return True
-
-
-def piece_is_lower_fairy_equal_than_enemy_on_dstfield(match, gmove):
-    flag = True
-
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-
-    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
-
-    enemies = list_field_touches(match, match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty)
-    for enemy in enemies:
-        if(PIECES_RANK[piece] > PIECES_RANK[enemy.piece]):
-            if(PIECES_RANK[enemy.piece] == PIECES_RANK[PIECES['wPw']]):
-                flag = False
-                break
-            if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wQu']]):
-                flag = False
-                break
-
-    match.writefield(gmove.srcx, gmove.srcy, piece)
-
-    return flag
-
-
-def dstfield_is_supported(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-    
-    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])    
-
-    is_touched = match.is_field_touched(match.color_of_piece(piece), gmove.dstx, gmove.dsty, 0)
-
-    match.writefield(gmove.srcx, gmove.srcy, piece)
-    
-    return is_touched
-
-
-def dstfield_is_attacked(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-    
-    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])    
-
-    is_touched = match.is_field_touched( match.oppcolor_of_piece(piece), gmove.dstx, gmove.dsty, 0)
-
-    match.writefield(gmove.srcx, gmove.srcy, piece)
-
-    return is_touched
-
-
-def dstfield_count_of_supporter_is_equal_or_higher_than_count_of_attacker(match, gmove):
-    piece = match.readfield(gmove.srcx, gmove.srcy)
-    
-    match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
-
-    frdlytouches, enmytouches = list_all_field_touches(match, match.color_of_piece(piece), gmove.dstx, gmove.dsty)
-
-    match.writefield(gmove.srcx, gmove.srcy, piece)
-
-    return len(frdlytouches) >= len(enmytouches)
-
-
-def is_discl_attacked_supported(discl_attacked):
-    if(len(discl_attacked) == 0):
+def is_piece_le_captured(gmove):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+        return True
+    captured_piece = gmove.match.readfield(gmove.dstx, gmove.dsty)
+    if(PIECES_RANK[piece] <= PIECES_RANK[captured_piece]):
+        return True
+    else:
         return False
-
-    for ctouch_beyond in discl_attacked:
-        if(len(ctouch_beyond.supporter_beyond) > 0):
-            return True
-
-    return False
-
-
-def is_discl_supported_attacked_(discl_supported):
-    if(len(discl_supported) == 0):
-        return False
-
-    for ctouch_beyond in discl_supported:
-        if(len(ctouch_beyond.attacker_beyond) > 0):
-            return True
-
-    return False
-
-
-def is_discl_supported_weak(discl_supported):
-    if(len(discl_supported) == 0):
-        return False
-
-    for ctouch_beyond in discl_supported:
-        if(len(ctouch_beyond.attacker_beyond) > len(ctouch_beyond.supporter_beyond)):
-            return True
-
-    return False
-
-
-def is_fork_field(match, color, forkx, forky):
-    opp_color = REVERSED_COLORS[color]
-
-    frdlytouches, enmytouches = list_all_field_touches(match, color, forkx, forky)
-    if(len(frdlytouches) >= len(enmytouches)):
-        return False
-
-    crookfield = rookfield.cRookField(match, forkx, forky)
-    if(crookfield.is_field_touched(opp_color, 2)):
-        if(crookfield.count_touches(color) > 1):
-            return True
-
-    cbishopfield = bishopfield.cBishopField(match, forkx, forky)
-    if(cbishopfield.is_field_touched(opp_color, 2)):
-        if(cbishopfield.count_touches(color) > 1):
-            return True
-
-    cknightfield = knightfield.cKnightField(match, forkx, forky)
-    if(cknightfield.is_field_touched(opp_color, 2)):
-        if(cknightfield.count_touches(color) > 1):
-            return True
-
-    cpawnfield = pawnfield.cPawnField(match, forkx, forky)
-    if(cpawnfield.is_field_touched(opp_color, 2)):
-        if(cpawnfield.count_touches(color) > 1):
-            return True
-
-    ckingfield = kingfield.cKingField(match, forkx, forky)
-    if(ckingfield.is_field_touched(opp_color)):
-        if(ckingfield.count_touches(color) > 1):
-            return True
-
-    return False
-
-
-def is_piece_attacked(attacked, piece1, piece2):
-    for ctouch_beyond in attacked:
-        if(ctouch_beyond.piece == piece1 or ctouch_beyond.piece == piece2):
-            return True
-    return False
-
-
-def is_attacked_supported(attacked):
-    for ctouch_beyond in attacked:
-        if(len(ctouch_beyond.supporter_beyond) > 0):
-            return True
-    return False
-
-
-def is_attacked_weak(match, attacked):
-    for ctouch_beyond in attacked:
-        if(len(ctouch_beyond.attacker_beyond) > len(ctouch_beyond.supporter_beyond)):
-            return True
-        elif(match.is_soft_pin(ctouch_beyond.fieldx, ctouch_beyond.fieldy)):
-            return True
-    return False
-
-
-def is_attacked_pinned(match, attacked):
-    if(len(attacked) == 0):
-        return False
-
-    for ctouch_beyond in attacked:
-        pindir = match.evaluate_pin_dir(ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-        if(pindir != match.DIRS['undefined']):
-            return True
-
-    return False
-
-
-def is_attacked_soft_pinned(match, attacked):
-    if(len(attacked) == 0):
-        return False
-
-    for ctouch_beyond in attacked:
-        if(match.is_soft_pin(ctouch_beyond.fieldx, ctouch_beyond.fieldy)):
-            return True
-
-    return False
-
-
-def is_attacked_higher_than_piece(match, attacked):
-    for ctouch_beyond in attacked:
-        piece = match.readfield(ctouch_beyond.agent_srcx, ctouch_beyond.agent_srcy)
-        if(PIECES_RANK[ctouch_beyond.piece] > PIECES_RANK[piece]):
-            return True
-
-    return False
-
-
-def is_attacked_higher_equal_than_piece(match, attacked):
-    for ctouch_beyond in attacked:
-        piece = match.readfield(ctouch_beyond.agent_srcx, ctouch_beyond.agent_srcy)
-
-        if(PIECES_RANK[ctouch_beyond.piece] >= PIECES_RANK[piece]):
-            return True
-
-    return False
-
-
-def is_attacked_before_move(priomove, attacked):
-    match = priomove.gmove.match
-    for tbeyond in attacked:
-        piece = match.readfield(tbeyond.agent_srcx, tbeyond.agent_srcy)
-        if(piece == PIECES['wPw'] or piece == PIECES['bPw'] or 
-           piece == PIECES['wKn'] or piece == PIECES['bKn'] or 
-           piece == PIECES['wKg'] or piece == PIECES['bKg']):
-            return False
-        else:
-            dir1 = cValidator.dir_for_move(match, tbeyond.agent_srcx, tbeyond.agent_srcy, tbeyond.agent_dstx, tbeyond.agent_dsty)
-            dir2 = cValidator.dir_for_move(match, tbeyond.agent_srcx, tbeyond.agent_srcy, tbeyond.fieldx, tbeyond.fieldy)
-            if(dir1 == dir2 or match.REVERSE_DIRS[dir1] == dir2):
-                continue
-            else:
-                return False
-    return True
-
-
-def is_supported_weak(match, supported):
-    for ctouch_beyond in supported:
-        if(len(ctouch_beyond.attacker_beyond) > len(ctouch_beyond.supporter_beyond)):
-            return True
-        elif(match.is_soft_pin(ctouch_beyond.fieldx, ctouch_beyond.fieldy)):
-            return True
-    return False
-
-
-def is_supported_attacked(supported):
-    for ctouch_beyond in supported:
-        if(len(ctouch_beyond.attacker_beyond) > 0):
-            return True
-    return False
-
-
-def is_supported_lower_equal_than_attacker(match, supported):
-    if(len(supported) == 0):
-        return False
-
-    for ctouch_beyond in supported:
-        for attacker_beyond in ctouch_beyond.attacker_beyond:
-            if(PIECES_RANK[ctouch_beyond.piece] > PIECES_RANK[attacker_beyond.piece]):
-                return False
-
-    return True
-
-
-def is_supported_running_pawn(match, supported):
-    if(match.is_endgame() == False or len(supported) == 0):
-        return False
-
-    for ctouch_beyond in supported:
-        if(ctouch_beyond.piece == PIECES['wPw'] or ctouch_beyond.piece == PIECES['bPw']):
-            cpawn = cPawn(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-            if(cpawn.is_running()):
-                return True
-    return False
-

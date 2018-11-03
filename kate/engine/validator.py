@@ -232,9 +232,9 @@ class cValidator:
             if(x1 is not None):
                 friend = match.readfield(x1, y1)
                 if(match.color_of_piece(friend) == color and 
-                   match.PIECES_RANK[friend] > match.PIECES_RANK[piece] and 
-                   match.PIECES_RANK[friend] > match.PIECES_RANK[enemy.piece]):
-                    return True
+                   PIECES_RANK[friend] > PIECES_RANK[piece] and 
+                   PIECES_RANK[friend] > PIECES_RANK[enemy.piece]):
+                    return True, enemy
 
         enemies.clear()
         cbishopfield = cBishopField(match, srcx, srcy)
@@ -246,10 +246,10 @@ class cValidator:
             if(x1 is not None):
                 friend = match.readfield(x1, y1)
                 if(match.color_of_piece(friend) == color and 
-                   match.PIECES_RANK[friend] > match.PIECES_RANK[piece] and 
-                   match.PIECES_RANK[friend] > match.PIECES_RANK[enemy.piece]):
-                    return True
-        return False
+                   PIECES_RANK[friend] > PIECES_RANK[piece] and 
+                   PIECES_RANK[friend] > PIECES_RANK[enemy.piece]):
+                    return True, enemy
+        return False, None
 
     @classmethod
     def dir_for_move(cls, match, srcx, srcy, dstx, dsty):

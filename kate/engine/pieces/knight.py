@@ -63,7 +63,7 @@ class cKnight(cPiece):
     def is_piece_trapped(self):
         return False # knight cannot be trapped
 
-    #is_piece_stuck_new(self):
+    #is_piece_stuck(self):
         # works with inherited class
 
     def is_move_stuck(self, dstx, dsty):
@@ -91,10 +91,10 @@ class cKnight(cPiece):
         # works with inherited class
 
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
-        from .. analyze_helper import field_touches_beyond
+        from .. analyze_helper import list_field_touches_beyond
 
         cknight = cKnight(self.match, dstx, dsty)
-        if(cknight.is_piece_stuck_new()):
+        if(cknight.is_piece_stuck()):
             return
 
         opp_color =  self.match.oppcolor_of_piece(self.piece)
@@ -112,7 +112,7 @@ class cKnight(cPiece):
                     attacked.append(ctouch_beyond)
                     ###
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    field_touches_beyond(self.match, opp_color, ctouch_beyond)
+                    list_field_touches_beyond(self.match, opp_color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
                 else:
@@ -122,7 +122,7 @@ class cKnight(cPiece):
                     supported.append(ctouch_beyond)
                     ###
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    field_touches_beyond(self.match, self.color, ctouch_beyond)
+                    list_field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
 
@@ -158,7 +158,7 @@ class cKnight(cPiece):
 
         score = 0
 
-        if(self.is_piece_stuck_new()):
+        if(self.is_piece_stuck()):
             return score
 
         opp_color = self.match.oppcolor_of_piece(self.piece)
@@ -194,7 +194,7 @@ class cKnight(cPiece):
     def score_supports(self):
         score = 0
 
-        if(self.is_piece_stuck_new()):
+        if(self.is_piece_stuck()):
             return score
 
         opp_color = self.match.oppcolor_of_piece(self.piece)

@@ -1,5 +1,7 @@
 from .. values import *
 from . piece import *
+from . rook import cRook
+from . bishop import cBishop
 
 
 class cKing(cPiece):
@@ -74,7 +76,7 @@ class cKing(cPiece):
     def is_piece_trapped(self):
         return False # king cannot be trapped
 
-    def is_piece_stuck_new(self):
+    def is_piece_stuck(self):
         return False # king cannot stuck
 
     def is_move_stuck(self, dstx, dsty):
@@ -255,7 +257,7 @@ class cKing(cPiece):
         return True
 
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
-        from .. analyze_helper import field_touches_beyond
+        from .. analyze_helper import list_field_touches_beyond
 
         opp_color = self.match.oppcolor_of_piece(self.piece)
         for step in self.STEPS:
@@ -274,7 +276,7 @@ class cKing(cPiece):
                     attacked.append(ctouch_beyond)
                     ###
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    field_touches_beyond(self.match, opp_color, ctouch_beyond)
+                    list_field_touches_beyond(self.match, opp_color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
                 else:
@@ -282,7 +284,7 @@ class cKing(cPiece):
                     supported.append(ctouch_beyond)
                     ###
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    field_touches_beyond(self.match, self.color, ctouch_beyond)
+                    list_field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
 
@@ -395,11 +397,11 @@ class cKing(cPiece):
 
             direction = cRook.dir_for_move(self.xpos, self.ypos, enemy.fieldx, enemy.fieldy)
             if(direction != self.DIRS['undefined']):
-                direction, step_x, step_y = cRook.step_for_dir(direction)
+                step_x, step_y = cRook.step_for_dir(direction)
             else:
                 direction = cBishop.dir_for_move(self.xpos, self.ypos, enemy.fieldx, enemy.fieldy)
                 if(direction != self.DIRS['undefined']):
-                    direction, step_x, step_y = cBishop.step_for_dir(direction)
+                    step_x, step_y = cBishop.step_for_dir(direction)
                 else:
                     return False
 

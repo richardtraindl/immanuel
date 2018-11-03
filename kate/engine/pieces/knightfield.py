@@ -20,13 +20,13 @@ class cKnightField(cPieceField):
                         return True
                     elif(mode == 1):
                         cknight = cKnight(self.match, x1, y1)
-                        if(cknight.is_piece_stuck_new()):
+                        if(cknight.is_piece_stuck()):
                             continue
                         else:
                             return True
                     else: #mode == 2
                         cknight = cKnight(self.match, x1, y1)
-                        if(cknight.is_piece_stuck_new() or self.match.is_soft_pin(x1, y1)):
+                        if(cknight.is_piece_stuck() or self.match.is_soft_pin(x1, y1)):
                             continue
                         else:
                             return True
@@ -40,7 +40,7 @@ class cKnightField(cPieceField):
                 piece = self.match.readfield(x1, y1)
                 if(piece == self.white_faces[0] or piece == self.black_faces[0]):
                     cknight = cKnight(self.match, x1, y1)
-                    if(cknight.is_piece_stuck_new()):
+                    if(cknight.is_piece_stuck()):
                         continue
                     if(self.match.color_of_piece(piece) == color):
                         frdlytouches.append(cTouch(piece, x1, y1))
@@ -57,7 +57,7 @@ class cKnightField(cPieceField):
                 if( (color == COLORS['white'] and piece == self.white_faces[0]) or
                     (color == COLORS['black'] and piece == self.black_faces[0]) ):
                     cknight = cKnight(self.match, x1, y1)
-                    if(cknight.is_piece_stuck_new()):
+                    if(cknight.is_piece_stuck()):
                         continue
                     else:
                         touches.append(cTouch(piece, x1, y1))
