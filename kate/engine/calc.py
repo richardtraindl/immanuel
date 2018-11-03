@@ -55,23 +55,23 @@ class SearchLimits:
     def __init__(self, match):
         if(match.level == match.LEVELS['blitz']):
             self.move_count = 8
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 5
-            self.dpth_max = 8
+            self.dpth_stage1 = 2
+            self.dpth_stage2 = 4
+            self.dpth_max = 10
         elif(match.level == match.LEVELS['low']):
             self.move_count = 12
-            self.dpth_stage1 = 4
-            self.dpth_stage2 = 6
+            self.dpth_stage1 = 3
+            self.dpth_stage2 = 5
             self.dpth_max = 10
         elif(match.level == match.LEVELS['medium']):
             self.move_count = 16
-            self.dpth_stage1 = 5
-            self.dpth_stage2 = 7
+            self.dpth_stage1 = 4
+            self.dpth_stage2 = 6
             self.dpth_max = 12
         else:
             self.move_count = 20
-            self.dpth_stage1 = 6
-            self.dpth_stage2 = 8
+            self.dpth_stage1 = 5
+            self.dpth_stage2 = 7
             self.dpth_max = 12
 
         if(match.is_endgame()):
@@ -200,6 +200,8 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
 
         if(depth == 1):
             prnt_before_calc(match, count, priomove)
+        if(depth == 2):
+            print(".", end="")
 
         if(priomove.has_domain_tactic(cPrioMove.TACTICS['tactical-draw'])):
             newcandidates.clear()
