@@ -157,14 +157,14 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         resort_if_last_move_is_bad_capture(priomoves, last_pmove, 25)
         count = count_up_to_prio(priomoves, 25)
         if(count == 0):
-            return min(slimits.mvcnt_stage1, priomoves)
+            return min(slimits.mvcnt_stage1, len(priomoves))
         else:
             return min(slimits.mvcnt_stage1, count)
     elif(depth <= slimits.dpth_stage2):
         resort_if_last_move_is_bad_capture(priomoves, last_pmove, 20)
         count = count_up_to_prio(priomoves, 20)
         if(count == 0):
-            return min(slimits.mvcnt_stage2, priomoves)
+            return min(slimits.mvcnt_stage2, len(priomoves))
         else:
             return min(slimits.mvcnt_stage2, count)
     elif(depth <= slimits.dpth_max):
