@@ -54,23 +54,27 @@ class Msgs:
 class SearchLimits:
     def __init__(self, match):
         if(match.level == match.LEVELS['blitz']):
-            self.move_count = 8
-            self.dpth_stage1 = 2
-            self.dpth_stage2 = 4
+            self.mvcnt_stage1 = 8
+            self.mvcnt_stage2 = 8
+            self.dpth_stage1 = 1
+            self.dpth_stage2 = 3
             self.dpth_max = 10
         elif(match.level == match.LEVELS['low']):
-            self.move_count = 12
-            self.dpth_stage1 = 3
+            self.mvcnt_stage1 = 12
+            self.mvcnt_stage2 = 8
+            self.dpth_stage1 = 2
             self.dpth_stage2 = 5
             self.dpth_max = 10
         elif(match.level == match.LEVELS['medium']):
-            self.move_count = 16
-            self.dpth_stage1 = 4
+            self.mvcnt_stage1 = 16
+            self.mvcnt_stage2 = 12
+            self.dpth_stage1 = 3
             self.dpth_stage2 = 6
             self.dpth_max = 12
         else:
-            self.move_count = 20
-            self.dpth_stage1 = 5
+            self.mvcnt_stage1 = 20
+            self.mvcnt_stage2 = 12
+            self.dpth_stage1 = 4
             self.dpth_stage2 = 7
             self.dpth_max = 12
 
@@ -97,42 +101,50 @@ def count_up_to_prio(priomoves, prio_limit):
             count += 1
     return count
 
-def resort_if_challenge(priomoves, last_pmove, new_prio, selectiv):
+def resort_if_last_move_is_bad_capture(priomoves, last_pmove, new_prio):
     if(last_pmove and last_pmove.has_tactic(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['bad-deal']))):
         good_capture_moves = []
         bad_capture_moves = []
         silent_moves = []
-        if(selectiv):
-            for priomove in priomoves:
-                if(priomove.has_domain_tactic(cPrioMove.TACTICS['capture'])):
-                    if(priomove.has_subtactic('bad-deal')):
+        for priomove in priomoves:
+            if(priomove.has_domain_tactic(cPrioMove.TACTICS['capture'])):
+                if(priomove.has_subtactic('bad-deal')):
+                    bad_capture_moves.append(priomove)
+                else:
+                    good_capture_moves.append(priomove)
+            else:
+                silent_moves.append(priomove)
+        if(len(good_capture_moves) == 0 and len(bad_capture_moves) > 0):
+            for bad_capture_move in bad_capture_moves:
+                bad_capture_move.prio = min(bad_capture_move.prio, new_prio)
+            if(len(silent_moves) > 0):
+                silent_moves[0].prio = min(silent_moves[0].prio, new_prio - 1)
+            priomoves.sort(key=attrgetter('prio'))
+
+def resort_if_last_move_is_capture(priomoves, last_pmove, new_prio):
+    challenge = False
+    if(last_pmove and last_pmove.has_domain_tactic(cPrioMove.TACTICS['capture'])):
+        good_capture_moves = []
+        bad_capture_moves = []
+        silent_moves = []
+        last_pmove_is_bad_deal = last_pmove.has_subtactic('bad-deal')
+        for priomove in priomoves:
+            if(priomove.has_domain_tactic(cPrioMove.TACTICS['capture'])):
+                if(priomove.has_subtactic('bad-deal')):
+                    if(last_pmove_is_bad_deal):
                         priomove.prio = min(priomove.prio, new_prio)
                         bad_capture_moves.append(priomove)
-                    else:
-                        priomove.prio = min(priomove.prio, new_prio - 2)
-                        good_capture_moves.append(priomove)
+                        challenge = True
                 else:
-                    priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio5'])
-                    silent_moves.append(priomove)
+                    priomove.prio = min(priomove.prio, new_prio - 2)
+                    good_capture_moves.append(priomove)
+                    challenge = True
+            else:
+                priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio5'])
+                silent_moves.append(priomove)
+        if(last_pmove_is_bad_deal):
             silent_moves[0].prio = min(silent_moves[0].prio, new_prio - 1)
-        else:
-            for priomove in priomoves:
-                if(priomove.has_domain_tactic(cPrioMove.TACTICS['capture'])):
-                    if(priomove.has_subtactic('bad-deal')):
-                        bad_capture_moves.append(priomove)
-                    else:
-                        good_capture_moves.append(priomove)
-                else:
-                    silent_moves.append(priomove)
-            if(len(good_capture_moves) == 0 and len(bad_capture_moves) > 0):
-                for bad_capture_move in bad_capture_moves:
-                    bad_capture_move.prio = min(bad_capture_move.prio, new_prio)
-                if(len(silent_moves) > 0):
-                    silent_moves[0].prio = min(silent_moves[0].prio, new_prio - 1)
-        priomoves.sort(key=attrgetter('prio'))
-        return True
-    else:
-        return False
+    return challenge
 
 def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     if(len(priomoves) == 0 or depth > slimits.dpth_max):
@@ -142,17 +154,22 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return len(priomoves)
 
     if(depth <= slimits.dpth_stage1):
-        resort_if_challenge(priomoves, last_pmove, 25, False)
-        if(match.level == match.LEVELS['blitz']):
-            return min(slimits.move_count, count_up_to_prio(priomoves, 25))
+        resort_if_last_move_is_bad_capture(priomoves, last_pmove, 25)
+        count = count_up_to_prio(priomoves, 25)
+        if(count == 0):
+            return min(slimits.mvcnt_stage1, priomoves)
         else:
-            return max(slimits.move_count, count_up_to_prio(priomoves, 25))
+            return min(slimits.mvcnt_stage1, count)
     elif(depth <= slimits.dpth_stage2):
-        resort_if_challenge(priomoves, last_pmove, 20, False)
-        return min(slimits.move_count, count_up_to_prio(priomoves, 20))
+        resort_if_last_move_is_bad_capture(priomoves, last_pmove, 20)
+        count = count_up_to_prio(priomoves, 20)
+        if(count == 0):
+            return min(slimits.mvcnt_stage2, priomoves)
+        else:
+            return min(slimits.mvcnt_stage2, count)
     elif(depth <= slimits.dpth_max):
-        if(resort_if_challenge(priomoves, last_pmove, 15, True)):
-            return min(slimits.move_count, count_up_to_prio(priomoves, 15))
+        if(resort_if_last_move_is_capture(priomoves, last_pmove, 15)):
+            return count_up_to_prio(priomoves, 15)
         else:
             return 0
     else:
@@ -200,8 +217,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
 
         if(depth == 1):
             prnt_before_calc(match, count, priomove)
-        if(depth == 2):
-            print(".", end="")
 
         if(priomove.has_domain_tactic(cPrioMove.TACTICS['tactical-draw'])):
             newcandidates.clear()
