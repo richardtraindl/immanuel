@@ -54,28 +54,24 @@ class Msgs:
 class SearchLimits:
     def __init__(self, match):
         if(match.level == match.LEVELS['blitz']):
-            self.mvcnt_stage1 = 8
-            self.mvcnt_stage2 = 8
-            self.dpth_stage1 = 1
-            self.dpth_stage2 = 3
-            self.dpth_max = 10
-        elif(match.level == match.LEVELS['low']):
-            self.mvcnt_stage1 = 12
-            self.mvcnt_stage2 = 8
+            self.mvcnt = 8
             self.dpth_stage1 = 2
-            self.dpth_stage2 = 5
-            self.dpth_max = 10
-        elif(match.level == match.LEVELS['medium']):
-            self.mvcnt_stage1 = 16
-            self.mvcnt_stage2 = 12
+            self.dpth_stage2 = 6
+            self.dpth_max = 8
+        elif(match.level == match.LEVELS['low']):
+            self.mvcnt = 12
             self.dpth_stage1 = 3
             self.dpth_stage2 = 6
-            self.dpth_max = 12
-        else:
-            self.mvcnt_stage1 = 20
-            self.mvcnt_stage2 = 12
+            self.dpth_max = 10
+        elif(match.level == match.LEVELS['medium']):
+            self.mvcnt = 16
             self.dpth_stage1 = 4
             self.dpth_stage2 = 7
+            self.dpth_max = 12
+        else:
+            self.mvcnt = 20
+            self.dpth_stage1 = 4
+            self.dpth_stage2 = 8
             self.dpth_max = 12
 
         if(match.is_endgame()):
@@ -101,81 +97,52 @@ def count_up_to_prio(priomoves, prio_limit):
             count += 1
     return count
 
-def resort_if_last_move_is_bad_capture(priomoves, last_pmove, new_prio):
-    if(last_pmove and last_pmove.has_tactic(cTactic(cPrioMove.TACTICS['capture'], cPrioMove.SUB_TACTICS['bad-deal']))):
-        good_capture_moves = []
-        bad_capture_moves = []
-        silent_moves = []
-        for priomove in priomoves:
-            if(priomove.has_domain_tactic(cPrioMove.TACTICS['capture'])):
-                if(priomove.has_subtactic('bad-deal')):
-                    bad_capture_moves.append(priomove)
-                else:
-                    good_capture_moves.append(priomove)
-            else:
-                silent_moves.append(priomove)
-        if(len(good_capture_moves) == 0 and len(bad_capture_moves) > 0):
-            for bad_capture_move in bad_capture_moves:
-                bad_capture_move.prio = min(bad_capture_move.prio, new_prio)
-            if(len(silent_moves) > 0):
-                silent_moves[0].prio = min(silent_moves[0].prio, new_prio - 1)
-            priomoves.sort(key=attrgetter('prio'))
+def resort_for_stormy_moves(priomoves, new_prio, last_pmove_capture_bad_deal, cnt_of_checks_in_stage):
+    count_of_stormy = 0
+    count_of_bad_captures = 0
+    first_silent = None
+    for priomove in priomoves:
+        if(priomove.is_tactic_stormy(cnt_of_checks_in_stage)):
+            count_of_stormy += 1
+            priomove.prio = min(priomove.prio, new_prio - 2)
+        elif(last_pmove_capture_bad_deal):
+            if(priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['captures'], cPrioMove.SUB_TACTICS['bad-deal']))):
+                count_of_bad_captures += 1
+                priomove.prio = min(priomove.prio, new_prio)
+        else:
+            if(first_silent is None):
+                first_silent = priomove
+    if(count_of_bad_captures > 0 and count_of_stormy == 0 and first_silent):
+        first_silent.prio = min(first_silent.prio, new_prio - 1)
+    priomoves.sort(key=attrgetter('prio'))
 
-def resort_if_last_move_is_capture(priomoves, last_pmove, new_prio):
-    challenge = False
-    if(last_pmove and last_pmove.has_domain_tactic(cPrioMove.TACTICS['capture'])):
-        good_capture_moves = []
-        bad_capture_moves = []
-        silent_moves = []
-        last_pmove_is_bad_deal = last_pmove.has_subtactic('bad-deal')
-        for priomove in priomoves:
-            if(priomove.has_domain_tactic(cPrioMove.TACTICS['capture'])):
-                if(priomove.has_subtactic('bad-deal')):
-                    if(last_pmove_is_bad_deal):
-                        priomove.prio = min(priomove.prio, new_prio)
-                        bad_capture_moves.append(priomove)
-                        challenge = True
-                else:
-                    priomove.prio = min(priomove.prio, new_prio - 2)
-                    good_capture_moves.append(priomove)
-                    challenge = True
-            else:
-                priomove.prio = min(priomove.prio, cPrioMove.PRIO['prio5'])
-                silent_moves.append(priomove)
-        if(last_pmove_is_bad_deal):
-            silent_moves[0].prio = min(silent_moves[0].prio, new_prio - 1)
-    return challenge
-
-def select_maxcount(match, priomoves, depth, slimits, last_pmove):
+def select_maxcount(match, priomoves, depth, slimits, last_pmove, cnt_of_checks_in_stage):
     if(len(priomoves) == 0 or depth > slimits.dpth_max):
         return 0
 
-    if(priomoves[0].has_domain_tactic(cPrioMove.TACTICS['defend-check'])):
+    if(priomoves[0].has_domain_tactic(cPrioMove.TACTICS['defends-check'])):
         return len(priomoves)
 
+    if(last_pmove and last_pmove.has_tactic_ext(cTactic(cPrioMove.TACTICS['captures'], cPrioMove.SUB_TACTICS['bad-deal']))):
+        last_pmove_capture_bad_deal = True
+    else:
+        last_pmove_capture_bad_deal = False
+
     if(depth <= slimits.dpth_stage1):
-        resort_if_last_move_is_bad_capture(priomoves, last_pmove, 25)
+        resort_for_stormy_moves(priomoves, 25, last_pmove_capture_bad_deal, cnt_of_checks_in_stage)
         count = count_up_to_prio(priomoves, 25)
         if(count == 0):
-            return min(slimits.mvcnt_stage1, len(priomoves))
+            return min(slimits.mvcnt, len(priomoves))
         else:
-            return min(slimits.mvcnt_stage1, count)
+            return count
     elif(depth <= slimits.dpth_stage2):
-        resort_if_last_move_is_bad_capture(priomoves, last_pmove, 20)
-        count = count_up_to_prio(priomoves, 20)
-        if(count == 0):
-            return min(slimits.mvcnt_stage2, len(priomoves))
-        else:
-            return min(slimits.mvcnt_stage2, count)
-    elif(depth <= slimits.dpth_max):
-        if(resort_if_last_move_is_capture(priomoves, last_pmove, 15)):
-            return count_up_to_prio(priomoves, 15)
-        else:
-            return 0
+        resort_for_stormy_moves(priomoves, 15, last_pmove_capture_bad_deal, cnt_of_checks_in_stage)
+        return count_up_to_prio(priomoves, 15)
     else:
-        return 0
+        resort_for_stormy_moves(priomoves, 6, last_pmove_capture_bad_deal, None)
+        return count_up_to_prio(priomoves, 6)
 
-def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
+def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, cnt_of_checks_in_stage, msgs):
     color = match.next_color()
     candidates = []
     newcandidates = []
@@ -188,10 +155,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         minscore = beta
 
     cgenerator = cGenerator(match)
-    priomoves, piececnt = cgenerator.generate_moves(1)
-    rank_gmoves(match, priomoves, piececnt)    
-    maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
-    priomoves.sort(key=attrgetter('prio'))
+    priomoves, piecescnt = cgenerator.generate_moves(1)
+    rank_gmoves(match, priomoves, piecescnt, last_pmove)
+    maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove, cnt_of_checks_in_stage)
 
     if(depth == 1):
         print("************ maxcnt: " + str(maxcnt) + " ******************")
@@ -201,7 +167,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             pmove = priomoves[0]
             candidates.append(pmove.gmove)
             candidates.append(None)
-            if(pmove.has_domain_tactic(cPrioMove.TACTICS['tactical-draw'])):
+            if(pmove.has_domain_tactic(cPrioMove.TACTICS['is-tactical-draw'])):
                 return 0, candidates
             else:
                 return analyze_position.score_position(match, len(priomoves)), candidates
@@ -211,14 +177,18 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         return analyze_position.score_position(match, len(priomoves)), candidates
 
     for priomove in priomoves:
-        gmove = priomove.gmove
+        if(depth <= slimits.dpth_stage1):
+            cnt_of_checks_in_stage = 0        
+        elif(priomove.has_domain_tactic(cPrioMove.TACTICS['attacks-king'])):
+            cnt_of_checks_in_stage += 1
 
+        gmove = priomove.gmove
         count += 1
 
         if(depth == 1):
             prnt_before_calc(match, count, priomove)
 
-        if(priomove.has_domain_tactic(cPrioMove.TACTICS['tactical-draw'])):
+        if(priomove.has_domain_tactic(cPrioMove.TACTICS['is-tactical-draw'])):
             newcandidates.clear()
             newcandidates.append(None)
             newscore = 0
@@ -226,9 +196,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             if(maximizing):
-                newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, msgs)
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, cnt_of_checks_in_stage, msgs)
             else:
-                newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, msgs)
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, cnt_of_checks_in_stage, msgs)
 
             match.undo_move()
 
@@ -280,7 +250,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             #continue
         if(count >= maxcnt):
             break
-        elif(msgs.terminate):
+        if(msgs.terminate):
             break
 
     if(maximizing):
@@ -306,7 +276,7 @@ def calc_move(match, msgs):
         maximizing = match.next_color() == COLORS['white']
         alpha = SCORES[PIECES['wKg']] * 10
         beta = SCORES[PIECES['bKg']] * 10 
-        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, msgs)
+        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, 0, msgs)
 
     ### time
     elapsed_time = time.time() - match.time_start

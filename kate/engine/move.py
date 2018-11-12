@@ -125,26 +125,27 @@ class cPrioMove:
         'prio5' : 50 }
 
     TACTICS = {
-        'defend-check' :         10,
-        'capture' :              20,  # 'good-deal' | 'bad-deal'
-        'attack-king' :          30,  # 'good-deal' | 'bad-deal'
-        'attack' :               40,  # 'stormy' | 'good-deal' | 'bad-deal'
-        'discl-attack' :         50,  # 'good-deal' | 'bad-deal' | 'downgraded'
-        'support' :              60,  # 'good-deal' | 'bad-deal'
-        'discl-support' :        70,  # 'good-deal' | 'bad-deal' | 'downgraded'
-        'support-running-pawn' : 80,  # 'good-deal' | 'bad-deal'
-        'support-unattacked' :   90,  # 'good-deal' | 'bad-deal'
-        'flee' :                 100, # 'urgent' | 'downgraded'
-        'defend-fork' :          110, # 'downgraded'
-        'does-unpin' :           120,
-        'block' :                130,
-        'promotion' :            140, 
-        'tactical-draw' :        150,
-        'running-pawn' :         160, 
-        'controle-file' :        170,
-        'castling' :             180,
-        'progress' :             190,
-        'undefined' :            200 }
+        'defends-check' :         10,
+        'captures' :              20,
+        'attacks-king' :          30,
+        'attacks' :               40,
+        'attacks-discl' :         50,
+        'supports' :              60,
+        'supports-discl' :        70,
+        'supports-running-pawn' : 80,
+        'supports-unattacked' :   90,
+        'flees' :                 100,
+        'forks' :                 110,
+        'defends-fork' :          120,
+        'unpins' :                130,
+        'blocks' :                140,
+        'promotes' :              150, 
+        'is-tactical-draw' :      160,
+        'is-running-pawn' :       170, 
+        'controles-file' :        180,
+        'castles' :               190,
+        'is-progress' :           200,
+        'is-undefined' :          300 }
 
     SUB_TACTICS = {
         'stormy' : 1,
@@ -155,32 +156,33 @@ class cPrioMove:
         'neutral' : 6 }
 
     TACTICS_TO_PRIO = {
-        TACTICS['defend-check'] : PRIO['prio5'],
-        TACTICS['capture'] : PRIO['prio2'],
-        TACTICS['attack-king'] : PRIO['prio2'],
-        TACTICS['attack'] : PRIO['prio3'],
-        TACTICS['discl-attack'] : PRIO['prio3'],
-        TACTICS['support'] : PRIO['prio3'],
-        TACTICS['discl-support'] : PRIO['prio3'], 
-        TACTICS['support-running-pawn'] : PRIO['prio3'], 
-        TACTICS['support-unattacked'] : PRIO['prio4'],
-        TACTICS['flee'] : PRIO['prio3'],
-        TACTICS['defend-fork'] : PRIO['prio2'], 
-        TACTICS['does-unpin'] : PRIO['prio2'], 
-        TACTICS['block'] : PRIO['prio3'], 
-        TACTICS['promotion'] : PRIO['prio2'],
-        TACTICS['tactical-draw'] : PRIO['prio1'],
-        TACTICS['running-pawn'] : PRIO['prio2'], 
-        TACTICS['controle-file'] : PRIO['prio3'], 
-        TACTICS['castling'] : PRIO['prio3'],
-        TACTICS['progress'] : PRIO['prio3'], 
-        TACTICS['undefined'] : PRIO['prio5'] }
+        TACTICS['defends-check'] : PRIO['prio5'],
+        TACTICS['captures'] : PRIO['prio2'],
+        TACTICS['attacks-king'] : PRIO['prio2'],
+        TACTICS['attacks'] : PRIO['prio3'],
+        TACTICS['attacks-discl'] : PRIO['prio3'],
+        TACTICS['supports'] : PRIO['prio3'],
+        TACTICS['supports-discl'] : PRIO['prio3'], 
+        TACTICS['supports-running-pawn'] : PRIO['prio3'], 
+        TACTICS['supports-unattacked'] : PRIO['prio4'],
+        TACTICS['flees'] : PRIO['prio3'],
+        TACTICS['forks'] : PRIO['prio2'], 
+        TACTICS['defends-fork'] : PRIO['prio2'], 
+        TACTICS['unpins'] : PRIO['prio2'], 
+        TACTICS['blocks'] : PRIO['prio3'], 
+        TACTICS['promotes'] : PRIO['prio2'],
+        TACTICS['is-tactical-draw'] : PRIO['prio1'],
+        TACTICS['is-running-pawn'] : PRIO['prio2'], 
+        TACTICS['controles-file'] : PRIO['prio3'], 
+        TACTICS['castles'] : PRIO['prio3'],
+        TACTICS['is-progress'] : PRIO['prio3'], 
+        TACTICS['is-undefined'] : PRIO['prio5'] }
 
     SUB_TACTICS_TO_ADJUST = {
         SUB_TACTICS['stormy'] : -10,
         SUB_TACTICS['urgent'] : -10,
         SUB_TACTICS['good-deal'] : -5,
-        SUB_TACTICS['neutral'] : 0, 
+        SUB_TACTICS['neutral'] : 0,
         SUB_TACTICS['downgraded'] : 5,
         SUB_TACTICS['bad-deal'] : 10 }
 
@@ -201,14 +203,17 @@ class cPrioMove:
     def downgrade(self, tactic):
         for tactitem in self.tactics:
             if(tactitem.tactic == tactic.tactic):
-                tactitem.subtactic = self.SUB_TACTICS['downgraded']
+                if(tactitem.subtactic == self.SUB_TACTICS['stormy'] or
+                   tactitem.subtactic == self.SUB_TACTICS['urgent'] or 
+                   tactitem.subtactic == self.SUB_TACTICS['good-deal']):
+                    tactitem.subtactic = self.SUB_TACTICS['downgraded']
                 return
 
     def fetch_tactics(self, idx):
         if(len(self.tactics) > idx):
             return self.tactics[idx].tactic
         else:
-            return self.TACTICS['undefined']
+            return self.TACTICS['is-undefined']
 
     def has_tactic(self, tactic):
         for tactitem in self.tactics:
@@ -235,88 +240,21 @@ class cPrioMove:
                 return True
         return False
 
-    """def is_tactic_stormy(self):
+    def is_tactic_stormy(self, cnt_of_checks_in_stage):
         for tactitem in self.tactics:
-            if(tactitem.tactic == self.TACTICS['defend-check'] or
-               tactitem.tactic == self.TACTICS['promotion'] or
-               tactitem.tactic == self.TACTICS['capture'] or
-               tactitem.tactic == self.TACTICS['attack-king'] or 
-               (tactitem.tactic == self.TACTICS['attack'] and 
-                (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
-                 tactitem.subtactic == self.SUB_TACTICS['urgent'] or
-                 tactitem.subtactic == self.SUB_TACTICS['good-deal']))):
+            if(tactitem.subtactic == self.SUB_TACTICS['stormy'] or
+               tactitem.subtactic == self.SUB_TACTICS['urgent']):
                 return True
-        return False"""
-
-    def is_tactic_selectiv(self):
-        for tactitem in self.tactics:
-            if((tactitem.tactic == self.TACTICS['promotion'] or
-                tactitem.tactic == self.TACTICS['capture'] or
-                tactitem.tactic == self.TACTICS['flee'] or
-                tactitem.tactic == self.TACTICS['block'] or
-                tactitem.tactic == self.TACTICS['support'] or
-                tactitem.tactic == self.TACTICS['discl-support'] or
-                tactitem.tactic == self.TACTICS['support-running-pawn'] or
-                tactitem.tactic == self.TACTICS['defend-fork'] or
-                tactitem.tactic == self.TACTICS['does-unpin']) and
-                (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
-                 tactitem.subtactic == self.SUB_TACTICS['urgent'] or
-                 tactitem.subtactic == self.SUB_TACTICS['good-deal'])):
+            if((tactitem.tactic == self.TACTICS['promotes'] or
+                tactitem.tactic == self.TACTICS['captures']) and 
+               tactitem.subtactic == self.SUB_TACTICS['good-deal']):
                 return True
+            if(cnt_of_checks_in_stage and cnt_of_checks_in_stage <= 2):
+                if((tactitem.tactic == self.TACTICS['attacks-king'] or
+                    tactitem.tactic == self.TACTICS['defends-check']) and
+                   tactitem.subtactic == self.SUB_TACTICS['good-deal']):
+                    return True
         return False
-
-    def is_tactic_super_selectiv(self):
-        for tactitem in self.tactics:
-            if((tactitem.tactic == self.TACTICS['promotion'] or
-                  tactitem.tactic == self.TACTICS['capture'] or
-                  tactitem.tactic == self.TACTICS['flee'] or
-                  tactitem.tactic == self.TACTICS['block'] or
-                  tactitem.tactic == self.TACTICS['support'] or
-                  tactitem.tactic == self.TACTICS['discl-support'] or
-                  tactitem.tactic == self.TACTICS['support-running-pawn'] or
-                  tactitem.tactic == self.TACTICS['defend-fork'] or
-                  tactitem.tactic == self.TACTICS['does-unpin']) and
-                  (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
-                   tactitem.subtactic == self.SUB_TACTICS['urgent'] or
-                   tactitem.subtactic == self.SUB_TACTICS['good-deal'])):
-                return True
-        return False
-
-    def is_tactic_selectiv_old(self):
-        for tactitem in self.tactics:
-            if(tactitem.tactic == self.TACTICS['promotion'] or
-               (tactitem.tactic == self.TACTICS['capture'] and
-                 (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
-                  tactitem.subtactic == self.SUB_TACTICS['good-deal'])) or
-               (tactitem.tactic == self.TACTICS['attack'] and 
-                (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
-                 tactitem.subtactic == self.SUB_TACTICS['good-deal']))):
-                return True
-        return False
-
-    def is_tactic_urgent(self):
-        for tactitem in self.tactics:
-            if(tactitem.tactic == self.TACTICS['promotion'] or
-               (tactitem.tactic == self.TACTICS['capture'] and
-                 (tactitem.subtactic == self.SUB_TACTICS['stormy'] or
-                  tactitem.subtactic == self.SUB_TACTICS['good-deal'])) or
-               (tactitem.tactic == self.TACTICS['attack'] and 
-                tactitem.subtactic == self.SUB_TACTICS['stormy'])):
-                return True
-        return False
-
-    def is_tactic_silent(self):
-        for tactitem in self.tactics:
-            if((tactitem.tactic == self.TACTICS['capture'] and
-                tactitem.subtactic == self.SUB_TACTICS['bad-deal']) or
-               (tactitem.tactic == self.TACTICS['attack-king'] and
-                tactitem.subtactic == self.SUB_TACTICS['bad-deal']) or               
-               (tactitem.tactic == self.TACTICS['attack'] and
-                tactitem.subtactic == self.SUB_TACTICS['bad-deal']) or
-               (tactitem.tactic == self.TACTICS[ 'support'] and 
-                tactitem.subtactic == self.SUB_TACTICS[ 'bad-deal'])):
-                return False
-        return True
 
     def concat_tactics(self, delimiter):
         str_tactics = ""

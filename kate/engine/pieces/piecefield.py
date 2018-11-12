@@ -120,7 +120,7 @@ class cPieceField:
                     touches.append(cTouch(piece, x1, y1))
         return touches
 
-    def count_touches(self, color):
+    def count_touches(self, color, excludes):
         count = 0
 
         for step in self.STEPS:
@@ -128,6 +128,14 @@ class cPieceField:
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
             if(x1 is not None):
+                continue_flag = False
+                for exclude in excludes:
+                    if(exclude[0] == x1 and exclude[1] == y1):
+                        continue_flag = True
+                        break
+                if(continue_flag):
+                    continue
+
                 piece = self.match.readfield(x1, y1)
 
                 cpiece = self.obj_for_piece(piece, self.fieldx, self.fieldy)

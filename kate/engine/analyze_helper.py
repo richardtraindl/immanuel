@@ -202,30 +202,27 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
 
-def is_fork_field(match, color, forkx, forky):
+def is_fork_field(match, color, forkx, forky, excludes):
     opp_color = REVERSED_COLORS[color]
-    frdlytouches, enmytouches = list_all_field_touches(match, color, forkx, forky)
-    if(len(frdlytouches) >= len(enmytouches)):
-        return False
     crookfield = rookfield.cRookField(match, forkx, forky)
     if(crookfield.is_field_touched(opp_color, 2)):
-        if(crookfield.count_touches(color) > 1):
+        if(crookfield.count_touches(color, excludes) > 1):
             return True
     cbishopfield = bishopfield.cBishopField(match, forkx, forky)
     if(cbishopfield.is_field_touched(opp_color, 2)):
-        if(cbishopfield.count_touches(color) > 1):
+        if(cbishopfield.count_touches(color, excludes) > 1):
             return True
     cknightfield = knightfield.cKnightField(match, forkx, forky)
     if(cknightfield.is_field_touched(opp_color, 2)):
-        if(cknightfield.count_touches(color) > 1):
+        if(cknightfield.count_touches(color, excludes) > 1):
             return True
     cpawnfield = pawnfield.cPawnField(match, forkx, forky)
     if(cpawnfield.is_field_touched(opp_color, 2)):
-        if(cpawnfield.count_touches(color) > 1):
+        if(cpawnfield.count_touches(color, excludes) > 1):
             return True
     ckingfield = kingfield.cKingField(match, forkx, forky)
     if(ckingfield.is_field_touched(opp_color)):
-        if(ckingfield.count_touches(color) > 1):
+        if(ckingfield.count_touches(color, excludes) > 1):
             return True
     return False
 
@@ -263,17 +260,12 @@ def is_piece_lfe_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
     return True
 
 
-def is_supported_weak(gmove, from_dstfield_supported):
+def is_supported_weak(gmove, supported):
     gmove.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-    for supported in from_dstfield_supported:
-        if(len(supported.attacker_beyond) > len(supported.supporter_beyond)):
-            gmove.match.undo_move()
-            return True
-        elif(gmove.match.is_soft_pin(supported.fieldx, supported.fieldy)):
-            gmove.match.undo_move()
-            return True
+    supported_weak = len(supported.attacker_beyond) > len(supported.supporter_beyond) or \
+                     gmove.match.is_soft_pin(supported.fieldx, supported.fieldy)
     gmove.match.undo_move()
-    return False
+    return supported_weak
 
 
 def is_supported_le_attacker(from_dstfield_supported):
@@ -298,20 +290,12 @@ def is_discl_attacked_supported(discl_attacked):
     return False
 
 
-def is_supported_running_pawn(match, from_dstfield_supported):
-    if(match.is_endgame() == False or len(from_dstfield_supported) == 0):
+def is_supported_running_pawn(match, supported):
+    if(match.is_endgame() == False):
         return False
-    for supported in from_dstfield_supported:
-        if(supported.piece == PIECES['wPw'] or supported.piece == PIECES['bPw']):
-            cpawn = cPawn(match, supported.fieldx, supported.fieldy)
-            if(cpawn.is_running()):
-                return True
-    return False
-
-
-def is_attacked_piece_king(from_dstfield_attacked):
-    for attacked in from_dstfield_attacked:
-        if(attacked.piece == PIECES['wKg'] or attacked.piece == PIECES['bKg']):
+    if(supported.piece == PIECES['wPw'] or supported.piece == PIECES['bPw']):
+        cpawn = cPawn(match, supported.fieldx, supported.fieldy)
+        if(cpawn.is_running()):
             return True
     return False
 
@@ -329,17 +313,14 @@ def is_captured_pinned_or_soft_pinned(gmove):
         return False
 
 
-def is_attacked_soft_pinned(gmove, from_dstfield_attacked):
+def is_attacked_soft_pinned(gmove, attacked):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
     if(piece != PIECES['wKg'] and piece != PIECES['bKg']):
         gmove.match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
-    for attacked in from_dstfield_attacked:
-        if(gmove.match.is_soft_pin(attacked.fieldx, attacked.fieldy)):
-            gmove.match.writefield(gmove.srcx, gmove.srcy, piece)
-            return True
+    is_soft_pinned = gmove.match.is_soft_pin(attacked.fieldx, attacked.fieldy)
     gmove.match.writefield(gmove.srcx, gmove.srcy, piece)
-    return False
-    
+    return is_soft_pinned
+
 
 def is_piece_le_captured(gmove):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)

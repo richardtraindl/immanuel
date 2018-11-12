@@ -44,12 +44,20 @@ class cKingField(cPieceField):
                     touches.append(cTouch(piece, x1, y1))
         return touches
 
-    def count_touches(self, color):
+    def count_touches(self, color, excludes):
         count = 0
         for step in self.STEPS:
             x1 = self.fieldx + step[0]
             y1 = self.fieldy + step[1]
             if(self.match.is_inbounds(x1, y1)):
+                continue_flag = False
+                for exclude in excludes:
+                    if(exclude[0] == x1 and exclude[1] == y1):
+                        continue_flag = True
+                        break
+                if(continue_flag):
+                    continue
+
                 piece = self.match.readfield(x1, y1)
 
                 if(piece == PIECES['blk']):
