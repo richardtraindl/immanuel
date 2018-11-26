@@ -55,9 +55,9 @@ class SearchLimits:
     def __init__(self, match):
         if(match.level == match.LEVELS['blitz']):
             self.mvcnt = 8
-            self.dpth_stage1 = 2
+            self.dpth_stage1 = 3
             self.dpth_stage2 = 6
-            self.dpth_max = 8
+            self.dpth_max = 10
         elif(match.level == match.LEVELS['low']):
             self.mvcnt = 12
             self.dpth_stage1 = 3
@@ -97,17 +97,39 @@ def count_up_to_prio(priomoves, prio_limit):
             count += 1
     return count
 
-def resort_for_stormy_moves(priomoves, new_prio, last_pmove_capture_bad_deal, cnt_of_checks_in_stage):
+def resort_for_stormy_moves(priomoves, new_prio, last_pmove_capture_bad_deal, with_check):
+    if(last_pmove_capture_bad_deal == False):
+        return
     count_of_stormy = 0
     count_of_bad_captures = 0
     first_silent = None
     for priomove in priomoves:
-        if(priomove.is_tactic_stormy(cnt_of_checks_in_stage)):
+        if(priomove.is_tactic_stormy(with_check)):
+            count_of_stormy += 1
+            priomove.prio = min(priomove.prio, new_prio - 2)
+        elif(priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['captures'], cPrioMove.SUB_TACTICS['bad-deal']))):
+            count_of_bad_captures += 1
+            priomove.upgrade(priomove.TACTICS['captures'])
+            priomove.prio = min(priomove.prio, new_prio)
+        else:
+            if(first_silent is None):
+                first_silent = priomove
+    if(count_of_bad_captures > 0 and count_of_stormy == 0 and first_silent):
+        first_silent.prio = min(first_silent.prio, new_prio - 1)
+    priomoves.sort(key=attrgetter('prio'))
+
+def resort_for_stormy_moves_ori(priomoves, new_prio, last_pmove_capture_bad_deal, with_check):
+    count_of_stormy = 0
+    count_of_bad_captures = 0
+    first_silent = None
+    for priomove in priomoves:
+        if(priomove.is_tactic_stormy(with_check)):
             count_of_stormy += 1
             priomove.prio = min(priomove.prio, new_prio - 2)
         elif(last_pmove_capture_bad_deal):
             if(priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['captures'], cPrioMove.SUB_TACTICS['bad-deal']))):
                 count_of_bad_captures += 1
+                priomove.upgrade(priomove.TACTICS['captures'])
                 priomove.prio = min(priomove.prio, new_prio)
         else:
             if(first_silent is None):
@@ -116,7 +138,7 @@ def resort_for_stormy_moves(priomoves, new_prio, last_pmove_capture_bad_deal, cn
         first_silent.prio = min(first_silent.prio, new_prio - 1)
     priomoves.sort(key=attrgetter('prio'))
 
-def select_maxcount(match, priomoves, depth, slimits, last_pmove, cnt_of_checks_in_stage):
+def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     if(len(priomoves) == 0 or depth > slimits.dpth_max):
         return 0
 
@@ -129,20 +151,28 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove, cnt_of_checks_
         last_pmove_capture_bad_deal = False
 
     if(depth <= slimits.dpth_stage1):
-        resort_for_stormy_moves(priomoves, 25, last_pmove_capture_bad_deal, cnt_of_checks_in_stage)
-        count = count_up_to_prio(priomoves, 25)
-        if(count == 0):
+        if(match.level == match.LEVELS['blitz']):
+            max_prio = 19
+        else:
+            max_prio = 29
+        resort_for_stormy_moves(priomoves, max_prio, last_pmove_capture_bad_deal, False)
+        count = count_up_to_prio(priomoves, max_prio)
+        if(count < slimits.mvcnt):
             return min(slimits.mvcnt, len(priomoves))
         else:
             return count
     elif(depth <= slimits.dpth_stage2):
-        resort_for_stormy_moves(priomoves, 15, last_pmove_capture_bad_deal, cnt_of_checks_in_stage)
-        return count_up_to_prio(priomoves, 15)
+        if(match.level == match.LEVELS['blitz']):
+            max_prio = 15
+        else:
+            max_prio = 29
+        resort_for_stormy_moves(priomoves, max_prio, last_pmove_capture_bad_deal, False)
+        return count_up_to_prio(priomoves, max_prio)
     else:
-        resort_for_stormy_moves(priomoves, 6, last_pmove_capture_bad_deal, None)
-        return count_up_to_prio(priomoves, 6)
+        resort_for_stormy_moves(priomoves, 9, last_pmove_capture_bad_deal, False)
+        return count_up_to_prio(priomoves, 9)
 
-def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, cnt_of_checks_in_stage, msgs):
+def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
     color = match.next_color()
     candidates = []
     newcandidates = []
@@ -157,7 +187,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, cnt_of
     cgenerator = cGenerator(match)
     priomoves, piecescnt = cgenerator.generate_moves(1)
     rank_gmoves(match, priomoves, piecescnt, last_pmove)
-    maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove, cnt_of_checks_in_stage)
+    maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 
     if(depth == 1):
         print("************ maxcnt: " + str(maxcnt) + " ******************")
@@ -177,11 +207,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, cnt_of
         return analyze_position.score_position(match, len(priomoves)), candidates
 
     for priomove in priomoves:
-        if(depth <= slimits.dpth_stage1):
-            cnt_of_checks_in_stage = 0        
-        elif(priomove.has_domain_tactic(cPrioMove.TACTICS['attacks-king'])):
-            cnt_of_checks_in_stage += 1
-
         gmove = priomove.gmove
         count += 1
 
@@ -196,9 +221,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, cnt_of
             match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             if(maximizing):
-                newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, cnt_of_checks_in_stage, msgs)
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, msgs)
             else:
-                newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, cnt_of_checks_in_stage, msgs)
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, msgs)
 
             match.undo_move()
 
@@ -276,7 +301,7 @@ def calc_move(match, msgs):
         maximizing = match.next_color() == COLORS['white']
         alpha = SCORES[PIECES['wKg']] * 10
         beta = SCORES[PIECES['bKg']] * 10 
-        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, 0, msgs)
+        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, msgs)
 
     ### time
     elapsed_time = time.time() - match.time_start

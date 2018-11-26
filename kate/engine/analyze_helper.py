@@ -230,8 +230,6 @@ def is_fork_field(match, color, forkx, forky, excludes):
 def is_piece_le_attacker_on_srcfield(gmove, enmytouches_on_srcfield):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
     for enmy in enmytouches_on_srcfield:
-        if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wKg']]):
-            continue
         if(PIECES_RANK[piece] > PIECES_RANK[enmy.piece]):
             return False
     return True
@@ -240,8 +238,6 @@ def is_piece_le_attacker_on_srcfield(gmove, enmytouches_on_srcfield):
 def is_piece_le_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
     for enmy in enmytouches_on_dstfield:
-        if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wKg']]):
-            continue
         if(PIECES_RANK[piece] > PIECES_RANK[enmy.piece]):
             return False
     return True
@@ -249,13 +245,13 @@ def is_piece_le_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
 
 def is_piece_lfe_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wKg']]):
+        return False
     for enmy in enmytouches_on_dstfield:
         if(PIECES_RANK[piece] > PIECES_RANK[enmy.piece]):
-            if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wKg']]):
-                continue
-            if(PIECES_RANK[enmy.piece] == PIECES_RANK[PIECES['wPw']]):
+            if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wQu']]):
                 return False
-            elif(PIECES_RANK[piece] == PIECES_RANK[PIECES['wQu']]):
+            if(PIECES_RANK[enmy.piece] == PIECES_RANK[PIECES['wPw']]):
                 return False
     return True
 

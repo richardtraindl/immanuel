@@ -2,7 +2,7 @@ import random
 from .values import *
 from .match import *
 from .move import *
-from .openings import *
+from .openings import DEPTH, fill_openings
 from .helper import coord_to_index, index_to_coord
 
 
@@ -11,38 +11,34 @@ def retrieve_move(match):
         print("############ depth not supported ############")
         return None
 
-    lastmoves = ""
+    root = fill_openings()
+    node = root
     for move in match.move_list:
-        lastmoves += index_to_coord(move.srcx, move.srcy)
-        lastmoves += "-"
-        lastmoves += index_to_coord(move.dstx, move.dsty)
-        lastmoves += ","
+        str_move = index_to_coord(move.srcx, move.srcy)
+        str_move += "-"
+        str_move += index_to_coord(move.dstx, move.dsty)
+        ok = False
+        for childnode in node.children:
+            #print("childnode: " + str(childnode.str_move) + " str_move: " + str_move)
+            if(childnode.str_move == str_move):
+                    node = childnode
+                    ok = True
+                    break
+        if(ok):
+            continue
+        else:
+            node = None
 
-    lastmoves = lastmoves[:-1]
-    print("lastmoves: " + lastmoves)
-
-    if(match.movecnt() == 0):
-        omovelist = FIRST
-    elif(match.movecnt() == 1):
-        omovelist = SECOND
-    elif(match.movecnt() == 2):
-        omovelist = THIRD
-    else:
-        omovelist = FOURTH
-
-    candidates = []
-    for omove in omovelist:
-        if(omove[0] == lastmoves):            
-            candidates = omove[1:]
-            break
-
-    if(len(candidates) == 0):
+    if(match.movecnt() > 0 and (node is None or node is root or len(node.children) == 0)):
         print("############ No opening move found ############")
         return None
     else:
-        idx = random.randint(0, len(candidates) - 1)
-        candidate = candidates[idx]
-        srcx, srcy = coord_to_index(candidate[:2])
-        dstx, dsty = coord_to_index(candidate[3:])
+        if(match.movecnt() == 0):
+            node = root
+        idx = random.randint(0, len(node.children) - 1)
+        candidate = node.children[idx]
+        srcx, srcy = coord_to_index(candidate.str_move[:2])
+        dstx, dsty = coord_to_index(candidate.str_move[3:])
         return cGenMove(match, srcx, srcy, dstx, dsty, PIECES['blk'])
 
+ 

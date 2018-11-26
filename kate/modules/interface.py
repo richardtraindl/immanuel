@@ -133,12 +133,12 @@ class ImmanuelsThread(threading.Thread):
     def __init__(self, name, match):
         threading.Thread.__init__(self)
         self.name = name
-        self.match = copy.deepcopy(match)
+        self.match = match
         self.msgs = calc.Msgs()
 
     def run(self):
         print("Thread starting " + str(self.name))
-        candidates = calc.calc_move(self.match, self.msgs) 
+        candidates = calc.calc_move(self.match, self.msgs)
         if(len(candidates) > 0):
             gmove = candidates[0]
             move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
