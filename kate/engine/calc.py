@@ -3,7 +3,7 @@ from operator import attrgetter
 from .values import *
 from .match import *
 from .move import *
-from .openingmove import retrieve_move
+from .openings import retrieve_move
 from .analyze_move import *
 from . import analyze_position
 from .helper import *
