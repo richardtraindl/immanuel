@@ -171,59 +171,54 @@ def score_controled_vertical_files(match):
     return score
 
 
-def is_rook_on_baseline_trapped(match, color):
+def count_on_baseline_trapped_rooks(match, color):
+    count = 0
     if(color == COLORS['white']):
         y = match.board.COORD['1']
-        rookpiece = PIECES['wRk']
+        rook = PIECES['wRk']
     else:
         y = match.board.COORD['8']
-        rookpiece = PIECES['bRk']
+        rook = PIECES['bRk']
 
     for x in range(8):
         piece = match.readfield(x, y)
-        if(piece == rookpiece):
-            rook = cRook(match, x, y)
-            if(rook.is_rook_trapped()):
-                return True
-    return False
+        if(piece == rook):
+            crook = cRook(match, x, y)
+            if(crook.is_rook_trapped()):
+                count += 1
+    return count
 
 def score_trapped_rooks(match):
     value = 0
-    whiterate = ATTACKED_SCORES[PIECES['bKn']]
-    blackrate = ATTACKED_SCORES[PIECES['wKn']]
-    if(is_rook_on_baseline_trapped(match, COLORS['white'])):
-        value += blackrate
-    if(is_rook_on_baseline_trapped(match, COLORS['black'])):
-        value += whiterate
+    count = count_on_baseline_trapped_rooks(match, COLORS['white'])
+    value += (count * ATTACKED_SCORES[PIECES['wKn']])
+    count = count_on_baseline_trapped_rooks(match, COLORS['black'])
+    value += (count * ATTACKED_SCORES[PIECES['bKn']])
     return value
 
 def score_kings_safety(match):
     value = 0
-    whiterate = ATTACKED_SCORES[PIECES['bKn']]
-    blackrate = ATTACKED_SCORES[PIECES['wKn']]
     king = cKing(match, match.board.wKg_x, match.board.wKg_y)
-    if(king.is_king_safe()):
-        value += whiterate
+    if(king.is_king_safe() == False):
+        value += ATTACKED_SCORES[PIECES['wKn']]
     king = cKing(match, match.board.bKg_x, match.board.bKg_y)
-    if(king.is_king_safe()):
-        value += blackrate
+    if(king.is_king_safe() == False):
+        value += ATTACKED_SCORES[PIECES['bKn']]
     return value
 
 def score_stuck_pieces_on_baseline(match):
     value = 0
-    whiterate = ATTACKED_SCORES[PIECES['bKn']]
-    blackrate = ATTACKED_SCORES[PIECES['wKn']]
     for i in range(2):
         if(i == 0):
             y = match.board.COORD['1']
             knight = PIECES['wKn']
             bishop = PIECES['wBp']
-            rate = blackrate
+            rate = ATTACKED_SCORES[PIECES['wKn']]
         else:
             y = match.board.COORD['8']
             knight = PIECES['bKn']
             bishop = PIECES['bBp']
-            rate = whiterate
+            rate = ATTACKED_SCORES[PIECES['bKn']]
         for x in range(8):
             piece = match.readfield(x, y)
             if(piece == knight or piece == bishop):
