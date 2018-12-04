@@ -160,6 +160,8 @@ class cPrioMove:
         TACTICS['captures'] :               14,
         TACTICS['is-running-pawn'] :        14, 
         TACTICS['is-tactical-draw'] :       15,
+        TACTICS['castles'] :                20,
+        TACTICS['attacks-king'] :           20,
         TACTICS['forks'] :                  23, 
         TACTICS['defends-fork'] :           23, 
         TACTICS['pins'] :                   23, 
@@ -168,9 +170,7 @@ class cPrioMove:
         TACTICS['supports'] :               24,
         TACTICS['flees'] :                  24, 
         TACTICS['blocks'] :                 24,
-        TACTICS['attacks-king'] :           25,
         TACTICS['attacks'] :                25,
-        TACTICS['castles'] :                25,
         TACTICS['controles-file'] :         33, 
         TACTICS['is-progress'] :            33,
         TACTICS['supports-unattacked'] :    33,
@@ -256,8 +256,8 @@ class cPrioMove:
                 tactitem.subtactic <= self.SUB_TACTICS['good-deal']):
                 return True
             if(with_check):
-                if((tactitem.tactic == self.TACTICS['attacks-king'] or
-                    tactitem.tactic == self.TACTICS['defends-check']) and
+                # tactitem.tactic == self.TACTICS['defends-check'])
+                if(tactitem.tactic == self.TACTICS['attacks-king'] and 
                    tactitem.subtactic <= self.SUB_TACTICS['good-deal']):
                     return True
         return False

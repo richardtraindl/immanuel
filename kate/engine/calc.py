@@ -150,12 +150,19 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     else:
         last_pmove_capture_bad_deal = False
 
+    if(match.next_color() == COLORS['white']):
+        cking = cKing(match, match.board.bKg_x, match.board.bKg_y)
+    else:
+        cking = cKing(match, match.board.wKg_x, match.board.wKg_y)
+
+    with_check = not cking.is_king_safe()
+
     if(depth <= slimits.dpth_stage1):
         if(match.level == match.LEVELS['blitz']):
             max_prio = 19
         else:
             max_prio = 29
-        resort_for_stormy_moves(priomoves, max_prio, last_pmove_capture_bad_deal, False)
+        resort_for_stormy_moves(priomoves, max_prio, last_pmove_capture_bad_deal, with_check)
         count = count_up_to_prio(priomoves, max_prio)
         if(count < slimits.mvcnt):
             return min(slimits.mvcnt, len(priomoves))
@@ -166,10 +173,10 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
             max_prio = 15
         else:
             max_prio = 29
-        resort_for_stormy_moves(priomoves, max_prio, last_pmove_capture_bad_deal, False)
+        resort_for_stormy_moves(priomoves, max_prio, last_pmove_capture_bad_deal, with_check)
         return count_up_to_prio(priomoves, max_prio)
     else:
-        resort_for_stormy_moves(priomoves, 9, last_pmove_capture_bad_deal, False)
+        resort_for_stormy_moves(priomoves, 9, last_pmove_capture_bad_deal, with_check)
         return count_up_to_prio(priomoves, 9)
 
 def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
