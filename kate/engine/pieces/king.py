@@ -368,7 +368,10 @@ class cKing(cPiece):
     # list_moves(self):
        # works with inherited class
 
-    # generate_moves(self, mode):
+    # generate_moves(self):
+       # works with inherited class
+
+    # generate_priomoves(self):
        # works with inherited class
 
     def is_king_safe(self):

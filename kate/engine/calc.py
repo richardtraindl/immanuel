@@ -159,9 +159,9 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
 
     if(depth <= slimits.dpth_stage1):
         if(match.level == match.LEVELS['blitz']):
-            max_prio = 19
+            max_prio = 190
         else:
-            max_prio = 29
+            max_prio = 290
         resort_for_stormy_moves(priomoves, max_prio, last_pmove_capture_bad_deal, with_check)
         count = count_up_to_prio(priomoves, max_prio)
         if(count < slimits.mvcnt):
@@ -170,9 +170,9 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
             return count
     elif(depth <= slimits.dpth_stage2):
         if(match.level == match.LEVELS['blitz']):
-            max_prio = 15
+            max_prio = 150
         else:
-            max_prio = 29
+            max_prio = 290
         resort_for_stormy_moves(priomoves, max_prio, last_pmove_capture_bad_deal, with_check)
         return count_up_to_prio(priomoves, max_prio)
     else:
@@ -192,7 +192,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
         minscore = beta
 
     cgenerator = cGenerator(match)
-    priomoves, piecescnt = cgenerator.generate_moves(1)
+    priomoves, piecescnt = cgenerator.generate_priomoves()
     rank_gmoves(match, priomoves, piecescnt, last_pmove)
     maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 

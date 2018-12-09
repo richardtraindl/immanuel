@@ -86,14 +86,7 @@ class cGenMove(object):
     def format_genmove(self):
         piece = self.match.readfield(self.srcx, self.srcy)
         dstpiece = self.match.readfield(self.dstx, self.dsty)
-
-        if(dstpiece != PIECES['blk']):
-            hyphen = "x"
-        elif( (piece == PIECES['wPw'] or piece == PIECES['bPw']) and 
-               self.srcx != self.dstx ):
-            hyphen = "x"
-        else:
-            hyphen = "-"
+        hyphen = "-"
 
         if(self.prom_piece and self.prom_piece != PIECES['blk']):
             trailing = ", " + reverse_lookup(PIECES, self.prom_piece)
@@ -117,12 +110,12 @@ class cTactic:
 
 class cPrioMove:
     PRIO = {
-        'prio0' : 0,
-        'prio1' : 10,
-        'prio2' : 20,
-        'prio3' : 30,
-        'prio4' : 40,
-        'prio5' : 50 }
+        'prio0' : 100,
+        'prio1' : 200,
+        'prio2' : 300,
+        'prio3' : 400,
+        'prio4' : 500,
+        'prio5' : 600 }
 
     TACTICS = {
         'defends-check' :         10,
@@ -156,35 +149,39 @@ class cPrioMove:
         'neutral' : 7 }
 
     TACTICS_TO_PRIO = {
-        TACTICS['promotes'] :               13,
-        TACTICS['captures'] :               14,
-        TACTICS['is-running-pawn'] :        14, 
-        TACTICS['is-tactical-draw'] :       15,
-        TACTICS['castles'] :                20,
-        TACTICS['attacks-king'] :           20,
-        TACTICS['forks'] :                  23, 
-        TACTICS['defends-fork'] :           23, 
-        TACTICS['pins'] :                   23, 
-        TACTICS['unpins'] :                 23, 
-        TACTICS['supports-running-pawn'] :  24, 
-        TACTICS['supports'] :               24,
-        TACTICS['flees'] :                  24, 
-        TACTICS['blocks'] :                 24,
-        TACTICS['attacks'] :                25,
-        TACTICS['controles-file'] :         33, 
-        TACTICS['is-progress'] :            33,
-        TACTICS['supports-unattacked'] :    33,
-        TACTICS['defends-check']  :         50, 
-        TACTICS['is-undefined'] :           50 }
+        ### level 1 ###
+        TACTICS['promotes'] :               100,
+        TACTICS['captures'] :               110,
+        TACTICS['is-running-pawn'] :        120, 
+        TACTICS['is-tactical-draw'] :       130,
+        ### level 2 ###
+        TACTICS['castles'] :                200,
+        TACTICS['attacks-king'] :           200,
+        TACTICS['forks'] :                  210, 
+        TACTICS['defends-fork'] :           210, 
+        TACTICS['pins'] :                   210, 
+        TACTICS['unpins'] :                 210, 
+        TACTICS['supports-running-pawn'] :  210, 
+        TACTICS['supports'] :               210,
+        TACTICS['flees'] :                  210, 
+        TACTICS['blocks'] :                 210,
+        ### level 3 ###
+        TACTICS['attacks'] :                300,
+        TACTICS['controles-file'] :         310, 
+        TACTICS['is-progress'] :            310,
+        TACTICS['supports-unattacked'] :    310,
+        TACTICS['defends-check']  :         500, 
+        ### level ? ###
+        TACTICS['is-undefined'] :           600 }
 
     SUB_TACTICS_TO_ADJUST = {
-        SUB_TACTICS['stormy'] : -7,
-        SUB_TACTICS['urgent'] : -7,
+        SUB_TACTICS['stormy'] : -70,
+        SUB_TACTICS['urgent'] : -70,
         SUB_TACTICS['good-deal'] : 0,
         SUB_TACTICS['neutral'] : 0,
-        SUB_TACTICS['downgraded'] : 4,
+        SUB_TACTICS['downgraded'] : 40,
         SUB_TACTICS['upgraded'] : 0,
-        SUB_TACTICS['bad-deal'] : 13 }
+        SUB_TACTICS['bad-deal'] : 130 }
 
     def __init__(self, gmove=None, prio=PRIO['prio5']):
         self.gmove = gmove

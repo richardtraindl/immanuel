@@ -245,9 +245,9 @@ def score_endgame(match):
     value = 0
 
     whiterate = ATTACKED_SCORES[PIECES['bPw']]
-    white_step_rates = [ 0, 0, 0, 2, 3, 5, 8, 12]
+    white_step_rates = [ 0, 0, 1, 2, 4, 7, 11, 0]
     blackrate = ATTACKED_SCORES[PIECES['wPw']]
-    black_step_rates = [12, 8, 5, 3, 2, 0, 0, 0 ]
+    black_step_rates = [0, 11, 7, 4, 2, 1, 0, 0 ]
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
@@ -255,15 +255,15 @@ def score_endgame(match):
                 cpawn = cPawn(match, x, y)
                 if(cpawn.is_running()):
                     value += whiterate
-                    value += whiterate * white_step_rates[y]
+                    value += whiterate * white_step_rates[y] # + match.movecnt() / 10
             elif(piece == PIECES['bPw']):
                 cpawn = cPawn(match, x, y)
                 if(cpawn.is_running()):
                     value += blackrate
-                    value += blackrate * black_step_rates[y]
+                    value += blackrate * black_step_rates[y] # - match.movecnt() / 10
 
-    value += score_stuck_pieces_on_baseline(match)
-    value += score_trapped_rooks(match)
+    #value += score_stuck_pieces_on_baseline(match)
+    #value += score_trapped_rooks(match)
     return value
 
 

@@ -98,7 +98,10 @@ class cBishop(cPiece):
     # list_moves(self):
        # works with inherited class
 
-    # generate_moves(self, mode):
+    # generate_moves(self):
+       # works with inherited class
+
+    # generate_priomoves(self):
        # works with inherited class
 
 # class end

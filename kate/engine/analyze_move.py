@@ -47,33 +47,32 @@ def defends_fork(gmove):
 
 def flees(gmove):
     match = gmove.match
-    old_lower_cnt = 0
-    old_higher_cnt = 0
-    new_lower_cnt = 0
-    new_higher_cnt = 0
+    lower_enmy_cnt_old = 0
+    lower_enmy_cnt_new = 0
     piece = match.readfield(gmove.srcx, gmove.srcy)
     color = match.color_of_piece(piece)
-    opp_color = match.oppcolor_of_piece(piece)
-    enmycontacts = list_field_touches(match, opp_color, gmove.srcx, gmove.srcy)
-    for enmy in enmycontacts:
-        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
-            old_lower_cnt += 1
-        else:
-            old_higher_cnt += 1
-    enmycontacts.clear()
+    
+    frdlytouches_old, enmytouches_old = list_all_field_touches(match, color, gmove.srcx, gmove.srcy)
     ###
     match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-    enmycontacts = list_field_touches(match, opp_color, gmove.dstx, gmove.dsty)
-    for enmy in enmycontacts:
-        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
-            new_lower_cnt += 1
-        else:
-            new_higher_cnt += 1
+    frdlytouches_new, enmytouches_new = list_all_field_touches(match, color, gmove.dstx, gmove.dsty)
     match.undo_move()
     ###
-    if((old_lower_cnt + old_higher_cnt) > 0 and 
-       (new_lower_cnt < old_lower_cnt or 
-        new_lower_cnt + new_higher_cnt < old_lower_cnt + old_higher_cnt)):
+
+    if(len(enmytouches_old) > 0 and 
+       (len(frdlytouches_old) < len(frdlytouches_new))):
+        return True
+
+    if(len(enmytouches_old) > len(enmytouches_new)):
+        return True
+
+    for enmy in enmytouches_old:
+        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
+            lower_enmy_cnt_old += 1
+    for enmy in enmytouches_new:
+        if(PIECES_RANK[enmy.piece] < PIECES_RANK[piece]):
+            lower_enmy_cnt_new += 1
+    if(lower_enmy_cnt_old > lower_enmy_cnt_new):
         return True
     else:
         return False

@@ -262,11 +262,12 @@ class cPiece:
                 if(self.is_move_stuck(x1, y1)):
                     continue
 
-                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
-                #if(len(frdlytouches) < len(enmytouches)):
-                    #continue
-                    
                 attacked = self.match.readfield(x1, y1)
+
+                if(attacked == PIECES['wKg'] or attacked == PIECES['bKg']):
+                    continue
+
+                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
 
                 if(self.match.color_of_piece(attacked) == opp_color):
                     if(len(enmytouches) == 0 or 
@@ -326,22 +327,34 @@ class cPiece:
         return movelist
 
 
-    def generate_moves(self, mode):
-        genmoves = []
+    def generate_moves(self):
+        moves = []
         for direction in self.GEN_STEPS:
             for step in direction:
                 dstx = self.xpos + step[0]
                 dsty = self.ypos + step[1]
                 flag, errcode = self.match.is_move_valid(self.xpos, self.ypos, dstx, dsty, step[2])
                 if(flag):
-                    if(mode == 0):
-                        genmoves.append(cGenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2]))
-                    else:
-                        gmove = cGenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2])
-                        genmoves.append(cPrioMove(gmove))
+                    moves.append(cGenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2]))
                 elif(errcode == 31): #cValidator.RETURN_CODES['out-of-bounds']
                     break
-        return genmoves
+        return moves
+
+
+    def generate_priomoves(self):
+        moves = []
+        for direction in self.GEN_STEPS:
+            for step in direction:
+                dstx = self.xpos + step[0]
+                dsty = self.ypos + step[1]
+                flag, errcode = self.match.is_move_valid(self.xpos, self.ypos, dstx, dsty, step[2])
+                if(flag):
+                    gmove = cGenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2])
+                    moves.append(cPrioMove(gmove))
+                elif(errcode == 31): #cValidator.RETURN_CODES['out-of-bounds']
+                    break
+        return moves
+
 # class end
 
 
