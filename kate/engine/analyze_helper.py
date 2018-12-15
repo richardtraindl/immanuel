@@ -245,8 +245,8 @@ def is_piece_le_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
 
 def is_piece_lfe_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
-    if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wKg']]):
-        return False
+    #if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wKg']]):
+        #return False
     for enmy in enmytouches_on_dstfield:
         if(PIECES_RANK[piece] > PIECES_RANK[enmy.piece]):
             if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wQu']]):

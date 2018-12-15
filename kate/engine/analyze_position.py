@@ -95,7 +95,7 @@ def score_supports(match, color):
     return score
 
 
-def score_controled_horizontal_files(match):
+"""def score_controled_horizontal_files(match):
     score = 0
     whiterate = ATTACKED_SCORES[PIECES['bKn']]
     blackrate = ATTACKED_SCORES[PIECES['wKn']]
@@ -130,10 +130,10 @@ def score_controled_horizontal_files(match):
         if(wcnt > bcnt):
             score += whiterate
 
-    return score
+    return score"""
 
 
-def score_controled_vertical_files(match):
+"""def score_controled_vertical_files(match):
     score = 0
     whiterate = ATTACKED_SCORES[PIECES['bKn']]
     blackrate = ATTACKED_SCORES[PIECES['wKn']]
@@ -168,7 +168,7 @@ def score_controled_vertical_files(match):
             elif(bcnt > wcnt):
                 score += blackrate
 
-    return score
+    return score"""
 
 
 def count_on_baseline_trapped_rooks(match, color):
@@ -191,19 +191,19 @@ def count_on_baseline_trapped_rooks(match, color):
 def score_trapped_rooks(match):
     value = 0
     count = count_on_baseline_trapped_rooks(match, COLORS['white'])
-    value += (count * ATTACKED_SCORES[PIECES['wKn']])
+    value += (count * ATTACKED_SCORES[PIECES['wQu']])
     count = count_on_baseline_trapped_rooks(match, COLORS['black'])
-    value += (count * ATTACKED_SCORES[PIECES['bKn']])
+    value += (count * ATTACKED_SCORES[PIECES['bQu']])
     return value
 
 def score_kings_safety(match):
     value = 0
     king = cKing(match, match.board.wKg_x, match.board.wKg_y)
     if(king.is_king_safe() == False):
-        value += ATTACKED_SCORES[PIECES['wKn']]
+        value += ATTACKED_SCORES[PIECES['wQu']]
     king = cKing(match, match.board.bKg_x, match.board.bKg_y)
     if(king.is_king_safe() == False):
-        value += ATTACKED_SCORES[PIECES['bKn']]
+        value += ATTACKED_SCORES[PIECES['bQu']]
     return value
 
 def score_stuck_pieces_on_baseline(match):
@@ -213,41 +213,55 @@ def score_stuck_pieces_on_baseline(match):
             y = match.board.COORD['1']
             knight = PIECES['wKn']
             bishop = PIECES['wBp']
-            rate = ATTACKED_SCORES[PIECES['wKn']]
+            rate = ATTACKED_SCORES[PIECES['wQu']]
         else:
             y = match.board.COORD['8']
             knight = PIECES['bKn']
             bishop = PIECES['bBp']
-            rate = ATTACKED_SCORES[PIECES['bKn']]
+            rate = ATTACKED_SCORES[PIECES['bQu']]
         for x in range(8):
             piece = match.readfield(x, y)
             if(piece == knight or piece == bishop):
                 value += rate
     return value
 
+def score_weak_pawns(match):
+    value = 0
+    for y in range(8):
+        for x in range(8):
+            piece = match.readfield(x, y)
+            if(piece == PIECES['wPw']):
+                cpawn = cPawn(match, x, y)
+                if(cpawn.is_pawn_weak()):
+                    value += ATTACKED_SCORES[PIECES['wQu']]
+            elif(piece == PIECES['bPw']):
+                cpawn = cPawn(match, x, y)
+                if(cpawn.is_pawn_weak()):
+                    value += ATTACKED_SCORES[PIECES['bQu']]
+    return value
 
 def score_opening(match):
     value = 0
     value += score_stuck_pieces_on_baseline(match)
     value += score_kings_safety(match)
     value += score_trapped_rooks(match)
+    value += score_weak_pawns(match)
     return value
-
 
 def score_middlegame(match):
     value = 0
     value += score_stuck_pieces_on_baseline(match)
     value += score_kings_safety(match)
     value += score_trapped_rooks(match)
+    value += score_weak_pawns(match)
     return value
 
 def score_endgame(match):
     value = 0
-
     whiterate = ATTACKED_SCORES[PIECES['bPw']]
-    white_step_rates = [ 0, 0, 1, 2, 4, 7, 11, 0]
+    white_step_rates = [ 0, 0, 1, 2, 3, 4, 5, 0]
     blackrate = ATTACKED_SCORES[PIECES['wPw']]
-    black_step_rates = [0, 11, 7, 4, 2, 1, 0, 0 ]
+    black_step_rates = [0, 5, 4, 3, 2, 1, 0, 0 ]
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)

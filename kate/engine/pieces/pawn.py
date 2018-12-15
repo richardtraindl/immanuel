@@ -458,5 +458,33 @@ class cPawn(cPiece):
     # generate_priomoves(self):
        # works with inherited class
 
+    def is_pawn_weak(self):
+        from .. analyze_helper import list_all_field_touches
+
+        friends, enemies = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
+        if(len(friends) > len(enemies)):
+            return False
+
+        if(self.color == COLORS['white']):
+            stepy = -1
+        else:
+            stepy = 1
+
+        for i in range(2):
+            if(i == 0):
+                newx = self.xpos + 1
+            else:
+                newx = self.xpos - 1
+
+            if(self.match.is_inbounds(newx, self.ypos)):
+                x1, y1 = self.match.search(newx, self.ypos, newx, stepy)
+                if(x1):
+                    piece = self.match.readfield(x1, y1)
+                    if((piece == PIECES['wPw'] or piece == PIECES['bPw']) and
+                       self.color == self.match.color_of_piece(piece)):
+                        return False
+
+        return True
+
 # class end
 

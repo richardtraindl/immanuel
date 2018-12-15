@@ -51,7 +51,11 @@ def flees(gmove):
     lower_enmy_cnt_new = 0
     piece = match.readfield(gmove.srcx, gmove.srcy)
     color = match.color_of_piece(piece)
-    
+
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
+        return False
+
     frdlytouches_old, enmytouches_old = list_all_field_touches(match, color, gmove.srcx, gmove.srcy)
     ###
     match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -462,7 +466,12 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
                 priomove.tactics.append(cTactic(priomove.TACTICS['captures'], priomove.SUB_TACTICS['bad-deal']))
 
         if(does_unpin(priomove.gmove)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['unpins'], priomove.SUB_TACTICS['good-deal']))
+            if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and
+               is_piece_lfe_attacker_on_dstfield_flag):
+                subtactic = priomove.SUB_TACTICS['good-deal']
+            else:
+                subtactic = priomove.SUB_TACTICS['bad-deal']
+            priomove.tactics.append(cTactic(priomove.TACTICS['unpins'], subtactic))
 
         if(defends_fork(priomove.gmove)):
             if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and 
@@ -535,7 +544,12 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
             all_discl_supporting.append(priomove)
 
         if(blocks(priomove.gmove)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['blocks'], priomove.SUB_TACTICS['good-deal']))
+            if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and
+               is_piece_lfe_attacker_on_dstfield_flag):
+                subtactic = priomove.SUB_TACTICS['good-deal']
+            else:
+                subtactic = priomove.SUB_TACTICS['bad-deal']
+            priomove.tactics.append(cTactic(priomove.TACTICS['blocks'], subtactic))
 
         if(running_pawn_in_endgame(priomove.gmove)):
             if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield)):

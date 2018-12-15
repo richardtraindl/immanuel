@@ -166,9 +166,9 @@ class cPrioMove:
         TACTICS['flees'] :                  210, 
         TACTICS['blocks'] :                 210,
         ### level 3 ###
+        TACTICS['controles-file'] :         290, 
+        TACTICS['is-progress'] :            290,
         TACTICS['attacks'] :                300,
-        TACTICS['controles-file'] :         310, 
-        TACTICS['is-progress'] :            310,
         TACTICS['supports-unattacked'] :    310,
         TACTICS['defends-check']  :         500, 
         ### level ? ###
@@ -195,7 +195,7 @@ class cPrioMove:
                 prio_new = self.TACTICS_TO_PRIO[tactitem.tactic] + \
                            self.SUB_TACTICS_TO_ADJUST[tactitem.subtactic]
                 self.prio = min(self.prio, prio_new)
-            self.prio -= len(self.tactics)
+            #self.prio -= len(self.tactics)
 
     def downgrade(self, domain_tactic):
         for tactic in self.tactics:

@@ -268,18 +268,22 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
                 for candidate in candidates:
                     msgs.currentsearch.append(candidate)
 
-        #if(depth == 1):
-        #    diff = match.score + newscore
-        #    diff_limit = abs(match.SCORES[PIECES['wPw']]) * 2
-        #    huge_diff = diff > diff_limit
-        #    elapsed_time = time.time() - starttime
-        #    exceeded = elapsed_time > match.seconds_per_move
-        #else:
-        #    huge_diff = False
-        #    exceeded = False
+        if(depth == 1):
+            if(color == COLORS['white']):
+                #print(str(match.score + (SCORES[PIECES['wPw']] * 2)))
+                huge_diff = maxscore < match.score + (SCORES[PIECES['wPw']] * 2)
+            else:
+                #print(str(match.score + (SCORES[PIECES['bPw']] * 2)))
+                huge_diff = minscore > match.score + (SCORES[PIECES['bPw']] * 2)
+            #elapsed_time = time.time() - starttime
+            #exceeded = elapsed_time > match.seconds_per_move
+            exceeded = False
+        else:
+            huge_diff = False
+            exceeded = False
 
-        #if(huge_diff and exceeded == False and count <= 24):
-            #continue
+        if(huge_diff and exceeded == False and count <= maxcnt + 6):
+            continue
         if(count >= maxcnt):
             break
         if(msgs.terminate):
