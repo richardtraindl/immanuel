@@ -24,6 +24,7 @@ LEVEL_CHOICES = (
     (1, 'low'),
     (2, 'medium'),
     (3, 'high'),
+    (4, 'debug'),
 )
 
 class MatchForm(forms.Form):

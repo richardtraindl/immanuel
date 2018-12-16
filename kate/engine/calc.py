@@ -68,11 +68,16 @@ class SearchLimits:
             self.dpth_stage1 = 4
             self.dpth_stage2 = 7
             self.dpth_max = 12
-        else:
+        elif(match.level == match.LEVELS['high']):
             self.mvcnt = 20
             self.dpth_stage1 = 4
             self.dpth_stage2 = 8
             self.dpth_max = 12
+        else:                       # level debug
+            self.mvcnt = 120
+            self.dpth_stage1 = 1
+            self.dpth_stage2 = 1
+            self.dpth_max = 1
 
         if(match.is_endgame()):
             self.dpth_stage1 += 1
@@ -157,7 +162,16 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
 
     with_check = not cking.is_king_safe()
 
-    if(depth <= slimits.dpth_stage1):
+    if(depth == 1):
+        max_prio = 300
+        resort_for_stormy_moves(priomoves, max_prio, last_pmove_capture_bad_deal, with_check)
+        count = count_up_to_prio(priomoves, max_prio)
+        if(count < slimits.mvcnt):
+            return min(slimits.mvcnt, len(priomoves))
+        else:
+            return count
+        return len(priomoves)
+    elif(depth <= slimits.dpth_stage1):
         if(match.level == match.LEVELS['blitz']):
             max_prio = 190
         else:

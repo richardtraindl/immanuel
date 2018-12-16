@@ -29,36 +29,30 @@ def score_stucks(match):
     return score
 
 
-def score_attacks(match, color):
+def score_attacks_and_supports(match, color):
     score = 0
-
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
-
             if(piece == PIECES['blk']):
                 continue
-            #elif(Match.color_of_piece(piece) != color):
-                #continue
             elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                cpawn= cPawn(match, x, y)
-                score += cpawn.score_attacks()
+                cpiece = cPawn(match, x, y)
             elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                cknight= cKnight(match, x, y)
-                score += cknight.score_attacks()
+                cpiece = cKnight(match, x, y)
             elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                cbishop= cBishop(match, x, y)
-                score += cbishop.score_attacks()
+                cpiece = cBishop(match, x, y)
             elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                crook= cRook(match, x, y)
-                score += crook.score_attacks()    
+                cpiece = cRook(match, x, y)
             elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                cqueen= cQueen(match, x, y)
-                score += cqueen.score_attacks()
+                cpiece = cQueen(match, x, y)
             else:
-                cking= cKing(match, x, y)
-                score += cking.score_attacks()
+                cpiece= cKing(match, x, y)
 
+            if(match.color_of_piece(piece) == color):
+                score += cpiece.score_attacks()
+            else:
+                score += cpiece.score_supports()
     return score
 
 
@@ -298,9 +292,7 @@ def score_position(match, movecnt):
 
         #score += score_stucks(match)
 
-        score += score_attacks(match, color)
-
-        score += score_supports(match, REVERSED_COLORS[color])
+        score += score_attacks_and_supports(match, color)
 
         #score += score_controled_horizontal_files(match)
 

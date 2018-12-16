@@ -28,13 +28,15 @@ class cMatch:
             'blitz' : 0,
             'low' : 1,
             'medium' : 2,
-            'high' : 3 }
+            'high' : 3,
+            'debug' : 4 }
 
     SECONDS_PER_MOVE = {
             LEVELS['blitz'] : 30,
             LEVELS['low'] : 60,
             LEVELS['medium'] : 90,
-            LEVELS['high'] : 120 }
+            LEVELS['high'] : 120,
+            LEVELS['debug'] : 60 }
 
     DIRS = {
         'north' : 1,
