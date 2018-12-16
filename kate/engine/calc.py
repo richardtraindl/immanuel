@@ -296,7 +296,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             huge_diff = False
             exceeded = False
 
-        if(huge_diff and exceeded == False and count <= maxcnt + 6):
+        if(huge_diff and exceeded == False and count < maxcnt + 6):
             continue
         if(count >= maxcnt):
             break

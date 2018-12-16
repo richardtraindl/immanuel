@@ -325,7 +325,6 @@ class cKing(cPiece):
         from .. analyze_helper import list_all_field_touches
 
         score = 0
-
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
         for step in self.STEPS:

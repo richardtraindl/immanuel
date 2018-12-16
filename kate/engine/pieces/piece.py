@@ -247,7 +247,7 @@ class cPiece:
         from .. analyze_helper import list_all_field_touches
 
         score = 0
-
+        count = 0
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
         frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
@@ -257,13 +257,17 @@ class cPiece:
         for step in self.STEPS:
             stepx = step[0]
             stepy = step[1]
-            x1, y1 = self.match.search(self.xpos, self.ypos, stepx, stepy)
-            if(x1 is not None):
+            x1, y1, newcount = self.match.search_and_count(self.xpos, self.ypos, stepx, stepy)
+            if(x1 is None):
+                count += newcount
+                continue
+            else:
                 if(self.is_move_stuck(x1, y1)):
                     continue
 
-                attacked = self.match.readfield(x1, y1)
+                count += newcount
 
+                attacked = self.match.readfield(x1, y1)
                 if(attacked == PIECES['wKg'] or attacked == PIECES['bKg']):
                     continue
 
@@ -288,32 +292,42 @@ class cPiece:
 
                     if(self.match.is_soft_pin(x1, y1)):
                         score += ATTACKED_SCORES[attacked]
-        return score
 
+        if(self.color == COLORS['white']):
+            return score + count
+        else:
+            return score + count * -1
 
     def score_supports(self):
         score = 0
-
+        count = 0
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
         for step in self.STEPS:
             stepx = step[0]
             stepy = step[1]
-            x1, y1 = self.match.search(self.xpos, self.ypos, stepx , stepy)
-            if(x1 is not None):
+            x1, y1, newcount = self.match.search_and_count(self.xpos, self.ypos, stepx , stepy)
+            if(x1 is None):
+                count += newcount
+                continue
+            else:
                 if(x1 == self.xpos and y1 == self.ypos):
                     continue
-
                 if(self.is_move_stuck(x1, y1)):
                     continue
+
+                count += newcount
 
                 supported = self.match.readfield(x1, y1)
 
                 if(self.match.color_of_piece(supported) == self.color):
                     if(self.match.is_field_touched(opp_color, x1, y1, 1)):
                         score += SUPPORTED_SCORES[supported]
-        return score
 
+        if(self.color == COLORS['white']):
+            return score + count * -1
+        else:
+            return score + count
 
     def list_moves(self):
         movelist = []
@@ -325,7 +339,6 @@ class cPiece:
                 if(self.match.color_of_piece(piece) != self.color):
                     movelist.append([x1, y1])
         return movelist
-
 
     def generate_moves(self):
         moves = []
@@ -339,7 +352,6 @@ class cPiece:
                 elif(errcode == 31): #cValidator.RETURN_CODES['out-of-bounds']
                     break
         return moves
-
 
     def generate_priomoves(self):
         moves = []

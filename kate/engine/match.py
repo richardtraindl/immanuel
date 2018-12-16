@@ -163,6 +163,9 @@ class cMatch:
     def search(self, srcx, srcy, stepx, stepy):
         return self.board.search(srcx, srcy, stepx, stepy)
 
+    def search_and_count(self, srcx, srcy, stepx, stepy):
+        return self.board.search_and_count(srcx, srcy, stepx, stepy)
+
     def movecnt(self):
         return len(self.move_list)
 

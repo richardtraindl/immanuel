@@ -56,39 +56,6 @@ def score_attacks_and_supports(match, color):
     return score
 
 
-def score_supports(match, color):
-    score = 0
-
-    for y in range(8):
-        for x in range(8):
-            piece = match.readfield(x, y)
-
-            if(piece == PIECES['blk']):
-                continue
-            elif(match.color_of_piece(piece) != color):
-                continue
-            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                cpawn= cPawn(match, x, y)
-                score += cpawn.score_supports()
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                cknight= cKnight(match, x, y)
-                score += cknight.score_supports()
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                cbishop= cBishop(match, x, y)
-                score += cbishop.score_supports()
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                crook= cRook(match, x, y)
-                score += crook.score_supports()
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                cqueen= cQueen(match, x, y)
-                score += cqueen.score_supports()
-            else:
-                cking= cKing(match, x, y)
-                score += cking.score_supports()
-
-    return score
-
-
 """def score_controled_horizontal_files(match):
     score = 0
     whiterate = ATTACKED_SCORES[PIECES['bKn']]

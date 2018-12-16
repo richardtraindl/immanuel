@@ -160,11 +160,11 @@ class cKnight(cPiece):
         from .. analyze_helper import list_all_field_touches
 
         score = 0
+        count = 0
+        opp_color = self.match.oppcolor_of_piece(self.piece)
 
         if(self.is_piece_stuck()):
             return score
-
-        opp_color = self.match.oppcolor_of_piece(self.piece)
 
         frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
         if(len(frdlytouches) < len(enmytouches)):
@@ -174,12 +174,12 @@ class cKnight(cPiece):
             x1 = self.xpos + step[0]
             y1 = self.ypos + step[1]
             if(self.match.is_inbounds(x1, y1)):
+                count += 1
                 frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
                 #if(len(frdlytouches) < len(enmytouches)):
                     #continue
 
                 attacked = self.match.readfield(x1, y1)
-
                 if(self.match.color_of_piece(attacked) == opp_color):
                     if(len(enmytouches) == 0 or 
                        PIECES_RANK[attacked] > PIECES_RANK[self.piece]):
@@ -192,33 +192,38 @@ class cKnight(cPiece):
 
                     if(self.match.is_soft_pin(x1, y1)):
                         score += ATTACKED_SCORES[attacked]
-        return score
+
+        if(self.color == COLORS['white']):
+            return score + count
+        else:
+            return score + count * -1
 
     def score_supports(self):
         score = 0
+        count = 0
+        opp_color = self.match.oppcolor_of_piece(self.piece)
 
         if(self.is_piece_stuck()):
             return score
 
-        opp_color = self.match.oppcolor_of_piece(self.piece)
-
         for step in self.STEPS:
-            stepx = step[0]
-            stepy = step[1]
-            x1, y1 = self.match.search(self.xpos, self.ypos, stepx , stepy)
-            if(x1 is not None):
-                if(x1 == self.xpos and y1 == self.ypos):
-                    continue
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                count += 1
 
                 supported = self.match.readfield(x1, y1)
-
                 if(supported == PIECES['blk']):
                     continue
 
                 if(self.match.color_of_piece(supported) == self.color):
                     if(self.match.is_field_touched(opp_color, x1, y1, 1)):
                         score += SUPPORTED_SCORES[supported]
-        return score 
+
+        if(self.color == COLORS['white']):
+            return score + count * -1
+        else:
+            return score + count
 
     # list_moves(self):
        # works with inherited class

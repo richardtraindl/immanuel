@@ -432,7 +432,6 @@ class cPawn(cPiece):
 
     def score_supports(self):
         score = 0
-
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
         for step in self.STEPS:

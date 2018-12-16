@@ -237,6 +237,19 @@ class cBoard:
             y += stepy
         return None, None
 
+    def search_and_count(self, srcx, srcy, stepx, stepy):
+        count = 0
+        x = srcx + stepx
+        y = srcy + stepy
+        while(x >= self.COORD['1'] and x <= self.COORD['8'] and y >= self.COORD['1'] and y <= self.COORD['8']):
+            count += 1
+            field = self.readfield(x, y)
+            if(field != PIECES['blk']):
+                return x, y, count
+            x += stepx
+            y += stepy
+        return None, None, count
+
     @classmethod
     def is_inbounds(cls, x, y):
         if(x < cls.COORD['1'] or x > cls.COORD['8'] or y < cls.COORD['1'] or y > cls.COORD['8']):
