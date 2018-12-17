@@ -425,7 +425,8 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
 
         if(defends_check(match)):
             if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and
-               is_piece_lfe_attacker_on_dstfield_flag):
+               is_piece_lfe_attacker_on_dstfield_flag and 
+               match.is_soft_pin(priomove.gmove.srcx, priomove.gmove.srcy) == False):
                 subtactic = priomove.SUB_TACTICS['good-deal']
             else:
                 subtactic = priomove.SUB_TACTICS['bad-deal']

@@ -154,6 +154,7 @@ class cPrioMove:
         TACTICS['captures'] :               110,
         TACTICS['is-running-pawn'] :        120, 
         TACTICS['is-tactical-draw'] :       130,
+        TACTICS['defends-check']  :         150, 
         ### level 2 ###
         TACTICS['castles'] :                200,
         TACTICS['attacks-king'] :           200,
@@ -170,7 +171,6 @@ class cPrioMove:
         TACTICS['is-progress'] :            290,
         TACTICS['attacks'] :                300,
         TACTICS['supports-unattacked'] :    310,
-        TACTICS['defends-check']  :         500, 
         ### level ? ###
         TACTICS['is-undefined'] :           600 }
 
