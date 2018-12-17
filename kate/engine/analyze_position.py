@@ -159,11 +159,11 @@ def score_trapped_rooks(match):
 
 def score_kings_safety(match):
     value = 0
-    king = cKing(match, match.board.wKg_x, match.board.wKg_y)
-    if(king.is_king_safe() == False):
+    cking = cKing(match, match.board.wKg_x, match.board.wKg_y)
+    if(cking.is_safe() == False):
         value += ATTACKED_SCORES[PIECES['wQu']]
-    king = cKing(match, match.board.bKg_x, match.board.bKg_y)
-    if(king.is_king_safe() == False):
+    cking = cKing(match, match.board.bKg_x, match.board.bKg_y)
+    if(cking.is_safe() == False):
         value += ATTACKED_SCORES[PIECES['bQu']]
     return value
 
@@ -193,11 +193,11 @@ def score_weak_pawns(match):
             piece = match.readfield(x, y)
             if(piece == PIECES['wPw']):
                 cpawn = cPawn(match, x, y)
-                if(cpawn.is_pawn_weak()):
+                if(cpawn.is_weak()):
                     value += ATTACKED_SCORES[PIECES['wQu']]
             elif(piece == PIECES['bPw']):
                 cpawn = cPawn(match, x, y)
-                if(cpawn.is_pawn_weak()):
+                if(cpawn.is_weak()):
                     value += ATTACKED_SCORES[PIECES['bQu']]
     return value
 

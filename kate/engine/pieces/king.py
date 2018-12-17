@@ -373,7 +373,7 @@ class cKing(cPiece):
     # generate_priomoves(self):
        # works with inherited class
 
-    def is_king_safe(self):
+    def is_safe(self):
         from .. analyze_helper import list_all_field_touches
 
         count = 0
@@ -418,7 +418,7 @@ class cKing(cPiece):
                     break
         return True
 
-    def is_king_centered(self):
+    def is_centered(self):
         if(self.xpos >= 2 and self.xpos <= 5 and self.ypos >= 2 and self.ypos <= 5):
             return True
         else:

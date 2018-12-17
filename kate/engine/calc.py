@@ -160,7 +160,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     else:
         cking = cKing(match, match.board.wKg_x, match.board.wKg_y)
 
-    with_check = not cking.is_king_safe()
+    with_check = not cking.is_safe()
 
     if(depth == 1):
         max_prio = 300

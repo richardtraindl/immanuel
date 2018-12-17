@@ -498,9 +498,9 @@ def word_debug(session, params):
     match = session.match
 
     king = cKing(match, match.board.wKg_x, match.board.wKg_y)
-    print("wKg - is_king_safe: " + str(king.is_king_safe()))
+    print("wKg - is_king_safe: " + str(king.is_safe()))
     king = cKing(match, match.board.bKg_x, match.board.bKg_y)
-    print("bKg - is_king_safe: " + str(king.is_king_safe()))
+    print("bKg - is_king_safe: " + str(king.is_safe()))
     return True
 
 

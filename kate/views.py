@@ -298,9 +298,9 @@ def dbginfo(request, matchid=None):
     
     str_dbgfunc = []
     king = cKing(match, match.board.wKg_x, match.board.wKg_y)
-    str_dbgfunc.append("wKg - is_king_safe: " + str(king.is_king_safe()))
+    str_dbgfunc.append("wKg - is_king_safe: " + str(king.is_safe()))
     king = cKing(match, match.board.bKg_x, match.board.bKg_y)
-    str_dbgfunc.append("bKg - is_king_safe: " + str(king.is_king_safe()))
+    str_dbgfunc.append("bKg - is_king_safe: " + str(king.is_safe()))
     str_dbgfunc.append("count_on_baseline_trapped_rooks - white: " + str(count_on_baseline_trapped_rooks(match, COLORS['white'])))
     str_dbgfunc.append("count_on_baseline_trapped_rooks - black: " + str(count_on_baseline_trapped_rooks(match, COLORS['black'])))
 

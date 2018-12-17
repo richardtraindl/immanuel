@@ -434,7 +434,7 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
         if(castles(priomove.gmove)):
             match.do_move(priomove.gmove.srcx, priomove.gmove.srcy, priomove.gmove.dstx, priomove.gmove.dsty, priomove.gmove.prom_piece)
             cking = cKing(match, priomove.gmove.dstx, priomove.gmove.dsty)
-            is_king_safe = cking.is_king_safe()
+            is_king_safe = cking.is_safe()
             match.undo_move()
             if(is_king_safe):
                 subtactic = priomove.SUB_TACTICS['good-deal']
