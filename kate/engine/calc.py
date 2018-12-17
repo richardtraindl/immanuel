@@ -20,12 +20,14 @@ def prnt_before_calc(match, count, priomove):
     print("priority: " + str(priomove.prio))
     print("\n***********************************************")
 
+
 def prnt_search(match, label, score, gmove, candidates):
     if(gmove):
         str_gmove = " [" + gmove.format_genmove() + "] "
     else:
         str_gmove = ""
     print(label + str(score).rjust(8, " ") + str_gmove + concat_fmt_gmoves(match, candidates))
+
 
 def concat_fmt_gmoves(match, gmoves):
     str_gmoves = ""
@@ -34,22 +36,18 @@ def concat_fmt_gmoves(match, gmoves):
             str_gmoves += " [" + gmove.format_genmove() + "] "
     return str_gmoves
 
+
 def prnt_priomoves(match, priomoves):
     for priomove in priomoves:
         print("\n" + priomove.gmove.format_genmove() + " prio: " + str(priomove.prio), end=" ")
         priomove.prnt_tactics()
+
 
 def prnt_fmttime(msg, seconds):
     minute, sec = divmod(seconds, 60)
     hour, minute = divmod(minute, 60)
     print( msg + "%02d:%02d:%02d" % (hour, minute, sec))
 
-class Msgs:
-    def __init__(self):
-        self.created_at = time.time()
-        self.terminate = False
-        self.currentsearch = []
-# class end
 
 class SearchLimits:
     def __init__(self, match):
@@ -82,18 +80,18 @@ class SearchLimits:
         if(match.is_endgame()):
             self.dpth_stage1 += 1
             self.dpth_stage2 += 1
-
 # class end
+
 
 def append_newmove(gmove, candidates, newcandidates):
     candidates.clear()
     candidates.append(gmove)
-
     for newcandidate in newcandidates:
         if(newcandidate):
             candidates.append(newcandidate)
         else:
             break
+
 
 def count_up_to_prio(priomoves, prio_limit):
     count = 0
@@ -101,6 +99,7 @@ def count_up_to_prio(priomoves, prio_limit):
         if(priomove.prio <= prio_limit):
             count += 1
     return count
+
 
 def resort_for_stormy_moves(priomoves, new_prio, last_pmove_capture_bad_deal, with_check):
     if(last_pmove_capture_bad_deal == False):
@@ -123,25 +122,6 @@ def resort_for_stormy_moves(priomoves, new_prio, last_pmove_capture_bad_deal, wi
         first_silent.prio = min(first_silent.prio, new_prio - 1)
     priomoves.sort(key=attrgetter('prio'))
 
-def resort_for_stormy_moves_ori(priomoves, new_prio, last_pmove_capture_bad_deal, with_check):
-    count_of_stormy = 0
-    count_of_bad_captures = 0
-    first_silent = None
-    for priomove in priomoves:
-        if(priomove.is_tactic_stormy(with_check)):
-            count_of_stormy += 1
-            priomove.prio = min(priomove.prio, new_prio - 2)
-        elif(last_pmove_capture_bad_deal):
-            if(priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['captures'], cPrioMove.SUB_TACTICS['bad-deal']))):
-                count_of_bad_captures += 1
-                priomove.upgrade(priomove.TACTICS['captures'])
-                priomove.prio = min(priomove.prio, new_prio)
-        else:
-            if(first_silent is None):
-                first_silent = priomove
-    if(count_of_bad_captures > 0 and count_of_stormy == 0 and first_silent):
-        first_silent.prio = min(first_silent.prio, new_prio - 1)
-    priomoves.sort(key=attrgetter('prio'))
 
 def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     if(len(priomoves) == 0 or depth > slimits.dpth_max):
@@ -193,7 +173,8 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         resort_for_stormy_moves(priomoves, 9, last_pmove_capture_bad_deal, with_check)
         return count_up_to_prio(priomoves, 9)
 
-def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
+
+def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
     color = match.next_color()
     candidates = []
     newcandidates = []
@@ -242,9 +223,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
 
             if(maximizing):
-                newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, msgs)
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove)
             else:
-                newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, msgs)
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove)
 
             match.undo_move()
 
@@ -258,10 +239,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             if(depth == 1):
                 prnt_search(match, "CURRENT SEARCH: ", newscore, gmove, newcandidates)
                 prnt_search(match, "CANDIDATE:      ", maxscore, None, candidates)
-                msgs.currentsearch.clear()
-                for candidate in candidates:
-                    msgs.currentsearch.append(candidate)
-
         else:
             if(newscore < minscore):
                 minscore = newscore
@@ -272,9 +249,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             if(depth == 1):
                 prnt_search(match, "CURRENT SEARCH: ", newscore, gmove, newcandidates)
                 prnt_search(match, "CANDIDATE:      ", minscore, None, candidates)
-                msgs.currentsearch.clear()
-                for candidate in candidates:
-                    msgs.currentsearch.append(candidate)
 
         if(depth == 1):
             if(color == COLORS['white']):
@@ -294,15 +268,14 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, msgs):
             continue
         if(count >= maxcnt):
             break
-        if(msgs.terminate):
-            break
 
     if(maximizing):
         return maxscore, candidates
     else:
         return minscore, candidates
 
-def calc_move(match, msgs):
+
+def calc_move(match):
     print("is opening: " + str(match.is_opening()) + \
           " is endgame: " + str(match.is_endgame()))
 
@@ -320,7 +293,7 @@ def calc_move(match, msgs):
         maximizing = match.next_color() == COLORS['white']
         alpha = SCORES[PIECES['wKg']] * 10
         beta = SCORES[PIECES['bKg']] * 10 
-        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, msgs)
+        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None)
 
     ### time
     elapsed_time = time.time() - match.time_start

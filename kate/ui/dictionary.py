@@ -2,7 +2,7 @@ import re, os, threading, copy
 from engine.values import *
 from engine.match import *
 from engine.move import *
-from engine.calc import calc_move, Msgs
+from engine.calc import calc_move
 from engine.pieces.king import cKing
 from engine.debug import prnt_match_attributes, prnt_board, list_match_attributes, list_move_attributes
 from engine.helper import coord_to_index, reverse_lookup
@@ -40,8 +40,6 @@ def init_words():
         return False
     if(new_word("resume", word_resume, "resumes (paused) match") == False):
         return False
-    if(new_word("force", word_force, "terminates calculation") == False):
-        return False
     if(new_word("show", word_show, "prints debug info") == False):
         return False
     if(new_word("set", word_set, "sets attributes, e.g. set level medium") == False):
@@ -78,7 +76,7 @@ class CalcThread(threading.Thread):
     def run(self):
         self.session.thread_is_busy = True
         print("Thread starting...")
-        candidates = calc_move(self.calc_match, self.session.msgs)
+        candidates = calc_move(self.calc_match)
         if(len(candidates) > 0):
             gmove = candidates[0]
             self.session.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -133,13 +131,6 @@ def word_resume(session, params):
     if(match.evaluate_status() == match.STATUS['open']):
         match.status = match.STATUS['open']
     calc_and_domove(session)
-    return True
-
-
-def word_force(session, params):
-    if(session.thread_is_busy):
-        session.msgs.terminate = True
-        print("try to terminante calculation...")
     return True
 
 
@@ -417,7 +408,6 @@ def word_load(session, params):
 
     match.update_attributes()
     session.match = match
-    session.msgs = Msgs()
     
     prnt_match_attributes(session.match, ", ")
     prnt_board(session.match)
@@ -518,7 +508,6 @@ def word_bye(session, params):
         session.terminate = True
         session.thread.join()
         session.thread = None
-        session.terminate = False
     print("bye")
     return False
 
