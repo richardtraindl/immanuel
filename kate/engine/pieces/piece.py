@@ -325,9 +325,9 @@ class cPiece:
                         score += SUPPORTED_SCORES[supported]
 
         if(self.color == COLORS['white']):
-            return score + count * -1
-        else:
             return score + count
+        else:
+            return score + count * -1
 
     def list_moves(self):
         movelist = []

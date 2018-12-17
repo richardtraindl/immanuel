@@ -221,9 +221,9 @@ class cKnight(cPiece):
                         score += SUPPORTED_SCORES[supported]
 
         if(self.color == COLORS['white']):
-            return score + count * -1
-        else:
             return score + count
+        else:
+            return score + count * -1
 
     # list_moves(self):
        # works with inherited class
