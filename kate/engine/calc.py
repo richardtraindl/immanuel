@@ -232,30 +232,28 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
         if(maximizing):
             if(newscore > maxscore):
                 maxscore = newscore
-                append_newmove(gmove, candidates, newcandidates)
                 if(maxscore >= beta):
                     break # beta cut-off
-
-            if(depth == 1):
-                prnt_search(match, "CURRENT SEARCH: ", newscore, gmove, newcandidates)
-                prnt_search(match, "CANDIDATE:      ", maxscore, None, candidates)
+                else:
+                    append_newmove(gmove, candidates, newcandidates)
+                    if(depth == 1):
+                        prnt_search(match, "CURRENT SEARCH: ", newscore, gmove, newcandidates)
+                        prnt_search(match, "CANDIDATE:      ", maxscore, None, candidates)
         else:
             if(newscore < minscore):
                 minscore = newscore
-                append_newmove(gmove, candidates, newcandidates)
                 if(minscore <= alpha):
                     break # alpha cut-off
-
-            if(depth == 1):
-                prnt_search(match, "CURRENT SEARCH: ", newscore, gmove, newcandidates)
-                prnt_search(match, "CANDIDATE:      ", minscore, None, candidates)
+                else:
+                    append_newmove(gmove, candidates, newcandidates)
+                    if(depth == 1):
+                        prnt_search(match, "CURRENT SEARCH: ", newscore, gmove, newcandidates)
+                        prnt_search(match, "CANDIDATE:      ", minscore, None, candidates)
 
         if(depth == 1):
             if(color == COLORS['white']):
-                #print(str(match.score + (SCORES[PIECES['wPw']] * 2)))
                 huge_diff = maxscore < match.score + (SCORES[PIECES['wPw']] * 2)
             else:
-                #print(str(match.score + (SCORES[PIECES['bPw']] * 2)))
                 huge_diff = minscore > match.score + (SCORES[PIECES['bPw']] * 2)
             #elapsed_time = time.time() - starttime
             #exceeded = elapsed_time > match.seconds_per_move
@@ -263,7 +261,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
         else:
             huge_diff = False
             exceeded = False
-
         if(huge_diff and exceeded == False and count < maxcnt + 6):
             continue
         if(count >= maxcnt):
