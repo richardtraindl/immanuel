@@ -221,37 +221,32 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
             newscore = 0
         else:
             match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-
             if(maximizing):
                 newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove)
             else:
                 newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove)
-
             match.undo_move()
+
+        if(depth == 1):
+            prnt_search(match, "CURRENT SEARCH: ", newscore, gmove, newcandidates)
 
         if(maximizing):
             if(newscore > maxscore):
                 maxscore = newscore
                 if(maxscore >= beta):
-                    if(depth == 1):
-                        print("beta cut-off - CURRENT MOVE: " + gmove.format_genmove())
                     break # beta cut-off
                 else:
                     append_newmove(gmove, candidates, newcandidates)
                     if(depth == 1):
-                        prnt_search(match, "CURRENT SEARCH: ", newscore, gmove, newcandidates)
                         prnt_search(match, "CANDIDATE:      ", maxscore, None, candidates)
         else:
             if(newscore < minscore):
                 minscore = newscore
                 if(minscore <= alpha):
-                    if(depth == 1):
-                        print("alpha cut-off - CURRENT MOVE: " + gmove.format_genmove())
                     break # alpha cut-off
                 else:
                     append_newmove(gmove, candidates, newcandidates)
                     if(depth == 1):
-                        prnt_search(match, "CURRENT SEARCH: ", newscore, gmove, newcandidates)
                         prnt_search(match, "CANDIDATE:      ", minscore, None, candidates)
 
         if(depth == 1):
