@@ -233,6 +233,8 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
             if(newscore > maxscore):
                 maxscore = newscore
                 if(maxscore >= beta):
+                    if(depth == 1):
+                        print("beta cut-off CURRENT MOVE: ", gmove.format_genmove())
                     break # beta cut-off
                 else:
                     append_newmove(gmove, candidates, newcandidates)
@@ -243,6 +245,8 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
             if(newscore < minscore):
                 minscore = newscore
                 if(minscore <= alpha):
+                    if(depth == 1):
+                        print("alpha cut-off CURRENT MOVE: ", gmove.format_genmove())
                     break # alpha cut-off
                 else:
                     append_newmove(gmove, candidates, newcandidates)
