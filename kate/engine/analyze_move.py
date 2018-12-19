@@ -326,7 +326,7 @@ def controles_file(gmove):
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
         crook = cRook(match, gmove.srcx, gmove.srcy)
         return crook.move_controles_file(gmove.dstx, gmove.dsty)
-     elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
         cqueen = cQueen(match, gmove.srcx, gmove.srcy)
         return cqueen.move_controles_file(gmove.dstx, gmove.dsty)
     else:
