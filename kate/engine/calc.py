@@ -272,16 +272,22 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
 
 
 def calc_move(match):
-    print("is opening: " + str(match.is_opening()) + \
-          " is endgame: " + str(match.is_endgame()))
+    if(match.is_opening()):
+        msg = "is opening"
+    elif(match.is_endgame()):
+        msg = "is endgame"
+    else:
+        msg = "is middlegame"
+    print(msg)
 
     candidates = []
-    
     slimits = SearchLimits(match)
-
     match.time_start = time.time()
+    gmove = None
 
-    gmove = retrieve_move(match)
+    if(match.is_opening()):
+        gmove = retrieve_move(match)
+
     if(gmove is not None):
         candidates.append(gmove)
         score = match.score
