@@ -319,26 +319,18 @@ def defends_invasion(match, gmove):
 def controles_file(gmove):
     match = gmove.match
     piece = match.readfield(gmove.srcx, gmove.srcy)
-    color = match.color_of_piece(piece)
 
-    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        return False
-    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        return False
-    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        if(bishop.controles_file(match, piece, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)):
-            return True
+    if(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+        cbishop = cBishop(match, gmove.srcx, gmove.srcy)
+        return cbishop.move_controles_file(gmove.dstx, gmove.dsty)
     elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        if(rook.controles_file(match, piece, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)):
-            return True
-    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        if(rook.controles_file(match, piece, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)):
-            return True
-        if(bishop.controles_file(match, piece, color, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)):
-            return True
-
-    return False
-
+        crook = cRook(match, gmove.srcx, gmove.srcy)
+        return crook.move_controles_file(gmove.dstx, gmove.dsty)
+     elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+        cqueen = cQueen(match, gmove.srcx, gmove.srcy)
+        return cqueen.move_controles_file(gmove.dstx, gmove.dsty)
+    else:
+        return False
 
 def is_tactical_draw(gmove):
     newmatch = copy.deepcopy(gmove.match)
@@ -560,10 +552,13 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
             priomove.tactics.append(cTactic(priomove.TACTICS['is-running-pawn'], subtactic))
             all_running.append(priomove)
 
-        """if(controles_file(priomove.gmove)):
-            if(len(supports_of_dstfield) >= len(attacks_on_dstfield) and 
+        if(controles_file(priomove.gmove)):
+            if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and
                is_piece_lfe_attacker_on_dstfield_flag):
-                priomove.tactics.append(cTactic(priomove.TACTICS['controles-file'], priomove.SUB_TACTICS['good-deal']))"""
+                subtactic = priomove.SUB_TACTICS['good-deal']
+            else:
+                subtactic = priomove.SUB_TACTICS['bad-deal']
+            priomove.tactics.append(cTactic(priomove.TACTICS['controles-file'], subtactic))
 
         if(is_progress(priomove.gmove)):
             priomove.tactics.append(cTactic(priomove.TACTICS['is-progress'], priomove.SUB_TACTICS['neutral']))
