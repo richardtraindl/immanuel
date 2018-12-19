@@ -194,9 +194,9 @@ class cKnight(cPiece):
                         score += ATTACKED_SCORES[attacked]
 
         if(self.color == COLORS['white']):
-            return score + count
+            return score + count * 2
         else:
-            return score + count * -1
+            return score + count * -2
 
     def score_supports(self):
         score = 0
@@ -221,9 +221,9 @@ class cKnight(cPiece):
                         score += SUPPORTED_SCORES[supported]
 
         if(self.color == COLORS['white']):
-            return score + count
+            return score + count * 2
         else:
-            return score + count * -1
+            return score + count * -2
 
     # list_moves(self):
        # works with inherited class
