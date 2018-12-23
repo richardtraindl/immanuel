@@ -316,12 +316,12 @@ def is_attacked_soft_pinned(gmove, attacked):
     return is_soft_pinned
 
 
-def is_piece_le_captured(gmove):
+def is_piece_lfe_captured(gmove):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
-    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        return True
     captured_piece = gmove.match.readfield(gmove.dstx, gmove.dsty)
-    if(PIECES_RANK[piece] <= PIECES_RANK[captured_piece]):
-        return True
-    else:
-        return False
+    if(PIECES_RANK[piece] > PIECES_RANK[captured_piece]):
+        if(PIECES_RANK[piece] == PIECES_RANK[PIECES['wQu']]):
+            return False
+        if(PIECES_RANK[captured_piece] == PIECES_RANK[PIECES['wPw']]):
+            return False
+    return True

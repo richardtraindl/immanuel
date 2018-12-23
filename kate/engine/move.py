@@ -111,6 +111,7 @@ class cTactic:
 class cPrioMove:
     PRIO = {
         'prio0' : 0,
+        'prio1' : 150,
         'prio5' : 300 }
 
     TACTICS = {
@@ -243,9 +244,11 @@ class cPrioMove:
 
     def is_tactic_stormy(self, with_check):
         for tactitem in self.tactics:
-            if((tactitem.tactic == self.TACTICS['promotes'] or
-                tactitem.tactic == self.TACTICS['captures']) and 
-                tactitem.subtactic <= self.SUB_TACTICS['good-deal']):
+            if(tactitem.subtactic == self.SUB_TACTICS['stormy'] or
+               tactitem.subtactic == self.SUB_TACTICS['urgent'] or
+               ((tactitem.tactic == self.TACTICS['promotes'] or
+                 tactitem.tactic == self.TACTICS['captures']) and 
+                tactitem.subtactic == self.SUB_TACTICS['good-deal'])):
                 return True
             if(with_check):
                 # tactitem.tactic == self.TACTICS['defends-check'])

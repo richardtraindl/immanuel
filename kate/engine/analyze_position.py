@@ -49,33 +49,6 @@ def score_touches(match):
     return score
 
 
-def score_attacks_and_supports(match, color):
-    score = 0
-    for y in range(8):
-        for x in range(8):
-            piece = match.readfield(x, y)
-            if(piece == PIECES['blk']):
-                continue
-            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                cpiece = cPawn(match, x, y)
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                cpiece = cKnight(match, x, y)
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                cpiece = cBishop(match, x, y)
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                cpiece = cRook(match, x, y)
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                cpiece = cQueen(match, x, y)
-            else:
-                cpiece= cKing(match, x, y)
-
-            if(match.color_of_piece(piece) == color):
-                score += cpiece.score_attacks()
-            else:
-                score += cpiece.score_supports()
-    return score
-
-
 def score_controled_horizontal_files(match):
     score = 0
     whiterate = ATTACKED_SCORES[PIECES['bKn']]
@@ -271,25 +244,16 @@ def score_position(match, movecnt):
             return SCORES[PIECES['blk']]
     else:
         score = match.score
-
-        color = match.next_color()
-
         score += score_stucks(match)
-
         score += score_touches(match)
-        #score += score_attacks_and_supports(match, color)
-
         score += score_controled_horizontal_files(match)
-
         score += score_controled_vertical_files(match)
-
         if(match.is_opening()):
             score += score_opening(match)
         elif(match.is_endgame()):
             score += score_endgame(match)
         else:
             score += score_middlegame(match)
-
         return score
 
 

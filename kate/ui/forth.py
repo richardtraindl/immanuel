@@ -3,7 +3,7 @@ from . dictionary import *
 
 
 class Session:
-    def __init__(self, match=None, msgs=None):
+    def __init__(self, match=None):
         self.thread = None
         self.thread_is_busy = False
         self.match = match
@@ -30,7 +30,7 @@ def interpret(session, inputstr):
 
 def forth():
     lstparam = ['White', 'h', 'Black', "m"]
-    session = Session(new_match(lstparam), Msgs())
+    session = Session(new_match(lstparam))
 
     if(init_words() == False):
         return

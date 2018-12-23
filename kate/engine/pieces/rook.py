@@ -89,10 +89,7 @@ class cRook(cPiece):
     #move_controles_file(self, dstx, dsty)
         # works with inherited class
 
-    #score_attacks(self):
-        # works with inherited class
-
-    #score_supports(self):
+    #score_touches(self):
         # works with inherited class
 
     # list_moves(self):

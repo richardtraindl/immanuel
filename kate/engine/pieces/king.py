@@ -346,47 +346,6 @@ class cKing(cPiece):
                             score += ATTACKED_SCORES[touched]
         return score
 
-    def score_attacks(self):
-        from .. analyze_helper import list_all_field_touches
-
-        score = 0
-        opp_color = self.match.oppcolor_of_piece(self.piece)
-
-        for step in self.STEPS:
-            x1 = self.xpos + step[0]
-            y1 = self.ypos + step[1]
-            if(self.match.is_inbounds(x1, y1)):
-                attacked = self.match.readfield(x1, y1)
-                if(self.match.color_of_piece(attacked) == opp_color):
-                    frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
-                    if(len(frdlytouches) <= len(enmytouches)):
-                        score += ATTACKED_SCORES[attacked]
-
-                        # extra score if attacked is pinned
-                        if(self.match.is_soft_pin(x1, y1)):
-                            score += ATTACKED_SCORES[attacked]
-        return score
-
-    def score_supports(self):
-        from .. analyze_helper import list_all_field_touches
-
-        score = 0
-        opp_color = self.match.oppcolor_of_piece(self.piece)
-
-        for step in self.STEPS:
-            x1 = self.xpos + step[0]
-            y1 = self.ypos + step[1]
-            if(self.match.is_inbounds(x1, y1)):
-                if(x1 == self.xpos and y1 == self.ypos):
-                    continue
-
-                supported = self.match.readfield(x1, y1)
-                if(self.match.color_of_piece(supported) == self.color):
-                    frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
-                    if(len(enmytouches) > 0):
-                        score += SUPPORTED_SCORES[supported]
-        return score 
-
     # list_moves(self):
        # works with inherited class
 

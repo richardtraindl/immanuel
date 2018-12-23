@@ -92,7 +92,6 @@ def calc_and_domove(session):
     if(session.thread_is_busy == False and 
        match.evaluate_status() == match.STATUS['open'] and 
        match.is_next_color_human() == False):
-        session.msgs.terminate = False
         session.thread = CalcThread(session)
         session.thread.start()
 
