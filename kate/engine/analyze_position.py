@@ -13,19 +13,39 @@ def score_stucks(match):
     whiterate = ATTACKED_SCORES[PIECES['bPw']]
     blackrate = ATTACKED_SCORES[PIECES['wPw']]
     score = 0
-
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
             if(piece == PIECES['blk']):
                 continue
-
             if(is_piece_stuck(match, x, y)):
                 if(match.color_of_piece(piece) == COLORS['white']):
                     score += blackrate
                 else:
                     score += whiterate
+    return score
 
+
+def score_touches(match):
+    score = 0
+    for y in range(8):
+        for x in range(8):
+            piece = match.readfield(x, y)
+            if(piece == PIECES['blk']):
+                continue
+            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                cpiece = cPawn(match, x, y)
+            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
+                cpiece = cKnight(match, x, y)
+            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
+                cpiece = cBishop(match, x, y)
+            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
+                cpiece = cRook(match, x, y)
+            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
+                cpiece = cQueen(match, x, y)
+            else:
+                cpiece= cKing(match, x, y)
+            score += cpiece.score_touches()
     return score
 
 
@@ -56,7 +76,7 @@ def score_attacks_and_supports(match, color):
     return score
 
 
-"""def score_controled_horizontal_files(match):
+def score_controled_horizontal_files(match):
     score = 0
     whiterate = ATTACKED_SCORES[PIECES['bKn']]
     blackrate = ATTACKED_SCORES[PIECES['wKn']]
@@ -72,7 +92,6 @@ def score_attacks_and_supports(match, color):
                 bcnt += 1
             else:
                 continue
-
         if(bcnt > wcnt):
             score += blackrate
 
@@ -87,14 +106,13 @@ def score_attacks_and_supports(match, color):
                 wcnt += 1
             else:
                 continue
-
         if(wcnt > bcnt):
             score += whiterate
 
-    return score"""
+    return score
 
 
-"""def score_controled_vertical_files(match):
+def score_controled_vertical_files(match):
     score = 0
     whiterate = ATTACKED_SCORES[PIECES['bKn']]
     blackrate = ATTACKED_SCORES[PIECES['wKn']]
@@ -128,8 +146,7 @@ def score_attacks_and_supports(match, color):
                 score += whiterate
             elif(bcnt > wcnt):
                 score += blackrate
-
-    return score"""
+    return score
 
 
 def count_on_baseline_trapped_rooks(match, color):
@@ -257,13 +274,14 @@ def score_position(match, movecnt):
 
         color = match.next_color()
 
-        #score += score_stucks(match)
+        score += score_stucks(match)
 
-        score += score_attacks_and_supports(match, color)
+        score += score_touches(match)
+        #score += score_attacks_and_supports(match, color)
 
-        #score += score_controled_horizontal_files(match)
+        score += score_controled_horizontal_files(match)
 
-        #score += score_controled_vertical_files(match)
+        score += score_controled_vertical_files(match)
 
         if(match.is_opening()):
             score += score_opening(match)

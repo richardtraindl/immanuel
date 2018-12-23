@@ -110,12 +110,8 @@ class cTactic:
 
 class cPrioMove:
     PRIO = {
-        'prio0' : 100,
-        'prio1' : 200,
-        'prio2' : 300,
-        'prio3' : 400,
-        'prio4' : 500,
-        'prio5' : 600 }
+        'prio0' : 0,
+        'prio5' : 300 }
 
     TACTICS = {
         'defends-check' :         10,
@@ -151,35 +147,34 @@ class cPrioMove:
     TACTICS_TO_PRIO = {
         ### level 1 ###
         TACTICS['promotes'] :               100,
-        TACTICS['captures'] :               110,
-        TACTICS['is-running-pawn'] :        120, 
-        TACTICS['is-tactical-draw'] :       130,
-        TACTICS['defends-check']  :         150, 
+        TACTICS['captures'] :               105,
+        TACTICS['is-running-pawn'] :        110,
+        TACTICS['is-tactical-draw'] :       115,
+        TACTICS['defends-check']  :         120,
         ### level 2 ###
         TACTICS['castles'] :                200,
-        TACTICS['attacks-king'] :           200,
-        TACTICS['forks'] :                  210, 
+        TACTICS['attacks-king'] :           205,
+        #TACTICS['forks'] :                  210, 
         TACTICS['defends-fork'] :           210, 
-        TACTICS['pins'] :                   210, 
-        TACTICS['unpins'] :                 210, 
-        TACTICS['supports-running-pawn'] :  210, 
-        TACTICS['supports'] :               210,
-        TACTICS['flees'] :                  210, 
-        TACTICS['blocks'] :                 210,
+        #TACTICS['pins'] :                   210, 
+        TACTICS['unpins'] :                 215, 
+        TACTICS['supports-running-pawn'] :  220, 
+        TACTICS['flees'] :                  225, 
+        TACTICS['blocks'] :                 230,
+        TACTICS['controles-file'] :         235, 
+        TACTICS['is-progress'] :            240,
+        TACTICS['supports'] :               245,
+        TACTICS['attacks'] :                250,
+        TACTICS['supports-unattacked'] :    255,
         ### level 3 ###
-        TACTICS['controles-file'] :         290, 
-        TACTICS['is-progress'] :            290,
-        TACTICS['attacks'] :                300,
-        TACTICS['supports-unattacked'] :    310,
-        ### level ? ###
-        TACTICS['is-undefined'] :           600 }
+        TACTICS['is-undefined'] :           300 }
 
     SUB_TACTICS_TO_ADJUST = {
         SUB_TACTICS['stormy'] : -70,
         SUB_TACTICS['urgent'] : -70,
         SUB_TACTICS['good-deal'] : 0,
         SUB_TACTICS['neutral'] : 0,
-        SUB_TACTICS['downgraded'] : 40,
+        SUB_TACTICS['downgraded'] : 60,
         SUB_TACTICS['upgraded'] : 0,
         SUB_TACTICS['bad-deal'] : 130 }
 

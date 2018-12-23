@@ -416,7 +416,7 @@ class cMatch:
                     return self.STATUS['winner_white']
         return self.STATUS['draw']
 
-    def evaluate_pin_dir(self, srcx, srcy):
+    def eval_pin_dir(self, srcx, srcy):
         cpieces = [cRook, cBishop]
         white_faces = [PIECES['wRk'], PIECES['wBp']]
         black_faces = [PIECES['bRk'], PIECES['bBp']]
@@ -457,7 +457,7 @@ class cMatch:
 
     def is_pinned(self, x, y):
         piece = self.readfield(x, y)
-        direction = self.evaluate_pin_dir(x, y)
+        direction = self.eval_pin_dir(x, y)
         return direction != self.DIRS['undefined']
 
     def is_soft_pin(self, srcx, srcy):

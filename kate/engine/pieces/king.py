@@ -321,6 +321,31 @@ class cKing(cPiece):
     def move_controles_file(self, dstx, dsty):
         return False
 
+    def score_touches(self):
+        from .. analyze_helper import list_all_field_touches
+        score = 0
+
+        for step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                touched = self.match.readfield(x1, y1)
+                if(touched == PIECES['blk']):
+                    continue
+                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
+                if(len(frdlytouches) <= len(enmytouches)):
+                    if(self.match.color_of_piece(touched) == self.color):
+                        score += SUPPORTED_SCORES[touched]
+                        # extra score if supported is pinned
+                        if(self.match.is_soft_pin(x1, y1)):
+                            score += SUPPORTED_SCORES[touched] // 2
+                    else:
+                        score += ATTACKED_SCORES[touched]
+                        # extra score if attacked is pinned
+                        if(self.match.is_soft_pin(x1, y1)):
+                            score += ATTACKED_SCORES[touched]
+        return score
+
     def score_attacks(self):
         from .. analyze_helper import list_all_field_touches
 
@@ -332,22 +357,20 @@ class cKing(cPiece):
             y1 = self.ypos + step[1]
             if(self.match.is_inbounds(x1, y1)):
                 attacked = self.match.readfield(x1, y1)
-
                 if(self.match.color_of_piece(attacked) == opp_color):
-                    score += ATTACKED_SCORES[attacked]
-
-                    # extra score if attacked is pinned
-                    enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color, 
-                    if(enmy_pin != self.DIRS['undefined']):
+                    frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
+                    if(len(frdlytouches) <= len(enmytouches)):
                         score += ATTACKED_SCORES[attacked]
 
-                    if(self.match.is_soft_pin(x1, y1)):
-                        score += ATTACKED_SCORES[attacked]
+                        # extra score if attacked is pinned
+                        if(self.match.is_soft_pin(x1, y1)):
+                            score += ATTACKED_SCORES[attacked]
         return score
 
     def score_supports(self):
-        score = 0
+        from .. analyze_helper import list_all_field_touches
 
+        score = 0
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
         for step in self.STEPS:
@@ -358,9 +381,9 @@ class cKing(cPiece):
                     continue
 
                 supported = self.match.readfield(x1, y1)
-
                 if(self.match.color_of_piece(supported) == self.color):
-                    if(self.match.is_field_touched(opp_color, x1, y1, 1)):
+                    frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
+                    if(len(enmytouches) > 0):
                         score += SUPPORTED_SCORES[supported]
         return score 
 

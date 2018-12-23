@@ -116,7 +116,7 @@ class cPawn(cPiece):
         if(move_dir == self.DIRS['undefined']):
             return False
 
-        pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos) #self.color, 
+        pin_dir = self.match.eval_pin_dir(self.xpos, self.ypos)
 
         dstpiece = self.match.readfield(dstx, dsty)
 
@@ -394,11 +394,39 @@ class cPawn(cPiece):
                     break
         return True
 
+    def score_touches(self):
+        from .. analyze_helper import list_all_field_touches
+        score = 0
+
+        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
+        if(len(frdlytouches) < len(enmytouches)):
+            return score
+
+        for step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_inbounds(x1, y1)):
+                touched = self.match.readfield(x1, y1)
+                if(touched == PIECES['blk']):
+                    continue
+                if(self.is_move_stuck(x1, y1)):
+                    continue
+                if(self.match.color_of_piece(touched) == self.color):
+                    score += SUPPORTED_SCORES[touched]
+                    # extra score if supported is pinned
+                    if(self.match.is_soft_pin(x1, y1)):
+                        score += SUPPORTED_SCORES[touched] // 2
+                else:
+                    score += ATTACKED_SCORES[touched]
+                    # extra score if attacked is pinned
+                    if(self.match.is_soft_pin(x1, y1)):
+                        score += ATTACKED_SCORES[touched]
+        return score
+
     def score_attacks(self):
         from .. analyze_helper import list_all_field_touches
 
         score = 0
-
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
         frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
@@ -412,27 +440,26 @@ class cPawn(cPiece):
                 if(self.is_move_stuck(x1, y1)):
                     continue
 
-                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
-                #if(len(frdlytouches) < len(enmytouches)):
-                    #continue
-
-                piece = self.match.readfield(x1, y1)
-
-                if(self.match.color_of_piece(piece) == opp_color):
-                    score += ATTACKED_SCORES[piece]
+                attacked = self.match.readfield(x1, y1)
+                if(attacked == PIECES['wKg'] or attacked == PIECES['bKg']):
+                    continue
+                if(self.match.color_of_piece(attacked) == opp_color):
+                    score += ATTACKED_SCORES[attacked]
 
                     # extra score if attacked is pinned
-                    enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color
-                    if(enmy_pin != self.DIRS['undefined']):
-                        score += ATTACKED_SCORES[piece]
-
                     if(self.match.is_soft_pin(x1, y1)):
-                        score += ATTACKED_SCORES[piece]
+                        score += ATTACKED_SCORES[attacked]
         return score
 
     def score_supports(self):
+        from .. analyze_helper import list_all_field_touches
+
         score = 0
         opp_color = self.match.oppcolor_of_piece(self.piece)
+
+        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
+        if(len(frdlytouches) < len(enmytouches)):
+            return score
 
         for step in self.STEPS:
             x1 = self.xpos + step[0]
@@ -442,9 +469,11 @@ class cPawn(cPiece):
                     continue
 
                 supported = self.match.readfield(x1, y1)
-
+                if(supported == PIECES['wKg'] or supported == PIECES['bKg']):
+                    continue
                 if(self.match.color_of_piece(supported) == self.color):
-                    if(self.match.is_field_touched(opp_color, x1, y1, 1)):
+                    frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
+                    if(len(enmytouches) > 0):
                         score += SUPPORTED_SCORES[supported]
         return score
  

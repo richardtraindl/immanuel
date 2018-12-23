@@ -46,7 +46,9 @@ class cPiece:
         return True
 
     def is_piece_stuck(self):
-        pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos)
+        pin_dir = self.match.eval_pin_dir(self.xpos, self.ypos)
+        if(pin_dir == self.DIRS['undefined']):
+            return False
         for piecedir in self.DIRS_ARY:
             if(pin_dir == piecedir):
                 return False
@@ -54,7 +56,7 @@ class cPiece:
 
     def is_move_stuck(self, dstx, dsty):
         mv_dir = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
-        pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos)
+        pin_dir = self.match.eval_pin_dir(self.xpos, self.ypos)
         if(pin_dir == self.DIRS['undefined'] or mv_dir == pin_dir or self.REVERSE_DIRS[mv_dir] == pin_dir):
             return False
         else:
@@ -67,7 +69,7 @@ class cPiece:
             return False
 
         stepx, stepy = self.step_for_dir(direction)
-        pin_dir = self.match.evaluate_pin_dir(self.xpos, self.ypos) # self.color, 
+        pin_dir = self.match.eval_pin_dir(self.xpos, self.ypos)
         for piecedir in self.DIRS_ARY:
             if(direction == piecedir):
                 if(pin_dir != piecedir and pin_dir != self.REVERSE_DIRS[piecedir] and pin_dir != self.DIRS['undefined']):
@@ -243,6 +245,39 @@ class cPiece:
         else:
             return False
 
+    def score_touches(self):
+        from .. analyze_helper import list_all_field_touches
+        score = 0
+
+        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
+        if(len(frdlytouches) < len(enmytouches)):
+            return score
+
+        for step in self.STEPS:
+            stepx = step[0]
+            stepy = step[1]
+            x1, y1 = self.match.search(self.xpos, self.ypos, stepx, stepy)
+            if(x1 is None):
+                continue
+            else:
+                if(self.is_move_stuck(x1, y1)):
+                    continue
+                touched = self.match.readfield(x1, y1)
+                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
+                if(len(frdlytouches) <= len(enmytouches) or
+                   PIECES_RANK[touched] >= PIECES_RANK[self.piece]):
+                    if(self.match.color_of_piece(touched) == self.color):
+                        score += SUPPORTED_SCORES[touched]
+                        # extra score if supported is pinned
+                        if(self.match.is_soft_pin(x1, y1)):
+                            score += SUPPORTED_SCORES[touched] // 2
+                    else:
+                        score += ATTACKED_SCORES[touched]
+                        # extra score if attacked is pinned
+                        if(self.match.is_soft_pin(x1, y1)):
+                            score += ATTACKED_SCORES[touched]
+        return score
+
     def score_attacks(self):
         from .. analyze_helper import list_all_field_touches
 
@@ -270,28 +305,15 @@ class cPiece:
                 attacked = self.match.readfield(x1, y1)
                 if(attacked == PIECES['wKg'] or attacked == PIECES['bKg']):
                     continue
-
-                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
-
                 if(self.match.color_of_piece(attacked) == opp_color):
-                    if(len(enmytouches) == 0 or 
-                       PIECES_RANK[self.piece] <= PIECES_RANK[attacked]):
+                    frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
+                    if(len(frdlytouches) <= len(enmytouches) or
+                       PIECES_RANK[attacked] >= PIECES_RANK[self.piece]):
                         score += ATTACKED_SCORES[attacked]
 
-                    # extra score if attacked is pinned
-                    direction = self.dir_for_move(self.xpos, self.ypos, x1, y1)
-                    enmy_pin = self.match.evaluate_pin_dir(x1, y1) #opp_color, 
-                    if(enmy_pin != self.match.DIRS['undefined']):
-                        if(enmy_pin != direction and 
-                           enmy_pin != self.match.REVERSE_DIRS[direction]):
+                        # extra score if attacked is pinned
+                        if(self.match.is_soft_pin(x1, y1)):
                             score += ATTACKED_SCORES[attacked]
-                        else:
-                            if(PIECES_RANK[attacked] != PIECES_RANK[self.piece] and
-                               attacked != PIECES['wPw'] and attacked != PIECES['bPw']):
-                                score += ATTACKED_SCORES[attacked]
-
-                    if(self.match.is_soft_pin(x1, y1)):
-                        score += ATTACKED_SCORES[attacked]
 
         if(self.color == COLORS['white']):
             return score + count * 2
@@ -299,9 +321,15 @@ class cPiece:
             return score + count * -2
 
     def score_supports(self):
+        from .. analyze_helper import list_all_field_touches
+
         score = 0
         count = 0
         opp_color = self.match.oppcolor_of_piece(self.piece)
+
+        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
+        if(len(frdlytouches) < len(enmytouches)):
+            return score
 
         for step in self.STEPS:
             stepx = step[0]
@@ -319,9 +347,11 @@ class cPiece:
                 count += newcount
 
                 supported = self.match.readfield(x1, y1)
-
+                if(supported == PIECES['wKg'] or supported == PIECES['bKg']):
+                    continue
                 if(self.match.color_of_piece(supported) == self.color):
-                    if(self.match.is_field_touched(opp_color, x1, y1, 1)):
+                    frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
+                    if(len(enmytouches) > 0):
                         score += SUPPORTED_SCORES[supported]
 
         if(self.color == COLORS['white']):
