@@ -185,13 +185,16 @@ class cPrioMove:
         self.prio = prio
 
     def evaluate_priorities(self):
+        count = 0
         self.prio = self.PRIO['prio5']
         if(self.tactics):
             for tactitem in self.tactics:
                 prio_new = self.TACTICS_TO_PRIO[tactitem.tactic] + \
                            self.SUB_TACTICS_TO_ADJUST[tactitem.subtactic]
                 self.prio = min(self.prio, prio_new)
-            #self.prio -= len(self.tactics)
+                if(tactitem.subtactic <= self.SUB_TACTICS['good-deal']):
+                    count += 1
+            self.prio -= count
 
     def downgrade(self, domain_tactic):
         for tactic in self.tactics:

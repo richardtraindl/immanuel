@@ -6,24 +6,7 @@ from .pieces.bishop import cBishop
 from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
-from .analyze_helper import list_all_field_touches, is_piece_stuck
-
-
-def score_stucks(match):
-    whiterate = ATTACKED_SCORES[PIECES['bPw']]
-    blackrate = ATTACKED_SCORES[PIECES['wPw']]
-    score = 0
-    for y in range(8):
-        for x in range(8):
-            piece = match.readfield(x, y)
-            if(piece == PIECES['blk']):
-                continue
-            if(is_piece_stuck(match, x, y)):
-                if(match.color_of_piece(piece) == COLORS['white']):
-                    score += blackrate
-                else:
-                    score += whiterate
-    return score
+from .analyze_helper import list_all_field_touches
 
 
 def score_touches(match):
@@ -244,7 +227,6 @@ def score_position(match, movecnt):
             return SCORES[PIECES['blk']]
     else:
         score = match.score
-        score += score_stucks(match)
         score += score_touches(match)
         score += score_controled_horizontal_files(match)
         score += score_controled_vertical_files(match)

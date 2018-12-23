@@ -261,7 +261,12 @@ class cPiece:
                 continue
             else:
                 if(self.is_move_stuck(x1, y1)):
+                    if(self.color == COLORS['white']):
+                        score += ATTACKED_SCORES[PIECES['wPw']]
+                    else:
+                        score += ATTACKED_SCORES[PIECES['bPw']]
                     continue
+
                 touched = self.match.readfield(x1, y1)
                 frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
                 if(len(frdlytouches) <= len(enmytouches) or

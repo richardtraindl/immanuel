@@ -410,6 +410,10 @@ class cPawn(cPiece):
                 if(touched == PIECES['blk']):
                     continue
                 if(self.is_move_stuck(x1, y1)):
+                    if(self.color == COLORS['white']):
+                        score += ATTACKED_SCORES[PIECES['wPw']]
+                    else:
+                        score += ATTACKED_SCORES[PIECES['bPw']]
                     continue
                 if(self.match.color_of_piece(touched) == self.color):
                     score += SUPPORTED_SCORES[touched]

@@ -161,6 +161,10 @@ class cKnight(cPiece):
         score = 0
 
         if(self.is_piece_stuck()):
+            if(self.color == COLORS['white']):
+                score += ATTACKED_SCORES[PIECES['wPw']]
+            else:
+                score += ATTACKED_SCORES[PIECES['bPw']]
             return score
 
         frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
