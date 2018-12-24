@@ -52,23 +52,23 @@ def prnt_fmttime(msg, seconds):
 class SearchLimits:
     def __init__(self, match):
         if(match.level == match.LEVELS['blitz']):
+            self.mvcnt = 6
+            self.dpth_stage1 = 2
+            self.dpth_stage2 = 5
+            self.dpth_max = 8
+        elif(match.level == match.LEVELS['low']):
             self.mvcnt = 8
             self.dpth_stage1 = 3
             self.dpth_stage2 = 6
             self.dpth_max = 10
-        elif(match.level == match.LEVELS['low']):
+        elif(match.level == match.LEVELS['medium']):
             self.mvcnt = 12
             self.dpth_stage1 = 3
-            self.dpth_stage2 = 6
-            self.dpth_max = 10
-        elif(match.level == match.LEVELS['medium']):
-            self.mvcnt = 16
-            self.dpth_stage1 = 4
             self.dpth_stage2 = 7
             self.dpth_max = 12
         elif(match.level == match.LEVELS['high']):
-            self.mvcnt = 20
-            self.dpth_stage1 = 4
+            self.mvcnt = 16
+            self.dpth_stage1 = 3
             self.dpth_stage2 = 8
             self.dpth_max = 12
         else:                       # level debug
@@ -143,23 +143,15 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     with_check = False
 
     if(depth <= slimits.dpth_stage1):
-        if(match.level == match.LEVELS['blitz']):
-            max_prio = 255 #195
-        else:
-            max_prio = 255
         resort_for_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove_capture_bad_deal, with_check)
-        count = count_up_to_prio(priomoves, max_prio)
+        count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio2'])
         if(count < slimits.mvcnt):
             return min(slimits.mvcnt, len(priomoves))
         else:
-            return slimits.mvcnt #count
-    elif(depth <= slimits.dpth_stage2):
-        if(match.level == match.LEVELS['blitz']):
-            max_prio = 195
-        else:
-            max_prio = 195
-        resort_for_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove_capture_bad_deal, with_check)
-        return count_up_to_prio(priomoves, max_prio)
+            if(match.level == match.LEVELS['blitz']):
+                return slimits.mvcnt
+            else:
+                return count
     else:
         resort_for_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove_capture_bad_deal, with_check)
         return count_up_to_prio(priomoves, cPrioMove.PRIO['prio1'])

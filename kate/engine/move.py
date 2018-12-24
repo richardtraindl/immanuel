@@ -110,9 +110,9 @@ class cTactic:
 
 class cPrioMove:
     PRIO = {
-        'prio0' : 0,
         'prio1' : 150,
-        'prio5' : 300 }
+        'prio2' : 250,
+        'prio3' : 300 }
 
     TACTICS = {
         'defends-check' :         10,
@@ -148,27 +148,27 @@ class cPrioMove:
     TACTICS_TO_PRIO = {
         ### level 1 ###
         TACTICS['promotes'] :               100,
-        TACTICS['captures'] :               105,
-        TACTICS['is-running-pawn'] :        110,
-        TACTICS['is-tactical-draw'] :       115,
-        TACTICS['defends-check']  :         120,
+        TACTICS['captures'] :               101,
+        TACTICS['is-running-pawn'] :        102,
+        TACTICS['is-tactical-draw'] :       103,
+        TACTICS['defends-check']  :         104,
         ### level 2 ###
         TACTICS['castles'] :                200,
-        TACTICS['attacks-king'] :           205,
-        #TACTICS['forks'] :                  210, 
-        TACTICS['defends-fork'] :           210, 
-        #TACTICS['pins'] :                   210, 
-        TACTICS['unpins'] :                 215, 
-        TACTICS['supports-running-pawn'] :  220, 
-        TACTICS['flees'] :                  225, 
-        TACTICS['blocks'] :                 230,
-        TACTICS['controles-file'] :         235, 
-        TACTICS['is-progress'] :            240,
-        TACTICS['supports'] :               245,
-        TACTICS['attacks'] :                250,
-        TACTICS['supports-unattacked'] :    255,
+        TACTICS['attacks-king'] :           201,
+        #TACTICS['forks'] :                  202, 
+        TACTICS['defends-fork'] :           203, 
+        #TACTICS['pins'] :                   204, 
+        TACTICS['unpins'] :                 205, 
+        TACTICS['supports-running-pawn'] :  206, 
+        TACTICS['flees'] :                  207, 
+        TACTICS['blocks'] :                 208,
+        TACTICS['controles-file'] :         209, 
+        TACTICS['is-progress'] :            210,
+        TACTICS['supports'] :               211,
+        TACTICS['attacks'] :                212,
+        TACTICS['supports-unattacked'] :    213,
         ### level 3 ###
-        TACTICS['is-undefined'] :           300 }
+        TACTICS['is-undefined'] :           500 }
 
     SUB_TACTICS_TO_ADJUST = {
         SUB_TACTICS['stormy'] : -70,
@@ -179,14 +179,14 @@ class cPrioMove:
         SUB_TACTICS['upgraded'] : 0,
         SUB_TACTICS['bad-deal'] : 130 }
 
-    def __init__(self, gmove=None, prio=PRIO['prio5']):
+    def __init__(self, gmove=None, prio=PRIO['prio3']):
         self.gmove = gmove
         self.tactics = []
         self.prio = prio
 
     def evaluate_priorities(self):
         count = 0
-        self.prio = self.PRIO['prio5']
+        self.prio = self.PRIO['prio3']
         if(self.tactics):
             for tactitem in self.tactics:
                 prio_new = self.TACTICS_TO_PRIO[tactitem.tactic] + \
