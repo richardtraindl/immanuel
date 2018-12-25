@@ -102,7 +102,7 @@ class cPawn(cPiece):
     #step_for_dir(direction):
         # not used for pawn
 
-    def is_piece_trapped(self):
+    def is_trapped(self):
         return False # pawn cannot be trapped
 
     #is_piece_stuck(self):

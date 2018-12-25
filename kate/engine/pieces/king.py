@@ -73,7 +73,7 @@ class cKing(cPiece):
     #step_for_dir(direction):
         # not used for king
 
-    def is_piece_trapped(self):
+    def is_trapped(self):
         return False # king cannot be trapped
 
     def is_piece_stuck(self):

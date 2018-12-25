@@ -60,7 +60,7 @@ class cKnight(cPiece):
     #step_for_dir(direction):
         # not used for knight
 
-    def is_piece_trapped(self):
+    def is_trapped(self):
         return False # knight cannot be trapped
 
     #is_piece_stuck(self):

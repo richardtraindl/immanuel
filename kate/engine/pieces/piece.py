@@ -27,21 +27,26 @@ class cPiece:
     def step_for_dir(cls, direction):
         return cls.UNDEF_X, cls.UNDEF_Y
 
-    def is_piece_trapped(self):
+    def is_trapped(self):
+        from .. analyze_helper import list_all_field_touches
+
         for step in self.STEPS:
             x1 = self.xpos + step[0]
             y1 = self.ypos + step[1]
             if(self.match.is_inbounds(x1, y1)):
                 dstpiece = self.match.readfield(x1, y1)
-                if(dstpiece == PIECES['blk']):
-                    return False
-                elif(self.match.color_of_piece(dstpiece) == self.color):
+                if(self.match.color_of_piece(dstpiece) == self.color):
                     continue
                 else:
-                    if(self.match.is_field_touched(self.match.oppcolor_of_piece(self.piece), x1, y1, 0)):
-                        if(PIECES_RANK[self.piece] <= PIECES_RANK[dstpiece]):
-                            return False
-                    else:
+                    if(dstpiece != PIECES['blk'] and PIECES_RANK[self.piece] <= PIECES_RANK[dstpiece]):
+                        return False
+                    frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
+                    enmy_is_lower = False
+                    for enmy in enmytouches:
+                        if(PIECES_RANK[enmy.piece] < PIECES_RANK[self.piece]):
+                            enmy_is_lower = True
+                            break
+                    if(len(frdlytouches) >= len(enmytouches) and enmy_is_lower == False):
                         return False
         return True
 

@@ -9,7 +9,7 @@ from .pieces.queen import cQueen
 from .analyze_helper import list_all_field_touches
 
 
-def score_touches(match):
+def score_traps_and_touches(match):
     score = 0
     for y in range(8):
         for x in range(8):
@@ -28,7 +28,10 @@ def score_touches(match):
                 cpiece = cQueen(match, x, y)
             else:
                 cpiece= cKing(match, x, y)
+
             score += cpiece.score_touches()
+            if(cpiece.is_trapped()):
+                score += SCORES[cpiece.piece] // 3
     return score
 
 
@@ -105,31 +108,6 @@ def score_controled_vertical_files(match):
     return score
 
 
-def count_on_baseline_trapped_rooks(match, color):
-    count = 0
-    if(color == COLORS['white']):
-        y = match.board.COORD['1']
-        rook = PIECES['wRk']
-    else:
-        y = match.board.COORD['8']
-        rook = PIECES['bRk']
-
-    for x in range(8):
-        piece = match.readfield(x, y)
-        if(piece == rook):
-            crook = cRook(match, x, y)
-            if(crook.is_rook_trapped()):
-                count += 1
-    return count
-
-def score_trapped_rooks(match):
-    value = 0
-    count = count_on_baseline_trapped_rooks(match, COLORS['white'])
-    value += (count * ATTACKED_SCORES[PIECES['wQu']])
-    count = count_on_baseline_trapped_rooks(match, COLORS['black'])
-    value += (count * ATTACKED_SCORES[PIECES['bQu']])
-    return value
-
 def score_kings_safety(match):
     value = 0
     cking = cKing(match, match.board.wKg_x, match.board.wKg_y)
@@ -140,24 +118,26 @@ def score_kings_safety(match):
         value += ATTACKED_SCORES[PIECES['bQu']]
     return value
 
-def score_stuck_pieces_on_baseline(match):
+
+def score_penalty_for_knight_bishop_on_baseline(match):
     value = 0
     for i in range(2):
         if(i == 0):
             y = match.board.COORD['1']
             knight = PIECES['wKn']
             bishop = PIECES['wBp']
-            rate = ATTACKED_SCORES[PIECES['wQu']]
+            rate = ATTACKED_SCORES[PIECES['wBp']]
         else:
             y = match.board.COORD['8']
             knight = PIECES['bKn']
             bishop = PIECES['bBp']
-            rate = ATTACKED_SCORES[PIECES['bQu']]
+            rate = ATTACKED_SCORES[PIECES['bBp']]
         for x in range(8):
             piece = match.readfield(x, y)
             if(piece == knight or piece == bishop):
                 value += rate
     return value
+
 
 def score_weak_pawns(match):
     value = 0
@@ -174,21 +154,22 @@ def score_weak_pawns(match):
                     value += ATTACKED_SCORES[PIECES['bQu']]
     return value
 
+
 def score_opening(match):
     value = 0
-    value += score_stuck_pieces_on_baseline(match)
+    value += score_penalty_for_knight_bishop_on_baseline(match)
     value += score_kings_safety(match)
-    value += score_trapped_rooks(match)
     value += score_weak_pawns(match)
     return value
 
+
 def score_middlegame(match):
     value = 0
-    value += score_stuck_pieces_on_baseline(match)
+    value += score_penalty_for_knight_bishop_on_baseline(match)
     value += score_kings_safety(match)
-    value += score_trapped_rooks(match)
     value += score_weak_pawns(match)
     return value
+
 
 def score_endgame(match):
     value = 0
@@ -209,9 +190,7 @@ def score_endgame(match):
                 if(cpawn.is_running()):
                     value += blackrate
                     value += blackrate * black_step_rates[y] # - match.movecnt() / 10
-
-    #value += score_stuck_pieces_on_baseline(match)
-    #value += score_trapped_rooks(match)
+    value += score_kings_safety(match)
     return value
 
 
@@ -227,7 +206,7 @@ def score_position(match, movecnt):
             return SCORES[PIECES['blk']]
     else:
         score = match.score
-        score += score_touches(match)
+        score += score_traps_and_touches(match)
         score += score_controled_horizontal_files(match)
         score += score_controled_vertical_files(match)
         if(match.is_opening()):

@@ -98,7 +98,7 @@ class cQueen(cPiece):
         else:
             return cls.UNDEF_X, cls.UNDEF_Y
 
-    #is_piece_trapped(self)
+    #is_trapped(self)
         # works with inherited class
 
     #is_piece_stuck(self):

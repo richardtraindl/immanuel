@@ -62,7 +62,7 @@ class cRook(cPiece):
         else:
             return cls.UNDEF_X, cls.UNDEF_Y
 
-    #is_piece_trapped(self)
+    #is_trapped(self)
         # works with inherited class
 
     #is_piece_stuck(self):
@@ -100,22 +100,6 @@ class cRook(cPiece):
 
     # generate_priomoves(self):
        # works with inherited class
-
-    def is_rook_trapped(self):
-        count = 0
-        for direction in self.GEN_STEPS:
-            for step in direction:
-                dstx = self.xpos + step[0]
-                dsty = self.ypos + step[1]
-                if(self.match.board.is_inbounds(dstx, dsty)):
-                    piece = self.match.readfield(dstx, dsty)
-                    if(piece == PIECES['blk']):
-                        count += 1
-                    else:
-                        if(self.match.color_of_piece(self.piece) != self.match.color_of_piece(piece)):
-                            count += 1
-                        break
-        return count <= 3
 
 # class end
 

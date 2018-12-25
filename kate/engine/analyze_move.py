@@ -282,14 +282,40 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
 
 
 def blocks(gmove):
-    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
-    color = gmove.match.color_of_piece(piece)
-    oppenents = search_opposed_pieces(gmove.match, color, gmove.dstx, gmove.dsty, gmove.srcx, gmove.srcy)
-    for oppenent in oppenents:
-        if(PIECES_RANK[oppenent[0].piece] > PIECES_RANK[oppenent[1].piece] and 
-           PIECES_RANK[oppenent[0].piece] > PIECES_RANK[piece]):
-            return True
-    return False
+    match = gmove.match
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+    color = match.color_of_piece(piece)
+    #frdlytouches_before_count = 0
+    enmytouches_before_count = 0
+    #frdlytouches_after_count = 0
+    enmytouches_after_count = 0
+
+    for step in cQueen.STEPS:
+        stepx = step[0]
+        stepy = step[1]
+        x1, y1 = match.search(gmove.dstx, gmove.dsty, stepx, stepy)
+        if(x1 is not None):
+            dstpiece = match.readfield(x1, y1)
+            if(match.color_of_piece(dstpiece) == color):
+                frdlytouches, enmytouches = list_all_field_touches(match, color, x1, y1)
+                enmytouches_before_count += len(enmytouches)
+
+    match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    for step in cQueen.STEPS:
+        stepx = step[0]
+        stepy = step[1]
+        x1, y1 = match.search(gmove.dstx, gmove.dsty, stepx, stepy)
+        if(x1 is not None):
+            dstpiece = match.readfield(x1, y1)
+            if(match.color_of_piece(dstpiece) == color):
+                frdlytouches, enmytouches = list_all_field_touches(match, color, x1, y1)
+                enmytouches_after_count += len(enmytouches)
+    match.undo_move()
+
+    if(enmytouches_after_count < enmytouches_before_count):
+           return True
+    else:
+        return False
 
 
 def running_pawn_in_endgame(gmove):
