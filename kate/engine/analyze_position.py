@@ -147,11 +147,33 @@ def score_weak_pawns(match):
             if(piece == PIECES['wPw']):
                 cpawn = cPawn(match, x, y)
                 if(cpawn.is_weak()):
-                    value += ATTACKED_SCORES[PIECES['wQu']]
+                    value += ATTACKED_SCORES[PIECES['wKg']]
             elif(piece == PIECES['bPw']):
                 cpawn = cPawn(match, x, y)
                 if(cpawn.is_weak()):
-                    value += ATTACKED_SCORES[PIECES['bQu']]
+                    value += ATTACKED_SCORES[PIECES['bKg']]
+    return value
+
+
+def score_penalty_for_weak_fianchetto(match):
+    value = 0
+
+    piece = match.readfield(match.board.COORD['2'], match.board.COORD['2'])
+    if(piece == PIECES['blk']):
+        value += ATTACKED_SCORES[PIECES['wRk']]
+
+    piece = match.readfield(match.board.COORD['7'], match.board.COORD['2'])
+    if(piece == PIECES['blk']):
+        value += ATTACKED_SCORES[PIECES['wRk']]
+
+    piece = match.readfield(match.board.COORD['2'], match.board.COORD['7'])
+    if(piece == PIECES['blk']):
+        value += ATTACKED_SCORES[PIECES['bRk']]
+
+    piece = match.readfield(match.board.COORD['7'], match.board.COORD['7'])
+    if(piece == PIECES['blk']):
+        value += ATTACKED_SCORES[PIECES['bRk']]
+
     return value
 
 
@@ -160,6 +182,7 @@ def score_opening(match):
     value += score_penalty_for_knight_bishop_on_baseline(match)
     value += score_kings_safety(match)
     value += score_weak_pawns(match)
+    value += score_penalty_for_weak_fianchetto(match)
     return value
 
 

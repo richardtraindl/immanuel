@@ -205,19 +205,19 @@ def list_field_touches(match, color, fieldx, fieldy):
 def is_fork_field(match, color, forkx, forky, excludes):
     opp_color = REVERSED_COLORS[color]
     crookfield = rookfield.cRookField(match, forkx, forky)
-    if(crookfield.is_field_touched(opp_color, 2)):
+    if(crookfield.is_field_touched(opp_color, match.EVAL_MODES['all-pins'])):
         if(crookfield.count_touches(color, excludes) > 1):
             return True
     cbishopfield = bishopfield.cBishopField(match, forkx, forky)
-    if(cbishopfield.is_field_touched(opp_color, 2)):
+    if(cbishopfield.is_field_touched(opp_color, match.EVAL_MODES['all-pins'])):
         if(cbishopfield.count_touches(color, excludes) > 1):
             return True
     cknightfield = knightfield.cKnightField(match, forkx, forky)
-    if(cknightfield.is_field_touched(opp_color, 2)):
+    if(cknightfield.is_field_touched(opp_color, match.EVAL_MODES['all-pins'])):
         if(cknightfield.count_touches(color, excludes) > 1):
             return True
     cpawnfield = pawnfield.cPawnField(match, forkx, forky)
-    if(cpawnfield.is_field_touched(opp_color, 2)):
+    if(cpawnfield.is_field_touched(opp_color, match.EVAL_MODES['all-pins'])):
         if(cpawnfield.count_touches(color, excludes) > 1):
             return True
     ckingfield = kingfield.cKingField(match, forkx, forky)
@@ -260,6 +260,14 @@ def is_supported_weak(gmove, supported):
                      gmove.match.is_soft_pin(supported.fieldx, supported.fieldy)
     gmove.match.undo_move()
     return supported_weak
+
+
+def is_supporter_lower_attacker(gmove, supported):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    for attacker in supported.attacker_beyond:
+        if(PIECES_RANK[piece] >= PIECES_RANK[attacker.piece]):
+            return False
+    return True
 
 
 def is_supported_le_attacker(from_dstfield_supported):

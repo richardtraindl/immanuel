@@ -108,6 +108,12 @@ class cMatch:
         RETURN_CODES['general-error'] : "general error",
     }
 
+    EVAL_MODES = {
+        'ignore-pins' : 0,
+        'only-pins-to-king' : 1,
+        'all-pins' : 2
+    }
+
     def __init__(self):
         self.status = self.STATUS['open']
         self.score = 0
@@ -202,7 +208,7 @@ class cMatch:
         if(king != PIECES['wKg'] and king != PIECES['bKg']):
             return False
         color = self.color_of_piece(king)
-        return self.is_field_touched(REVERSED_COLORS[color], x1, y1, 0)
+        return self.is_field_touched(REVERSED_COLORS[color], x1, y1, self.EVAL_MODES['ignore-pins'])
 
     def is_last_move_promotion(self):
         if(len(self.move_list) > 0):
@@ -354,9 +360,9 @@ class cMatch:
         self.writefield(dstx, dsty, piece)
 
         if(self.color_of_piece(piece) == COLORS['white']):
-            flag = self.is_field_touched(COLORS['black'], self.board.wKg_x, self.board.wKg_y, 0)
+            flag = self.is_field_touched(COLORS['black'], self.board.wKg_x, self.board.wKg_y, self.EVAL_MODES['ignore-pins'])
         else:
-            flag = self.is_field_touched(COLORS['white'], self.board.bKg_x, self.board.bKg_y, 0)
+            flag = self.is_field_touched(COLORS['white'], self.board.bKg_x, self.board.bKg_y, self.EVAL_MODES['ignore-pins'])
 
         self.writefield(dstx, dsty, dstpiece)
         self.writefield(srcx, srcy, piece)
@@ -409,10 +415,10 @@ class cMatch:
             return self.STATUS['open']
         else:
             if(self.next_color() == COLORS['white']):
-                if(self.is_field_touched(COLORS['black'], self.board.wKg_x, self.board.wKg_y, 0)):
+                if(self.is_field_touched(COLORS['black'], self.board.wKg_x, self.board.wKg_y, self.EVAL_MODES['ignore-pins'])):
                     return self.STATUS['winner_black']
             else:
-                if(self.is_field_touched(COLORS['white'], self.board.bKg_x, self.board.bKg_y, 0)):
+                if(self.is_field_touched(COLORS['white'], self.board.bKg_x, self.board.bKg_y, self.EVAL_MODES['ignore-pins'])):
                     return self.STATUS['winner_white']
         return self.STATUS['draw']
 

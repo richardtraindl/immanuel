@@ -65,7 +65,7 @@ class cKingField(cPieceField):
 
                 if(self.match.color_of_piece(piece) == color):
                     if(piece == PIECES['wKg'] or piece == PIECES['bKg'] or 
-                       self.match.is_field_touched(color, x1, y1, 1) == False):
+                       self.match.is_field_touched(color, x1, y1, self.match.EVAL_MODES['only-pins-to-king']) == False):
                         count += 1
         return count
 

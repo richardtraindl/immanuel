@@ -52,15 +52,15 @@ class cPieceField:
                             flag = True
                             break
                 if(flag):
-                    if(mode == 0):
+                    if(mode == self.match.EVAL_MODES['ignore-pins']):
                         return True
-                    elif(mode == 1):
+                    elif(mode == self.match.EVAL_MODES['only-pins-to-king']):
                         cpiece = self.obj_for_piece(piece, x1, y1)
                         if(cpiece.is_move_stuck(self.fieldx, self.fieldy)):
                             continue
                         else:
                             return True
-                    else: #mode == 2
+                    else: #mode == EVAL_MODES['all-pins']
                         cpiece = self.obj_for_piece(piece, x1, y1)
                         if(cpiece.is_move_stuck(self.fieldx, self.fieldy) or self.match.is_soft_pin(x1, y1)):
                             continue
@@ -144,7 +144,7 @@ class cPieceField:
 
                 if(self.match.color_of_piece(piece) == color):
                     if(piece == PIECES['wKg'] or piece == PIECES['bKg'] or 
-                       self.match.is_field_touched(color, x1, y1, 1) == False):
+                       self.match.is_field_touched(color, x1, y1, self.match.EVAL_MODES['only-pins-to-king']) == False):
                         count += 1
         return count
 

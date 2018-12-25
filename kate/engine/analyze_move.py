@@ -393,11 +393,11 @@ def is_progress(gmove):
         piece = match.readfield(gmove.srcx, gmove.srcy)
         if(piece == PIECES['wPw']):
             if(gmove.srcy == match.board.COORD['2'] and 
-               gmove.srcx >= match.board.COORD['2'] and gmove.srcx <= match.board.COORD['7']):
+               gmove.srcx >= match.board.COORD['3'] and gmove.srcx <= match.board.COORD['6']):
                 return True
         elif(piece == PIECES['bPw']):
             if(gmove.srcy == match.board.COORD['7'] and 
-               gmove.srcx >= match.board.COORD['2'] and gmove.srcx <= match.board.COORD['7']):
+               gmove.srcx >= match.board.COORD['3'] and gmove.srcx <= match.board.COORD['6']):
                 return True
         elif(piece == PIECES['wKn']):
             if(gmove.srcy == match.board.COORD['1'] and 
@@ -513,17 +513,24 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
         if(len(from_dstfield_supported) > 0):
             if(subtactic == priomove.SUB_TACTICS['good-deal'] and 
                is_supported_le_attacker(from_dstfield_supported)):
-                supp_subtactic = priomove.SUB_TACTICS['good-deal']
+                support_subtactic = priomove.SUB_TACTICS['good-deal']
             else:
-                supp_subtactic = priomove.SUB_TACTICS['bad-deal']
+                support_subtactic = priomove.SUB_TACTICS['bad-deal']
 
             for supported in from_dstfield_supported:
                 if(is_supported_running_pawn(match, supported)):
-                    priomove.tactics.append(cTactic(priomove.TACTICS['supports-running-pawn'], supp_subtactic))
-                elif(is_supported_weak(gmove, supported)):
-                    priomove.tactics.append(cTactic(priomove.TACTICS['supports'], supp_subtactic))
+                    support_tactic = priomove.TACTICS['supports-running-pawn']
+                elif(len(supported.attacker_beyond) > 0):
+                    support_tactic = priomove.TACTICS['supports']
                 else:
-                    priomove.tactics.append(cTactic(priomove.TACTICS['supports-unattacked'], supp_subtactic))
+                    support_tactic = priomove.TACTICS['supports-unattacked']
+
+                if(support_subtactic == priomove.SUB_TACTICS['good-deal'] and 
+                   len(supported.attacker_beyond) > 0 and
+                   is_supporter_lower_attacker(gmove, supported)):
+                    support_subtactic = priomove.SUB_TACTICS['urgent']
+                       
+                priomove.tactics.append(cTactic(support_tactic, support_subtactic))
             all_supporting.append(priomove)
 
         if(len(discl_attacked) > 0):

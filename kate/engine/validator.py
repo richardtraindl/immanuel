@@ -122,9 +122,9 @@ class cValidator:
         match.writefield(dstx, dsty, piece)
 
         if(match.color_of_piece(piece) == match.COLORS['white']):
-            flag = cls.is_field_touched(match, match.COLORS['black'], match.board.wKg_x, match.board.wKg_y, 0)
+            flag = cls.is_field_touched(match, match.COLORS['black'], match.board.wKg_x, match.board.wKg_y, self.match.EVAL_MODES['ignore-pins'])
         else:
-            flag = cls.is_field_touched(match, match.COLORS['white'], match.board.bKg_x, match.board.bKg_y, 0)
+            flag = cls.is_field_touched(match, match.COLORS['white'], match.board.bKg_x, match.board.bKg_y, self.match.EVAL_MODES['ignore-pins'])
 
         match.writefield(dstx, dsty, dstpiece)
         match.writefield(srcx, srcy, piece)

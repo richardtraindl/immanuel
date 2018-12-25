@@ -29,6 +29,9 @@ class cPiece:
 
     def is_trapped(self):
         from .. analyze_helper import list_all_field_touches
+        
+        if(self.match.is_field_touched(REVERSED_COLORS[self.color], self.xpos, self.ypos, self.match.EVAL_MODES['only-pins-to-king']) == False):
+            return False
 
         for step in self.STEPS:
             x1 = self.xpos + step[0]

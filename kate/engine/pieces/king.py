@@ -96,7 +96,7 @@ class cKing(cPiece):
         captured = self.match.readfield(dstx, dsty)
         self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
         self.match.writefield(dstx, dsty, self.piece)
-        attacked = self.match.is_field_touched(opp_color, dstx, dsty, 0)
+        attacked = self.match.is_field_touched(opp_color, dstx, dsty, self.match.EVAL_MODES['ignore-pins'])
         self.match.writefield(self.xpos, self.ypos, self.piece)
         self.match.writefield(dstx, dsty, captured)
         if(attacked == True):
@@ -216,7 +216,7 @@ class cKing(cPiece):
         self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
         for i in range(3):
             castlingx = self.xpos + i
-            attacked = self.match.is_field_touched(opp_color, castlingx, self.ypos, 0)
+            attacked = self.match.is_field_touched(opp_color, castlingx, self.ypos, self.match.EVAL_MODES['ignore-pins'])
             if(attacked == True):
                 self.match.writefield(self.xpos, self.ypos, self.piece)
                 return False
@@ -248,7 +248,7 @@ class cKing(cPiece):
         self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
         for i in range(0, -3, -1):
             castlingx = self.xpos + i
-            attacked = self.match.is_field_touched(opp_color, castlingx, self.ypos, 0)
+            attacked = self.match.is_field_touched(opp_color, castlingx, self.ypos, self.match.EVAL_MODES['ignore-pins'])
             if(attacked == True):
                 self.match.writefield(self.xpos, self.ypos, self.piece)
                 return False
