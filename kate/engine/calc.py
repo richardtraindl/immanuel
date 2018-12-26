@@ -52,30 +52,29 @@ def prnt_fmttime(msg, seconds):
 class SearchLimits:
     def __init__(self, match):
         if(match.level == match.LEVELS['blitz']):
-            self.mvcnt = 6
-            self.dpth_stage1 = 2
-            self.dpth_stage2 = 5
-            self.dpth_max = 8
-        elif(match.level == match.LEVELS['low']):
-            self.mvcnt = 8
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 6
-            self.dpth_max = 10
-        elif(match.level == match.LEVELS['medium']):
-            self.mvcnt = 12
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 7
-            self.dpth_max = 12
-        elif(match.level == match.LEVELS['high']):
-            self.mvcnt = 16
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 8
-            self.dpth_max = 12
-        else:                       # level debug
-            self.mvcnt = 120
             self.dpth_stage1 = 1
-            self.dpth_stage2 = 1
-            self.dpth_max = 1
+            self.mvcnt_stage1 = 12
+            self.dpth_stage2 = 2
+            self.mvcnt_stage2 = 6
+            self.dpth_max = 6
+        elif(match.level == match.LEVELS['low']):
+            self.dpth_stage1 = 1
+            self.mvcnt_stage1 = 16
+            self.dpth_stage2 = 3
+            self.mvcnt_stage2 = 8
+            self.dpth_max = 8
+        elif(match.level == match.LEVELS['medium']):
+            self.dpth_stage1 = 2
+            self.mvcnt_stage1 = 20
+            self.dpth_stage2 = 4
+            self.mvcnt_stage2 = 10
+            self.dpth_max = 10
+        else: #match.LEVELS['high']
+            self.dpth_stage1 = 2
+            self.mvcnt_stage1 = 24
+            self.dpth_stage2 = 5
+            self.mvcnt_stage2 = 12
+            self.dpth_max = 12
 
         if(match.is_endgame()):
             self.dpth_stage1 += 1
@@ -144,12 +143,22 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
 
     if(depth <= slimits.dpth_stage1):
         resort_for_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove_capture_bad_deal, with_check)
-        count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio2'])
-        if(count < slimits.mvcnt):
-            return min(slimits.mvcnt, len(priomoves))
+        count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio3'])
+        if(count < slimits.mvcnt_stage1):
+            return min(slimits.mvcnt_stage1, len(priomoves))
         else:
             if(match.level == match.LEVELS['blitz']):
-                return slimits.mvcnt
+                return slimits.mvcnt_stage1
+            else:
+                return count
+    elif(depth <= slimits.dpth_stage2):
+        resort_for_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove_capture_bad_deal, with_check)
+        count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio2'])
+        if(count < slimits.mvcnt_stage2):
+            return min(slimits.mvcnt_stage2, len(priomoves))
+        else:
+            if(match.level == match.LEVELS['blitz']):
+                return slimits.mvcnt_stage2
             else:
                 return count
     else:

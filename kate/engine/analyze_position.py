@@ -126,12 +126,12 @@ def score_penalty_for_knight_bishop_on_baseline(match):
             y = match.board.COORD['1']
             knight = PIECES['wKn']
             bishop = PIECES['wBp']
-            rate = ATTACKED_SCORES[PIECES['wBp']]
+            rate = ATTACKED_SCORES[PIECES['wRk']]
         else:
             y = match.board.COORD['8']
             knight = PIECES['bKn']
             bishop = PIECES['bBp']
-            rate = ATTACKED_SCORES[PIECES['bBp']]
+            rate = ATTACKED_SCORES[PIECES['bRk']]
         for x in range(8):
             piece = match.readfield(x, y)
             if(piece == knight or piece == bishop):
@@ -147,11 +147,11 @@ def score_weak_pawns(match):
             if(piece == PIECES['wPw']):
                 cpawn = cPawn(match, x, y)
                 if(cpawn.is_weak()):
-                    value += ATTACKED_SCORES[PIECES['wKg']]
+                    value += ATTACKED_SCORES[PIECES['wRk']]
             elif(piece == PIECES['bPw']):
                 cpawn = cPawn(match, x, y)
                 if(cpawn.is_weak()):
-                    value += ATTACKED_SCORES[PIECES['bKg']]
+                    value += ATTACKED_SCORES[PIECES['bRk']]
     return value
 
 
