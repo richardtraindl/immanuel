@@ -145,16 +145,15 @@ def score_penalty_for_multiple_moves(match):
             moves = black_moves
             rate =  ATTACKED_SCORES[PIECES['bRk']]
 
-        if(len(moves)):
-            for idx in len(moves):
-                mvtcnt = 0
-                move1 = moves[idx]
-                for move2 in moves[(idx + 1):]:
-                    if(move2.dstx == move1.srcx and move2.dsty == move1.srcy):
-                        move1 = move2
-                        mvtcnt += 1
-                if(mvtcnt >= 2):
-                    value += rate
+        for idx in range(len(moves)):
+            mvtcnt = 0
+            move1 = moves[idx]
+            for move2 in moves[(idx + 1):]:
+                if(move2.dstx == move1.srcx and move2.dsty == move1.srcy):
+                    move1 = move2
+                    mvtcnt += 1
+            if(mvtcnt >= 2):
+                value += rate
     return rate
 
 
