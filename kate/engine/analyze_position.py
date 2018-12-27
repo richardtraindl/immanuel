@@ -119,6 +119,23 @@ def score_kings_safety(match):
     return value
 
 
+def score_penalty_for_lost_castlings(match):
+    value = 0
+    
+    if(match.board.white_movecnt_short_castling_lost > 0 and match.board.white_movecnt_long_castling_lost > 0):
+        short_move = match.move_list[match.board.white_movecnt_short_castling_lost - 1]
+        long_move = match.move_list[match.board.white_movecnt_long_castling_lost - 1]
+        if(short_move.move_type != short_move.TYPES['short_castling'] and long_move.move_type != long_move.TYPES['long_castling']):
+            value += ATTACKED_SCORES[PIECES['wRk']] * 2
+
+    if(match.board.black_movecnt_short_castling_lost > 0 and match.board.black_movecnt_long_castling_lost > 0):
+        short_move = match.move_list[match.board.black_movecnt_short_castling_lost - 1]
+        long_move = match.move_list[match.board.black_movecnt_long_castling_lost - 1]
+        if(short_move.move_type != short_move.TYPES['short_castling'] and long_move.move_type != long_move.TYPES['long_castling']):
+            value += ATTACKED_SCORES[PIECES['bRk']] * 2
+    return value
+
+
 def score_penalty_for_multiple_moves(match):
     value = 0
     white_moves = []
@@ -220,6 +237,7 @@ def score_opening(match):
     value += score_penalty_for_multiple_moves(match)
     value += score_penalty_for_knight_bishop_on_baseline(match)
     value += score_kings_safety(match)
+    value += score_penalty_for_lost_castlings(match)
     value += score_weak_pawns(match)
     value += score_penalty_for_weak_fianchetto(match)
     return value
