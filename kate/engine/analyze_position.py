@@ -136,10 +136,10 @@ def score_penalty_for_multiple_moves(match):
     for i in range(2):
         if(i == 0):
             moves = white_moves
-            rate =  ATTACKED_SCORES[PIECES['wRk']] * 3
+            rate =  ATTACKED_SCORES[PIECES['wRk']]
         else:
             moves = black_moves
-            rate =  ATTACKED_SCORES[PIECES['bRk']] * 3
+            rate =  ATTACKED_SCORES[PIECES['bRk']]
 
         idx = 0
         for move in moves:
@@ -154,7 +154,7 @@ def score_penalty_for_multiple_moves(match):
                     mvtcnt += 1
             if(mvtcnt >= 2):
                 value += rate
-    return rate
+    return value
 
 
 def score_penalty_for_knight_bishop_on_baseline(match):
