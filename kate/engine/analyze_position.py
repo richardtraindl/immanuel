@@ -125,32 +125,32 @@ def score_penalty_for_multiple_moves(match):
     black_moves = []
 
     for i in range(2):
-        for move in reversed(match.move_list):
+        for move in match.move_list:
             if(move.captured_piece):
                 continue
-            piece = match.readfield(move.dstx, move.dsty)
-            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                continue
+            if(move.count % 2 == 1):
+                white_moves.append(move)
             else:
-                if(move.count % 2 == 1):
-                    white_moves.append(move)
-                else:
-                    black_moves.append(move)
+                black_moves.append(move)
 
     for i in range(2):
         if(i == 0):
             moves = white_moves
-            rate =  ATTACKED_SCORES[PIECES['wRk']]
+            rate =  ATTACKED_SCORES[PIECES['wRk']] * 3
         else:
             moves = black_moves
-            rate =  ATTACKED_SCORES[PIECES['bRk']]
+            rate =  ATTACKED_SCORES[PIECES['bRk']] * 3
 
-        for idx in range(len(moves)):
+        idx = 0
+        for move in moves:
+            idx += 1
             mvtcnt = 0
-            move1 = moves[idx]
-            for move2 in moves[(idx + 1):]:
-                if(move2.dstx == move1.srcx and move2.dsty == move1.srcy):
-                    move1 = move2
+            if(idx == len(moves)):
+                break
+            lower_move = move
+            for higher_move in moves[idx:]:
+                if(lower_move.dstx == higher_move.srcx and lower_move.dsty == higher_move.srcy):
+                    lower_move = higher_move
                     mvtcnt += 1
             if(mvtcnt >= 2):
                 value += rate
