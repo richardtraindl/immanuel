@@ -70,43 +70,6 @@ def search_lines_of_pin(match, color, fieldx, fieldy, exclx, excly):
     return pinlines
 
 
-def search_opposed_pieces(match, color, fieldx, fieldy, excl_fieldx, excl_fieldy):
-    oppenents = []
-
-    MAX_STEP_IDX_FOR_RK = 3
-    
-    oppcolor = REVERSED_COLORS[color]
-
-    for i in range(0, 8, 2):
-        touches = [None, None]
-
-        for k in range(2):
-            stepx = cQueen.STEPS[i+k][0]
-            stepy = cQueen.STEPS[i+k][1]
-
-            x1, y1 = match.search(fieldx, fieldy, stepx, stepy)
-            if(x1 is not None and x1 == excl_fieldx and y1 == excl_fieldy):
-                break
-
-            if(x1):
-                piece = match.readfield(x1, y1)
-
-                if(match.color_of_piece(piece) == color):
-                    if(touches[0] is None):
-                        touches[0] = cTouch(piece, x1, y1)
-                else:
-                    if(touches[1] is None):
-                        if(piece == PIECES['wQu'] or piece == PIECES['bQu'] or
-                          (i+k <= MAX_STEP_IDX_FOR_RK and (piece == PIECES['wRk'] or piece == PIECES['bRk'])) or
-                          (i+k > MAX_STEP_IDX_FOR_RK and (piece == PIECES['wBp'] or piece == PIECES['bBp']))):
-                            touches[1] = cTouch(piece, x1, y1)
-
-        if(touches[0] and touches[1]):
-            oppenents.append(touches)
-
-    return oppenents
-
-
 def is_piece_stuck(match, srcx, srcy):
     piece = match.readfield(srcx, srcy)
 

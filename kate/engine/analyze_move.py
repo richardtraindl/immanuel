@@ -165,11 +165,19 @@ def does_unpin(gmove):
 
 
 def defends_check(match):
-    # is king attaked
     if(match.next_color() == COLORS['white']):
-        return match.is_king_attacked(match.board.wKg_x, match.board.wKg_y)
+        cking = cKing(match, match.board.wKg_x, match.board.wKg_y)
     else:
-        return match.is_king_attacked(match.board.bKg_x, match.board.bKg_y)
+        cking = cKing(match, match.board.bKg_x, match.board.bKg_y)
+    return cking.is_attacked()
+
+
+def check_mates(gmove):
+    match = gmove.match
+    match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    is_move_available = match.is_move_available()
+    match.undo_move()
+    return not is_move_available
 
 
 def find_disclosed_pieces(match, srcx, srcy, dstx, dsty, discl_attacked, discl_supported):
@@ -502,7 +510,10 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
             for attacked in from_dstfield_attacked:
                 if(attacked.piece == PIECES['wKg'] or 
                    attacked.piece == PIECES['bKg']):
-                    priomove.tactics.append(cTactic(priomove.TACTICS['attacks-king'], subtactic))
+                    if(check_mates(gmove)):
+                        priomove.tactics.append(cTactic(priomove.TACTICS['attacks-king'], priomove.SUB_TACTICS['urgent']))
+                    else:
+                        priomove.tactics.append(cTactic(priomove.TACTICS['attacks-king'], subtactic))
                 elif(subtactic == priomove.SUB_TACTICS['good-deal'] and 
                    is_attacked_soft_pinned(gmove, attacked)):
                     priomove.tactics.append(cTactic(priomove.TACTICS['attacks'], priomove.SUB_TACTICS['stormy']))

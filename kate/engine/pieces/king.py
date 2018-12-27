@@ -82,6 +82,9 @@ class cKing(cPiece):
     def is_move_stuck(self, dstx, dsty):
         return False # not used for king
 
+    def is_attacked(self):
+        return self.match.is_field_touched(REVERSED_COLORS[self.color], self.xpos, self.ypos, self.match.EVAL_MODES['ignore-pins'])
+
     def is_move_valid(self, dstx, dsty):
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
@@ -302,7 +305,8 @@ class cKing(cPiece):
                 continue
 
             if(self.match.is_inbounds(x1, y1)):
-                if(self.match.is_king_attacked(x1, y1)):
+                cking = cKing(self.match, x1, y1)
+                if(cking.is_attacked()):
                     continue
 
                 piece = self.match.readfield(x1, y1)

@@ -201,13 +201,6 @@ class cMatch:
 
         return False
 
-    def is_king_attacked(self, x1, y1):
-        king = self.readfield(x1, y1)
-        if(king != PIECES['wKg'] and king != PIECES['bKg']):
-            return False
-        color = self.color_of_piece(king)
-        return self.is_field_touched(REVERSED_COLORS[color], x1, y1, self.EVAL_MODES['ignore-pins'])
-
     def is_last_move_promotion(self):
         if(len(self.move_list) > 0):
             move = self.move_list[-1]
