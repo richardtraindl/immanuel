@@ -119,6 +119,44 @@ def score_kings_safety(match):
     return value
 
 
+def score_penalty_for_multiple_moves(match):
+    value = 0
+    white_moves = []
+    black_moves = []
+
+    for i in range(2):
+        for move in reversed(match.move_list):
+            if(move.captured_piece):
+                continue
+            piece = match.readfield(move.dstx, move.dsty)
+            if(piece == PIECES['wPw'] or piece == PIECES['bPw'])
+                continue
+            else:
+                if(move.count % 2 == 1):
+                    white_moves.append(move)
+                else:
+                    black_moves.append(move)
+
+    for i in range(2):
+        if(i == 0):
+            moves = white_moves
+            rate =  ATTACKED_SCORES[PIECES['wRk']]
+        else:
+            moves = black_moves
+            rate =  ATTACKED_SCORES[PIECES['bRk']]
+
+        for idx in len(moves):
+            mvtcnt = 0
+            move1 = moves[idx]
+            for move2 in moves[(idx + 1):]:
+                if(move2.dstx == move1.srcx and move2.dsty == move1.srcy):
+                    move1 = move2
+                    mvtcnt += 1
+            if(mvtcnt >= 2):
+                value += rate
+    return rate
+
+
 def score_penalty_for_knight_bishop_on_baseline(match):
     value = 0
     for i in range(2):
@@ -179,6 +217,7 @@ def score_penalty_for_weak_fianchetto(match):
 
 def score_opening(match):
     value = 0
+    value += score_penalty_for_multiple_moves(match)
     value += score_penalty_for_knight_bishop_on_baseline(match)
     value += score_kings_safety(match)
     value += score_weak_pawns(match)
