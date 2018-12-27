@@ -129,7 +129,7 @@ def score_penalty_for_multiple_moves(match):
             if(move.captured_piece):
                 continue
             piece = match.readfield(move.dstx, move.dsty)
-            if(piece == PIECES['wPw'] or piece == PIECES['bPw'])
+            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
                 continue
             else:
                 if(move.count % 2 == 1):
