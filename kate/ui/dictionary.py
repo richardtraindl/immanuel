@@ -156,8 +156,8 @@ def word_set(session, params):
 
     if(tokens[0] == "level"):
         try:
-            session.match.level = LEVELS[tokens[1]]
-            session.match.seconds_per_move = SECONDS_PER_MOVE[session.match.level]
+            session.match.level = session.match.LEVELS[tokens[1]]
+            session.match.seconds_per_move = session.match.SECONDS_PER_MOVE[session.match.level]
         except KeyError:
             print("??? value")
     elif(tokens[0] == "white-player"):
