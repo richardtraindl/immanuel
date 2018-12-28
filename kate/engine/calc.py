@@ -55,8 +55,8 @@ class SearchLimits:
             self.dpth_stage1 = 1
             self.mvcnt_stage1 = 12
             self.dpth_stage2 = 2
-            self.mvcnt_stage2 = 12
-            self.dpth_max = 10
+            self.mvcnt_stage2 = 8
+            self.dpth_max = 8
             self.add_mvcnt = 4
         elif(match.level == match.LEVELS['low']):
             self.dpth_stage1 = 2
