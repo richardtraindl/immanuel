@@ -54,31 +54,31 @@ class SearchLimits:
         if(match.level == match.LEVELS['blitz']):
             self.dpth_stage1 = 1
             self.mvcnt_stage1 = 12
-            self.dpth_stage2 = 3
-            self.mvcnt_stage2 = 6
-            self.dpth_max = 6
+            self.dpth_stage2 = 2
+            self.mvcnt_stage2 = 12
+            self.dpth_max = 10
             self.add_mvcnt = 4
         elif(match.level == match.LEVELS['low']):
             self.dpth_stage1 = 2
             self.mvcnt_stage1 = 16
             self.dpth_stage2 = 3
             self.mvcnt_stage2 = 8
-            self.dpth_max = 8
-            self.add_mvcnt = 4
+            self.dpth_max = 10
+            self.add_mvcnt = 0
         elif(match.level == match.LEVELS['medium']):
             self.dpth_stage1 = 2
             self.mvcnt_stage1 = 20
             self.dpth_stage2 = 4
             self.mvcnt_stage2 = 10
-            self.dpth_max = 10
-            self.add_mvcnt = 6
+            self.dpth_max = 12
+            self.add_mvcnt = 0
         else: #match.LEVELS['high']
             self.dpth_stage1 = 2
             self.mvcnt_stage1 = 24
             self.dpth_stage2 = 5
             self.mvcnt_stage2 = 12
             self.dpth_max = 12
-            self.add_mvcnt = 6
+            self.add_mvcnt = 0
 
         if(match.is_endgame()):
             self.dpth_stage1 += 1
