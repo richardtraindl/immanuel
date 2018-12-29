@@ -507,18 +507,24 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
             all_fleeing.append(priomove)
 
         if(len(from_dstfield_attacked) > 0):
+            attack_subtactic = subtactic
+            if(attack_subtactic == priomove.SUB_TACTICS['bad-deal']):
+                if(is_piece_lower_attacker_on_dstfield(gmove, enmytouches_on_dstfield) and 
+                   len(frdlytouches_on_dstfield) > 0):
+                    attack_subtactic = priomove.SUB_TACTICS['good-deal']
+
             for attacked in from_dstfield_attacked:
                 if(attacked.piece == PIECES['wKg'] or 
                    attacked.piece == PIECES['bKg']):
                     if(check_mates(gmove)):
                         priomove.tactics.append(cTactic(priomove.TACTICS['attacks-king'], priomove.SUB_TACTICS['urgent']))
                     else:
-                        priomove.tactics.append(cTactic(priomove.TACTICS['attacks-king'], subtactic))
+                        priomove.tactics.append(cTactic(priomove.TACTICS['attacks-king'], attack_subtactic))
                 elif(subtactic == priomove.SUB_TACTICS['good-deal'] and 
                    is_attacked_soft_pinned(gmove, attacked)):
                     priomove.tactics.append(cTactic(priomove.TACTICS['attacks'], priomove.SUB_TACTICS['stormy']))
                 else:
-                    priomove.tactics.append(cTactic(priomove.TACTICS['attacks'], subtactic))
+                    priomove.tactics.append(cTactic(priomove.TACTICS['attacks'], attack_subtactic))
             all_attacking.append(priomove)
 
         if(len(from_dstfield_supported) > 0):
@@ -559,7 +565,12 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
             all_discl_supporting.append(priomove)
 
         if(blocks(gmove)):
-            priomove.tactics.append(cTactic(priomove.TACTICS['blocks'], subtactic))
+            block_subtactic = subtactic
+            if(block_subtactic == priomove.SUB_TACTICS['bad-deal']):
+                if(is_piece_lower_attacker_on_dstfield(gmove, enmytouches_on_dstfield) and 
+                   len(frdlytouches_on_dstfield) > 0):
+                    block_subtactic = priomove.SUB_TACTICS['good-deal']
+            priomove.tactics.append(cTactic(priomove.TACTICS['blocks'], block_subtactic))
 
         if(running_pawn_in_endgame(gmove)):
             if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield)):
