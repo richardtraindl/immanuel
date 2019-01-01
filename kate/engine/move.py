@@ -110,6 +110,7 @@ class cTactic:
 
 class cPrioMove:
     PRIO = {
+        'prio0' : 100,
         'prio1' : 150,
         'prio2' : 250,
         'prio3' : 300 }
@@ -147,11 +148,11 @@ class cPrioMove:
 
     TACTICS_TO_PRIO = {
         ### level 1 ###
-        TACTICS['promotes'] :               100,
-        TACTICS['captures'] :               101,
-        TACTICS['is-running-pawn'] :        102,
-        TACTICS['is-tactical-draw'] :       103,
-        TACTICS['defends-check']  :         104,
+        TACTICS['promotes'] :               90,
+        TACTICS['captures'] :               91,
+        TACTICS['is-running-pawn'] :        92,
+        TACTICS['is-tactical-draw'] :       93,
+        TACTICS['defends-check']  :         94,
         ### level 2 ###
         TACTICS['castles'] :                200,
         TACTICS['attacks-king'] :           201,
@@ -214,11 +215,11 @@ class cPrioMove:
                     tactic.subtactic = self.SUB_TACTICS['upgraded']
                     return
 
-    def fetch_tactics(self, idx):
-        if(len(self.tactics) > idx):
-            return self.tactics[idx].tactic
-        else:
-            return self.TACTICS['is-undefined']
+    def fetch_subtactic(self, domain_tactic):
+        for tactitem in self.tactics:
+            if(tactitem.tactic == domain_tactic):
+                return tactitem.subtactic
+        return None
 
     def has_tactic(self, tactic):
         for tactitem in self.tactics:
@@ -245,7 +246,7 @@ class cPrioMove:
                 return True
         return False
 
-    def is_tactic_stormy(self, with_check):
+    def is_tactic_stormy(self):
         for tactitem in self.tactics:
             if(tactitem.subtactic == self.SUB_TACTICS['stormy'] or
                tactitem.subtactic == self.SUB_TACTICS['urgent'] or
@@ -253,11 +254,6 @@ class cPrioMove:
                  tactitem.tactic == self.TACTICS['captures']) and 
                 tactitem.subtactic == self.SUB_TACTICS['good-deal'])):
                 return True
-            if(with_check):
-                # tactitem.tactic == self.TACTICS['defends-check'])
-                if(tactitem.tactic == self.TACTICS['attacks-king'] and 
-                   tactitem.subtactic <= self.SUB_TACTICS['good-deal']):
-                    return True
         return False
 
     def concat_tactics(self, delimiter):

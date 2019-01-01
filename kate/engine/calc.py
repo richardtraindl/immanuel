@@ -51,34 +51,25 @@ def prnt_fmttime(msg, seconds):
 
 class SearchLimits:
     def __init__(self, match):
+        self.add_mvcnt = 2
         if(match.level == match.LEVELS['blitz']):
-            self.dpth_stage1 = 1
-            self.mvcnt_stage1 = 12
-            self.dpth_stage2 = 2
-            self.mvcnt_stage2 = 8
-            self.dpth_max = 8
-            self.add_mvcnt = 4
-        elif(match.level == match.LEVELS['low']):
             self.dpth_stage1 = 2
-            self.mvcnt_stage1 = 16
-            self.dpth_stage2 = 3
-            self.mvcnt_stage2 = 8
-            self.dpth_max = 10
-            self.add_mvcnt = 0
-        elif(match.level == match.LEVELS['medium']):
-            self.dpth_stage1 = 2
-            self.mvcnt_stage1 = 20
-            self.dpth_stage2 = 4
-            self.mvcnt_stage2 = 10
-            self.dpth_max = 12
-            self.add_mvcnt = 0
-        else: #match.LEVELS['high']
-            self.dpth_stage1 = 2
-            self.mvcnt_stage1 = 24
             self.dpth_stage2 = 5
+            self.dpth_max = 20
+            self.mvcnt_stage1 = 12
+            self.mvcnt_stage2 = 6
+        elif(match.level == match.LEVELS['medium']):
+            self.dpth_stage1 = 3
+            self.dpth_stage2 = 6
+            self.dpth_max = 20
+            self.mvcnt_stage1 = 16
+            self.mvcnt_stage2 = 8
+        else: # high
+            self.dpth_stage1 = 4
+            self.dpth_stage2 = 7
+            self.dpth_max = 20
+            self.mvcnt_stage1 = 24
             self.mvcnt_stage2 = 12
-            self.dpth_max = 12
-            self.add_mvcnt = 0
 
         if(match.is_endgame()):
             self.dpth_stage1 += 1
@@ -104,70 +95,58 @@ def count_up_to_prio(priomoves, prio_limit):
     return count
 
 
-def resort_for_stormy_moves(priomoves, new_prio, last_pmove_capture_bad_deal, with_check):
-    if(last_pmove_capture_bad_deal == False):
-        return
+def resort_exchange_or_stormy_moves(priomoves, new_prio, last_pmove, only_exchange):
+    if(only_exchange and last_pmove.has_domain_tactic(cPrioMove.TACTICS['captures']) == False):
+        return False
+    if(last_pmove and last_pmove.has_tactic_ext(cTactic(cPrioMove.TACTICS['captures'], cPrioMove.SUB_TACTICS['bad-deal']))):
+        last_pmove_capture_bad_deal = True
+    else:
+        last_pmove_capture_bad_deal = False
     count_of_stormy = 0
     count_of_bad_captures = 0
+    count_of_good_captures = 0
     first_silent = None
     for priomove in priomoves:
-        if(priomove.is_tactic_stormy(with_check)):
+        if(only_exchange == False and priomove.is_tactic_stormy()):
             count_of_stormy += 1
-            priomove.prio = min(priomove.prio, new_prio - 2)
-        elif(priomove.has_tactic_ext(cTactic(cPrioMove.TACTICS['captures'], cPrioMove.SUB_TACTICS['bad-deal']))):
-            count_of_bad_captures += 1
-            priomove.upgrade(priomove.TACTICS['captures'])
-            priomove.prio = min(priomove.prio, new_prio)
-        else:
-            if(first_silent is None):
-                first_silent = priomove
-    if(count_of_bad_captures > 0 and count_of_stormy == 0 and first_silent):
+            priomove.prio = min(priomove.prio, new_prio - 3)
+        elif(priomove.has_domain_tactic(cPrioMove.TACTICS['captures'])):
+            subtactic = priomove.fetch_subtactic(cPrioMove.TACTICS['captures'])
+            if(subtactic > cPrioMove.SUB_TACTICS['bad-deal']):
+                count_of_good_captures += 1
+                priomove.prio = min(priomove.prio, new_prio - 2)
+            elif(last_pmove_capture_bad_deal):
+                count_of_bad_captures += 1
+                priomove.prio = min(priomove.prio, new_prio)
+        elif(first_silent is None):
+            first_silent = priomove
+    if(first_silent and count_of_bad_captures > 0 and count_of_good_captures == 0 and count_of_stormy == 0):
         first_silent.prio = min(first_silent.prio, new_prio - 1)
     priomoves.sort(key=attrgetter('prio'))
+    return True
 
 
 def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     if(len(priomoves) == 0 or depth > slimits.dpth_max):
         return 0
 
-    if(priomoves[0].has_domain_tactic(cPrioMove.TACTICS['defends-check'])):
+    if(depth <= slimits.dpth_stage1 and priomoves[0].has_domain_tactic(cPrioMove.TACTICS['defends-check'])):
         return len(priomoves)
 
-    if(last_pmove and last_pmove.has_tactic_ext(cTactic(cPrioMove.TACTICS['captures'], cPrioMove.SUB_TACTICS['bad-deal']))):
-        last_pmove_capture_bad_deal = True
-    else:
-        last_pmove_capture_bad_deal = False
-
-    """if(match.next_color() == COLORS['white']):
-        cking = cKing(match, match.board.bKg_x, match.board.bKg_y)
-    else:
-        cking = cKing(match, match.board.wKg_x, match.board.wKg_y)
-    with_check = not cking.is_safe()"""
-    with_check = False
-
     if(depth <= slimits.dpth_stage1):
-        resort_for_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove_capture_bad_deal, with_check)
+        resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove, False)
         count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio3'])
-        if(count < slimits.mvcnt_stage1):
-            return min(slimits.mvcnt_stage1, len(priomoves))
-        else:
-            if(match.level == match.LEVELS['blitz']):
-                return slimits.mvcnt_stage1
-            else:
-                return count
+        return min(slimits.mvcnt_stage1, count)
     elif(depth <= slimits.dpth_stage2):
-        resort_for_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove_capture_bad_deal, with_check)
+        resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove, False)
         count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio2'])
-        if(count < slimits.mvcnt_stage2):
-            return min(slimits.mvcnt_stage2, len(priomoves))
-        else:
-            if(match.level == match.LEVELS['blitz']):
-                return slimits.mvcnt_stage2
-            else:
-                return count
+        return min(slimits.mvcnt_stage2, count)
+    #elif(depth <= slimits.dpth_stage2 + 2):
     else:
-        resort_for_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove_capture_bad_deal, with_check)
-        return count_up_to_prio(priomoves, cPrioMove.PRIO['prio1'])
+        if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio0'], last_pmove, True)):
+            return count_up_to_prio(priomoves, cPrioMove.PRIO['prio0'])
+        else:
+            return 0
 
 
 def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
@@ -225,6 +204,8 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
 
         if(depth == 1):
             prnt_search(match, "CURRENT SEARCH: ", newscore, gmove, newcandidates)
+            if(len(candidates) > 0):
+                prnt_search(match, "CANDIDATE:      ", maxscore, None, candidates)
 
         if(maximizing):
             if(newscore > maxscore):
@@ -234,7 +215,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
                 else:
                     append_newmove(gmove, candidates, newcandidates)
                     if(depth == 1):
-                        prnt_search(match, "CANDIDATE:      ", maxscore, None, candidates)
+                        prnt_search(match, "new CANDIDATE:  ", maxscore, None, candidates)
         else:
             if(newscore < minscore):
                 minscore = newscore
@@ -243,7 +224,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
                 else:
                     append_newmove(gmove, candidates, newcandidates)
                     if(depth == 1):
-                        prnt_search(match, "CANDIDATE:      ", minscore, None, candidates)
+                        prnt_search(match, "new CANDIDATE:  ", minscore, None, candidates)
 
         if(depth == 1):
             if(color == COLORS['white']):

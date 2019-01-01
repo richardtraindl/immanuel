@@ -21,9 +21,8 @@ class DoMoveForm(forms.Form):
            
 LEVEL_CHOICES = (
     (0, 'blitz'),
-    (1, 'low'),
-    (2, 'medium'),
-    (3, 'high'),
+    (1, 'medium'),
+    (2, 'high'),
 )
 
 class MatchForm(forms.Form):

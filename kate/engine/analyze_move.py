@@ -428,9 +428,6 @@ def is_progress(gmove):
         return False
 
 
-def fetch_first_tactics(priomove):
-    return priomove.fetch_tactics(0)
-
 def rank_gmoves(match, priomoves, piecescnt, last_pmove):
     all_attacking = []
     all_supporting = []
