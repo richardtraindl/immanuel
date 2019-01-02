@@ -141,7 +141,7 @@ def word_show(session, params):
 
 def word_set(session, params):
     if(params == "?"):
-        print("set level blitz | medium | high")
+        print("set level blitz | low | medium | high")
         print("set white-player Richard")
         print("set black-player Hermann")
         print("set white-human j | n")

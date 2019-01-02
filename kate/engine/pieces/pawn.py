@@ -383,14 +383,11 @@ class cPawn(cPiece):
             x1 = self.xpos + i
             y1 = self.ypos
             while(True):
-                oppx, oppy = self.match.search(x1, y1, stepx, stepy)
-                if(oppx):
-                    piece = self.match.readfield(oppx, oppy)
+                x1, y1 = self.match.search(x1, y1, stepx, stepy)
+                if(x1):
+                    piece = self.match.readfield(x1, y1)
                     if(piece == opp_pawn):
                         return False
-                    else:
-                        x1 = oppx
-                        y1 = oppy
                 else:
                     break
         return True
