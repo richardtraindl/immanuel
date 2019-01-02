@@ -141,7 +141,6 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove, False)
         count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio2'])
         return min(slimits.mvcnt_stage2, count)
-    #elif(depth <= slimits.dpth_stage2 + 2):
     else:
         if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio0'], last_pmove, True)):
             return count_up_to_prio(priomoves, cPrioMove.PRIO['prio0'])
