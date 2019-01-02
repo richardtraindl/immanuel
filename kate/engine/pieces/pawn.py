@@ -379,17 +379,18 @@ class cPawn(cPiece):
             stepx = 0
             stepy = -1
             opp_pawn = PIECES['wPw']
-
-        STARTX = [0, 1, -1]
-        for i in range(3):
-            x1 = self.xpos + STARTX[i]
+        for i in range(-1, 2, 1):
+            x1 = self.xpos + i
             y1 = self.ypos
-            while(self.match.is_inbounds(x1, y1) ):
-                x1, y1 = self.match.search(x1, y1, stepx, stepy)
-                if(x1 is not None):
-                    piece = self.match.readfield(x1, y1)
+            while(True):
+                oppx, oppy = self.match.search(x1, y1, stepx, stepy)
+                if(oppx):
+                    piece = self.match.readfield(oppx, oppy)
                     if(piece == opp_pawn):
                         return False
+                    else:
+                        x1 = oppx
+                        y1 = oppy
                 else:
                     break
         return True

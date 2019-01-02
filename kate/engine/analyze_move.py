@@ -638,13 +638,13 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
             pmove.downgrade(pmove.TACTICS['flees'])
             pmove.evaluate_priorities()
 
-    excludes.clear()
+    """excludes.clear()
     all_running.sort(key=attrgetter('prio'))
     for pmove in all_running:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(pmove.TACTICS['is-running-pawn'])
-            pmove.evaluate_priorities()
+            pmove.evaluate_priorities()"""
 
     priomoves.sort(key=attrgetter('prio'))

@@ -71,9 +71,9 @@ class SearchLimits:
             self.mvcnt_stage1 = 24
             self.mvcnt_stage2 = 12
 
-        if(match.is_endgame()):
+        """if(match.is_endgame()):
             self.dpth_stage1 += 1
-            self.dpth_stage2 += 1
+            self.dpth_stage2 += 1"""
 # class end
 
 
