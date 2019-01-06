@@ -417,7 +417,7 @@ class cPawn(cPiece):
                     score += SUPPORTED_SCORES[touched]
                     # extra score if supported is pinned
                     if(self.match.is_soft_pin(x1, y1)):
-                        score += SUPPORTED_SCORES[touched] // 2
+                        score += SUPPORTED_SCORES[touched]
                 else:
                     score += ATTACKED_SCORES[touched]
                     # extra score if attacked is pinned

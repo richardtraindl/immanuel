@@ -336,18 +336,7 @@ class cKing(cPiece):
                 touched = self.match.readfield(x1, y1)
                 if(touched == PIECES['blk']):
                     continue
-                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
-                if(len(frdlytouches) <= len(enmytouches)):
-                    if(self.match.color_of_piece(touched) == self.color):
-                        score += SUPPORTED_SCORES[touched]
-                        # extra score if supported is pinned
-                        if(self.match.is_soft_pin(x1, y1)):
-                            score += SUPPORTED_SCORES[touched] // 2
-                    else:
-                        score += ATTACKED_SCORES[touched]
-                        # extra score if attacked is pinned
-                        if(self.match.is_soft_pin(x1, y1)):
-                            score += ATTACKED_SCORES[touched]
+                score += self.score_for_score_touches(touched, x1, y1)
         return score
 
     # list_moves(self):

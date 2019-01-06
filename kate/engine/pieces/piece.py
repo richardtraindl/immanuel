@@ -253,6 +253,27 @@ class cPiece:
         else:
             return False
 
+    def score_for_score_touches(self, touched, x1, y1):
+        from .. analyze_helper import list_all_field_touches
+        score = 0
+        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
+        if(len(frdlytouches) <= len(enmytouches) or
+           PIECES_RANK[touched] >= PIECES_RANK[self.piece]):
+            addjust = 1
+        else:
+            addjust = 2
+        if(self.match.color_of_piece(touched) == self.color):
+            score += SUPPORTED_SCORES[touched] // addjust
+            # extra score if supported is pinned
+            if(self.match.is_soft_pin(x1, y1)):
+                score += SUPPORTED_SCORES[touched]
+            else:
+                score += ATTACKED_SCORES[touched] // addjust
+                # extra score if attacked is pinned
+                if(self.match.is_soft_pin(x1, y1)):
+                    score += ATTACKED_SCORES[touched]
+        return score
+
     def score_touches(self):
         from .. analyze_helper import list_all_field_touches
         score = 0
@@ -276,19 +297,7 @@ class cPiece:
                     continue
 
                 touched = self.match.readfield(x1, y1)
-                frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
-                if(len(frdlytouches) <= len(enmytouches) or
-                   PIECES_RANK[touched] >= PIECES_RANK[self.piece]):
-                    if(self.match.color_of_piece(touched) == self.color):
-                        score += SUPPORTED_SCORES[touched]
-                        # extra score if supported is pinned
-                        if(self.match.is_soft_pin(x1, y1)):
-                            score += SUPPORTED_SCORES[touched] // 2
-                    else:
-                        score += ATTACKED_SCORES[touched]
-                        # extra score if attacked is pinned
-                        if(self.match.is_soft_pin(x1, y1)):
-                            score += ATTACKED_SCORES[touched]
+                score += self.score_for_score_touches(touched, x1, y1)
         return score
 
     def list_moves(self):

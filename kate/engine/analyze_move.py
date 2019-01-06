@@ -290,6 +290,7 @@ def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
 
 
 def blocks(gmove):
+    STEPS = [ [0, 1], [1, 0], [1, 1], [-1, 1] ]
     match = gmove.match
     piece = match.readfield(gmove.srcx, gmove.srcy)
     color = match.color_of_piece(piece)
@@ -298,26 +299,44 @@ def blocks(gmove):
     #frdlytouches_after_count = 0
     enmytouches_after_count = 0
 
-    for step in cQueen.STEPS:
+    for step in STEPS:
         stepx = step[0]
         stepy = step[1]
-        x1, y1 = match.search(gmove.dstx, gmove.dsty, stepx, stepy)
-        if(x1 is not None):
-            dstpiece = match.readfield(x1, y1)
-            if(match.color_of_piece(dstpiece) == color):
+        x1, y1, x2, y2 = match.search_bi_dirs(gmove.dstx, gmove.dsty, stepx, stepy)
+        if(x1):
+            if((x1 == gmove.srcx and y1 == gmove.srcy) or
+               (x2 == gmove.srcx and y2 == gmove.srcy)):
+                    continue
+            piece1 = match.readfield(x1, y1)
+            piece2 = match.readfield(x2, y2)
+            if(match.color_of_piece(piece1) == match.color_of_piece(piece2)):
+                continue
+            if(match.color_of_piece(piece1) == color):
                 frdlytouches, enmytouches = list_all_field_touches(match, color, x1, y1)
-                enmytouches_before_count += len(enmytouches)
+            else:
+                frdlytouches, enmytouches = list_all_field_touches(match, color, x2, y2)
+            enmytouches_before_count += len(enmytouches)
 
     match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-    for step in cQueen.STEPS:
+
+    for step in STEPS:
         stepx = step[0]
         stepy = step[1]
-        x1, y1 = match.search(gmove.dstx, gmove.dsty, stepx, stepy)
-        if(x1 is not None):
-            dstpiece = match.readfield(x1, y1)
-            if(match.color_of_piece(dstpiece) == color):
+        x1, y1, x2, y2 = match.search_bi_dirs(gmove.dstx, gmove.dsty, stepx, stepy)
+        if(x1):
+            if((x1 == gmove.srcx and y1 == gmove.srcy) or
+               (x2 == gmove.srcx and y2 == gmove.srcy)):
+                    continue
+            piece1 = match.readfield(x1, y1)
+            piece2 = match.readfield(x2, y2)
+            if(match.color_of_piece(piece1) == match.color_of_piece(piece2)):
+                continue
+            if(match.color_of_piece(piece1) == color):
                 frdlytouches, enmytouches = list_all_field_touches(match, color, x1, y1)
-                enmytouches_after_count += len(enmytouches)
+            else:
+                frdlytouches, enmytouches = list_all_field_touches(match, color, x2, y2)
+            enmytouches_after_count += len(enmytouches)
+
     match.undo_move()
 
     if(enmytouches_after_count < enmytouches_before_count):
@@ -449,7 +468,8 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
         is_piece_lfe_attacker_on_dstfield_flag = is_piece_lfe_attacker_on_dstfield(gmove, enmytouches_on_dstfield)
 
         if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and 
-           is_piece_lfe_attacker_on_dstfield_flag):
+           is_piece_lfe_attacker_on_dstfield_flag and
+           match.is_soft_pin(gmove.srcx, gmove.srcy) == False):
             subtactic = priomove.SUB_TACTICS['good-deal']
         else:
             subtactic = priomove.SUB_TACTICS['bad-deal']

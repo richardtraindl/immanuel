@@ -18,7 +18,7 @@ def prnt_before_calc(match, count, priomove):
     print("calculate: " + priomove.gmove.format_genmove())
     print("tactics: " + priomove.concat_tactics(" | "))
     print("priority: " + str(priomove.prio))
-    print("\n***********************************************")
+    print("***********************************************")
 
 
 def prnt_search(match, label, score, gmove, candidates):
@@ -37,9 +37,22 @@ def concat_fmt_gmoves(match, gmoves):
     return str_gmoves
 
 
-def prnt_priomoves(match, priomoves):
+def prnt_priomoves(match, priomoves, last_pmove):
+    is_exchange = resort_exchange_or_stormy_moves(priomoves, 0, last_pmove, True)
+    print("------------------------------------------------")
+    print("is_exchange: " + str(is_exchange))
     for priomove in priomoves:
-        print("\n" + priomove.gmove.format_genmove() + " prio: " + str(priomove.prio), end=" ")
+        if(priomove.prio <= cPrioMove.PRIO['prio0']):
+            print("----------prio0---------------------------------")
+        elif(priomove.prio <= cPrioMove.PRIO['prio1']):
+            print("----------prio1---------------------------------")
+        elif(priomove.prio <= cPrioMove.PRIO['prio2']):
+            print("----------prio2---------------------------------")
+        elif(priomove.prio <= cPrioMove.PRIO['prio3']):
+            print("----------prio3---------------------------------")
+        else:
+            print("----------> prio3--------------------------------")
+        print(priomove.gmove.format_genmove() + " prio: " + str(priomove.prio) + " is_tactic_stormy: " + str(priomove.is_tactic_stormy()))
         priomove.prnt_tactics()
 
 
@@ -56,10 +69,10 @@ class SearchLimits:
             self.dpth_stage1 = 2
             self.dpth_stage2 = 4
             self.dpth_max = 20
-            self.mvcnt_stage1 = 6
-            self.mvcnt_stage2 = 3
+            self.mvcnt_stage1 = 12
+            self.mvcnt_stage2 = 4
         elif(match.level == match.LEVELS['low']):
-            self.dpth_stage1 = 2
+            self.dpth_stage1 = 3
             self.dpth_stage2 = 5
             self.dpth_max = 20
             self.mvcnt_stage1 = 12
@@ -71,7 +84,7 @@ class SearchLimits:
             self.mvcnt_stage1 = 16
             self.mvcnt_stage2 = 8
         else: # high
-            self.dpth_stage1 = 4
+            self.dpth_stage1 = 3
             self.dpth_stage2 = 7
             self.dpth_max = 20
             self.mvcnt_stage1 = 20
@@ -102,7 +115,7 @@ def count_up_to_prio(priomoves, prio_limit):
 
 
 def resort_exchange_or_stormy_moves(priomoves, new_prio, last_pmove, only_exchange):
-    if(only_exchange and last_pmove.has_domain_tactic(cPrioMove.TACTICS['captures']) == False):
+    if(only_exchange and last_pmove and last_pmove.has_domain_tactic(cPrioMove.TACTICS['captures']) == False):
         return False
     if(last_pmove and last_pmove.has_tactic_ext(cTactic(cPrioMove.TACTICS['captures'], cPrioMove.SUB_TACTICS['bad-deal']))):
         last_pmove_capture_bad_deal = True
@@ -173,7 +186,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
 
     if(depth == 1):
         print("************ maxcnt: " + str(maxcnt) + " ******************")
-        prnt_priomoves(match, priomoves)
+        prnt_priomoves(match, priomoves, last_pmove)
 
         if(len(priomoves) == 1):
             pmove = priomoves[0]
@@ -187,7 +200,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
     if(len(priomoves) == 0 or maxcnt == 0):
         candidates.append(None)
         return analyze_position.score_position(match, len(priomoves)), candidates
-
+        
     for priomove in priomoves:
         gmove = priomove.gmove
         count += 1
@@ -233,7 +246,6 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
                     append_newmove(gmove, candidates, newcandidates)
                     if(depth == 1):
                         prnt_search(match, "new CANDIDATE:  ", minscore, None, candidates)
-
         if(depth == 1):
             if(color == COLORS['white']):
                 huge_diff = maxscore < match.score + (SCORES[PIECES['wPw']] * 2)
@@ -273,7 +285,7 @@ def calc_move(match):
     if(match.is_opening()):
         gmove = retrieve_move(match)
 
-    if(gmove is not None):
+    if(gmove):
         candidates.append(gmove)
         score = match.score
     else:

@@ -237,18 +237,28 @@ class cBoard:
             y += stepy
         return None, None
 
-    def search_and_count(self, srcx, srcy, stepx, stepy):
-        count = 0
-        x = srcx + stepx
-        y = srcy + stepy
-        while(x >= self.COORD['1'] and x <= self.COORD['8'] and y >= self.COORD['1'] and y <= self.COORD['8']):
-            count += 1
-            field = self.readfield(x, y)
-            if(field != PIECES['blk']):
-                return x, y, count
-            x += stepx
-            y += stepy
-        return None, None, count
+    def search_bi_dirs(self, srcx, srcy, stepx, stepy):
+        first_x = None
+        first_y = None
+        for i in range(2):
+            if(i == 1):
+                stepx = stepx * -1
+                stepy = stepy * -1
+            x = srcx + stepx
+            y = srcy + stepy
+            while(x >= self.COORD['1'] and x <= self.COORD['8'] and y >= self.COORD['1'] and y <= self.COORD['8']):
+                field = self.readfield(x, y)
+                if(field != PIECES['blk']):
+                    if(i == 0):
+                        first_x = x
+                        first_y = y
+                    else:
+                        return first_x, first_y, x, y
+                x += stepx
+                y += stepy
+            if(first_x is None):
+                break
+        return None, None, None, None
 
     @classmethod
     def is_inbounds(cls, x, y):

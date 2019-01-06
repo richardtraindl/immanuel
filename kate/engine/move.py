@@ -276,7 +276,7 @@ class cPrioMove:
             if(i < length):
                 str_end = " | "
             else:
-                str_end = ""
+                str_end = "\n"
             if(tactitem.subtactic != self.SUB_TACTICS['neutral']):
                 subtactic_str = " * " + reverse_lookup(self.SUB_TACTICS, tactitem.subtactic)
             else:
