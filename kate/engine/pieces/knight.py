@@ -156,7 +156,7 @@ class cKnight(cPiece):
     def move_controles_file(self, dstx, dsty):
         return False
 
-    def score_touches(self):
+    """def score_touches(self):
         from .. analyze_helper import list_all_field_touches
         score = 0
 
@@ -179,7 +179,7 @@ class cKnight(cPiece):
                 if(touched == PIECES['blk']):
                     continue
                 score += self.score_for_score_touches(touched, x1, y1)
-        return score
+        return score"""
 
     # list_moves(self):
        # works with inherited class

@@ -447,7 +447,7 @@ def is_progress(gmove):
         return False
 
 
-def rank_gmoves(match, priomoves, piecescnt, last_pmove):
+def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
     all_attacking = []
     all_supporting = []
     all_fork_defending = []
@@ -561,9 +561,10 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
 
                 if(support_subtactic == priomove.SUB_TACTICS['good-deal'] and 
                    len(supported.attacker_beyond) > 0 and
-                   is_supporter_lower_attacker(gmove, supported)):
+                   (is_supporter_lower_attacker(gmove, supported) or
+                    match.is_soft_pin(supported.fieldx, supported.fieldy))):
                     support_subtactic = priomove.SUB_TACTICS['urgent']
-                       
+
                 priomove.tactics.append(cTactic(support_tactic, support_subtactic))
             all_supporting.append(priomove)
 
@@ -667,4 +668,12 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove):
             pmove.downgrade(pmove.TACTICS['is-running-pawn'])
             pmove.evaluate_priorities()"""
 
+    if(dbggmove):
+        for priomove in priomoves:
+            if(priomove.gmove.srcx == dbggmove.srcx and 
+               priomove.gmove.srcy == dbggmove.srcy and 
+               priomove.gmove.dstx == dbggmove.dstx and 
+               priomove.gmove.dsty == dbggmove.dsty):
+                priomove.prio = dbgprio
+                break
     priomoves.sort(key=attrgetter('prio'))

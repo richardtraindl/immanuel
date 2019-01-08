@@ -325,7 +325,7 @@ class cKing(cPiece):
     def move_controles_file(self, dstx, dsty):
         return False
 
-    def score_touches(self):
+    def score_touches_ori(self):
         from .. analyze_helper import list_all_field_touches
         score = 0
 
@@ -338,6 +338,9 @@ class cKing(cPiece):
                     continue
                 score += self.score_for_score_touches(touched, x1, y1)
         return score
+
+    def score_touches(self):
+        return 0
 
     # list_moves(self):
        # works with inherited class

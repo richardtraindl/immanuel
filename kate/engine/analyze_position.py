@@ -287,14 +287,14 @@ def score_position(match, movecnt):
     else:
         score = match.score
         score += score_traps_and_touches(match)
-        score += score_controled_horizontal_files(match)
+        """score += score_controled_horizontal_files(match)
         score += score_controled_vertical_files(match)
         if(match.is_opening()):
             score += score_opening(match)
         elif(match.is_endgame()):
             score += score_endgame(match)
         else:
-            score += score_middlegame(match)
+            score += score_middlegame(match)"""
         return score
 
 

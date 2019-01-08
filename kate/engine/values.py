@@ -70,13 +70,13 @@ SCORES = {
     PIECES['wKg'] : -20000,
     PIECES['wPw'] : -100,
     PIECES['wRk'] : -450,
-    PIECES['wKn'] : -336,
+    PIECES['wKn'] : -340,
     PIECES['wBp'] : -340,
     PIECES['wQu'] : -900,
     PIECES['bKg'] : 20000,
     PIECES['bPw'] : 100,
     PIECES['bRk'] : 450,
-    PIECES['bKn'] : 336,
+    PIECES['bKn'] : 340,
     PIECES['bBp'] : 340,
     PIECES['bQu'] : 900 
 }
@@ -89,13 +89,13 @@ SUPPORTED_SCORES = {
     PIECES['wRk'] : 24,
     PIECES['wKn'] : 18,
     PIECES['wBp'] : 18,
-    PIECES['wQu'] : 24,
+    PIECES['wQu'] : 30,
     PIECES['bKg'] : 0,
     PIECES['bPw'] : -6,
     PIECES['bRk'] : -24,
     PIECES['bKn'] : -18,
     PIECES['bBp'] : -18,
-    PIECES['bQu'] : -24 
+    PIECES['bQu'] : -30 
 }
 
 
@@ -106,13 +106,13 @@ ATTACKED_SCORES = {
     PIECES['wRk'] : -24,
     PIECES['wKn'] : -18,
     PIECES['wBp'] : -18,
-    PIECES['wQu'] : -24,
+    PIECES['wQu'] : -30,
     PIECES['bKg'] : 0,
     PIECES['bPw'] : 6,
     PIECES['bRk'] : 24,
     PIECES['bKn'] : 18,
     PIECES['bBp'] : 18,
-    PIECES['bQu'] : 24
+    PIECES['bQu'] : 30
 }
 
 OPERATORS = {

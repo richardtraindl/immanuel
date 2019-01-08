@@ -68,24 +68,28 @@ class SearchLimits:
         if(match.level == match.LEVELS['blitz']):
             self.dpth_stage1 = 2
             self.dpth_stage2 = 4
+            self.dpth_stage3 = 8
+            self.dpth_max = 20
+            self.mvcnt_stage1 = 8
+            self.mvcnt_stage2 = 4
+        elif(match.level == match.LEVELS['low']):
+            self.dpth_stage1 = 2
+            self.dpth_stage2 = 5
+            self.dpth_stage3 = 10
             self.dpth_max = 20
             self.mvcnt_stage1 = 12
             self.mvcnt_stage2 = 4
-        elif(match.level == match.LEVELS['low']):
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 5
-            self.dpth_max = 20
-            self.mvcnt_stage1 = 12
-            self.mvcnt_stage2 = 6
         elif(match.level == match.LEVELS['medium']):
-            self.dpth_stage1 = 3
+            self.dpth_stage1 = 2
             self.dpth_stage2 = 6
+            self.dpth_stage3 = 10
             self.dpth_max = 20
             self.mvcnt_stage1 = 16
             self.mvcnt_stage2 = 8
         else: # high
             self.dpth_stage1 = 3
-            self.dpth_stage2 = 7
+            self.dpth_stage2 = 6
+            self.dpth_stage3 = 12
             self.dpth_max = 20
             self.mvcnt_stage1 = 20
             self.mvcnt_stage2 = 10
@@ -122,9 +126,9 @@ def resort_exchange_or_stormy_moves(priomoves, new_prio, last_pmove, only_exchan
     else:
         last_pmove_capture_bad_deal = False
     count_of_stormy = 0
-    count_of_bad_captures = 0
     count_of_good_captures = 0
     first_silent = None
+    bad_captures = []
     for priomove in priomoves:
         if(only_exchange == False and priomove.is_tactic_stormy()):
             count_of_stormy += 1
@@ -135,12 +139,16 @@ def resort_exchange_or_stormy_moves(priomoves, new_prio, last_pmove, only_exchan
                 count_of_good_captures += 1
                 priomove.prio = min(priomove.prio, new_prio - 2)
             elif(last_pmove_capture_bad_deal):
-                count_of_bad_captures += 1
-                priomove.prio = min(priomove.prio, new_prio)
+                bad_captures.append(priomove)
+                #count_of_bad_captures += 1
+                #priomove.prio = min(priomove.prio, new_prio)
         elif(first_silent is None):
             first_silent = priomove
-    if(first_silent and count_of_bad_captures > 0 and count_of_good_captures == 0 and count_of_stormy == 0):
-        first_silent.prio = min(first_silent.prio, new_prio - 1)
+    if(len(bad_captures) > 0 and count_of_good_captures == 0 and count_of_stormy == 0):
+        if(first_silent):
+            first_silent.prio = min(first_silent.prio, new_prio - 1)
+        for capture in bad_captures:
+            capture.prio = min(capture.prio, new_prio)
     priomoves.sort(key=attrgetter('prio'))
     return True
 
@@ -162,7 +170,11 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
         return min(slimits.mvcnt_stage2, count)
     else:
         if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio0'], last_pmove, True)):
-            return count_up_to_prio(priomoves, cPrioMove.PRIO['prio0'])
+            count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio0'])
+            if(depth <= slimits.dpth_stage3):
+                return count
+            else:
+                return min(2, count)
         else:
             return 0
 
@@ -181,13 +193,13 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
 
     cgenerator = cGenerator(match)
     priomoves, piecescnt = cgenerator.generate_priomoves()
-    rank_gmoves(match, priomoves, piecescnt, last_pmove)
+    gmove = cGenMove(match, 4, 0, 2, 0, None)
+    rank_gmoves(match, priomoves, piecescnt, last_pmove, gmove, 1)
     maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 
     if(depth == 1):
         print("************ maxcnt: " + str(maxcnt) + " ******************")
         prnt_priomoves(match, priomoves, last_pmove)
-
         if(len(priomoves) == 1):
             pmove = priomoves[0]
             candidates.append(pmove.gmove)
@@ -207,6 +219,8 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
 
         if(depth == 1):
             prnt_before_calc(match, count, priomove)
+        if(depth == 2):
+            print("calculate 2nd: " + priomove.gmove.format_genmove())
 
         if(priomove.has_domain_tactic(cPrioMove.TACTICS['is-tactical-draw'])):
             newcandidates.clear()

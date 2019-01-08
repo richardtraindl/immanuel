@@ -73,7 +73,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1 is not None):
+            if(x1):
                 piece = self.match.readfield(x1, y1)
                 wflag = False
                 for face in self.white_faces:

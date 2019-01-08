@@ -257,30 +257,34 @@ class cPiece:
         from .. analyze_helper import list_all_field_touches
         score = 0
         frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
-        if(len(frdlytouches) <= len(enmytouches) or
-           PIECES_RANK[touched] >= PIECES_RANK[self.piece]):
-            addjust = 1
-        else:
-            addjust = 2
         if(self.match.color_of_piece(touched) == self.color):
+            if(len(enmytouches) > 0):
+                addjust = 1
+            else:
+                addjust = 4
             score += SUPPORTED_SCORES[touched] // addjust
             # extra score if supported is pinned
             if(self.match.is_soft_pin(x1, y1)):
-                score += SUPPORTED_SCORES[touched]
+                score += SUPPORTED_SCORES[touched] // addjust
+        else:
+            if(len(frdlytouches) >= len(enmytouches) or
+               PIECES_RANK[touched] >= PIECES_RANK[self.piece]):
+                addjust = 1
             else:
+                addjust = 4
+            score += ATTACKED_SCORES[touched] // addjust
+            # extra score if attacked is pinned
+            if(self.match.is_soft_pin(x1, y1)):
                 score += ATTACKED_SCORES[touched] // addjust
-                # extra score if attacked is pinned
-                if(self.match.is_soft_pin(x1, y1)):
-                    score += ATTACKED_SCORES[touched]
         return score
 
-    def score_touches(self):
+    def score_touches_ori(self):
         from .. analyze_helper import list_all_field_touches
         score = 0
 
-        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
+        """frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
         if(len(frdlytouches) < len(enmytouches)):
-            return score
+            return score"""
 
         for step in self.STEPS:
             stepx = step[0]
@@ -290,15 +294,39 @@ class cPiece:
                 continue
             else:
                 if(self.is_move_stuck(x1, y1)):
-                    if(self.color == COLORS['white']):
+                    """if(self.color == COLORS['white']):
                         score += ATTACKED_SCORES[PIECES['wPw']]
                     else:
-                        score += ATTACKED_SCORES[PIECES['bPw']]
+                        score += ATTACKED_SCORES[PIECES['bPw']]"""
                     continue
 
                 touched = self.match.readfield(x1, y1)
                 score += self.score_for_score_touches(touched, x1, y1)
         return score
+
+    def score_touches(self):
+        from .. analyze_helper import list_all_field_touches
+        support_score = 0
+        attack_score = 0
+
+        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
+        if(len(frdlytouches) > 0):
+            if(len(enmytouches) == 0):
+                support_score += SUPPORTED_SCORES[self.piece] // 2
+            else:
+                support_score += SUPPORTED_SCORES[self.piece]
+
+        if(len(enmytouches) > 0):
+            attack_score += ATTACKED_SCORES[self.piece]
+
+        if(self.match.is_soft_pin(self.xpos, self.ypos)):
+            rank = PIECES_RANK[PIECES['wKg']]
+            for enmy in enmytouches:
+                if(PIECES_RANK[enmy.piece] < rank):
+                    rank = PIECES_RANK[enmy.piece]
+            attack_score += attack_score // max(1, (rank - PIECES_RANK[PIECES['bPw']]))
+
+        return support_score + attack_score
 
     def list_moves(self):
         movelist = []

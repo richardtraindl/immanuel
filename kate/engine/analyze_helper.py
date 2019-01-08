@@ -70,7 +70,7 @@ def search_lines_of_pin(match, color, fieldx, fieldy, exclx, excly):
     return pinlines
 
 
-def is_piece_stuck(match, srcx, srcy):
+"""def is_piece_stuck(match, srcx, srcy):
     piece = match.readfield(srcx, srcy)
 
     if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
@@ -90,7 +90,7 @@ def is_piece_stuck(match, srcx, srcy):
         return cqueen.is_piece_stuck()
     else:
         cking = cKing(match, srcx, srcy)
-        return cking.is_piece_stuck()
+        return cking.is_piece_stuck()"""
 
 
 def list_all_field_touches(match, color, fieldx, fieldy):

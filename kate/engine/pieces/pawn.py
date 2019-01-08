@@ -392,7 +392,7 @@ class cPawn(cPiece):
                     break
         return True
 
-    def score_touches(self):
+    def score_touches_ori(self):
         from .. analyze_helper import list_all_field_touches
         score = 0
 
@@ -408,12 +408,13 @@ class cPawn(cPiece):
                 if(touched == PIECES['blk']):
                     continue
                 if(self.is_move_stuck(x1, y1)):
-                    if(self.color == COLORS['white']):
+                    """if(self.color == COLORS['white']):
                         score += ATTACKED_SCORES[PIECES['wPw']]
                     else:
-                        score += ATTACKED_SCORES[PIECES['bPw']]
+                        score += ATTACKED_SCORES[PIECES['bPw']]"""
                     continue
-                if(self.match.color_of_piece(touched) == self.color):
+                score += self.score_for_score_touches(touched, x1, y1)
+                """if(self.match.color_of_piece(touched) == self.color):
                     score += SUPPORTED_SCORES[touched]
                     # extra score if supported is pinned
                     if(self.match.is_soft_pin(x1, y1)):
@@ -422,7 +423,7 @@ class cPawn(cPiece):
                     score += ATTACKED_SCORES[touched]
                     # extra score if attacked is pinned
                     if(self.match.is_soft_pin(x1, y1)):
-                        score += ATTACKED_SCORES[touched]
+                        score += ATTACKED_SCORES[touched]"""
         return score
 
     # list_moves(self):
