@@ -604,7 +604,8 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
             priomove.tactics.append(cTactic(priomove.TACTICS['is-progress'], priomove.SUB_TACTICS['neutral']))
 
         if(len(priomove.tactics) > 0):
-            priomove.evaluate_priorities()
+            piece = match.readfield(gmove.srcx, gmove.srcy)
+            priomove.evaluate_priorities(piece)
 
     all_attacking.sort(key=attrgetter('prio'))
     for pmove in all_attacking:
@@ -612,7 +613,8 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(priomove.TACTICS['attacks'])
-            pmove.evaluate_priorities()
+            piece = match.readfield(pmove.gmove.srcx, pmove.gmove.srcy)
+            pmove.evaluate_priorities(piece)
 
     excludes.clear()
     all_discl_attacking.sort(key=attrgetter('prio'))
@@ -621,7 +623,8 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(pmove.TACTICS['attacks'])
-            pmove.evaluate_priorities()
+            piece = match.readfield(pmove.gmove.srcx, pmove.gmove.srcy)
+            pmove.evaluate_priorities(piece)
 
     excludes.clear()
     all_supporting.sort(key=attrgetter('prio'))
@@ -630,7 +633,8 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(pmove.TACTICS['supports'])
-            pmove.evaluate_priorities()
+            piece = match.readfield(pmove.gmove.srcx, pmove.gmove.srcy)
+            pmove.evaluate_priorities(piece)
 
     excludes.clear()
     all_discl_supporting.sort(key=attrgetter('prio'))
@@ -639,7 +643,8 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(pmove.TACTICS['supports'])
-            pmove.evaluate_priorities()
+            piece = match.readfield(pmove.gmove.srcx, pmove.gmove.srcy)
+            pmove.evaluate_priorities(piece)
 
     excludes.clear()
     all_fork_defending.sort(key=attrgetter('prio'))
@@ -648,7 +653,8 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(pmove.TACTICS['defends-fork'])
-            pmove.evaluate_priorities()
+            piece = match.readfield(pmove.gmove.srcx, pmove.gmove.srcy)
+            pmove.evaluate_priorities(piece)
 
     excludes.clear()
     all_fleeing.sort(key=attrgetter('prio'))
@@ -657,7 +663,8 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
             excludes.append([pmove.gmove.srcx, pmove.gmove.srcy])
         else:
             pmove.downgrade(pmove.TACTICS['flees'])
-            pmove.evaluate_priorities()
+            piece = match.readfield(pmove.gmove.srcx, pmove.gmove.srcy)
+            pmove.evaluate_priorities(piece)
 
     """excludes.clear()
     all_running.sort(key=attrgetter('prio'))
