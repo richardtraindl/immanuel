@@ -193,7 +193,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
 
     cgenerator = cGenerator(match)
     priomoves, piecescnt = cgenerator.generate_priomoves()
-    gmove = cGenMove(match, 4, 0, 2, 0, None)
+    gmove = cGenMove(match, 2, 3, 1, 4, None)
     rank_gmoves(match, priomoves, piecescnt, last_pmove, gmove, 1)
     maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 
