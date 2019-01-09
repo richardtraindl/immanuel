@@ -185,15 +185,20 @@ class cPrioMove:
         self.tactics = []
         self.prio = prio
 
-    def evaluate_priorities(self):
+    def evaluate_priorities(self, piece):
         count = 0
         self.prio = self.PRIO['prio3']
         if(self.tactics):
             for tactitem in self.tactics:
+                if(tactitem.tactic == TACTICS['captures']):
+                    adjust = PIECES_RANK[piece] % 10
+                else:
+                    adjust = 0
                 prio_new = self.TACTICS_TO_PRIO[tactitem.tactic] + \
-                           self.SUB_TACTICS_TO_ADJUST[tactitem.subtactic]
+                           self.SUB_TACTICS_TO_ADJUST[tactitem.subtactic] + \
+                           adjust
                 self.prio = min(self.prio, prio_new)
-                if(tactitem.subtactic <= self.SUB_TACTICS['good-deal']):
+                if(tactitem.subtactic <= self.SUB_TACTICS['downgraded']):
                     count += 1
             self.prio -= count
 
