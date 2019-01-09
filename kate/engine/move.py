@@ -190,7 +190,7 @@ class cPrioMove:
         self.prio = self.PRIO['prio3']
         if(self.tactics):
             for tactitem in self.tactics:
-                if(tactitem.tactic == TACTICS['captures']):
+                if(tactitem.tactic == self.TACTICS['captures']):
                     adjust = PIECES_RANK[piece] % 10
                 else:
                     adjust = 0
