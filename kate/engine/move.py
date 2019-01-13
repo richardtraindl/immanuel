@@ -156,7 +156,7 @@ class cPrioMove:
         ### level 2 ###
         TACTICS['castles'] :                200,
         TACTICS['attacks-king'] :           201,
-        #TACTICS['forks'] :                  202, 
+        TACTICS['forks'] :                  202, 
         TACTICS['defends-fork'] :           203, 
         #TACTICS['pins'] :                   204, 
         TACTICS['unpins'] :                 205, 

@@ -191,39 +191,42 @@ class cPiece:
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
 
-    def move_defends_forked_field(self, dstx, dsty):
-        from .. analyze_helper import list_all_field_touches, is_fork_field
-
-        if(self.is_move_stuck(dstx, dsty)):
+    def forks(self):
+        from .. analyze_helper import list_all_field_touches
+        count = 0
+        for step in self.STEPS:
+            x1, y1 = self.match.search(self.xpos, self.ypos, step[0], step[1])
+            if(x1):
+                if(self.is_move_stuck(x1, y1)):
+                    continue
+                dstpiece = self.match.readfield(x1, y1)
+                if(self.match.color_of_piece(dstpiece) == REVERSED_COLORS[self.color]):
+                    friends, enemies = list_all_field_touches(self.match, self.match.color_of_piece(dstpiece), x1, y1)
+                    if(len(friends) == 0 or
+                       len(friends) < len(enemies) or 
+                       PIECES_RANK[dstpiece] >= PIECES_RANK[self.piece]):
+                        count += 1
+        if(count >= 2):
+            return True
+        else:
             return False
 
-        opp_color = self.match.oppcolor_of_piece(self.piece)
-
-        direction = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
-        if(direction == self.DIRS_ARY[0] or direction == self.DIRS_ARY[1]):
-            STEPS = [self.STEPS[0], self.STEPS[1]]
-        else:
-            STEPS = [self.STEPS[2], self.STEPS[3]]
-
-        for step in STEPS:
-            stepx = step[0]
-            stepy = step[1]
-
-            x1 = dstx + stepx
-            y1 = dsty + stepy
-            while(self.match.is_inbounds(x1, y1)):
+    def move_defends_forked_field(self, dstx, dsty):
+        from .. analyze_helper import list_all_field_touches, is_fork_field
+        if(self.is_move_stuck(dstx, dsty)):
+            return False
+        for step in self.STEPS:
+            x1, y1 = self.match.search(dstx, dsty, step[0], step[1])
+            if(x1):
+                if(x1 == dstx and y1 == dsty):
+                    continue
                 piece = self.match.readfield(x1, y1)
                 if(piece == PIECES['blk'] or 
                    self.match.color_of_piece(piece) == self.color):
                     frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
                     if(len(frdlytouches) < len(enmytouches)):
-                        excludes = []
-                        excludes.append([self.xpos, self.ypos])
-                        if(is_fork_field(self.match, self.color, x1, y1, excludes)):
+                        if(is_fork_field(self.match, x1, y1, REVERSED_COLORS[self.color])):
                             return True
-                x1 += stepx
-                y1 += stepy
-
         return False
 
     def move_controles_file(self, dstx, dsty):

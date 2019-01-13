@@ -119,6 +119,9 @@ class cQueen(cPiece):
     #find_attacks_and_supports(self, dstx, dsty, attacked, supported):
         # works with inherited class
 
+    #forks(self)
+        # works with inherited class
+
     #move_defends_fork_field(self, dstx, dsty)
         # works with inherited class
 

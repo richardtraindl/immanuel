@@ -343,27 +343,42 @@ class cPawn(cPiece):
                     list_field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
-                    
-    def move_defends_forked_field(self, dstx, dsty):
-        from .. analyze_helper import list_all_field_touches, is_fork_field
 
-        if(self.is_move_stuck(dstx, dsty)):
+    def forks(self):
+        from .. analyze_helper import list_all_field_touches
+        count = 0
+        for step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_move_inbounds(self.xpos, self.ypos, x1, y1)):
+                if(self.is_move_stuck(x1, y1)):
+                    return False
+                dstpiece = self.match.readfield(x1, y1)
+                if(self.match.color_of_piece(dstpiece) == REVERSED_COLORS[self.color]):
+                    friends, enemies = list_all_field_touches(self.match, self.match.color_of_piece(dstpiece), x1, y1)
+                    if(len(friends) == 0 or
+                       len(friends) < len(enemies) or 
+                       PIECES_RANK[dstpiece] >= PIECES_RANK[self.piece]):
+                        count += 1
+        if(count >= 2):
+            return True
+        else:
             return False
 
+    def move_defends_forked_field(self, dstx, dsty):
+        from .. analyze_helper import list_all_field_touches, is_fork_field
+        if(self.is_move_stuck(dstx, dsty)):
+            return False
         for step in self.STEPS:
             x1 = dstx + step[0]
             y1 = dsty + step[1]
-
             if(self.match.is_inbounds(x1, y1)):
                 piece = self.match.readfield(x1, y1)
-
                 if(piece == PIECES['blk'] or 
                    self.match.color_of_piece(piece) == self.color):
                     frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
                     if(len(frdlytouches) < len(enmytouches)):
-                        excludes = []
-                        excludes.append([self.xpos, self.ypos])
-                        if(is_fork_field(self.match, self.color, x1, y1, excludes)):
+                        if(is_fork_field(self.match, x1, y1, REVERSED_COLORS[self.color])):
                             return True
         return False
 

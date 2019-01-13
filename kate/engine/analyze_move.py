@@ -12,6 +12,7 @@ from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
 from .pieces.piece import cTouchBeyond
+from .pieces.pieces_helper import obj_for_piece
 from .generator import cGenerator
 from .validator import *
 
@@ -43,6 +44,19 @@ def captures(gmove):
 def defends_fork(gmove):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
     return defends_fork_field(gmove.match, piece, gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty)
+
+
+def forks(gmove):
+    match = gmove.match
+    piece = match.readfield(gmove.srcx, gmove.srcy)
+    match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+    cpiece = obj_for_piece(match, piece, gmove.dstx, gmove.dsty)
+    if(cpiece):
+        is_fork = cpiece.forks()
+    else:
+        is_fork = False
+    match.undo_move()
+    return is_fork
 
 
 def flees(gmove):
@@ -85,27 +99,10 @@ def flees(gmove):
 def find_attacks_and_supports(match, fieldx, fieldy):
     attacked = []
     supported = []
-
     piece = match.readfield(fieldx, fieldy)
-
-    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        cpawn = cPawn(match, fieldx, fieldy)
-        cpawn.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
-    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        cknight = cKnight(match, fieldx, fieldy)
-        cknight.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
-    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        cbishop = cBishop(match, fieldx, fieldy)
-        cbishop.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
-    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        crook = cRook(match, fieldx, fieldy)
-        crook.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
-    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        cqueen = cQueen(match, fieldx, fieldy)
-        cqueen.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
-    elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        cking = cKing(match, fieldx, fieldy)
-        cking.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
+    cpiece = obj_for_piece(match, piece, fieldx, fieldy)
+    if(cpiece):
+        cpiece.find_attacks_and_supports(fieldx, fieldy, attacked, supported)
     return attacked, supported
 
 
@@ -267,24 +264,9 @@ def find_disclosures(match, gmove):
 
 
 def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
-    if(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        cqueen = cQueen(match, srcx, srcy)
-        return cqueen.move_defends_forked_field(dstx, dsty)
-    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        crook = cRook(match, srcx, srcy)
-        return crook.move_defends_forked_field(dstx, dsty)
-    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        cbishop = cBishop(match, srcx, srcy)
-        return cbishop.move_defends_forked_field(dstx, dsty)
-    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        cknight = cKnight(match, srcx, srcy)
-        return cknight.move_defends_forked_field(dstx, dsty)
-    elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-        cking = cKing(match, srcx, srcy)
-        return cking.move_defends_forked_field(dstx, dsty)
-    elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        cpawn = cPawn(match, srcx, srcy)
-        return cpawn.move_defends_forked_field(dstx, dsty)
+    cpiece = obj_for_piece(match, piece, srcx, srcy)
+    if(cpiece):
+        return cpiece.move_defends_forked_field(dstx, dsty)
     else:
         return False
 
@@ -467,9 +449,10 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
         is_piece_le_attacker_on_srcfield_flag = is_piece_le_attacker_on_srcfield(gmove, enmytouches_on_srcfield)
         is_piece_lfe_attacker_on_dstfield_flag = is_piece_lfe_attacker_on_dstfield(gmove, enmytouches_on_dstfield)
 
-        if(len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and 
-           is_piece_lfe_attacker_on_dstfield_flag and
+        if((len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and 
+            is_piece_lfe_attacker_on_dstfield_flag) and
            match.is_soft_pin(gmove.srcx, gmove.srcy) == False):
+             #is_piece_lower_attacked_from_dstfield(gmove, from_dstfield_attacked)))):
             subtactic = priomove.SUB_TACTICS['good-deal']
         else:
             subtactic = priomove.SUB_TACTICS['bad-deal']
@@ -513,6 +496,9 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
         if(defends_fork(gmove)):
             priomove.tactics.append(cTactic(priomove.TACTICS['defends-fork'], subtactic))
             all_fork_defending.append(priomove)
+
+        if(forks(gmove)):
+            priomove.tactics.append(cTactic(priomove.TACTICS['forks'], subtactic))
 
         if(flees(gmove)):
             if(subtactic == priomove.SUB_TACTICS['good-deal']):

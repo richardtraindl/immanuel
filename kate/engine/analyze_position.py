@@ -7,6 +7,7 @@ from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
 from .analyze_helper import list_all_field_touches
+from .pieces.pieces_helper import obj_for_piece
 
 
 def score_traps_and_touches(match):
@@ -14,21 +15,9 @@ def score_traps_and_touches(match):
     for y in range(8):
         for x in range(8):
             piece = match.readfield(x, y)
-            if(piece == PIECES['blk']):
+            cpiece = obj_for_piece(match, piece, x, y)
+            if(cpiece is None):
                 continue
-            elif(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                cpiece = cPawn(match, x, y)
-            elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-                cpiece = cKnight(match, x, y)
-            elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-                cpiece = cBishop(match, x, y)
-            elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-                cpiece = cRook(match, x, y)
-            elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-                cpiece = cQueen(match, x, y)
-            else:
-                cpiece= cKing(match, x, y)
-
             score += cpiece.score_touches()
             if(cpiece.is_trapped()):
                 score += SCORES[cpiece.piece] // 3
@@ -287,14 +276,14 @@ def score_position(match, movecnt):
     else:
         score = match.score
         score += score_traps_and_touches(match)
-        """score += score_controled_horizontal_files(match)
+        score += score_controled_horizontal_files(match)
         score += score_controled_vertical_files(match)
         if(match.is_opening()):
             score += score_opening(match)
         elif(match.is_endgame()):
             score += score_endgame(match)
         else:
-            score += score_middlegame(match)"""
+            score += score_middlegame(match)
         return score
 
 

@@ -8,6 +8,7 @@ from .pieces.bishop import cBishop
 from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
+from .pieces.pieces_helper import obj_for_piece
 from .pieces.pawnfield import cPawnField
 from .pieces.knightfield import cKnightField
 from .pieces.rookfield import cRookField
@@ -77,15 +78,11 @@ class cMatch:
         'winner_black' : 13,
         'match-cancelled' : 14,
         'wrong-color' : 15,
-        'pawn-error' : 20,
-        'rook-error' : 21,
-        'knight-error' : 22,
-        'bishop-error' : 23,
-        'queen-error' : 24,
-        'king-error' : 25,
-        'format-error' : 30,
-        'out-of-bounds' : 31,
-        'general-error' : 40,
+        'piece-error' : 16,
+        'king-attacked-error' : 17,
+        'format-error' : 18,
+        'out-of-bounds' : 19,
+        'general-error' : 20,
     }
 
     RETURN_MSGS = {
@@ -95,12 +92,8 @@ class cMatch:
         RETURN_CODES['winner_black'] : "winner black",
         RETURN_CODES['match-cancelled'] : " match is cancelled",
         RETURN_CODES['wrong-color'] : "wrong color",
-        RETURN_CODES['pawn-error'] : "pawn error",
-        RETURN_CODES['rook-error'] : "rook error",
-        RETURN_CODES['knight-error'] : "knight error",
-        RETURN_CODES['bishop-error'] : "bishop error",
-        RETURN_CODES['queen-error'] : "queen error",
-        RETURN_CODES['king-error'] : "king error",
+        RETURN_CODES['piece-error'] : "piece error",
+        RETURN_CODES['king-attacked-error'] : "king attacked error",
         RETURN_CODES['format-error'] : "format wrror",
         RETURN_CODES['out-of-bounds'] : "wrong square",
         RETURN_CODES['general-error'] : "general error",
@@ -233,103 +226,50 @@ class cMatch:
     def is_move_valid(self, srcx, srcy, dstx, dsty, prom_piece):
         if(not self.is_move_inbounds(srcx, srcy, dstx, dsty)):
             return False, self.RETURN_CODES['out-of-bounds']
-
         piece = self.readfield(srcx, srcy)
-
         if(self.next_color() != self.color_of_piece(piece)):
             return False, self.RETURN_CODES['wrong-color']
-
         if(piece != PIECES['wKg'] and piece != PIECES['bKg']):
             if(self.is_king_after_move_attacked(srcx, srcy, dstx, dsty)):
-                return False, self.RETURN_CODES['king-error']
-
-        if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-            cpawn = cPawn(self, srcx, srcy)
-            if(cpawn.is_move_valid(dstx, dsty, prom_piece)):
-                return True, self.RETURN_CODES['ok']
+                return False, self.RETURN_CODES['king-attacked-error']
+        cpiece = obj_for_piece(self, piece, srcx, srcy)
+        if(cpiece):
+            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
+                if(cpiece.is_move_valid(dstx, dsty, prom_piece)):
+                    return True, self.RETURN_CODES['ok']
+                else:
+                    return False, self.RETURN_CODES['piece-error']
             else:
-                return False, self.RETURN_CODES['pawn-error']
-        elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-            crook = cRook(self, srcx, srcy)
-            if(crook.is_move_valid(dstx, dsty)):
-                return True, self.RETURN_CODES['ok']
-            else:
-                return False, self.RETURN_CODES['rook-error']
-        elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-            cknight = cKnight(self, srcx, srcy)
-            if(cknight.is_move_valid(dstx, dsty)):
-                return True, self.RETURN_CODES['ok']
-            else:
-                return False, self.RETURN_CODES['knight-error']
-        elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-            cbishop = cBishop(self, srcx, srcy)
-            if(cbishop.is_move_valid(dstx, dsty)):
-                return True, self.RETURN_CODES['ok']
-            else:
-                return False, self.RETURN_CODES['bishop-error']
-        elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-            cqueen = cQueen(self, srcx, srcy)
-            if(cqueen.is_move_valid(dstx, dsty)):
-                return True, self.RETURN_CODES['ok']
-            else:
-                return False, self.RETURN_CODES['queen-error']
-        elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-            cking = cKing(self, srcx, srcy)
-            if(cking.is_move_valid(dstx, dsty)):
-                return True, self.RETURN_CODES['ok']
-            else:
-                return False, self.RETURN_CODES['king-error']
+                if(cpiece.is_move_valid(dstx, dsty)):
+                    return True, self.RETURN_CODES['ok']
+                else:
+                    return False, self.RETURN_CODES['piece-error']
         else:
             return False, self.RETURN_CODES['general-error']
 
     def do_move(self, srcx, srcy, dstx, dsty, prom_piece):
         piece = self.readfield(srcx, srcy)
-
-        if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-            cpawn = cPawn(self, srcx, srcy)
-            return cpawn.do_move(dstx, dsty, prom_piece)
-        elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-            crook =  cRook(self, srcx, srcy)
-            return crook.do_move(dstx, dsty, prom_piece)
-        elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-            cknight = cKnight(self, srcx, srcy)
-            return cknight.do_move(dstx, dsty, prom_piece)
-        elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-            cbishop = cBishop(self, srcx, srcy)
-            return cbishop.do_move(dstx, dsty, prom_piece)
-        elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-            cqueen = cQueen(self, srcx, srcy)
-            return cqueen.do_move(dstx, dsty, prom_piece)
-        elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-            cking = cKing(self, srcx, srcy)
-            return cking.do_move(dstx, dsty, prom_piece)
+        cpiece = obj_for_piece(self, piece, srcx, srcy)
+        if(cpiece):
+            return cpiece.do_move(dstx, dsty, prom_piece)
+        else:
+            return None
 
     def undo_move(self):
         if(len(self.move_list) > 0):
             move = self.move_list.pop()
         else:
             return None
-
         piece = self.readfield(move.dstx, move.dsty)
-
         if(move.move_type == move.TYPES['promotion'] or piece == PIECES['wPw'] or piece == PIECES['bPw']):
             cpawn = cPawn(self, move.dstx, move.dsty)
             return cpawn.undo_move(move)
-        elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-            crook =  cRook(self, move.dstx, move.dsty)
-            return crook.undo_move(move)
-        elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-            cknight = cKnight(self, move.dstx, move.dsty)
-            return cknight.undo_move(move)
-        elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-            cbishop = cBishop(self, move.dstx, move.dsty)
-            return cbishop.undo_move(move)
-        elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-            cqueen = cQueen(self, move.dstx, move.dsty)
-            return cqueen.undo_move(move)
-        elif(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-            cking = cKing(self, move.dstx, move.dsty)
-            return cking.undo_move(move)
+        else:
+            cpiece = obj_for_piece(self, piece, move.dstx, move.dsty)
+            if(cpiece):
+                return cpiece.undo_move(move)
+            else:
+                return None
 
     def is_king_after_move_attacked(self, srcx, srcy, dstx, dsty):
         piece = self.readfield(srcx, srcy)

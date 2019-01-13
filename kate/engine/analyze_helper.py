@@ -6,7 +6,8 @@ from .pieces.bishop import cBishop
 from .pieces.rook import cRook
 from .pieces.king import cKing
 from .pieces.queen import cQueen
-from .pieces import pawnfield, knightfield, rookfield, bishopfield, kingfield
+from .pieces import pawnfield, knightfield, rookfield, bishopfield, kingfield, piecefield
+from .pieces.pieces_helper import obj_for_piece
 from .pieces.piece import cTouch
 from .validator import *
 
@@ -68,29 +69,6 @@ def search_lines_of_pin(match, color, fieldx, fieldy, exclx, excly):
                 pinlines.append([dirtouches[0], dirtouches[1]])
 
     return pinlines
-
-
-"""def is_piece_stuck(match, srcx, srcy):
-    piece = match.readfield(srcx, srcy)
-
-    if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-        cpawn = cPawn(match, srcx, srcy)
-        return cpawn.is_piece_stuck()
-    elif(piece == PIECES['wKn'] or piece == PIECES['bKn']):
-        cknight = cKnight(match, srcx, srcy)
-        return cknight.is_piece_stuck()
-    elif(piece == PIECES['wBp'] or piece == PIECES['bBp']):
-        cbishop = cBishop(match, srcx, srcy)
-        return cbishop.is_piece_stuck()
-    elif(piece == PIECES['wRk'] or piece == PIECES['bRk']):
-        crook = cRook(match, srcx, srcy)
-        return crook.is_piece_stuck()
-    elif(piece == PIECES['wQu'] or piece == PIECES['bQu']):
-        cqueen = cQueen(match, srcx, srcy)
-        return cqueen.is_piece_stuck()
-    else:
-        cking = cKing(match, srcx, srcy)
-        return cking.is_piece_stuck()"""
 
 
 def list_all_field_touches(match, color, fieldx, fieldy):
@@ -165,27 +143,34 @@ def list_field_touches(match, color, fieldx, fieldy):
     return touches
 
 
-def is_fork_field(match, color, forkx, forky, excludes):
-    opp_color = REVERSED_COLORS[color]
-    crookfield = rookfield.cRookField(match, forkx, forky)
-    if(crookfield.is_field_touched(opp_color, match.EVAL_MODES['all-pins'])):
-        if(crookfield.count_touches(color, excludes) > 1):
-            return True
-    cbishopfield = bishopfield.cBishopField(match, forkx, forky)
-    if(cbishopfield.is_field_touched(opp_color, match.EVAL_MODES['all-pins'])):
-        if(cbishopfield.count_touches(color, excludes) > 1):
-            return True
-    cknightfield = knightfield.cKnightField(match, forkx, forky)
-    if(cknightfield.is_field_touched(opp_color, match.EVAL_MODES['all-pins'])):
-        if(cknightfield.count_touches(color, excludes) > 1):
-            return True
-    cpawnfield = pawnfield.cPawnField(match, forkx, forky)
-    if(cpawnfield.is_field_touched(opp_color, match.EVAL_MODES['all-pins'])):
-        if(cpawnfield.count_touches(color, excludes) > 1):
-            return True
-    ckingfield = kingfield.cKingField(match, forkx, forky)
-    if(ckingfield.is_field_touched(opp_color)):
-        if(ckingfield.count_touches(color, excludes) > 1):
+def is_fork_field(match, x, y, attacker_color):
+    piece = match.readfield(x, y)
+    field_color = match.color_of_piece(piece)
+    if(field_color == attacker_color):
+        return False
+    attackers = list_field_touches(match, attacker_color, x, y)
+    for attacker in attackers:
+        if(attacker.piece == PIECES['wPw'] or attacker.piece == PIECES['bPw']):
+            if(piece == PIECES['blk']):
+                attackers.remove(attacker)
+    if(piece == PIECES['blk']):
+        cpawnfield = cPawnField(match, x, y)
+        gmoves = cpawnfield.generate_moves_from_reverse(attacker_color)
+        for gmove in gmoves:
+            ctouch = cTouch(match.readfield(gmove.srcx, gmove.srcy), gmove.srcx, gmove.srcy)
+            attackers.append(ctouch)
+    for attacker in attackers:
+        match.writefield(attacker.fieldx, attacker.fieldy, PIECES['blk'])
+        match.writefield(x, y, attacker.piece)
+        ###
+        cpiece = obj_for_piece(match, attacker.piece, x, y)
+        if(cpiece):
+            is_fork_field = cpiece.forks()
+        else:
+            is_fork_field = False
+        match.writefield(attacker.fieldx, attacker.fieldy, attacker.piece)
+        match.writefield(x, y, piece)
+        if(is_fork_field):
             return True
     return False
 
@@ -205,6 +190,13 @@ def is_piece_lower_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
             return False
     return True
 
+
+def is_piece_lower_attacked_from_dstfield(gmove, from_dstfield_attacked):
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    for enmy in from_dstfield_attacked:
+        if(PIECES_RANK[piece] < PIECES_RANK[enmy.piece]):
+            return True
+    return False
 
 def is_piece_lfe_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)

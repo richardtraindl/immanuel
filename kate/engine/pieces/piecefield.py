@@ -100,7 +100,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1 is not None):
+            if(x1):
                 piece = self.match.readfield(x1, y1)
                 cpiece = self.obj_for_piece(piece, x1, y1)
                 if(cpiece.is_move_stuck(self.fieldx, self.fieldy)):

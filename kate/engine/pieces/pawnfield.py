@@ -2,6 +2,7 @@ from .. values import *
 from .piecefield import cPieceField
 from .piece import cTouch
 from .pawn import cPawn
+from .. move import cGenMove
 
 
 class cPawnField(cPieceField):
@@ -110,5 +111,15 @@ class cPawnField(cPieceField):
                         count += 1
         return count
 
+    def generate_moves_from_reverse(self, color):
+        moves = []
+        if(color == COLORS['white']):
+            ysteps = [-1, -2]
+        else:
+            ysteps = [1, 2]
+        for ystep in ysteps:
+            if(self.match.is_move_valid(self.fieldx, self.fieldy + ystep, self.fieldx, self.fieldy, None)[0]):
+                moves.append(cGenMove(self.match, self.fieldx, self.fieldy + ystep, self.fieldx, self.fieldy, None))
+        return moves
 # class end
 

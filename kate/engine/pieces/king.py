@@ -291,35 +291,44 @@ class cKing(cPiece):
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
 
+    def forks(self):
+        from .. analyze_helper import list_all_field_touches
+        count = 0
+        for step in self.STEPS:
+            x1 = self.xpos + step[0]
+            y1 = self.ypos + step[1]
+            if(self.match.is_move_inbounds(self.xpos, self.ypos, x1, y1)):
+                dstpiece = self.match.readfield(x1, y1)
+                if(self.match.color_of_piece(dstpiece) == REVERSED_COLORS[self.color]):
+                    friends, enemies = list_all_field_touches(self.match, self.match.color_of_piece(dstpiece), x1, y1)
+                    if(len(friends) == 0 or
+                       len(friends) < len(enemies)):
+                        count += 1
+        if(count >= 2):
+            return True
+        else:
+            return False
+
     def move_defends_forked_field(self, dstx, dsty):
         from .. analyze_helper import list_all_field_touches, is_fork_field
-
         for step in self.STEPS:
             stepx = step[0]
             stepy = step[1]
-
             x1 = dstx + stepx
             y1 = dsty + stepy
-
             if(x1 == self.xpos and y1 == self.ypos):
                 continue
-
             if(self.match.is_inbounds(x1, y1)):
                 cking = cKing(self.match, x1, y1)
                 if(cking.is_attacked()):
                     continue
-
                 piece = self.match.readfield(x1, y1)
-
                 if(piece == PIECES['blk'] or 
                    self.match.color_of_piece(piece) == self.color):
                     frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
                     if(len(frdlytouches) < len(enmytouches)):
-                        excludes = []
-                        excludes.append([self.xpos, self.ypos])
-                        if(is_fork_field(self.match, self.color, x1, y1, excludes)):
+                        if(is_fork_field(self.match, x1, y1, REVERSED_COLORS[self.color])):
                             return True
-
         return False
 
     def move_controles_file(self, dstx, dsty):
