@@ -132,12 +132,12 @@ def resort_exchange_or_stormy_moves(priomoves, new_prio, last_pmove, only_exchan
     for priomove in priomoves:
         if(only_exchange == False and priomove.is_tactic_stormy()):
             count_of_stormy += 1
-            priomove.prio = min(priomove.prio, new_prio - 3)
+            priomove.prio = min(priomove.prio, (new_prio + priomove.prio % 10) - 13)
         elif(priomove.has_domain_tactic(cPrioMove.TACTICS['captures'])):
             subtactic = priomove.fetch_subtactic(cPrioMove.TACTICS['captures'])
             if(subtactic > cPrioMove.SUB_TACTICS['bad-deal']):
                 count_of_good_captures += 1
-                priomove.prio = min(priomove.prio, new_prio - 2)
+                priomove.prio = min(priomove.prio, (new_prio  + priomove.prio % 10) - 12)
             elif(last_pmove_capture_bad_deal):
                 bad_captures.append(priomove)
                 #count_of_bad_captures += 1
@@ -146,9 +146,9 @@ def resort_exchange_or_stormy_moves(priomoves, new_prio, last_pmove, only_exchan
             first_silent = priomove
     if(len(bad_captures) > 0 and count_of_good_captures == 0 and count_of_stormy == 0):
         if(first_silent):
-            first_silent.prio = min(first_silent.prio, new_prio - 1)
+            first_silent.prio = min(first_silent.prio, (new_prio + first_silent.prio % 10) - 10)
         for capture in bad_captures:
-            capture.prio = min(capture.prio, new_prio)
+            capture.prio = min(capture.prio, new_prio + capture.prio % 10)
     priomoves.sort(key=attrgetter('prio'))
     return True
 
