@@ -9,7 +9,6 @@ from .pieces.queen import cQueen
 from .pieces import pawnfield, knightfield, rookfield, bishopfield, kingfield, piecefield
 from .pieces.pieces_helper import obj_for_piece
 from .pieces.piece import cTouch
-from .validator import *
 
 
 class cDirTouch:
@@ -212,7 +211,7 @@ def is_piece_lfe_attacker_on_dstfield(gmove, enmytouches_on_dstfield):
 def is_supported_weak(gmove, supported):
     gmove.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
     supported_weak = len(supported.attacker_beyond) > len(supported.supporter_beyond) or \
-                     gmove.match.is_soft_pin(supported.fieldx, supported.fieldy)
+                     gmove.match.is_soft_pin(supported.fieldx, supported.fieldy)[0]
     gmove.match.undo_move()
     return supported_weak
 
@@ -261,7 +260,7 @@ def is_captured_pinned_or_soft_pinned(gmove):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
     if(piece != PIECES['wKg'] and piece != PIECES['bKg']):
         gmove.match.writefield(gmove.srcx, gmove.srcy, PIECES['blk'])
-    is_soft_pin, pinning_piece = cValidator.is_soft_pin(gmove.match, gmove.dstx, gmove.dsty)
+    is_soft_pin, pinning_piece = gmove.match.is_soft_pin(gmove.dstx, gmove.dsty)
     gmove.match.writefield(gmove.srcx, gmove.srcy, piece)
     if(is_soft_pin and 
        (pinning_piece.fieldx != gmove.srcx or pinning_piece.fieldy != gmove.srcy)):

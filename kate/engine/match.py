@@ -157,8 +157,8 @@ class cMatch:
     def readfield(self, x, y):
         return self.board.readfield(x, y)
 
-    def search(self, srcx, srcy, stepx, stepy):
-        return self.board.search(srcx, srcy, stepx, stepy)
+    def search(self, srcx, srcy, stepx, stepy, maxcnt=7):
+        return self.board.search(srcx, srcy, stepx, stepy, maxcnt)
 
     def search_bi_dirs(self, srcx, srcy, stepx, stepy):
         return self.board.search_bi_dirs(srcx, srcy, stepx, stepy)
@@ -234,16 +234,10 @@ class cMatch:
                 return False, self.RETURN_CODES['king-attacked-error']
         cpiece = obj_for_piece(self, piece, srcx, srcy)
         if(cpiece):
-            if(piece == PIECES['wPw'] or piece == PIECES['bPw']):
-                if(cpiece.is_move_valid(dstx, dsty, prom_piece)):
-                    return True, self.RETURN_CODES['ok']
-                else:
-                    return False, self.RETURN_CODES['piece-error']
+            if(cpiece.is_move_valid(dstx, dsty, prom_piece)):
+                return True, self.RETURN_CODES['ok']
             else:
-                if(cpiece.is_move_valid(dstx, dsty)):
-                    return True, self.RETURN_CODES['ok']
-                else:
-                    return False, self.RETURN_CODES['piece-error']
+                return False, self.RETURN_CODES['piece-error']
         else:
             return False, self.RETURN_CODES['general-error']
 
@@ -412,7 +406,7 @@ class cMatch:
                 if(self.color_of_piece(friend) == color and 
                    PIECES_RANK[friend] > PIECES_RANK[piece] and 
                    PIECES_RANK[friend] > PIECES_RANK[enemy.piece]):
-                    return True
+                    return True, enemy
 
         enemies.clear()
         cbishopfield = cBishopField(self, srcx, srcy)
@@ -426,7 +420,7 @@ class cMatch:
                 if(self.color_of_piece(friend) == color and 
                    PIECES_RANK[friend] > PIECES_RANK[piece] and 
                    PIECES_RANK[friend] > PIECES_RANK[enemy.piece]):
-                    return True
-        return False
+                    return True, enemy
+        return False, None
 
 # class end

@@ -303,7 +303,9 @@ class cPawn(cPiece):
                 return True
         return False
 
-    def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+    #find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+        # works with inherited class
+    """def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
         from .. analyze_helper import list_field_touches_beyond
 
         opp_color = self.match.oppcolor_of_piece(self.piece)
@@ -342,7 +344,7 @@ class cPawn(cPiece):
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
                     list_field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
-                    ###
+                    ###"""
 
     def forks(self):
         from .. analyze_helper import list_all_field_touches
@@ -365,7 +367,7 @@ class cPawn(cPiece):
         else:
             return False
 
-    def move_defends_forked_field(self, dstx, dsty):
+    def move_defends_fork(self, dstx, dsty):
         from .. analyze_helper import list_all_field_touches, is_fork_field
         if(self.is_move_stuck(dstx, dsty)):
             return False
@@ -432,12 +434,12 @@ class cPawn(cPiece):
                 """if(self.match.color_of_piece(touched) == self.color):
                     score += SUPPORTED_SCORES[touched]
                     # extra score if supported is pinned
-                    if(self.match.is_soft_pin(x1, y1)):
+                    if(self.match.is_soft_pin(x1, y1)[0]):
                         score += SUPPORTED_SCORES[touched]
                 else:
                     score += ATTACKED_SCORES[touched]
                     # extra score if attacked is pinned
-                    if(self.match.is_soft_pin(x1, y1)):
+                    if(self.match.is_soft_pin(x1, y1)[0]):
                         score += ATTACKED_SCORES[touched]"""
         return score
 

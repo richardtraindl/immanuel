@@ -19,8 +19,8 @@ from django.contrib import admin
 from kate.urls import views
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/?', admin.site.urls),
     url(r'^$', views.index, name='index'),
-    url(r'^kate/', include('kate.urls')),
+    url(r'^kate/?', include('kate.urls')),
 ]
 

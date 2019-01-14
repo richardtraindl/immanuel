@@ -226,13 +226,15 @@ class cBoard:
     def readfield(self, x, y):
         return self.fields[y][x]
 
-    def search(self, srcx, srcy, stepx, stepy):
+    def search(self, srcx, srcy, stepx, stepy, maxcnt=7):
+        cnt = 0
         x = srcx + stepx
         y = srcy + stepy
-        while(x >= self.COORD['1'] and x <= self.COORD['8'] and y >= self.COORD['1'] and y <= self.COORD['8']):
+        while(x >= self.COORD['1'] and x <= self.COORD['8'] and y >= self.COORD['1'] and y <= self.COORD['8'] and cnt < maxcnt):
             field = self.readfield(x, y)
             if(field != PIECES['blk']):
                 return x, y
+            cnt += 1
             x += stepx
             y += stepy
         return None, None

@@ -7,7 +7,6 @@ from .openings import retrieve_move
 from .analyze_move import *
 from . import analyze_position
 from .helper import *
-from .validator import *
 from .generator import cGenerator
 
 

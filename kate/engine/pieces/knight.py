@@ -69,7 +69,7 @@ class cKnight(cPiece):
     #is_move_stuck(self, dstx, dsty):
         # works with inherited class
 
-    def is_move_valid(self, dstx, dsty):
+    def is_move_valid(self, dstx, dsty, prom_piece=PIECES['blk']):
         direction = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
         if(direction == self.match.DIRS['undefined']):
             return False
@@ -90,7 +90,9 @@ class cKnight(cPiece):
     #undo_move(self, move)
         # works with inherited class
 
-    def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+    #find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+        # works with inherited class
+    """"def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
         from .. analyze_helper import list_field_touches_beyond
 
         cknight = cKnight(self.match, dstx, dsty)
@@ -124,7 +126,7 @@ class cKnight(cPiece):
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
                     list_field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
-                    ###
+                    ###"""
 
     def forks(self):
         from .. analyze_helper import list_all_field_touches
@@ -147,7 +149,7 @@ class cKnight(cPiece):
         else:
             return False
 
-    def move_defends_forked_field(self, dstx, dsty):
+    def move_defends_fork(self, dstx, dsty):
         from .. analyze_helper import list_all_field_touches, is_fork_field
         if(self.is_move_stuck(dstx, dsty)):
             return False

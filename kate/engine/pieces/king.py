@@ -85,7 +85,7 @@ class cKing(cPiece):
     def is_attacked(self):
         return self.match.is_field_touched(REVERSED_COLORS[self.color], self.xpos, self.ypos, self.match.EVAL_MODES['ignore-pins'])
 
-    def is_move_valid(self, dstx, dsty):
+    def is_move_valid(self, dstx, dsty, prom_piece=PIECES['blk']):
         opp_color = self.match.oppcolor_of_piece(self.piece)
 
         direction = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
@@ -259,21 +259,19 @@ class cKing(cPiece):
         self.match.writefield(self.xpos, self.ypos, self.piece)
         return True
 
-    def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+    #find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+        # works with inherited class
+    """def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
         from .. analyze_helper import list_field_touches_beyond
-
         opp_color = self.match.oppcolor_of_piece(self.piece)
         for step in self.STEPS:
-            x1 = dstx + step[0]
-            y1 = dsty + step[1]
-            if(self.match.is_inbounds(x1, y1)):
+            stepx = step[0]
+            stepy = step[1]
+            x1, y1 = self.match.search(dstx, dsty, stepx , stepy, 1)
+            if(x1):
                 if(x1 == self.xpos and y1 == self.ypos):
                     continue
-    
                 piece = self.match.readfield(x1, y1)
-                if(piece == PIECES['blk']):
-                    continue
-
                 if(self.match.color_of_piece(piece) == opp_color):
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     attacked.append(ctouch_beyond)
@@ -282,14 +280,14 @@ class cKing(cPiece):
                     list_field_touches_beyond(self.match, opp_color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
-                else:
+                elif(self.match.color_of_piece(piece) == self.color):
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     supported.append(ctouch_beyond)
                     ###
                     self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
                     list_field_touches_beyond(self.match, self.color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
-                    ###
+                    ###"""
 
     def forks(self):
         from .. analyze_helper import list_all_field_touches
@@ -309,7 +307,7 @@ class cKing(cPiece):
         else:
             return False
 
-    def move_defends_forked_field(self, dstx, dsty):
+    def move_defends_fork(self, dstx, dsty):
         from .. analyze_helper import list_all_field_touches, is_fork_field
         for step in self.STEPS:
             stepx = step[0]

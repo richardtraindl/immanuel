@@ -33,7 +33,7 @@ class cPawnField(cPieceField):
                             return True
                     else: #mode == 2
                         cpawn = cPawn(self.match, x1, y1)
-                        if(cpawn.is_move_stuck(self.fieldx, self.fieldy) or self.match.is_soft_pin(x1, y1)):
+                        if(cpawn.is_move_stuck(self.fieldx, self.fieldy) or self.match.is_soft_pin(x1, y1)[0]):
                             continue
                         else:
                             return True
@@ -118,8 +118,8 @@ class cPawnField(cPieceField):
         else:
             ysteps = [1, 2]
         for ystep in ysteps:
-            if(self.match.is_move_valid(self.fieldx, self.fieldy + ystep, self.fieldx, self.fieldy, None)[0]):
-                moves.append(cGenMove(self.match, self.fieldx, self.fieldy + ystep, self.fieldx, self.fieldy, None))
+            if(self.match.is_move_valid(self.fieldx, self.fieldy + ystep, self.fieldx, self.fieldy, PIECES['blk'])[0]):
+                moves.append(cGenMove(self.match, self.fieldx, self.fieldy + ystep, self.fieldx, self.fieldy, PIECES['blk']))
         return moves
 # class end
 

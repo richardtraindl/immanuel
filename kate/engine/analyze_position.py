@@ -101,10 +101,10 @@ def score_kings_safety(match):
     value = 0
     cking = cKing(match, match.board.wKg_x, match.board.wKg_y)
     if(cking.is_safe() == False):
-        value += ATTACKED_SCORES[PIECES['wQu']]
+        value += ATTACKED_SCORES[PIECES['wQu']] * 10
     cking = cKing(match, match.board.bKg_x, match.board.bKg_y)
     if(cking.is_safe() == False):
-        value += ATTACKED_SCORES[PIECES['bQu']]
+        value += ATTACKED_SCORES[PIECES['bQu']] * 10
     return value
 
 
@@ -322,7 +322,7 @@ def is_stormy(match):
             """if(len(enmytouches) > len(frdlytouches)):
                 return True"""
 
-            if(match.is_pinned(x, y) or match.is_soft_pin(x, y)):
+            if(match.is_pinned(x, y) or match.is_soft_pin(x, y)[0]):
                 return True
 
             for enmy in enmytouches:

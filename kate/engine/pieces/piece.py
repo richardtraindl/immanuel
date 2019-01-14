@@ -71,7 +71,7 @@ class cPiece:
             return True
 
     # version for queen, rook and bishop - other pieces override function
-    def is_move_valid(self, dstx, dsty):
+    def is_move_valid(self, dstx, dsty, prom_piece=PIECES['blk']):
         direction = self.dir_for_move(self.xpos, self.ypos, dstx, dsty)
         if(direction == self.DIRS['undefined']):
             return False
@@ -155,22 +155,27 @@ class cPiece:
     # version for queen, rook and bishop - other pieces override function
     def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
         from .. analyze_helper import list_field_touches_beyond
-
+        if(self.piece == PIECES['wPw'] or self.piece == PIECES['bPw'] or 
+           self.piece == PIECES['wKn'] or self.piece == PIECES['bKn'] or
+           self.piece == PIECES['wKg'] or self.piece == PIECES['bKg']):
+            outer_maxcnt = 1
+            inner_maxcnt = 0
+        else:
+            outer_maxcnt = 7
+            inner_maxcnt = 7
         opp_color = self.match.oppcolor_of_piece(self.color)
         for step in self.STEPS:
             stepx = step[0]
             stepy = step[1]
-            x1, y1 = self.match.search(dstx, dsty, stepx , stepy)
-            if(x1 is not None):
+            x1, y1 = self.match.search(dstx, dsty, stepx , stepy, outer_maxcnt)
+            if(x1):
                 if(x1 == self.xpos and y1 == self.ypos):
-                    x1, y1 = self.match.search(x1, y1, stepx , stepy)
+                    x1, y1 = self.match.search(x1, y1, stepx, stepy, inner_maxcnt)
                     if(x1 is None):
                         continue
-
                 cpiece = cPiece(self.match, dstx, dsty)
                 if(cpiece.is_move_stuck(x1, y1)):
                     continue
-
                 piece = self.match.readfield(x1, y1)
                 if(self.match.color_of_piece(piece) == opp_color):
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
@@ -180,8 +185,8 @@ class cPiece:
                     list_field_touches_beyond(self.match, opp_color, ctouch_beyond)
                     self.match.writefield(self.xpos, self.ypos, self.piece)
                     ###
-                else:
-                    if(piece == PIECES['blk'] or piece == PIECES['wKg'] or piece == PIECES['bKg']):
+                elif(self.match.color_of_piece(piece) == self.color):
+                    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
                         continue
                     ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
                     supported.append(ctouch_beyond)
@@ -211,7 +216,7 @@ class cPiece:
         else:
             return False
 
-    def move_defends_forked_field(self, dstx, dsty):
+    def move_defends_fork(self, dstx, dsty):
         from .. analyze_helper import list_all_field_touches, is_fork_field
         if(self.is_move_stuck(dstx, dsty)):
             return False
@@ -267,7 +272,7 @@ class cPiece:
                 addjust = 4
             score += SUPPORTED_SCORES[touched] // addjust
             # extra score if supported is pinned
-            if(self.match.is_soft_pin(x1, y1)):
+            if(self.match.is_soft_pin(x1, y1)[0]):
                 score += SUPPORTED_SCORES[touched] // addjust
         else:
             if(len(frdlytouches) >= len(enmytouches) or
@@ -277,7 +282,7 @@ class cPiece:
                 addjust = 4
             score += ATTACKED_SCORES[touched] // addjust
             # extra score if attacked is pinned
-            if(self.match.is_soft_pin(x1, y1)):
+            if(self.match.is_soft_pin(x1, y1)[0]):
                 score += ATTACKED_SCORES[touched] // addjust
         return score
 
@@ -322,7 +327,7 @@ class cPiece:
         if(len(enmytouches) > 0):
             attack_score += ATTACKED_SCORES[self.piece]
 
-        if(self.match.is_soft_pin(self.xpos, self.ypos)):
+        if(self.match.is_soft_pin(self.xpos, self.ypos)[0]):
             rank = PIECES_RANK[PIECES['wKg']]
             for enmy in enmytouches:
                 if(PIECES_RANK[enmy.piece] < rank):
@@ -351,7 +356,7 @@ class cPiece:
                 flag, errcode = self.match.is_move_valid(self.xpos, self.ypos, dstx, dsty, step[2])
                 if(flag):
                     moves.append(cGenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2]))
-                elif(errcode == 31): #cValidator.RETURN_CODES['out-of-bounds']
+                elif(errcode == 31): #RETURN_CODES['out-of-bounds']
                     break
         return moves
 
@@ -365,7 +370,7 @@ class cPiece:
                 if(flag):
                     gmove = cGenMove(self.match, self.xpos, self.ypos, dstx, dsty, step[2])
                     moves.append(cPrioMove(gmove))
-                elif(errcode == 31): #cValidator.RETURN_CODES['out-of-bounds']
+                elif(errcode == 31): #RETURN_CODES['out-of-bounds']
                     break
         return moves
 

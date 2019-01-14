@@ -26,7 +26,7 @@ class cKnightField(cPieceField):
                             return True
                     else: #mode == 2
                         cknight = cKnight(self.match, x1, y1)
-                        if(cknight.is_piece_stuck() or self.match.is_soft_pin(x1, y1)):
+                        if(cknight.is_piece_stuck() or self.match.is_soft_pin(x1, y1)[0]):
                             continue
                         else:
                             return True

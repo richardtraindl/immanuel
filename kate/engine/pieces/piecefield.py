@@ -62,7 +62,7 @@ class cPieceField:
                             return True
                     else: #mode == EVAL_MODES['all-pins']
                         cpiece = self.obj_for_piece(piece, x1, y1)
-                        if(cpiece.is_move_stuck(self.fieldx, self.fieldy) or self.match.is_soft_pin(x1, y1)):
+                        if(cpiece.is_move_stuck(self.fieldx, self.fieldy) or self.match.is_soft_pin(x1, y1)[0]):
                             continue
                         else:
                             return True

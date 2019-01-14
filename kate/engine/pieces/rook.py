@@ -71,7 +71,7 @@ class cRook(cPiece):
     #is_move_stuck(self, dstx, dsty)
         # works with inherited class
 
-    #is_move_valid(self, dstx, dsty)
+    #is_move_valid(self, dstx, dsty, prom_piece=PIECES['blk'])
         # works with inherited class
 
     #do_move(self, dstx, dsty, prom_piece)

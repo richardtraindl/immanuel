@@ -14,7 +14,6 @@ from .pieces.queen import cQueen
 from .pieces.piece import cTouchBeyond
 from .pieces.pieces_helper import obj_for_piece
 from .generator import cGenerator
-from .validator import *
 
 
 def castles(gmove):
@@ -263,10 +262,10 @@ def find_disclosures(match, gmove):
     return discl_attacked, discl_supported
 
 
-def defends_fork_field(match, piece, srcx, srcy, dstx, dsty): # , forked
+def defends_fork_field(match, piece, srcx, srcy, dstx, dsty):
     cpiece = obj_for_piece(match, piece, srcx, srcy)
     if(cpiece):
-        return cpiece.move_defends_forked_field(dstx, dsty)
+        return cpiece.move_defends_fork(dstx, dsty)
     else:
         return False
 
@@ -451,7 +450,7 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
 
         if((len(frdlytouches_on_dstfield) >= len(enmytouches_on_dstfield) and 
             is_piece_lfe_attacker_on_dstfield_flag) and
-           match.is_soft_pin(gmove.srcx, gmove.srcy) == False):
+           match.is_soft_pin(gmove.srcx, gmove.srcy)[0] == False):
              #is_piece_lower_attacked_from_dstfield(gmove, from_dstfield_attacked)))):
             subtactic = priomove.SUB_TACTICS['good-deal']
         else:
@@ -459,7 +458,7 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
 
         if(defends_check(match)):
             if(subtactic == priomove.SUB_TACTICS['good-deal'] and
-               match.is_soft_pin(gmove.srcx, gmove.srcy) == False):
+               match.is_soft_pin(gmove.srcx, gmove.srcy)[0] == False):
                 priomove.tactics.append(cTactic(priomove.TACTICS['defends-check'], priomove.SUB_TACTICS['good-deal']))
             else:
                 priomove.tactics.append(cTactic(priomove.TACTICS['defends-check'], priomove.SUB_TACTICS['bad-deal']))
@@ -548,7 +547,7 @@ def rank_gmoves(match, priomoves, piecescnt, last_pmove, dbggmove, dbgprio):
                 if(support_subtactic == priomove.SUB_TACTICS['good-deal'] and 
                    len(supported.attacker_beyond) > 0 and
                    (is_supporter_lower_attacker(gmove, supported) or
-                    match.is_soft_pin(supported.fieldx, supported.fieldy))):
+                    match.is_soft_pin(supported.fieldx, supported.fieldy)[0])):
                     support_subtactic = priomove.SUB_TACTICS['urgent']
 
                 priomove.tactics.append(cTactic(support_tactic, support_subtactic))

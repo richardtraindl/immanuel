@@ -12,7 +12,6 @@ from .modules import interface
 from .engine.values import *
 from .engine.match import *
 from .engine.move import *
-from .engine.validator import *
 from .engine.helper import index_to_coord, coord_to_index
 from .engine.debug import list_match_attributes
 from .engine.pieces.king import cKing
@@ -66,7 +65,7 @@ def match(request, matchid=None):
     if(msgcode is None):
         msg = ""
     else:
-        msg = cValidator.VAL_MSGS[msgcode]
+        msg = match.RETURN_MSGS[msgcode]
 
     if(match.status == match.STATUS['winner_white'] or 
        match.status == match.STATUS['winner_black'] or 
@@ -87,7 +86,7 @@ def do_move(request, matchid=None):
     if(request.method == 'POST'):
         modelmatch = get_object_or_404(ModelMatch, pk=matchid)
         if(interface.is_next_color_human(modelmatch) == False):
-            msgcode= cValidator.VAL_CODES['wrong-color']
+            msgcode= cMatch.RETURN_CODES['wrong-color']
             return HttpResponseRedirect("%s?switch=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch))
 
         form = DoMoveForm(request.POST)
@@ -100,7 +99,7 @@ def do_move(request, matchid=None):
                 interface.do_move(modelmatch, srcx, srcy, dstx, dsty, prom_piece)
                 interface.calc_move_for_immanuel(modelmatch)
         else:
-            msgcode= cValidator.VAL_CODES['format-error']
+            msgcode= cMatch.RETURN_CODES['format-error']
 
         return HttpResponseRedirect("%s?switch=%s&msgcode=%s" % (reverse('kate:match', args=(modelmatch.id,)), switch, msgcode))
     else:
