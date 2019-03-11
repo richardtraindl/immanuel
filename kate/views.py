@@ -9,12 +9,12 @@ from .utils import *
 from .forms import *
 from .models import Match as ModelMatch, Move as ModelMove, Comment as ModelComment
 from .modules import interface
-from .engine.values import *
-from .engine.match import *
-from .engine.move import *
-from .engine.helper import index_to_coord, coord_to_index
-from .engine.debug import list_match_attributes
-from .engine.pieces.king import cKing
+from .engine2.values import *
+from .engine2.match import *
+from .engine2.move import *
+from .engine2.helper import index_to_coord, coord_to_index
+from .engine2.debug import list_match_attributes
+from .engine2.pieces.king import cKing
 
 
 def index(request):

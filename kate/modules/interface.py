@@ -1,10 +1,10 @@
 import random, threading, copy, time
 from django.conf import settings
 from .. models import Match as ModelMatch, Move as ModelMove
-from .. engine.values import *
-from .. engine.match import *
-from .. engine.move import *
-from .. engine import calc
+from .. engine2.values import *
+from .. engine2.match import *
+from .. engine2.move import *
+from .. engine2 import calc
 
 
 MAP_DIR = { 'model-to-engine' : 0, 'engine-to-model' : 1 }
@@ -40,13 +40,17 @@ def map_matches(src, dst, map_dir):
         dst.black_player_is_human = src.black_player.is_human
         dst.black_elapsed_seconds = src.black_player.elapsed_seconds
 
-    for y in range(8):
-        for x in range(8):
-            piece = src.readfield(x, y)
-            dst.writefield(x, y, piece)
-
     if(map_dir == MAP_DIR['model-to-engine']):
+        for y in range(8):
+            for x in range(8):
+                piece = src.readfield(x, y)
+                dst.board.writefield(x, y, piece)
         dst.update_attributes()
+    else:
+        for y in range(8):
+            for x in range(8):
+                piece = src.board.readfield(x, y)
+                dst.writefield(x, y, piece)
 
 
 def map_moves(src, dst):

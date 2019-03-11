@@ -23,23 +23,17 @@ def interpret(session, inputstr):
     for dword in dictionary:
         if(dword.name == tokens[0].lower()):
             return dword.code(session, params)
-
     print("???")
     return True
 
 
 def forth():
-    lstparam = ['White', 'h', 'Black', "m"]
-    session = Session(new_match(lstparam))
-
-    if(init_words() == False):
-        return
+    session = Session(cMatch())
+    init_words()
 
     while(True):
         calc_and_domove(session)
-
         inputstr = input("OK ")
-
         if(interpret(session, inputstr) == False):
             break
 

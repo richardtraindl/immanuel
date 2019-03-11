@@ -4,7 +4,7 @@ from engine.match import *
 from engine.move import *
 from engine.calc import calc_move
 from engine.pieces.king import cKing
-from engine.debug import prnt_match_attributes, prnt_board, list_match_attributes, list_move_attributes
+from engine.debug import prnt_match_attributes, prnt_matches_diff, prnt_board, list_match_attributes, list_move_attributes
 from engine.helper import coord_to_index, reverse_lookup
 
 
@@ -19,52 +19,30 @@ class Word():
         self.info = info
 
 def new_word(name, code, info):
-    for dword in dictionary:
-        if(dword.name == name):
-            print("naming error...")
-            return False
-
     word = Word(name, code, info)
     dictionary.append(word)
-    return True
 
 
 def init_words():
-    if(new_word("help", word_help, "this help") == False):
-        return False
-    if(new_word("?", word_help, "this help") == False):
-        return False
-    if(new_word("bye", word_bye, "exit") == False):
-        return False
-    if(new_word("pause", word_pause, "pauses match") == False):
-        return False
-    if(new_word("resume", word_resume, "resumes (paused) match") == False):
-        return False
-    if(new_word("show", word_show, "prints debug info") == False):
-        return False
-    if(new_word("set", word_set, "sets attributes, e.g. set level medium") == False):
-        return False
-    if(new_word("setboard", word_set_board, "set board") == False):
-        return False
-    if(new_word("completeboard", word_complete_board, "complete board") == False):
-        return False
-    if(new_word("setpiece", word_set_piece, "sets a piece on the board") == False):
-        return False
-    if(new_word("move", word_move, "moves piece(s), e.g. move e2-e4") == False):
-        return False
-    if(new_word("undo", word_undo, "undos last move") == False):
-        return False
-    if(new_word("list", word_list, "lists all saved matches") == False):
-        return False
-    if(new_word("save", word_save, "saves match") == False):
-        return False
-    if(new_word("load", word_load, "loads match with id, e.g. load 3") == False):
-        return False
-    if(new_word("delete", word_delete, "deletes match with id, e.g. delete 3") == False):
-        return False
-    if(new_word("debug", word_debug, "debug a function") == False):
-        return False
-    return True
+    new_word("help", word_help, "this help")
+    new_word("?", word_help, "this help")
+    new_word("bye", word_bye, "exit")
+    new_word("pause", word_pause, "pauses match")
+    new_word("resume", word_resume, "resumes (paused) match")
+    new_word("show", word_show, "prints debug info")
+    new_word("level", word_level, "sets level, e.g. level medium")
+    new_word("human", word_human, "sets player to human, e.g. human black")
+    new_word("engine", word_engine, "sets player to engine, e.g. engine white")
+    new_word("setup", word_setup, "start to set up a chess position")
+    new_word("close", word_close, "closes setup")
+    new_word("piece", word_piece, "sets a piece on the board during setups")
+    new_word("mv", word_move, "moves piece(s), e.g. move e2-e4")
+    new_word("undo", word_undo, "undos last move")
+    new_word("list", word_list, "lists all saved matches")
+    new_word("save", word_save, "saves match")
+    new_word("load", word_load, "loads match with id, e.g. load 3")
+    new_word("delete", word_delete, "deletes match with id, e.g. delete 3")
+    new_word("debug", word_debug, "debug a function")
 
 
 class CalcThread(threading.Thread):
@@ -76,11 +54,15 @@ class CalcThread(threading.Thread):
     def run(self):
         self.session.thread_is_busy = True
         print("Thread starting...")
+        match2 = copy.deepcopy(self.calc_match)
         candidates = calc_move(self.calc_match)
+        print("prnt_matches_diff")
+        prnt_matches_diff(self.calc_match, match2)
+        print("prnt_matches_diff")
         if(len(candidates) > 0):
             gmove = candidates[0]
             self.session.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
-            prnt_board(self.session.match)
+            prnt_board(self.session.match, 0)
         else:
             print("no move found!")
 
@@ -89,33 +71,17 @@ class CalcThread(threading.Thread):
 
 def calc_and_domove(session):
     match = session.match
+    status = match.evaluate_status()
     if(session.thread_is_busy == False and 
-       match.evaluate_status() == match.STATUS['open'] and 
+       status == match.STATUS['open'] and 
        match.is_next_color_human() == False):
         session.thread = CalcThread(session)
         session.thread.start()
-
-
-def new_match(lstparam):
-    if(len(lstparam) != 4):
-        print("??? params")
-        return None
-
-    match = cMatch()
-
-    match.white_player.name = lstparam[0]
-    if(lstparam[1] == "human" or lstparam[1] == "h"):
-        match.white_player.is_human = True
     else:
-        match.white_player.is_human = False
-    match.black_player.name = lstparam[2]
-
-    if(lstparam[3] == "human" or lstparam[3] == "h"):
-        match.black_player.is_human = True
-    else:
-        match.black_player.is_human = False
-
-    return match
+        if(status == match.STATUS['draw'] or
+           status == match.STATUS['winner_white'] or 
+           status == match.STATUS['winner_black']):
+            print(reverse_lookup(match.STATUS, match.evaluate_status()))
 
 
 def word_pause(session, params):
@@ -127,7 +93,7 @@ def word_pause(session, params):
 
 def word_resume(session, params):
     match = session.match
-    if(match.evaluate_status() == match.STATUS['open']):
+    if(match.status == match.STATUS['paused'] or match.status == match.STATUS['setup']):
         match.status = match.STATUS['open']
     calc_and_domove(session)
     return True
@@ -135,50 +101,57 @@ def word_resume(session, params):
 
 def word_show(session, params):
     prnt_match_attributes(session.match, ", ")
-    prnt_board(session.match)
+    prnt_board(session.match, 0)
     return True
 
 
-def word_set(session, params):
+def word_level(session, params):
+    msg = "level blitz | low | medium | high"
     if(params == "?"):
-        print("set level blitz | low | medium | high")
-        print("set white-player Richard")
-        print("set black-player Hermann")
-        print("set white-human j | n")
-        print("set black-human j | n")
+        print(msg)
         return True
-
-    tokens = params.split(" ")
-
-    if(len(tokens) != 2):
-        print("??? params...")
-        return True
-
-    if(tokens[0] == "level"):
+    else:
         try:
-            session.match.level = session.match.LEVELS[tokens[1]]
+            session.match.level = session.match.LEVELS[params]
             session.match.seconds_per_move = session.match.SECONDS_PER_MOVE[session.match.level]
         except KeyError:
-            print("??? value")
-    elif(tokens[0] == "white-player"):
-        session.match.white_player.name = tokens[1]
-    elif(tokens[0] == "black-player"):
-        session.match.black_player.name = tokens[1]
-    elif(tokens[0] == "white-human"):
-        if(tokens[1] == "J" or tokens[1] == "j"):
-            session.match.white_player.is_human = True
-        else:
-            session.match.white_player.is_human = False
-            session.match.black_player.is_human = True
-    elif(tokens[0] == "black-human"):
-        if(tokens[1] == "J" or tokens[1] == "j"):
-            session.match.black_player.is_human = True
-        else:
-            session.match.black_player.is_human = False
-            session.match.white_player.is_human = True
-    else:
-        print("??? params...")
+            print("??? " + msg)
+    return True
 
+
+def word_human(session, params):
+    msg = "human white | black | all"
+    if(params == "?"):
+        print(msg)
+        return True
+    else:
+        if(params == "white"):
+            session.match.white_player.is_human = True
+        elif(params == "black"):
+            session.match.black_player.is_human = True
+        elif(params == "all"):
+            session.match.white_player.is_human = True
+            session.match.black_player.is_human = True
+        else:
+            print("??? " + msg)
+    return True
+
+
+def word_engine(session, params):
+    msg = "engine white | black | all"
+    if(params == "?"):
+        print(msg)
+        return True
+    else:
+        if(params == "white"):
+            session.match.white_player.is_human = False
+        elif(params == "black"):
+            session.match.black_player.is_human = False
+        elif(params == "all"):
+            session.match.white_player.is_human = False
+            session.match.black_player.is_human = False
+        else:
+            print("??? " + msg)
     return True
 
 
@@ -206,7 +179,7 @@ def word_move(session, params):
             prom_piece = matchobj.group("prom")
 
             valid = False
-            for piece in match.PIECES:
+            for piece in PIECES:
                 if(piece == prom_piece):
                     valid = True
                     break
@@ -239,7 +212,7 @@ def word_move(session, params):
 
     if(match.is_move_valid(srcx, srcy, dstx, dsty, PIECES[prom_piece])[0]):
         match.do_move(srcx, srcy, dstx, dsty, PIECES[prom_piece])
-        prnt_board(match)
+        prnt_board(match, 0)
     else:
         print("invalid move!")
 
@@ -248,8 +221,13 @@ def word_move(session, params):
 
 def word_undo(session, params):
     match = session.match
-    match.undo_move()
-    prnt_board(match)
+    if(len(params) > 0):
+        count = abs(int(params))
+    else:
+        count = 1
+    for i in range(count):
+        match.undo_move()
+    prnt_board(match, 0)
     if(match.evaluate_status() == match.STATUS['open']):
         match.status = match.STATUS['paused']
     return True
@@ -269,12 +247,9 @@ def word_list(session, params):
 
 def word_save(session, params):
     match = session.match
-
     counter = None
-
     if not os.path.isdir(immanuels_dir):
         os.makedirs(immanuels_dir)
-
     try:
         fobject = open(immanuels_dir + "/counter.txt", "r")
         data = fobject.read()
@@ -287,7 +262,6 @@ def word_save(session, params):
     fobject = open(immanuels_dir + "/counter.txt", "w")
     fobject.write(str(counter))
     fobject.close()    
-
     #----------------------------
     fobject = open(immanuels_dir + "/" + str(counter) + ".txt", "w")
 
@@ -298,7 +272,7 @@ def word_save(session, params):
     strboard = "board:"
     for y in range(8):
         for x in range(8):
-            strboard += reverse_lookup(PIECES, match.readfield(x, y))
+            strboard += reverse_lookup(PIECES, match.board.readfield(x, y))
     fobject.write(strboard + ";")
 
     fobject.write("movelistcnt:" + str(len(match.move_list)) + ";")
@@ -311,7 +285,6 @@ def word_save(session, params):
                 fobject.write(classattr.label + ":" + str(classattr.attribute) + ";")
     #----------------------------
     fobject.close()
-
     return True
 
 
@@ -323,7 +296,6 @@ def word_load(session, params):
         return True
 
     match = cMatch()
-
     tokens = fobject.read().split(";")
     index = 0
 
@@ -367,13 +339,12 @@ def word_load(session, params):
         for x in range(8):
             idx = (y * 24) + (x * 3)
             strfield = strboard[idx:idx+3]
-            match.writefield(x, y, PIECES[strfield])
+            match.board.writefield(x, y, PIECES[strfield])
     # -----------------------
 
     # -----------------------
     movecnt = int(tokens[index].replace("movelistcnt:", ""))
     index += 1
-    
     for i in range(movecnt):
         move = cMove()
         attributes = list_move_attributes(move)
@@ -395,22 +366,17 @@ def word_load(session, params):
                             value = int(strvalue)
                         except ValueError:
                             value = strvalue
-
                 setattr(move, classattr.label, value)
                 index += 1
-
         match.move_list.append(move)
         index += 1
     # -----------------------
 
     fobject.close()
-
     match.update_attributes()
     session.match = match
-    
     prnt_match_attributes(session.match, ", ")
-    prnt_board(session.match)
-
+    prnt_board(session.match, 0)
     return True
 
 
@@ -423,44 +389,39 @@ def word_delete(session, params):
     return True
 
 
-def word_set_board(session, params):
+def word_setup(session, params):
     match = session.match
-    status = match.evaluate_status()
-    if(status == match.STATUS['open'] or status == match.STATUS['paused']):
-        match.status = match.STATUS['set-board']
-        match.score = 0
-        match.board.clear()
-        match.move_list.clear()
-        prnt_match_attributes(match, ", ")
-        prnt_board(match)
-        print("set board started. - please set pieces.")
-    else:
-        print("wrong status")
+    match.status = match.STATUS['setup']
+    match.score = 0
+    match.board.clear()
+    match.move_list.clear()
+    prnt_match_attributes(match, ", ")
+    prnt_board(match, 0)
+    print("board setup started - please set pieces")
     return True
 
 
-def word_complete_board(session, params):
+def word_close(session, params):
     match = session.match
-    if(match.status == match.STATUS['set-board']):
+    if(match.status == match.STATUS['setup']):
         match.update_attributes()
         if(match.board.verify() == False):
             print("invalid position")
         else:
             match.status = match.STATUS['open']
             prnt_match_attributes(session.match, ", ")
-            prnt_board(match)
-            print("set board finished")
+            prnt_board(match, 0)
+            print("board setup finished")
     else:
         print("wrong status")
     return True
 
 
-def word_set_piece(session, params):
+def word_piece(session, params):
     match = session.match
 
-    if(match.status == match.STATUS['set-board']):
+    if(match.status == match.STATUS['setup']):
         tokens = params.split(" ")
-
         if(len(tokens) != 2):
             print("??? 2 params required.")
             return True
@@ -468,16 +429,16 @@ def word_set_piece(session, params):
         try:
             piece = PIECES[tokens[0]]
         except KeyError:
-            print("??? 1. param error.")
+            print("??? 1. param error")
             return True
 
         x, y = coord_to_index(tokens[1])
         if(match.board.is_inbounds(x, y) == False):
-            print("??? 2. param error.")
+            print("??? 2. param error")
             return True
         else:
             match.board.writefield(x, y, piece)
-            prnt_board(match)
+            prnt_board(match, 0)
     else:
         print("wrong status")
     return True
@@ -485,7 +446,6 @@ def word_set_piece(session, params):
 
 def word_debug(session, params):
     match = session.match
-
     king = cKing(match, match.board.wKg_x, match.board.wKg_y)
     print("wKg - is_king_safe: " + str(king.is_safe()))
     king = cKing(match, match.board.bKg_x, match.board.bKg_y)
