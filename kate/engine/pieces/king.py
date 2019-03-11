@@ -7,7 +7,6 @@ from . bishop import cBishop
 class cKing(cPiece):
     DIRS = { 'sh-castling' : 11, 'lg-castling' : 12, 'valid' : 13, 'undefined' : 14 }
     STEPS = [ [0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1] ]
-
     STEP_1N_X = 0
     STEP_1N_Y = 1
     STEP_1N1E_X = 1
@@ -28,7 +27,6 @@ class cKing(cPiece):
     STEP_SH_CASTLING_Y = 0
     STEP_LG_CASTLING_X = -2
     STEP_LG_CASTLING_Y = 0
-
     GEN_STEPS = [ [[0, 1, PIECES['blk']]],
                   [[1, 1, PIECES['blk']]],
                   [[1, 0, PIECES['blk']]], 
@@ -39,6 +37,7 @@ class cKing(cPiece):
                   [[-1, 1, PIECES['blk']]],
                   [[2, 0, PIECES['blk']]],
                   [[-2, 0, PIECES['blk']]] ]
+    MAXCNT = 1
 
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
@@ -259,54 +258,27 @@ class cKing(cPiece):
         self.match.writefield(self.xpos, self.ypos, self.piece)
         return True
 
-    #find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+    #find_attacks_and_supports(self, attacked, supported):
         # works with inherited class
-    """def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
-        from .. analyze_helper import list_field_touches_beyond
-        opp_color = self.match.oppcolor_of_piece(self.piece)
+
+    #forks(self):
+        # works with inherited class
+
+    """def move_defends_fork(self, dstx, dsty):
+        from .. analyze_helper import list_all_field_touches, is_fork_field
         for step in self.STEPS:
-            stepx = step[0]
-            stepy = step[1]
-            x1, y1 = self.match.search(dstx, dsty, stepx , stepy, 1)
-            if(x1):
-                if(x1 == self.xpos and y1 == self.ypos):
+            x1, y1 = self.match.search(dstx, dsty, step[0], step[1], self.MAXCNT)
+            if(x1 is not None):
+                if(x1 == dstx and y1 == dsty):
                     continue
                 piece = self.match.readfield(x1, y1)
-                if(self.match.color_of_piece(piece) == opp_color):
-                    ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
-                    attacked.append(ctouch_beyond)
-                    ###
-                    self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    list_field_touches_beyond(self.match, opp_color, ctouch_beyond)
-                    self.match.writefield(self.xpos, self.ypos, self.piece)
-                    ###
-                elif(self.match.color_of_piece(piece) == self.color):
-                    ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
-                    supported.append(ctouch_beyond)
-                    ###
-                    self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    list_field_touches_beyond(self.match, self.color, ctouch_beyond)
-                    self.match.writefield(self.xpos, self.ypos, self.piece)
-                    ###"""
-
-    def forks(self):
-        from .. analyze_helper import list_all_field_touches
-        count = 0
-        for step in self.STEPS:
-            x1 = self.xpos + step[0]
-            y1 = self.ypos + step[1]
-            if(self.match.is_move_inbounds(self.xpos, self.ypos, x1, y1)):
-                dstpiece = self.match.readfield(x1, y1)
-                if(self.match.color_of_piece(dstpiece) == REVERSED_COLORS[self.color]):
-                    friends, enemies = list_all_field_touches(self.match, self.match.color_of_piece(dstpiece), x1, y1)
-                    if(len(friends) == 0 or
-                       len(friends) < len(enemies)):
-                        count += 1
-        if(count >= 2):
-            return True
-        else:
-            return False
-
+                if(piece == PIECES['blk'] or 
+                   self.match.color_of_piece(piece) == self.color):
+                    frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
+                    if(len(frdlytouches) < len(enmytouches)):
+                        if(is_fork_field(self.match, x1, y1, REVERSED_COLORS[self.color])):
+                            return True
+        return False
     def move_defends_fork(self, dstx, dsty):
         from .. analyze_helper import list_all_field_touches, is_fork_field
         for step in self.STEPS:
@@ -327,24 +299,10 @@ class cKing(cPiece):
                     if(len(frdlytouches) < len(enmytouches)):
                         if(is_fork_field(self.match, x1, y1, REVERSED_COLORS[self.color])):
                             return True
-        return False
+        return False"""
 
     def move_controles_file(self, dstx, dsty):
         return False
-
-    def score_touches_ori(self):
-        from .. analyze_helper import list_all_field_touches
-        score = 0
-
-        for step in self.STEPS:
-            x1 = self.xpos + step[0]
-            y1 = self.ypos + step[1]
-            if(self.match.is_inbounds(x1, y1)):
-                touched = self.match.readfield(x1, y1)
-                if(touched == PIECES['blk']):
-                    continue
-                score += self.score_for_score_touches(touched, x1, y1)
-        return score
 
     def score_touches(self):
         return 0
@@ -360,7 +318,6 @@ class cKing(cPiece):
 
     def is_safe(self):
         from .. analyze_helper import list_all_field_touches
-
         count = 0
         for step in self.STEPS:
             x1 = self.xpos + step[0]
@@ -379,12 +336,10 @@ class cKing(cPiece):
         friends, enemies = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
         if(len(enemies) >= 2):
             return False
-
         for enemy in enemies:
             friends_beyond, enemies_beyond = list_all_field_touches(self.match, self.color, enemy.fieldx, enemy.fieldy)
             if(len(friends_beyond) >= len(enemies_beyond)):
                 continue
-
             direction = cRook.dir_for_move(self.xpos, self.ypos, enemy.fieldx, enemy.fieldy)
             if(direction != self.DIRS['undefined']):
                 step_x, step_y = cRook.step_for_dir(direction)

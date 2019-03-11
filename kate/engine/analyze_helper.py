@@ -92,23 +92,22 @@ def list_all_field_touches(match, color, fieldx, fieldy):
     return frdlytouches, enmytouches
 
 
-def list_field_touches_beyond(match, color, ctouch_beyond):
-    crookfield = rookfield.cRookField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-    crookfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
+def list_field_touches_beyond(match, color, ctouch):
+    crookfield = rookfield.cRookField(match, ctouch.fieldx, ctouch.fieldy)
+    crookfield.list_all_field_touches(color, ctouch.supporter_beyond, ctouch.attacker_beyond)
 
-    cbishopfield = bishopfield.cBishopField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-    cbishopfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
+    cbishopfield = bishopfield.cBishopField(match, ctouch.fieldx, ctouch.fieldy)
+    cbishopfield.list_all_field_touches(color, ctouch.supporter_beyond, ctouch.attacker_beyond)
 
-    cknightfield = knightfield.cKnightField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-    cknightfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
+    cknightfield = knightfield.cKnightField(match, ctouch.fieldx, ctouch.fieldy)
+    cknightfield.list_all_field_touches(color, ctouch.supporter_beyond, ctouch.attacker_beyond)
 
-    ckingfield = kingfield.cKingField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-    ckingfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
+    ckingfield = kingfield.cKingField(match, ctouch.fieldx, ctouch.fieldy)
+    ckingfield.list_all_field_touches(color, ctouch.supporter_beyond, ctouch.attacker_beyond)
 
-    cpawnfield = pawnfield.cPawnField(match, ctouch_beyond.fieldx, ctouch_beyond.fieldy)
-    cpawnfield.list_all_field_touches(color, ctouch_beyond.supporter_beyond, ctouch_beyond.attacker_beyond)
+    cpawnfield = pawnfield.cPawnField(match, ctouch.fieldx, ctouch.fieldy)
+    cpawnfield.list_all_field_touches(color, ctouch.supporter_beyond, ctouch.attacker_beyond)
 
-    return
 
 
 def list_field_touches(match, color, fieldx, fieldy):
@@ -178,6 +177,13 @@ def is_piece_le_attacker_on_srcfield(gmove, enmytouches_on_srcfield):
     piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
     for enmy in enmytouches_on_srcfield:
         if(PIECES_RANK[piece] > PIECES_RANK[enmy.piece]):
+            return False
+    return True
+
+
+def is_piece_lower_equal_than_pieces_in_ctouches(piece, ctouches):
+    for ctouch in ctouches:
+        if(PIECES_RANK[piece] > PIECES_RANK[ctouch.piece]):
             return False
     return True
 
@@ -287,3 +293,18 @@ def is_piece_lfe_captured(gmove):
         if(PIECES_RANK[captured_piece] == PIECES_RANK[PIECES['wPw']]):
             return False
     return True
+
+
+def is_fork_move(gmove, from_dstfield_attacked):
+    if(len(from_dstfield_attacked) < 2):
+        return False
+    count = 0
+    piece = gmove.match.readfield(gmove.srcx, gmove.srcy)
+    for attacked in from_dstfield_attacked:
+        if(PIECES_RANK[piece] < PIECES_RANK[attacked.piece]):
+            count += 1
+        elif(len(attacked.supporter_beyond) == 0 or
+           len(attacked.supporter_beyond) < len(attacked.attacker_beyond)):
+            count += 1
+    return count >= 2
+

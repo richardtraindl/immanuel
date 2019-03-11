@@ -14,7 +14,6 @@ class cPawn(cPiece):
              '2south' : 10,
              'valid' : 13,
              'undefined' : 14 }
-
     REVERSE_DIRS = { DIRS['north'] : DIRS['south'],
                      DIRS['south'] : DIRS['north'],
                      DIRS['north-east'] : DIRS['south-west'],
@@ -25,7 +24,6 @@ class cPawn(cPiece):
                      DIRS['2south'] : DIRS['2north'],
                      DIRS['valid']  : DIRS['valid'],
                      DIRS['undefined']  : DIRS['undefined'] }
-
     STEP_1N_X = 0
     STEP_1N_Y = 1
     STEP_2N_X = 0
@@ -42,7 +40,6 @@ class cPawn(cPiece):
     STEP_1S1E_Y = -1
     STEP_1S1W_X = -1
     STEP_1S1W_Y = -1
-    
     blk = 0
     wRk = 3
     wKn = 4
@@ -52,6 +49,7 @@ class cPawn(cPiece):
     bKn = 12
     bBp = 13
     bQu = 14 
+    MAXCNT = 1
 
     def __init__(self, match, xpos, ypos):
         super().__init__(match, xpos, ypos)
@@ -303,89 +301,32 @@ class cPawn(cPiece):
                 return True
         return False
 
-    #find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+    #find_attacks_and_supports(self, attacked, supported):
         # works with inherited class
-    """def find_attacks_and_supports(self, dstx, dsty, attacked, supported):
-        from .. analyze_helper import list_field_touches_beyond
 
-        opp_color = self.match.oppcolor_of_piece(self.piece)
+    #forks(self):
+        # works with inherited class
 
-        for step in self.STEPS:
-            x1 = dstx + step[0]
-            y1 = dsty + step[1]
-            if(self.match.is_inbounds(x1, y1)):
-                if(x1 == self.xpos and y1 == self.ypos):
-                    continue
+    #defends_fork(self)
+        # works with inherited class
 
-                piece = self.match.readfield(x1, y1)
-            
-                if(piece == PIECES['blk']):
-                    continue
-
-                cpawn = cPawn(self.match, dstx, dsty)
-                if(self.is_move_stuck(x1, y1)):
-                    continue
-
-                if(self.match.color_of_piece(piece) == opp_color):
-                    ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
-                    attacked.append(ctouch_beyond)
-                    ###
-                    self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    list_field_touches_beyond(self.match, opp_color, ctouch_beyond)
-                    self.match.writefield(self.xpos, self.ypos, self.piece)
-                    ###
-                else:
-                    if(piece == PIECES['wKg'] or piece == PIECES['bKg']):
-                        continue
-
-                    ctouch_beyond = cTouchBeyond(self.xpos, self.ypos, dstx, dsty, piece, x1, y1)
-                    supported.append(ctouch_beyond)
-                    ###
-                    self.match.writefield(self.xpos, self.ypos, PIECES['blk'])
-                    list_field_touches_beyond(self.match, self.color, ctouch_beyond)
-                    self.match.writefield(self.xpos, self.ypos, self.piece)
-                    ###"""
-
-    def forks(self):
-        from .. analyze_helper import list_all_field_touches
-        count = 0
-        for step in self.STEPS:
-            x1 = self.xpos + step[0]
-            y1 = self.ypos + step[1]
-            if(self.match.is_move_inbounds(self.xpos, self.ypos, x1, y1)):
-                if(self.is_move_stuck(x1, y1)):
-                    return False
-                dstpiece = self.match.readfield(x1, y1)
-                if(self.match.color_of_piece(dstpiece) == REVERSED_COLORS[self.color]):
-                    friends, enemies = list_all_field_touches(self.match, self.match.color_of_piece(dstpiece), x1, y1)
-                    if(len(friends) == 0 or
-                       len(friends) < len(enemies) or 
-                       PIECES_RANK[dstpiece] >= PIECES_RANK[self.piece]):
-                        count += 1
-        if(count >= 2):
-            return True
-        else:
-            return False
-
-    def move_defends_fork(self, dstx, dsty):
-        from .. analyze_helper import list_all_field_touches, is_fork_field
-        if(self.is_move_stuck(dstx, dsty)):
-            return False
-        for step in self.STEPS:
-            x1 = dstx + step[0]
-            y1 = dsty + step[1]
-            if(self.match.is_inbounds(x1, y1)):
-                piece = self.match.readfield(x1, y1)
-                if(piece == PIECES['blk'] or 
-                   self.match.color_of_piece(piece) == self.color):
-                    frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, x1, y1)
-                    if(len(frdlytouches) < len(enmytouches)):
-                        if(is_fork_field(self.match, x1, y1, REVERSED_COLORS[self.color])):
-                            return True
-        return False
+    #move_defends_fork(self, dstx, dsty)
+        # works with inherited class
 
     def move_controles_file(self, dstx, dsty):
         return False
+
+    #score_touches(self):
+        # works with inherited class
+
+    # list_moves(self):
+       # works with inherited class
+
+    # generate_moves(self):
+       # works with inherited class
+
+    # generate_priomoves(self):
+       # works with inherited class
 
     def is_running(self):
         if(self.color == COLORS['white']):
@@ -401,7 +342,7 @@ class cPawn(cPiece):
             y1 = self.ypos
             while(True):
                 x1, y1 = self.match.search(x1, y1, stepx, stepy)
-                if(x1):
+                if(x1 is not None):
                     piece = self.match.readfield(x1, y1)
                     if(piece == opp_pawn):
                         return False
@@ -409,70 +350,23 @@ class cPawn(cPiece):
                     break
         return True
 
-    def score_touches_ori(self):
-        from .. analyze_helper import list_all_field_touches
-        score = 0
-
-        frdlytouches, enmytouches = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
-        if(len(frdlytouches) < len(enmytouches)):
-            return score
-
-        for step in self.STEPS:
-            x1 = self.xpos + step[0]
-            y1 = self.ypos + step[1]
-            if(self.match.is_inbounds(x1, y1)):
-                touched = self.match.readfield(x1, y1)
-                if(touched == PIECES['blk']):
-                    continue
-                if(self.is_move_stuck(x1, y1)):
-                    """if(self.color == COLORS['white']):
-                        score += ATTACKED_SCORES[PIECES['wPw']]
-                    else:
-                        score += ATTACKED_SCORES[PIECES['bPw']]"""
-                    continue
-                score += self.score_for_score_touches(touched, x1, y1)
-                """if(self.match.color_of_piece(touched) == self.color):
-                    score += SUPPORTED_SCORES[touched]
-                    # extra score if supported is pinned
-                    if(self.match.is_soft_pin(x1, y1)[0]):
-                        score += SUPPORTED_SCORES[touched]
-                else:
-                    score += ATTACKED_SCORES[touched]
-                    # extra score if attacked is pinned
-                    if(self.match.is_soft_pin(x1, y1)[0]):
-                        score += ATTACKED_SCORES[touched]"""
-        return score
-
-    # list_moves(self):
-       # works with inherited class
-
-    # generate_moves(self):
-       # works with inherited class
-
-    # generate_priomoves(self):
-       # works with inherited class
-
     def is_weak(self):
         from .. analyze_helper import list_all_field_touches
-
         friends, enemies = list_all_field_touches(self.match, self.color, self.xpos, self.ypos)
         if(len(friends) >= len(enemies)):
             return False
-
         if(self.color == COLORS['white']):
             stepy = -1
         else:
             stepy = 1
-
         for i in range(2):
             if(i == 0):
                 newx = self.xpos + 1
             else:
                 newx = self.xpos - 1
-
             if(self.match.is_inbounds(newx, self.ypos)):
                 x1, y1 = self.match.search(newx, self.ypos, newx, stepy)
-                if(x1):
+                if(x1 is not None):
                     piece = self.match.readfield(x1, y1)
                     if((piece == PIECES['wPw'] or piece == PIECES['bPw']) and
                        self.color == self.match.color_of_piece(piece)):

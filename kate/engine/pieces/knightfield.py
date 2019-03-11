@@ -5,6 +5,8 @@ from .knight import cKnight
 
 
 class cKnightField(cPieceField):
+    MAXCNT = 1
+
     def __init__(self, match, fieldx, fieldy):
         super().__init__(match, fieldx, fieldy, [PIECES['wKn']], [PIECES['bKn']], [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]])
 
@@ -32,7 +34,7 @@ class cKnightField(cPieceField):
                             return True
         return False
 
-    def list_all_field_touches(self, color, frdlytouches, enmytouches):
+    """def list_all_field_touches(self, color, frdlytouches, enmytouches):
         for step in self.STEPS:
             x1 = self.fieldx + step[0]
             y1 = self.fieldy + step[1]
@@ -45,7 +47,7 @@ class cKnightField(cPieceField):
                     if(self.match.color_of_piece(piece) == color):
                         frdlytouches.append(cTouch(piece, x1, y1))
                     else:
-                        enmytouches.append(cTouch(piece, x1, y1))
+                        enmytouches.append(cTouch(piece, x1, y1))"""
 
     def list_field_touches(self, color):
         touches = []

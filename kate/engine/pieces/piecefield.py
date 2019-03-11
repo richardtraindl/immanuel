@@ -9,6 +9,8 @@ from .piece import cTouch
 
 
 class cPieceField:
+    MAXCNT = 7
+
     def __init__(self, match, fieldx, fieldy, white_faces, black_faces, STEPS):
         self.match = match
         self.fieldx = fieldx
@@ -72,8 +74,8 @@ class cPieceField:
         for step in self.STEPS:
             stepx = step[0]
             stepy = step[1]
-            x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1):
+            x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy, self.MAXCNT)
+            if(x1 is not None):
                 piece = self.match.readfield(x1, y1)
                 wflag = False
                 for face in self.white_faces:
@@ -87,12 +89,13 @@ class cPieceField:
                         break
                 if(wflag or bflag):
                     cpiece = self.obj_for_piece(piece, x1, y1)
-                    if(cpiece.is_move_stuck(self.fieldx, self.fieldy)):
-                        continue
-                    if(self.match.color_of_piece(piece) == color):
-                        frdlytouches.append(cTouch(piece, x1, y1))
-                    else:
-                        enmytouches.append(cTouch(piece, x1, y1))
+                    if(cpiece):
+                        if(cpiece.is_move_stuck(self.fieldx, self.fieldy)):
+                            continue
+                        if(self.match.color_of_piece(piece) == color):
+                            frdlytouches.append(cTouch(piece, x1, y1))
+                        else:
+                            enmytouches.append(cTouch(piece, x1, y1))
 
     def list_field_touches(self, color):
         touches = []
@@ -100,7 +103,7 @@ class cPieceField:
             stepx = step[0]
             stepy = step[1]
             x1, y1 = self.match.search(self.fieldx, self.fieldy, stepx, stepy)
-            if(x1):
+            if(x1 is not None):
                 piece = self.match.readfield(x1, y1)
                 cpiece = self.obj_for_piece(piece, x1, y1)
                 if(cpiece.is_move_stuck(self.fieldx, self.fieldy)):

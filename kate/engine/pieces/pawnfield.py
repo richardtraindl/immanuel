@@ -6,6 +6,8 @@ from .. move import cGenMove
 
 
 class cPawnField(cPieceField):
+    MAXCNT = 1
+
     def __init__(self, match, fieldx, fieldy):
         super().__init__(match, fieldx, fieldy, [PIECES['wPw']], [PIECES['bPw']], None)
         self.WHITE_BACK_STEPS = [ [1, -1], [-1, -1] ]

@@ -4,6 +4,8 @@ from .piece import cTouch
 
 
 class cKingField(cPieceField):
+    MAXCNT = 1
+
     def __init__(self, match, fieldx, fieldy):
         super().__init__(match, fieldx, fieldy, [PIECES['wKg']], [PIECES['bKg']], [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]])
 
@@ -19,7 +21,7 @@ class cKingField(cPieceField):
                     return True
         return False
 
-    def list_all_field_touches(self, color, frdlytouches, enmytouches):
+    """def list_all_field_touches(self, color, frdlytouches, enmytouches):
         for step in self.STEPS:
             x1 = self.fieldx + step[0]
             y1 = self.fieldy + step[1]
@@ -29,7 +31,7 @@ class cKingField(cPieceField):
                     if(self.match.color_of_piece(piece) == color):
                         frdlytouches.append(cTouch(piece, x1, y1))
                     else:
-                        enmytouches.append(cTouch(piece, x1, y1))
+                        enmytouches.append(cTouch(piece, x1, y1))"""
 
     def list_field_touches(self, color):
         touches = []

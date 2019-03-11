@@ -365,14 +365,14 @@ class cMatch:
             if(direction != self.DIRS['undefined']):
                 stepx, stepy = cpieces[idx].step_for_dir(direction)
                 dstx, dsty = self.search(srcx, srcy, stepx, stepy)
-                if(dstx):
+                if(dstx is not None):
                     piece = self.readfield(dstx, dsty)
                     if( (color == COLORS['white'] and piece == PIECES['wKg']) or
                         (color == COLORS['black'] and piece == PIECES['bKg']) ):
                         reverse_dir = self.REVERSE_DIRS[direction]
                         stepx, stepy = cpieces[idx].step_for_dir(reverse_dir)
                         dstx, dsty = self.search(srcx, srcy, stepx, stepy)
-                        if(dstx):
+                        if(dstx is not None):
                             piece = self.readfield(dstx, dsty)
                             if(color == COLORS['white']):
                                 if(piece == PIECES['bQu'] or piece == black_faces[idx]):
@@ -401,7 +401,7 @@ class cMatch:
             enemy_dir = cRook.dir_for_move(srcx, srcy, enemy.fieldx, enemy.fieldy)
             stepx, stepy = cRook.step_for_dir(self.REVERSE_DIRS[enemy_dir])
             x1, y1 = self.search(srcx, srcy, stepx, stepy)
-            if(x1):
+            if(x1 is not None):
                 friend = self.readfield(x1, y1)
                 if(self.color_of_piece(friend) == color and 
                    PIECES_RANK[friend] > PIECES_RANK[piece] and 
@@ -415,7 +415,7 @@ class cMatch:
             enemy_dir = cBishop.dir_for_move(srcx, srcy, enemy.fieldx, enemy.fieldy)
             stepx, stepy = cBishop.step_for_dir(self.REVERSE_DIRS[enemy_dir])
             x1, y1 = self.search(srcx, srcy, stepx, stepy)
-            if(x1):
+            if(x1 is not None):
                 friend = self.readfield(x1, y1)
                 if(self.color_of_piece(friend) == color and 
                    PIECES_RANK[friend] > PIECES_RANK[piece] and 

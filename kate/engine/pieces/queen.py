@@ -12,9 +12,7 @@ class cQueen(cPiece):
              'north-west' : 7,
              'south-east' : 8,
              'undefined'  : 14 }
-
     DIRS_ARY = [DIRS['north'], DIRS['south'], DIRS['east'], DIRS['west'], DIRS['north-east'], DIRS['south-west'], DIRS['north-west'], DIRS['south-east']]
- 
     REVERSE_DIRS = { DIRS['north']     : DIRS['south'],
                      DIRS['south']     : DIRS['north'],
                      DIRS['east']      : DIRS['west'],
@@ -24,9 +22,7 @@ class cQueen(cPiece):
                      DIRS['north-west'] : DIRS['south-east'],
                      DIRS['south-east'] : DIRS['north-west'],
                      DIRS['undefined']  : DIRS['undefined'] } 
-
     STEPS = [ [0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [-1, -1], [-1, 1], [1, -1] ]
-
     STEP_NORTH_X = 0
     STEP_NORTH_Y = 1
     STEP_SOUTH_X = 0
@@ -43,7 +39,6 @@ class cQueen(cPiece):
     STEP_NWEST_Y = 1
     STEP_SEAST_X = 1
     STEP_SEAST_Y = -1
-
     GEN_STEPS = [ [[0, 1, PIECES['blk']],   [0, 2, PIECES['blk']],   [0, 3, PIECES['blk']],   [0, 4, PIECES['blk']],   [0, 5, PIECES['blk']],   [0, 6, PIECES['blk']],   [0, 7, PIECES['blk']]],
                   [[0, -1, PIECES['blk']],  [0, -2, PIECES['blk']],  [0, -3, PIECES['blk']],  [0, -4, PIECES['blk']],  [0, -5, PIECES['blk']],  [0, -6, PIECES['blk']],  [0, -7, PIECES['blk']]],
                   [[1, 0, PIECES['blk']],   [2, 0, PIECES['blk']],   [3, 0, PIECES['blk']],   [4, 0, PIECES['blk']],   [5, 0, PIECES['blk']],   [6, 0, PIECES['blk']],   [7, 0, PIECES['blk']]],
@@ -116,13 +111,16 @@ class cQueen(cPiece):
     #undo_move(self, move)
         # works with inherited class
 
-    #find_attacks_and_supports(self, dstx, dsty, attacked, supported):
+    #find_attacks_and_supports(self, attacked, supported):
         # works with inherited class
 
     #forks(self)
         # works with inherited class
 
-    #move_defends_fork_field(self, dstx, dsty)
+    #defends_fork(self)
+        # works with inherited class
+
+    #move_defends_fork(self, dstx, dsty)
         # works with inherited class
 
     #move_controles_file(self, dstx, dsty)
