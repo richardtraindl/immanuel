@@ -63,34 +63,35 @@ def prnt_fmttime(msg, seconds):
 class SearchLimits:
     def __init__(self, match):
         self.add_mvcnt = 2
+        self.dpth_max = 20
         if(match.level == match.LEVELS['blitz']):
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 3
-            self.dpth_stage3 = 8
-            self.dpth_max = 20
-            self.mvcnt_stage1 = 12
-            self.mvcnt_stage2 = 0
-        elif(match.level == match.LEVELS['low']):
             self.dpth_stage1 = 2
             self.dpth_stage2 = 5
-            self.dpth_stage3 = 10
-            self.dpth_max = 20
-            self.mvcnt_stage1 = 12
+            self.dpth_stage3 = 8
+            self.mvcnt_stage1 = 8
             self.mvcnt_stage2 = 4
-        elif(match.level == match.LEVELS['medium']):
+            self.mvcnt_stage3 = 4
+        elif(match.level == match.LEVELS['low']):
             self.dpth_stage1 = 2
             self.dpth_stage2 = 6
             self.dpth_stage3 = 10
-            self.dpth_max = 20
+            self.mvcnt_stage1 = 12
+            self.mvcnt_stage2 = 4
+            self.mvcnt_stage3 = 4
+        elif(match.level == match.LEVELS['medium']):
+            self.dpth_stage1 = 3
+            self.dpth_stage2 = 7
+            self.dpth_stage3 = 10
             self.mvcnt_stage1 = 16
             self.mvcnt_stage2 = 8
+            self.mvcnt_stage3 = 6
         else: # high
             self.dpth_stage1 = 3
-            self.dpth_stage2 = 6
+            self.dpth_stage2 = 8
             self.dpth_stage3 = 12
-            self.dpth_max = 20
             self.mvcnt_stage1 = 20
             self.mvcnt_stage2 = 10
+            self.mvcnt_stage3 = 6
 
         if(match.is_endgame()):
             if(match.board.wQu_cnt == 0 and match.board.bQu_cnt == 0):
@@ -162,19 +163,20 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
 
     if(depth <= slimits.dpth_stage1):
         resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove, False)
-        count = count_up_to_prio(priomoves, 200) # cPrioMove.PRIO['prio3']
+        count = count_up_to_prio(priomoves, 300) # cPrioMove.PRIO['prio3']
         return min(slimits.mvcnt_stage1, count)
     elif(depth <= slimits.dpth_stage2):
         resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove, False)
-        count = count_up_to_prio(priomoves, 200) # cPrioMove.PRIO['prio2']
+        count = count_up_to_prio(priomoves, 250) # cPrioMove.PRIO['prio2']
         return min(slimits.mvcnt_stage2, count)
     else:
         if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio0'], last_pmove, True)):
             count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio0'])
-            if(depth <= slimits.dpth_stage3):
+            return min(slimits.mvcnt_stage3, count)
+            """if(depth <= slimits.dpth_stage3):
                 return count
             else:
-                return min(2, count)
+                return min(2, count)"""
         else:
             return 0
 

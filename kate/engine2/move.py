@@ -252,7 +252,8 @@ class cPrioMove:
                tactitem.subtactic == self.SUB_TACTICS['urgent'] or
                ((tactitem.tactic == self.TACTICS['promotes'] or
                  tactitem.tactic == self.TACTICS['captures']) and 
-                tactitem.subtactic == self.SUB_TACTICS['good-deal'])):
+                (tactitem.subtactic == self.SUB_TACTICS['better-deal'] or
+                 tactitem.subtactic == self.SUB_TACTICS['good-deal']))):
                 return True
         return False
 

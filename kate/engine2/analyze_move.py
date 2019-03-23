@@ -573,7 +573,8 @@ def rank_gmoves(match, pmoves, last_pmove, dbggmove, dbgprio):
                         pmove.tactics.append(cTactic(pmove.TACTICS['attacks-king'], subtactic))
                 elif((subtactic == pmove.SUB_TACTICS['good-deal'] or subtactic == pmove.SUB_TACTICS['better-deal'])):
                     if(PIECES_RANK[piece] <= PIECES_RANK[attacked.piece] or 
-                       len(attacked.supporter_beyond) == 0): #  or is_attacked_soft_pinned(gmove, piece, attacked)
+                       len(attacked.supporter_beyond) == 0 or 
+                       match.is_soft_pin(attacked.fieldx, attacked.fieldy)[0]): 
                         pmove.tactics.append(cTactic(pmove.TACTICS['attacks'], pmove.SUB_TACTICS['stormy']))
                     else:
                         pmove.tactics.append(cTactic(pmove.TACTICS['attacks'], pmove.SUB_TACTICS['bad-deal']))
