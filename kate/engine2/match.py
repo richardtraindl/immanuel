@@ -361,7 +361,7 @@ class cMatch:
                     if(self.color_of_piece(friend) == color and 
                        PIECES_RANK[friend] > PIECES_RANK[piece] and 
                        PIECES_RANK[friend] > PIECES_RANK[enemy.piece]):
-                        return True, enemy
+                        return True, enemy_dir
         enemies.clear()
         enemies = cSearchForBishop.list_field_touches(self, srcx, srcy, opp_color) 
         for enemy in enemies:
@@ -374,7 +374,7 @@ class cMatch:
                     if(self.color_of_piece(friend) == color and 
                        PIECES_RANK[friend] > PIECES_RANK[piece] and 
                        PIECES_RANK[friend] > PIECES_RANK[enemy.piece]):
-                        return True, enemy
+                        return True, enemy_dir
         return False, None
 
     def is_discovered_attack(self, srcx, srcy):

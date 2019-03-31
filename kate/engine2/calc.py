@@ -39,8 +39,10 @@ def prnt_priomoves(match, priomoves, last_pmove):
     is_exchange = resort_exchange_or_stormy_moves(priomoves, 0, last_pmove, True)
     print("------------------------------------------------")
     print("is_exchange: " + str(is_exchange))
+    idx = 1
     for priomove in priomoves:
-        if(priomove.prio <= cPrioMove.PRIO['prio0']):
+        print(str(idx), end=".")
+        """if(priomove.prio <= cPrioMove.PRIO['prio0']):
             print("----------prio0---------------------------------")
         elif(priomove.prio <= cPrioMove.PRIO['prio1']):
             print("----------prio1---------------------------------")
@@ -49,9 +51,10 @@ def prnt_priomoves(match, priomoves, last_pmove):
         elif(priomove.prio <= cPrioMove.PRIO['prio3']):
             print("----------prio3---------------------------------")
         else:
-            print("----------> prio3--------------------------------")
+            print("----------> prio3--------------------------------")"""
         print(priomove.gmove.format_genmove() + " prio: " + str(priomove.prio) + " is_tactic_stormy: " + str(priomove.is_tactic_stormy()))
         priomove.prnt_tactics()
+        idx += 1
 
 
 def prnt_fmttime(msg, seconds):
@@ -69,29 +72,29 @@ class SearchLimits:
             self.dpth_stage2 = 5
             self.dpth_stage3 = 8
             self.mvcnt_stage1 = 8
-            self.mvcnt_stage2 = 4
-            self.mvcnt_stage3 = 4
+            self.mvcnt_stage2 = 5
+            self.mvcnt_stage3 = 3
         elif(match.level == match.LEVELS['low']):
-            self.dpth_stage1 = 2
+            self.dpth_stage1 = 3
+            self.dpth_stage2 = 6
+            self.dpth_stage3 = 10
+            self.mvcnt_stage1 = 10
+            self.mvcnt_stage2 = 4
+            self.mvcnt_stage3 = 2
+        elif(match.level == match.LEVELS['medium']):
+            self.dpth_stage1 = 4
             self.dpth_stage2 = 6
             self.dpth_stage3 = 10
             self.mvcnt_stage1 = 12
-            self.mvcnt_stage2 = 4
+            self.mvcnt_stage2 = 6
             self.mvcnt_stage3 = 4
-        elif(match.level == match.LEVELS['medium']):
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 7
-            self.dpth_stage3 = 10
-            self.mvcnt_stage1 = 16
-            self.mvcnt_stage2 = 8
-            self.mvcnt_stage3 = 6
         else: # high
-            self.dpth_stage1 = 3
-            self.dpth_stage2 = 8
+            self.dpth_stage1 = 4
+            self.dpth_stage2 = 6
             self.dpth_stage3 = 12
-            self.mvcnt_stage1 = 20
-            self.mvcnt_stage2 = 10
-            self.mvcnt_stage3 = 6
+            self.mvcnt_stage1 = 16
+            self.mvcnt_stage2 = 6
+            self.mvcnt_stage3 = 4
 
         if(match.is_endgame()):
             if(match.board.wQu_cnt == 0 and match.board.bQu_cnt == 0):
@@ -157,26 +160,25 @@ def resort_exchange_or_stormy_moves(priomoves, new_prio, last_pmove, only_exchan
 def select_maxcount(match, priomoves, depth, slimits, last_pmove):
     if(len(priomoves) == 0 or depth > slimits.dpth_max):
         return 0
-
     if(depth <= slimits.dpth_stage1 and priomoves[0].has_domain_tactic(cPrioMove.TACTICS['defends-check'])):
         return len(priomoves)
 
     if(depth <= slimits.dpth_stage1):
         resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove, False)
-        count = count_up_to_prio(priomoves, 300) # cPrioMove.PRIO['prio3']
+        count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio2'])
         return min(slimits.mvcnt_stage1, count)
     elif(depth <= slimits.dpth_stage2):
         resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio1'], last_pmove, False)
-        count = count_up_to_prio(priomoves, 250) # cPrioMove.PRIO['prio2']
+        count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio1'])
         return min(slimits.mvcnt_stage2, count)
     else:
         if(resort_exchange_or_stormy_moves(priomoves, cPrioMove.PRIO['prio0'], last_pmove, True)):
             count = count_up_to_prio(priomoves, cPrioMove.PRIO['prio0'])
-            return min(slimits.mvcnt_stage3, count)
-            """if(depth <= slimits.dpth_stage3):
+            if(depth <= slimits.dpth_stage3):
                 return count
             else:
-                return min(2, count)"""
+                return min(slimits.mvcnt_stage3, count)
+                #return min(2, count)
         else:
             return 0
 
@@ -195,8 +197,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
 
     cgenerator = cGenerator(match)
     priomoves = cgenerator.generate_priomoves()
-    gmove = cGenMove(match, 2, 3, 1, 4, None)
-    rank_gmoves(match, priomoves, last_pmove, gmove, 1)
+    #gmove = cGenMove(match, 1, 7, 3, 6, None)
+    search_deep_check_mate = depth <= slimits.dpth_stage1
+    rank_gmoves(match, priomoves, last_pmove, search_deep_check_mate, None, 1)
     maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 
     if(depth == 1):

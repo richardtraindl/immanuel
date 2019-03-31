@@ -112,8 +112,8 @@ class cPrioMove:
     PRIO = {
         'prio0' : 100,
         'prio1' : 150,
-        'prio2' : 250,
-        'prio3' : 300 }
+        'prio2' : 200,
+        'prio3' : 250 }
 
     TACTICS = {
         'defends-check' :         10,
@@ -139,12 +139,11 @@ class cPrioMove:
 
     SUB_TACTICS = {
         'stormy' : 1,
-        'urgent' : 2,
-        'better-deal' : 3,
-        'good-deal' : 4,
-        'downgraded' : 5,
-        'upgraded' : 6,
-        'bad-deal' : 7 }
+        'better-deal' : 2,
+        'good-deal' : 3,
+        'downgraded' : 4,
+        'upgraded' : 5,
+        'bad-deal' : 6 }
 
     TACTICS_TO_PRIO = {
         ### level 1 ###
@@ -173,7 +172,6 @@ class cPrioMove:
 
     SUB_TACTICS_TO_ADJUST = {
         SUB_TACTICS['stormy'] : -70,
-        SUB_TACTICS['urgent'] : -70,
         SUB_TACTICS['better-deal'] : -10,
         SUB_TACTICS['good-deal'] : 0,
         SUB_TACTICS['upgraded'] : 0,
@@ -185,13 +183,13 @@ class cPrioMove:
         self.tactics = []
         self.prio = prio
 
-    def evaluate_priorities(self, piece):
+    def evaluate_priorities(self, piece, dstpiece):
         count = 0
         self.prio = self.PRIO['prio3']
         if(self.tactics):
             for tactitem in self.tactics:
                 if(tactitem.tactic == self.TACTICS['captures']):
-                    adjust = PIECES_RANK[piece] % 10
+                    adjust = PIECES_RANK[piece] + (PIECES_RANK[dstpiece] * -1)
                 else:
                     adjust = 0
                 prio_new = self.TACTICS_TO_PRIO[tactitem.tactic] + \
@@ -199,14 +197,13 @@ class cPrioMove:
                            adjust
                 self.prio = min(self.prio, prio_new)
                 if(tactitem.subtactic <= self.SUB_TACTICS['downgraded']):
-                    count += 1
+                    count += 2
             self.prio -= count
 
     def downgrade(self, domain_tactic):
         for tactic in self.tactics:
             if(tactic.tactic == domain_tactic):
                 if(tactic.subtactic == self.SUB_TACTICS['stormy'] or
-                   tactic.subtactic == self.SUB_TACTICS['urgent'] or 
                    tactic.subtactic == self.SUB_TACTICS['better-deal'] or
                    tactic.subtactic == self.SUB_TACTICS['good-deal']):
                     tactic.subtactic = self.SUB_TACTICS['downgraded']
@@ -216,7 +213,6 @@ class cPrioMove:
         for tactic in self.tactics:
             if(tactic.tactic == domain_tactic):
                 if(tactic.subtactic != self.SUB_TACTICS['stormy'] and 
-                   tactic.subtactic != self.SUB_TACTICS['urgent'] and 
                    tactic.subtactic != self.SUB_TACTICS['better-deal'] and 
                    tactic.subtactic != self.SUB_TACTICS['good-deal']):
                     tactic.subtactic = self.SUB_TACTICS['upgraded']
@@ -249,7 +245,6 @@ class cPrioMove:
     def is_tactic_stormy(self):
         for tactitem in self.tactics:
             if(tactitem.subtactic == self.SUB_TACTICS['stormy'] or
-               tactitem.subtactic == self.SUB_TACTICS['urgent'] or
                ((tactitem.tactic == self.TACTICS['promotes'] or
                  tactitem.tactic == self.TACTICS['captures']) and 
                 (tactitem.subtactic == self.SUB_TACTICS['better-deal'] or
