@@ -163,6 +163,7 @@ class ImmanuelsThread(threading.Thread):
             modelmove = ModelMove()
             modelmove.match = modelmatch
             map_moves(move, modelmove)
+            modelmove.match = modelmatch
             modelmove.save()
             if(len(candidates) >= 3):
                 cache.set(self.match.id, candidates[1:3])
