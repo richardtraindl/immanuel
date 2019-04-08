@@ -81,7 +81,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 ALLOWED_HOSTS = ['*']
 
-#WSGI_APPLICATION = 'immanuel.wsgi.application'
+WSGI_APPLICATION = 'immanuel.wsgi.application'
 
 DEBUG = False
 
