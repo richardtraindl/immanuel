@@ -1,11 +1,11 @@
 import re, os, threading, copy
-from engine.values import *
-from engine.match import *
-from engine.move import *
-from engine.calc import calc_move
-from engine.pieces.king import cKing
-from engine.debug import prnt_match_attributes, prnt_matches_diff, prnt_board, list_match_attributes, list_move_attributes
-from engine.helper import coord_to_index, reverse_lookup
+from engine2.values import *
+from engine2.match import *
+from engine2.move import *
+from engine2.calc import calc_move
+from engine2.pieces.king import cKing
+from engine2.debug import prnt_match_attributes, prnt_board, list_match_attributes, list_move_attributes
+from engine2.helper import coord_to_index, reverse_lookup
 
 
 dictionary = []
@@ -49,23 +49,32 @@ class CalcThread(threading.Thread):
     def __init__(self, session):
         threading.Thread.__init__(self)
         self.session = session
-        self.calc_match = copy.deepcopy(session.match)
+        self.match = copy.deepcopy(session.match)
 
     def run(self):
         self.session.thread_is_busy = True
         print("Thread starting...")
-        match2 = copy.deepcopy(self.calc_match)
-        candidates = calc_move(self.calc_match)
-        print("prnt_matches_diff")
-        prnt_matches_diff(self.calc_match, match2)
-        print("prnt_matches_diff")
+        second_candidate = None
+        if(len(self.match.move_list) > 0 and len(self.session.candidate_list) >= 2):
+            last_move = self.match.move_list[-1]
+            first_candidate = self.session.candidate_list[0]
+            if(first_candidate.srcx == last_move.srcx and
+               first_candidate.srcy == last_move.srcy and
+               first_candidate.dstx == last_move.dstx and
+               first_candidate.dsty == last_move.dsty and
+               first_candidate.prom_piece == last_move.prom_piece):
+                second_candidate = self.session.candidate_list[1]
+        candidates = calc_move(self.match, second_candidate)
+        self.session.candidate_list.clear()
         if(len(candidates) > 0):
             gmove = candidates[0]
             self.session.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
+            if(len(candidates) >= 3):
+                self.session.candidate_list.append(candidates[1])
+                self.session.candidate_list.append(candidates[2])
             prnt_board(self.session.match, 0)
         else:
             print("no move found!")
-
         self.session.thread_is_busy = False
 
 

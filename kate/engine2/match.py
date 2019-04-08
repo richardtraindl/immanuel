@@ -79,6 +79,7 @@ class cMatch:
         self.black_player = cPlayer(COLORS['black'], "Hermann", True, 0)
         self.board = cBoard()
         self.move_list = []
+        self.candidate_list = []
 
     def update_attributes(self):
         self.seconds_per_move = self.SECONDS_PER_MOVE[self.level]

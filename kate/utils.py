@@ -1,6 +1,6 @@
-from .engine.helper import index_to_coord, reverse_lookup
-from .engine.values import *
-from .engine.match import *
+from .engine2.helper import index_to_coord, reverse_lookup
+from .engine2.values import *
+from .engine2.match import *
 
 
 def preformat_board(board, switch):

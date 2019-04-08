@@ -1,9 +1,9 @@
 from django.db import models
 from django.utils import timezone
-from kate.engine.values import *
-from kate.engine.match import *
-from kate.engine.move import *
-from kate.engine import helper
+from kate.engine2.values import *
+from kate.engine2.match import *
+from kate.engine2.move import *
+from kate.engine2 import helper
 
 
 class Match(models.Model):

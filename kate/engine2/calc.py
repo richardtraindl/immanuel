@@ -183,7 +183,7 @@ def select_maxcount(match, priomoves, depth, slimits, last_pmove):
             return 0
 
 
-def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
+def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove, candidate):
     color = match.next_color()
     candidates = []
     newcandidates = []
@@ -199,7 +199,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
     priomoves = cgenerator.generate_priomoves()
     #gmove = cGenMove(match, 1, 7, 3, 6, None)
     search_deep_check_mate = depth <= slimits.dpth_stage1
-    rank_gmoves(match, priomoves, last_pmove, search_deep_check_mate, None, 1)
+    rank_gmoves(match, priomoves, last_pmove, search_deep_check_mate, candidate, None, 1)
     maxcnt = select_maxcount(match, priomoves, depth, slimits, last_pmove)
 
     if(depth == 1):
@@ -234,9 +234,9 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
         else:
             match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
             if(maximizing):
-                newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove)
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, maxscore, beta, False, priomove, None)
             else:
-                newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove)
+                newscore, newcandidates = alphabeta(match, depth + 1, slimits, alpha, minscore, True, priomove, None)
             match.undo_move()
 
         if(maximizing):
@@ -287,7 +287,7 @@ def alphabeta(match, depth, slimits, alpha, beta, maximizing, last_pmove):
         return minscore, candidates
 
 
-def calc_move(match):
+def calc_move(match, candidate):
     print("movecnt " + str(match.movecnt()))
     if(match.is_opening()):
         msg = "is opening"
@@ -312,7 +312,7 @@ def calc_move(match):
         maximizing = match.next_color() == COLORS['white']
         alpha = SCORES[PIECES['wKg']] * 10
         beta = SCORES[PIECES['bKg']] * 10 
-        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None)
+        score, candidates = alphabeta(match, 1, slimits, alpha, beta, maximizing, None, candidate)
 
     ### time
     elapsed_time = time.time() - match.time_start

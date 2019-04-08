@@ -1,7 +1,7 @@
 from django import template
 import datetime
-from kate.engine.match import *
-from kate.engine import helper
+from kate.engine2.match import *
+from kate.engine2 import helper
 
 register = template.Library()
 

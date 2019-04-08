@@ -7,6 +7,7 @@ class Session:
         self.thread = None
         self.thread_is_busy = False
         self.match = match
+        self.candidate_list = []
 
 
 def interpret(session, inputstr):

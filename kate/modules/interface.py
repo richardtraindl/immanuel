@@ -1,5 +1,6 @@
 import random, threading, copy, time
 from django.conf import settings
+from django.core.cache import cache
 from .. models import Match as ModelMatch, Move as ModelMove
 from .. engine2.values import *
 from .. engine2.match import *
@@ -140,7 +141,19 @@ class ImmanuelsThread(threading.Thread):
 
     def run(self):
         print("Thread starting " + str(self.name))
-        candidates = calc.calc_move(self.match)
+        candidate_list = cache.get(self.match.id)
+        second_candidate = None
+        if(len(self.match.move_list) > 0 and candidate_list and len(candidate_list) >= 2):
+            last_move = self.match.move_list[-1]
+            first_candidate = candidate_list[0]
+            if(first_candidate.srcx == last_move.srcx and
+               first_candidate.srcy == last_move.srcy and
+               first_candidate.dstx == last_move.dstx and
+               first_candidate.dsty == last_move.dsty and
+               first_candidate.prom_piece == last_move.prom_piece):
+                second_candidate = candidate_list[1]
+        cache.set(self.match.id, None)
+        candidates = calc.calc_move(self.match, second_candidate)
         if(len(candidates) > 0):
             gmove = candidates[0]
             move = self.match.do_move(gmove.srcx, gmove.srcy, gmove.dstx, gmove.dsty, gmove.prom_piece)
@@ -150,8 +163,9 @@ class ImmanuelsThread(threading.Thread):
             modelmove = ModelMove()
             modelmove.match = modelmatch
             map_moves(move, modelmove)
-            modelmove.match = modelmatch
             modelmove.save()
+            if(len(candidates) >= 3):
+                cache.set(self.match.id, candidates[1:3])
             print("move saved")
         else:
             print("no move found or thread outdated!")

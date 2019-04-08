@@ -503,7 +503,7 @@ def is_progress(gmove):
         return False
 
 
-def rank_gmoves(match, pmoves, last_pmove, search_deep_check_mate, dbggmove, dbgprio):
+def rank_gmoves(match, pmoves, last_pmove, search_deep_check_mate, candidate, dbggmove, dbgprio):
     all_attacking = []
     all_supporting = []
     all_fork_defending = []
@@ -534,6 +534,13 @@ def rank_gmoves(match, pmoves, last_pmove, search_deep_check_mate, dbggmove, dbg
         is_soft_pinned_after_mv, enemy_dir_after_mv = match.is_soft_pin(gmove.dstx, gmove.dsty)
         match.undo_move()"""
 
+        if(candidate):
+            if(candidate.srcx == gmove.srcx and
+               candidate.srcy == gmove.srcy and
+               candidate.dstx == gmove.dstx and
+               candidate.dsty == gmove.dsty and
+               candidate.prom_piece == gmove.prom_piece):
+                pmove.tactics.append(cTactic(pmove.TACTICS['prev-candidate'], pmove.SUB_TACTICS['good-deal']))
 
         if((PIECES_RANK[piece] <= PIECES_RANK[dstpiece] or lowest_enemy_on_dstfield is None) and 
            (is_soft_pinned_before_mv == False or is_mv_within_soft_pinned_dirs)):
@@ -545,7 +552,7 @@ def rank_gmoves(match, pmoves, last_pmove, search_deep_check_mate, dbggmove, dbg
             subtactic = pmove.SUB_TACTICS['good-deal']
         else:
             subtactic = pmove.SUB_TACTICS['bad-deal']
-
+            
         if(defends_check(match)):
             pmove.tactics.append(cTactic(pmove.TACTICS['defends-check'], subtactic))
 
@@ -681,7 +688,7 @@ def rank_gmoves(match, pmoves, last_pmove, search_deep_check_mate, dbggmove, dbg
 
         if(len(pmove.tactics) > 0):
             pmove.evaluate_priorities(piece, dstpiece)
-
+            
     all_attacking.sort(key=attrgetter('prio'))
     for pmove in all_attacking:
         if(any(e[0] == pmove.gmove.srcx and e[1] == pmove.gmove.srcy for e in excludes) == False):

@@ -131,11 +131,12 @@ class cPrioMove:
         'blocks' :                130,
         'promotes' :              140, 
         'is-tactical-draw' :      150,
-        'is-running-pawn' :       160, 
-        'controles-file' :        170,
-        'castles' :               180,
-        'is-progress' :           190,
-        'is-undefined' :          200 }
+        'prev-candidate' :        160,
+        'is-running-pawn' :       170, 
+        'controles-file' :        180,
+        'castles' :               190,
+        'is-progress' :           200,
+        'is-undefined' :          210 }
 
     SUB_TACTICS = {
         'stormy' : 1,
@@ -152,6 +153,7 @@ class cPrioMove:
         TACTICS['is-running-pawn'] :        92,
         TACTICS['is-tactical-draw'] :       93,
         TACTICS['defends-check']  :         94,
+        TACTICS['prev-candidate']  :        95,
         ### level 2 ###
         TACTICS['castles'] :                200,
         TACTICS['attacks-king'] :           201,
